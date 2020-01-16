@@ -70,7 +70,7 @@ const App = () => {
       <GlobalStyle />
       <Switch>
         <Route exact path="/coordinators">
-          <CoordinatorPage />
+          <AboutSection />
         </Route>
         <Route exact path="/ceremony/:id">
           <CeremonyPage />
@@ -96,7 +96,7 @@ const Tabs = (props: { children: ReactNode; titles: string[] }) => {
         ))}
       </div>
 
-      {props.children[selectedTitleIndex]}
+      <SectionContainer>{props.children[selectedTitleIndex]}</SectionContainer>
     </>
   );
 };
@@ -107,7 +107,11 @@ const LandingPage = () => {
       <LandingPageTitle>ZK Party</LandingPageTitle>
 
       <Tabs titles={["Participants", "Coordinators", "About"]}>
-        {[<ParticipantsSection key="participants" />]}
+        {[
+          <ParticipantsSection key="participants" />,
+          <CoordinatorsSection key="coordinators" />,
+          <AboutSection key="about" />
+        ]}
       </Tabs>
     </LandingPageContainer>
   );
@@ -119,6 +123,15 @@ const ParticipantsSection = () => {
         <CeremonySummary key={i} ceremony={c} />
       ))}
     </>
+  );
+};
+
+const CoordinatorsSection = () => {
+  return (
+    <div>
+      wecome to zkparty ... <br />
+      <input type="button" value="register" />
+    </div>
   );
 };
 
@@ -134,14 +147,8 @@ const CeremonyPage = (props: RouteProps) => {
   );
 };
 
-const CoordinatorPage = () => {
-  return (
-    <div>
-      <Link to="/"> home</Link>
-      <br />
-      this is the coordinators page
-    </div>
-  );
+const AboutSection = () => {
+  return <div>this is the about</div>;
 };
 
 const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
@@ -215,6 +222,11 @@ const TabLink = styled.span`
     `;
   }}
 `;
+
+const SectionContainer = styled.div`
+  margin-top: 32px;
+`;
+
 const div = document.createElement("div");
 document.body.appendChild(div);
 ReactDOM.render(<App></App>, div);
