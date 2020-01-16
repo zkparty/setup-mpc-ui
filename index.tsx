@@ -138,17 +138,97 @@ const CoordinatorsSection = () => {
 const CeremonyPage = (props: RouteProps) => {
   let { id } = useParams();
 
-  let a = [1, 2, 3];
+  let participants = [
+    {
+      online: true,
+      address: "ofdlajfho2hpqui34hfqliufhasdkajbdkjasbd",
+      org: "EF",
+      status: "Complete"
+    },
+    {
+      online: true,
+      address: "ofdlajfho2hpqui34hfqliufh",
+      org: "EF",
+      status: "Complete"
+    },
+    {
+      online: true,
+      address: "ofdlajfho2hpqui34hfqliufh",
+      org: "EF",
+      status: "Complete"
+    },
+    {
+      online: true,
+      address: "ofdlajfho2hpqui34hfqliufh",
+      org: "EF",
+      status: "Complete"
+    }
+  ];
 
   return (
     <PageContainer>
       <Link to="/"> home</Link>
       <br />
       This is the ceremony page for the ceremony of id: {id}
-      {a.map(a => (
-        <Participant></Participant>
-      ))}
+      <ParticipantTable
+        participants={participants}
+        headers={[
+          { title: "online?", width: "100px" },
+          { title: "address", width: "200px" },
+          { title: "org", width: "100px" },
+          { title: "status", width: "50px" }
+        ]}
+      />
     </PageContainer>
+  );
+};
+
+interface ParticipantInfo {
+  online: boolean;
+  address: string;
+  org: string;
+  status: string;
+}
+
+const ParticipantTable = (props: {
+  participants: ParticipantInfo[];
+  headers: { title: string; width: string }[];
+}) => {
+  return (
+    <div>
+      <br />
+      {props.headers.map(header => {
+        return (
+          <span style={{ width: header.width, display: "inline-block" }}>
+            {header.title}
+          </span>
+        );
+      })}
+      <br />
+      <br />
+
+      {props.participants.map((p, i) => (
+        <ParticipantContainer key={i}>
+          <ProgressBar />
+
+          {[p.online, p.address, p.org, p.status].map((content, i) => {
+            return (
+              <span
+                style={{
+                  width: props.headers[i].width,
+                  maxWidth: props.headers[i].width,
+                  overflow: "hidden",
+                  textOverflow: "ellipses",
+                  display: "inline-block"
+                }}
+              >
+                {content}
+              </span>
+            );
+          })}
+        </ParticipantContainer>
+      ))}
+    </div>
   );
 };
 
@@ -173,29 +253,23 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
   );
 };
 
-const Participant = () => {
-  return (
-    <ParticipantContainer>
-      <ProgressBar />
-    </ParticipantContainer>
-  );
-};
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 const ParticipantContainer = styled.div`
-  width: 512px;
   position: relative;
   height: 32px;
   background-color: purple;
-  margin: 8px;
+  margin-bottom: 8px;
 `;
 
 const ProgressBar = styled.div`
   width: 33%;
   position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
   background-color: green;
+  z-index: 1;
 `;
 
 const PageContainer = styled.div`
