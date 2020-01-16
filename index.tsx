@@ -5,11 +5,14 @@ import {
   Switch,
   Route,
   Link,
-  HashRouter
+  HashRouter,
+  RouteProps,
+  useParams
 } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
 
 interface Ceremony {
+  id: string;
   title: string;
   description: string;
   start: string;
@@ -18,6 +21,7 @@ interface Ceremony {
 
 const ceremonies: Ceremony[] = [
   {
+    id: "one",
     title: "goblin",
     description:
       "Ingredients. 1 1/2 cups (355 ml) warm water (105°F-115°F) 1 package (2 1/4 teaspoons) of active dry yeast. 3 3/4 cups (490 g) bread flour. 2 tablespoons extra virgin olive oil (omit if cooking pizza in a wood-fired pizza oven) 2 teaspoons salt. 1 teaspoon sugar.",
@@ -25,6 +29,7 @@ const ceremonies: Ceremony[] = [
     end: "2020-01-17"
   },
   {
+    id: "two",
     title: "this is a test ceremony",
     description:
       "noun a flowerless plant which has feathery or leafy fronds and reproduces by spores released from the undersides of the fronds. Ferns have a vascular system for the transport of water and nutrients.",
@@ -32,18 +37,21 @@ const ceremonies: Ceremony[] = [
     end: "2020-01-17"
   },
   {
+    id: "three",
     title: "pandas are kinda the best",
     description: "test description",
     start: "2020-01-16",
     end: "2020-01-17"
   },
   {
+    id: "four",
     title: "zk snark test ceremony",
     description: "test description",
     start: "2020-01-16",
     end: "2020-01-17"
   },
   {
+    id: "five",
     title: "fluffy shmufy",
     description: "test description",
     start: "2020-01-16",
@@ -59,7 +67,7 @@ const App = () => {
         <Route exact path="/coordinators">
           <CoordinatorPage />
         </Route>
-        <Route exact path="/ceremony">
+        <Route exact path="/ceremony/:id">
           <CeremonyPage />
         </Route>
         <Route exact path="/">
@@ -74,19 +82,21 @@ const LandingPage = () => {
   return (
     <LandingPageContainer>
       <LandingPageTitle>ZK Party</LandingPageTitle>
-      {ceremonies.map(c => (
-        <CeremonySummary ceremony={c} />
+      {ceremonies.map((c, i) => (
+        <CeremonySummary key={i} ceremony={c} />
       ))}
     </LandingPageContainer>
   );
 };
 
-const CeremonyPage = () => {
+const CeremonyPage = (props: RouteProps) => {
+  let { id } = useParams();
+
   return (
     <div>
       <Link to="/"> home</Link>
       <br />
-      This is the ceremony page
+      This is the ceremony page for the ceremony of id: {id}
     </div>
   );
 };
@@ -101,11 +111,15 @@ const CoordinatorPage = () => {
   );
 };
 
-const CeremonySummary = (props: { ceremony: Ceremony }) => {
+const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
   const c = props.ceremony;
 
+  const onClick = () => {
+    console.log("ok", c.id);
+  };
+
   return (
-    <CeremonyContiner>
+    <CeremonyContiner onClick={onClick}>
       <CeremonyLinkTitle>{c.title}</CeremonyLinkTitle>
       {c.description} <br />
       <Link to="/ceremony"> ceremony</Link>
@@ -126,6 +140,7 @@ const LinksContainer = styled.div``;
 const LandingPageTitle = styled.div`
   font-size: 50pt;
   margin-bottom: 32px;
+  font-weight: bold;
 `;
 
 const CeremonyContiner = styled.div`
