@@ -7,7 +7,10 @@ import {
   Link,
   HashRouter,
   RouteProps,
-  useParams
+  useParams,
+  withRouter,
+  RouteComponentProps,
+  useHistory
 } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
 
@@ -114,8 +117,10 @@ const CoordinatorPage = () => {
 const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
   const c = props.ceremony;
 
+  let history = useHistory();
+
   const onClick = () => {
-    console.log("ok", c.id);
+    history.push(`/ceremony/${c.id}`);
   };
 
   return (
