@@ -12,9 +12,11 @@ const App = () => {
   return (
     <HashRouter>
       <Switch>
-        <Route path="/about"></Route>
-        <Route path="/ceremony">
-          <CeremonyPage></CeremonyPage>
+        <Route exact path="/coordinators">
+          <CoordinatorPage />
+        </Route>
+        <Route exact path="/ceremony">
+          <CeremonyPage />
         </Route>
         <Route exact path="/">
           <LandingPage></LandingPage>
@@ -35,7 +37,23 @@ const LandingPage = () => {
 };
 
 const CeremonyPage = () => {
-  return <div>This is the ceremony page</div>;
+  return (
+    <div>
+      <Link to="/"> home</Link>
+      <br />
+      This is the ceremony page
+    </div>
+  );
+};
+
+const CoordinatorPage = () => {
+  return (
+    <div>
+      <Link to="/"> home</Link>
+      <br />
+      this is the coordinators page
+    </div>
+  );
 };
 
 const CeremonySummary = () => {};
