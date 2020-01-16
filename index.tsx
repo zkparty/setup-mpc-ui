@@ -176,7 +176,7 @@ const CeremonyPage = (props: RouteProps) => {
           { title: "online?", width: "100px" },
           { title: "address", width: "200px" },
           { title: "org", width: "100px" },
-          { title: "status", width: "50px" }
+          { title: "status", width: "100px" }
         ]}
       />
     </PageContainer>
@@ -211,21 +211,25 @@ const ParticipantTable = (props: {
         <ParticipantContainer key={i}>
           <ProgressBar />
 
-          {[p.online, p.address, p.org, p.status].map((content, i) => {
-            return (
-              <span
-                style={{
-                  width: props.headers[i].width,
-                  maxWidth: props.headers[i].width,
-                  overflow: "hidden",
-                  textOverflow: "ellipses",
-                  display: "inline-block"
-                }}
-              >
-                {content}
-              </span>
-            );
-          })}
+          <div>
+            {[p.online, p.address, p.org, p.status].map((content, i) => {
+              return (
+                <span
+                  style={{
+                    width: props.headers[i].width,
+                    maxWidth: props.headers[i].width,
+                    overflow: "hidden",
+                    textOverflow: "ellipses",
+                    display: "inline-block",
+                    zIndex: 100,
+                    position: "relative"
+                  }}
+                >
+                  {content + ""}
+                </span>
+              );
+            })}
+          </div>
         </ParticipantContainer>
       ))}
     </div>
