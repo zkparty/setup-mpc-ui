@@ -168,39 +168,82 @@ const CoordinatorsSection = () => {
   );
 };
 
+let participants = [
+  {
+    progress: 1,
+    online: true,
+    address: "ofdlajfho2hpqui34hfqliufhasdkajbdkjasbd",
+    org: "EF"
+  },
+  {
+    progress: 1,
+    online: true,
+    address: "ofdlajfho2hpqui34hfqliufh",
+    org: "EF"
+  },
+  {
+    progress: 0.3,
+    online: true,
+    address: "ofdlajfho2hpqui34hfqliufh",
+    org: "EF"
+  },
+  {
+    progress: 0,
+    online: true,
+    address: "ofdlajfho2hpqui34hfqliufh",
+    org: "EF"
+  }
+];
+
+interface CeremonyDetails {}
+const CeremonyDetails = (props: CeremonyDetails) => {
+  return (
+    <CeremonyDetailsContainer>
+      <CeremonyDetailsSubSection>
+        status: <br />
+        start time: <br />
+        end time: <br />
+        for participants: <br />
+        homepage: <br />
+        github: <br />
+      </CeremonyDetailsSubSection>
+      <CeremonyDetailsSubSection>
+        It is a long established fact that a reader will be distracted by the
+        readable content of a page when looking at its layout. The point of
+        using Lorem Ipsum is that it has a more-or-less normal distribution of
+        letters, as opposed to using 'Content here, content here', making it
+        look like readable English. Many desktop publishing packages and web
+        page editors now use Lorem Ipsum as their default model text, and a
+        search for 'lorem ipsum' will uncover many web sites still in their
+        infancy. Various versions have evolved over the years, sometimes by
+        accident, sometimes on purpose (injected humour and the like).
+      </CeremonyDetailsSubSection>
+    </CeremonyDetailsContainer>
+  );
+};
+
+const CeremonyDetailsContainer = styled.div`
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+`;
+
+const CeremonyDetailsSubSection = styled.div`
+  width: 50%;
+  height: 100%;
+  flex-grow: 1;
+`;
+
 const CeremonyPage = (props: RouteProps) => {
   let { id } = useParams();
-
-  let participants = [
-    {
-      progress: 1,
-      online: true,
-      address: "ofdlajfho2hpqui34hfqliufhasdkajbdkjasbd",
-      org: "EF"
-    },
-    {
-      progress: 1,
-      online: true,
-      address: "ofdlajfho2hpqui34hfqliufh",
-      org: "EF"
-    },
-    {
-      progress: 0.3,
-      online: true,
-      address: "ofdlajfho2hpqui34hfqliufh",
-      org: "EF"
-    },
-    {
-      progress: 0,
-      online: true,
-      address: "ofdlajfho2hpqui34hfqliufh",
-      org: "EF"
-    }
-  ];
 
   return (
     <PageContainer>
       <Link to="/"> home</Link>
+      <br />
+      <CeremonyDetails></CeremonyDetails>
       <br />
       <br />
       This is the ceremony page for the ceremony of id: {id}
