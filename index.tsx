@@ -72,6 +72,9 @@ const App = () => {
         <Route exact path="/coordinators">
           <AboutSection />
         </Route>
+        <Route exact path="/register">
+          <RegisterPage />
+        </Route>
         <Route exact path="/ceremony/:id">
           <CeremonyPage />
         </Route>
@@ -98,6 +101,36 @@ const Tabs = (props: { children: ReactNode; titles: string[] }) => {
 
       <SectionContainer>{props.children[selectedTitleIndex]}</SectionContainer>
     </>
+  );
+};
+
+const RegisterPage = () => {
+  return (
+    <PageContainer>
+      here is where you will register
+      <Link to="/"> home</Link>
+      <br />
+      <form>
+        <label>
+          name: <input name="name" type="text" />
+        </label>
+        <br />
+        <label>
+          org: <input name="name" type="text" />
+        </label>
+        <br />
+        <label>
+          email: <input name="name" type="text" />
+        </label>
+        <br />
+        <label>
+          desc: <input name="name" type="text" />
+        </label>
+        <br />
+
+        <input type="submit" />
+      </form>
+    </PageContainer>
   );
 };
 
@@ -130,7 +163,7 @@ const CoordinatorsSection = () => {
   return (
     <div>
       wecome to zkparty ... <br />
-      <input type="button" value="register" />
+      <Link to="/register">register</Link>
     </div>
   );
 };
