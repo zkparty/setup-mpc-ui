@@ -140,28 +140,28 @@ const CeremonyPage = (props: RouteProps) => {
 
   let participants = [
     {
+      progress: 1,
       online: true,
       address: "ofdlajfho2hpqui34hfqliufhasdkajbdkjasbd",
-      org: "EF",
-      status: "Complete"
+      org: "EF"
     },
     {
+      progress: 1,
       online: true,
       address: "ofdlajfho2hpqui34hfqliufh",
-      org: "EF",
-      status: "Complete"
+      org: "EF"
     },
     {
+      progress: 0.3,
       online: true,
       address: "ofdlajfho2hpqui34hfqliufh",
-      org: "EF",
-      status: "Complete"
+      org: "EF"
     },
     {
+      progress: 0,
       online: true,
       address: "ofdlajfho2hpqui34hfqliufh",
-      org: "EF",
-      status: "Complete"
+      org: "EF"
     }
   ];
 
@@ -169,14 +169,19 @@ const CeremonyPage = (props: RouteProps) => {
     <PageContainer>
       <Link to="/"> home</Link>
       <br />
+      <br />
       This is the ceremony page for the ceremony of id: {id}
+      <br />
+      <br />
+      participants:
+      <br />
       <ParticipantTable
         participants={participants}
         headers={[
           { title: "online?", width: "100px" },
           { title: "address", width: "200px" },
           { title: "org", width: "100px" },
-          { title: "status", width: "100px" }
+          { title: "status", width: "150px" }
         ]}
       />
     </PageContainer>
@@ -184,12 +189,23 @@ const CeremonyPage = (props: RouteProps) => {
 };
 
 interface ParticipantInfo {
+  progress: number; // 0 to 1
   online: boolean;
   address: string;
   org: string;
-  status: string;
 }
 
+const progressToStatusString = (progress: number) => {
+  if (progress === 0) {
+    return "Waiting";
+  }
+
+  if (progress === 1) {
+    return "Complete";
+  }
+
+  return `Running (${Math.round(progress * 100)}%)`;
+};
 const ParticipantTable = (props: {
   participants: ParticipantInfo[];
   headers: { title: string; width: string }[];
@@ -209,10 +225,15 @@ const ParticipantTable = (props: {
 
       {props.participants.map((p, i) => (
         <ParticipantContainer key={i}>
-          <ProgressBar />
+          <ProgressBar progress={p.progress} />
 
           <div>
-            {[p.online, p.address, p.org, p.status].map((content, i) => {
+            {[
+              p.online,
+              p.address,
+              p.org,
+              progressToStatusString(p.progress)
+            ].map((content, i) => {
               return (
                 <span
                   style={{
@@ -267,13 +288,17 @@ const ParticipantContainer = styled.div`
 `;
 
 const ProgressBar = styled.div`
-  width: 33%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background-color: green;
-  z-index: 1;
+  ${(props: { progress: number }) => {
+    return css`
+      width: ${props.progress * 100}%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: green;
+      z-index: 1;
+    `;
+  }}
 `;
 
 const PageContainer = styled.div`
