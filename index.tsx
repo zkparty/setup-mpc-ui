@@ -96,7 +96,7 @@ const Tabs = (props: { children: ReactNode; titles: string[] }) => {
         ))}
       </div>
 
-      {props.children}
+      {props.children[selectedTitleIndex]}
     </>
   );
 };
@@ -107,7 +107,7 @@ const LandingPage = () => {
       <LandingPageTitle>ZK Party</LandingPageTitle>
 
       <Tabs titles={["Participants", "Coordinators", "About"]}>
-        <ParticipantsSection />
+        {[<ParticipantsSection key="participants" />]}
       </Tabs>
     </LandingPageContainer>
   );
