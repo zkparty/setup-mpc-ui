@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 import * as ReactDOM from "react-dom";
 import {
   BrowserRouter as Router,
@@ -12,7 +13,8 @@ import {
   RouteComponentProps,
   useHistory
 } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle, css } from "styled-components";
+import { ReactNode } from "react";
 
 interface Ceremony {
   id: string;
@@ -74,10 +76,28 @@ const App = () => {
           <CeremonyPage />
         </Route>
         <Route exact path="/">
-          <LandingPage></LandingPage>
+          <LandingPage />
         </Route>
       </Switch>
     </HashRouter>
+  );
+};
+
+const Tabs = (props: { children: ReactNode; titles: string[] }) => {
+  const [selectedTitleIndex, updateIndex] = useState(0);
+
+  return (
+    <>
+      <div>
+        {props.titles.map((title, i) => (
+          <span key={title} onClick={() => updateIndex(i)}>
+            <TabLink selected={i === selectedTitleIndex}>{title}</TabLink>{" "}
+          </span>
+        ))}
+      </div>
+
+      {props.children}
+    </>
   );
 };
 
@@ -85,10 +105,20 @@ const LandingPage = () => {
   return (
     <LandingPageContainer>
       <LandingPageTitle>ZK Party</LandingPageTitle>
+
+      <Tabs titles={["Participants", "Coordinators", "About"]}>
+        <ParticipantsSection />
+      </Tabs>
+    </LandingPageContainer>
+  );
+};
+const ParticipantsSection = () => {
+  return (
+    <>
       {ceremonies.map((c, i) => (
         <CeremonySummary key={i} ceremony={c} />
       ))}
-    </LandingPageContainer>
+    </>
   );
 };
 
@@ -175,6 +205,15 @@ const GlobalStyle = createGlobalStyle`
     margin-bottom: 64px;
     font-family: 'Inconsolata', monospace;
   }
+`;
+
+const TabLink = styled.span`
+  ${(props: { selected: boolean }) => {
+    return css`
+      text-decoration: ${props.selected ? "underline" : "none"};
+      cursor: pointer;
+    `;
+  }}
 `;
 const div = document.createElement("div");
 document.body.appendChild(div);
