@@ -126,8 +126,7 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
   return (
     <CeremonyContiner onClick={onClick}>
       <CeremonyLinkTitle>{c.title}</CeremonyLinkTitle>
-      {c.description} <br />
-      <Link to="/ceremony"> ceremony</Link>
+      {c.description}
     </CeremonyContiner>
   );
 };
@@ -155,6 +154,11 @@ const CeremonyContiner = styled.div`
   padding: 16px;
   border-radius: 4px;
   cursor: pointer;
+  border: 2px solid transparent;
+
+  &:hover {
+    border: 2px solid #aaa;
+  }
 `;
 
 const CeremonyLinkTitle = styled.div`
