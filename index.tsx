@@ -103,7 +103,7 @@ const Tabs = (props: { children: ReactNode; titles: string[] }) => {
 
 const LandingPage = () => {
   return (
-    <LandingPageContainer>
+    <PageContainer>
       <LandingPageTitle>ZK Party</LandingPageTitle>
 
       <Tabs titles={["Participants", "Coordinators", "About"]}>
@@ -113,7 +113,7 @@ const LandingPage = () => {
           <AboutSection key="about" />
         ]}
       </Tabs>
-    </LandingPageContainer>
+    </PageContainer>
   );
 };
 const ParticipantsSection = () => {
@@ -138,12 +138,17 @@ const CoordinatorsSection = () => {
 const CeremonyPage = (props: RouteProps) => {
   let { id } = useParams();
 
+  let a = [1, 2, 3];
+
   return (
-    <div>
+    <PageContainer>
       <Link to="/"> home</Link>
       <br />
       This is the ceremony page for the ceremony of id: {id}
-    </div>
+      {a.map(a => (
+        <Participant></Participant>
+      ))}
+    </PageContainer>
   );
 };
 
@@ -168,7 +173,32 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
   );
 };
 
-const LandingPageContainer = styled.div`
+const Participant = () => {
+  return (
+    <ParticipantContainer>
+      <ProgressBar />
+    </ParticipantContainer>
+  );
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+const ParticipantContainer = styled.div`
+  width: 512px;
+  position: relative;
+  height: 32px;
+  background-color: purple;
+  margin: 8px;
+`;
+
+const ProgressBar = styled.div`
+  width: 33%;
+  position: absolute;
+  height: 100%;
+  background-color: green;
+`;
+
+const PageContainer = styled.div`
   display: flex;
   width: 100vw;
   flex-direction: column;
