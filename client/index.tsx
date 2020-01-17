@@ -178,7 +178,7 @@ let participants = [
   },
   {
     progress: 1,
-    online: true,
+    online: false,
     address: "028857b795e62c83dad97b05de40b45cd6ce20c4",
     org: "EF"
   },
@@ -190,7 +190,7 @@ let participants = [
   },
   {
     progress: 0,
-    online: true,
+    online: false,
     address: "16dd8577e8af7b74796130f53bb03d599f2e3253",
     org: "EF"
   }
@@ -241,12 +241,17 @@ const CeremonyPage = (props: RouteProps) => {
         <ParticipantTable
           participants={participants}
           headers={[
-            { title: "online?", width: "100px" },
-            { title: "address", width: "200px" },
+            { title: "connection", width: "75px" },
+            { title: "address", width: "300px" },
             { title: "org", width: "100px" },
-            { title: "status", width: "150px" }
+            { title: "status", width: "100px" }
           ]}
-          cols={[p => p.online, p => p.address, p => p.org, p => p.progress]}
+          cols={[
+            p => (p.online ? "online" : "offline"),
+            p => p.address,
+            p => p.org,
+            p => p.progress
+          ]}
         />
       </PageContainer>
     </>
@@ -372,7 +377,7 @@ const TableHeader = styled(TableCell)`
 `;
 
 const CeremonyDetailsContainer = styled.div`
-  width: 80%;
+  width: 600px;
   background-color: ${lighterBackground};
   padding: 16px;
   border-radius: 4px;
