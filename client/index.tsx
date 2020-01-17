@@ -230,22 +230,26 @@ const CeremonyPage = (props: RouteProps) => {
   const ceremony = ceremonies.find(c => c.id == id);
 
   return (
-    <PageContainer>
-      <Link to="/"> </Link>
-      <br />
-      <CeremonyDetails ceremony={ceremony}></CeremonyDetails>
-      <br />
-      <ParticipantTable
-        participants={participants}
-        headers={[
-          { title: "online?", width: "100px" },
-          { title: "address", width: "200px" },
-          { title: "org", width: "100px" },
-          { title: "status", width: "150px" }
-        ]}
-        cols={[p => p.online, p => p.address, p => p.org, p => p.progress]}
-      />
-    </PageContainer>
+    <>
+      <HomeLinkContainer>
+        <Link to="/">home</Link>
+      </HomeLinkContainer>
+      <PageContainer>
+        <br />
+        <CeremonyDetails ceremony={ceremony}></CeremonyDetails>
+        <br />
+        <ParticipantTable
+          participants={participants}
+          headers={[
+            { title: "online?", width: "100px" },
+            { title: "address", width: "200px" },
+            { title: "org", width: "100px" },
+            { title: "status", width: "150px" }
+          ]}
+          cols={[p => p.online, p => p.address, p => p.org, p => p.progress]}
+        />
+      </PageContainer>
+    </>
   );
 };
 
@@ -341,6 +345,21 @@ const textColor = "#ddd";
 const accentColor = "#31c41d";
 const secondAccent = "#731dc4";
 
+const HomeLinkContainer = styled.div`
+  position: absolute;
+  top: 16px;
+  left: 16px;
+
+  a {
+    color: ${accentColor};
+
+    &:hover {
+      color: ${textColor};
+      background-color: ${secondAccent};
+    }
+  }
+`;
+
 const TableCell = styled.span`
   padding: 2px 5px;
   overflow: hidden;
@@ -371,6 +390,8 @@ const PageContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: 64px;
+  margin-bottom: 64px;
 `;
 
 const LandingPageTitle = styled.div`
@@ -405,8 +426,6 @@ const GlobalStyle = createGlobalStyle`
     background-color: #081a24;
     color: ${textColor};
     margin: 0;
-    margin-top: 64px;
-    margin-bottom: 64px;
     font-family: 'Inconsolata', monospace;
     font-size: 11pt;
   }
@@ -422,7 +441,7 @@ const TabLink = styled.span`
 
       &:hover {
         background-color: ${secondAccent};
-        color: black;
+        color: ${textColor};
       }
     `;
   }}
