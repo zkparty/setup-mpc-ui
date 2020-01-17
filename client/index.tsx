@@ -207,31 +207,24 @@ const CeremonyDetails = (props: { ceremony: Ceremony }) => {
             <td>status</td> <td>completed</td>
           </tr>
           <tr>
-            <td>start time</td> <td></td>
+            <td>start time</td> <td>{props.ceremony.start}</td>
           </tr>
           <tr>
-            <td>end time</td> <td></td>
+            <td>end time</td> <td>{props.ceremony.end}</td>
           </tr>
           <tr>
-            <td>for participants</td> <td></td>
+            <td>for participants</td> <td>{"something "}</td>
           </tr>
           <tr>
-            <td>hompage</td> <td></td>
+            <td>hompage</td> <td>{"https://www.google.com"}</td>
           </tr>
           <tr>
-            <td>github</td> <td></td>
+            <td>github</td> <td>{"https://github.com.test"}</td>
           </tr>
         </CeremonyDetailsTable>
       </CeremonyDetailsSubSection>
       <CeremonyDetailsSubSection>
-        It is a long established fact that a reader will be distracted by the
-        readable content of a page when looking at its layout. The point of
-        using Lorem Ipsum is that it has a more-or-less normal distribution of
-        letters, as opposed to using 'Content here, content here', making it
-        look like readable English. Many desktop publishing packages and web
-        page editors now use Lorem Ipsum as their default model text, and a
-        search for 'lorem ipsum' will uncover many web sites still in their
-        infancy.
+        {props.ceremony.description}
       </CeremonyDetailsSubSection>
     </CeremonyDetailsContainer>
   );
@@ -375,6 +368,7 @@ const secondAccent = "#731dc4";
 
 const CeremonyDetailsTable = styled.table`
   text-align: right;
+  font-size: 11pt;
 
   td {
     padding-left: 10px;
@@ -408,16 +402,16 @@ const TableHeader = styled(TableCell)`
 `;
 
 const CeremonyDetailsContainer = styled.div`
-  width: 600px;
+  width: 512px;
   background-color: ${lighterBackground};
   padding: 16px;
   border-radius: 4px;
 `;
 
 const CeremonyDetailsSubSection = styled.div`
-  width: 50%;
-  height: 100%;
   display: inline-block;
+  padding: 16px;
+  box-sizing: border-box;
 `;
 
 const PageContainer = styled.div`
