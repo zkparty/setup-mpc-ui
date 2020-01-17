@@ -44,8 +44,9 @@ const ceremonies: Ceremony[] = [
   },
   {
     id: "three",
-    title: "pandas are kinda the best",
-    description: "test description",
+    title: "cheese recipe ceremony",
+    description:
+      "olive magazine presents: the best cheese recipes in the world! We’re major cheese fiends at olive HQ, so we have hundreds of cheese recipes to pick our favourites from. Make pies oozing with brie, mac ‘n’ cheese laden with crisp bacon, or toasties stuffed with Fontina.    ",
     start: "2020-01-16",
     end: "2020-01-17"
   },
@@ -369,6 +370,7 @@ const secondAccent = "#731dc4";
 const CeremonyDetailsTable = styled.table`
   text-align: right;
   font-size: 11pt;
+  width: 100%;
 
   td {
     padding-left: 10px;
