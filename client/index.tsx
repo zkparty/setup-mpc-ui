@@ -173,25 +173,25 @@ let participants = [
   {
     progress: 1,
     online: true,
-    address: "ofdlajfho2hpqui34hfqliufhasdkajbdkjasbd",
+    address: "0170e419048ced5c40b38a799cb1610586f3c5d4",
     org: "EF"
   },
   {
     progress: 1,
     online: true,
-    address: "ofdlajfho2hpqui34hfqliufh",
+    address: "028857b795e62c83dad97b05de40b45cd6ce20c4",
     org: "EF"
   },
   {
     progress: 0.3,
     online: true,
-    address: "ofdlajfho2hpqui34hfqliufh",
+    address: "848ffc48585880014826034064c9be779b7966d0",
     org: "EF"
   },
   {
     progress: 0,
     online: true,
-    address: "ofdlajfho2hpqui34hfqliufh",
+    address: "16dd8577e8af7b74796130f53bb03d599f2e3253",
     org: "EF"
   }
 ];
@@ -349,6 +349,7 @@ const TableCell = styled.span`
 
 const TableHeader = styled(TableCell)`
   display: inline-block;
+  color: ${secondAccent};
 `;
 
 const CeremonyDetailsContainer = styled.div`
