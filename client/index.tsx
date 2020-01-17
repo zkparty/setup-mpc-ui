@@ -275,27 +275,20 @@ const ParticipantTable = (props: {
       <br />
       {props.headers.map(header => {
         return (
-          <span style={{ width: header.width, display: "inline-block" }}>
+          <TableHeader style={{ width: header.width }}>
             {header.title}
-          </span>
+          </TableHeader>
         );
       })}
       <br />
       <br />
 
       {props.participants.map((p, i) => (
-        <ParticipantContainer key={i}>
-          <ProgressBar progress={p.progress} />
-
-          <div>
-            {[
-              p.online,
-              p.address,
-              p.org,
-              progressToStatusString(p.progress)
-            ].map((content, i) => {
+        <div>
+          {[p.online, p.address, p.org, progressToStatusString(p.progress)].map(
+            (content, i) => {
               return (
-                <span
+                <TableCell
                   style={{
                     width: props.headers[i].width,
                     maxWidth: props.headers[i].width,
@@ -307,11 +300,11 @@ const ParticipantTable = (props: {
                   }}
                 >
                   {content + ""}
-                </span>
+                </TableCell>
               );
-            })}
-          </div>
-        </ParticipantContainer>
+            }
+          )}
+        </div>
       ))}
     </div>
   );
@@ -348,6 +341,16 @@ const textColor = "#ddd";
 const accentColor = "#31c41d";
 const secondAccent = "#731dc4";
 
+const TableCell = styled.span`
+  padding: 2px 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const TableHeader = styled(TableCell)`
+  display: inline-block;
+`;
+
 const CeremonyDetailsContainer = styled.div`
   width: 80%;
   background-color: ${lighterBackground};
@@ -359,13 +362,6 @@ const CeremonyDetailsSubSection = styled.div`
   width: 50%;
   height: 100%;
   display: inline-block;
-`;
-
-const ParticipantContainer = styled.div`
-  position: relative;
-  height: 32px;
-  background-color: purple;
-  margin-bottom: 8px;
 `;
 
 const ProgressBar = styled.div`
