@@ -15,6 +15,7 @@ import {
 } from "react-router-dom";
 import styled, { createGlobalStyle, css } from "styled-components";
 import { ReactNode } from "react";
+import color from "color";
 
 interface Ceremony {
   id: string;
@@ -356,6 +357,12 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
+const background = "#081a24";
+const lighterBackgorund = color(background)
+  .lighten(0.4)
+  .toString();
+const textColor = "#eee";
+
 const ParticipantContainer = styled.div`
   position: relative;
   height: 32px;
@@ -394,7 +401,7 @@ const LandingPageTitle = styled.div`
 `;
 
 const CeremonyContiner = styled.div`
-  background-color: #eee;
+  background-color: ${lighterBackgorund};
   margin: 10px;
   width: 512px;
   padding: 16px;
@@ -414,8 +421,8 @@ const CeremonyLinkTitle = styled.div`
 
 const GlobalStyle = createGlobalStyle`
   body {
-    background-color: #fefefe;
-    color: #222;
+    background-color: #081a24;
+    color: ${textColor};
     margin: 0;
     margin-top: 64px;
     margin-bottom: 64px;
