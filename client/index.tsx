@@ -138,7 +138,7 @@ const RegisterPage = () => {
 const LandingPage = () => {
   return (
     <PageContainer>
-      <LandingPageTitle>ZK Party</LandingPageTitle>
+      <LandingPageTitle>zkparty</LandingPageTitle>
 
       <Tabs titles={["Participants", "Coordinators", "About"]}>
         {[
@@ -362,6 +362,8 @@ const lighterBackgorund = color(background)
   .lighten(0.4)
   .toString();
 const textColor = "#eee";
+const accentColor = "#31c41d";
+const secondAccent = "#731dc4";
 
 const ParticipantContainer = styled.div`
   position: relative;
@@ -398,6 +400,7 @@ const LandingPageTitle = styled.div`
   font-size: 50pt;
   margin-bottom: 32px;
   font-weight: bold;
+  color: ${accentColor};
 `;
 
 const CeremonyContiner = styled.div`
@@ -410,13 +413,14 @@ const CeremonyContiner = styled.div`
   border: 2px solid transparent;
 
   &:hover {
-    border: 2px solid #aaa;
+    border: 2px solid ${secondAccent};
   }
 `;
 
 const CeremonyLinkTitle = styled.div`
   font-size: 18pt;
   margin-bottom: 16px;
+  color: ${accentColor};
 `;
 
 const GlobalStyle = createGlobalStyle`
@@ -427,6 +431,8 @@ const GlobalStyle = createGlobalStyle`
     margin-top: 64px;
     margin-bottom: 64px;
     font-family: 'Inconsolata', monospace;
+    font-size: 11pt;
+
   }
 `;
 
@@ -435,6 +441,13 @@ const TabLink = styled.span`
     return css`
       text-decoration: ${props.selected ? "underline" : "none"};
       cursor: pointer;
+      color: ${props.selected ? "black" : accentColor};
+      background-color: ${props.selected ? accentColor : "unset"};
+
+      &:hover {
+        background-color: ${secondAccent};
+        color: black;
+      }
     `;
   }}
 `;
