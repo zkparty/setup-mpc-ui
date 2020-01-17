@@ -203,26 +203,28 @@ const CeremonyDetails = (props: { ceremony: Ceremony }) => {
       <CeremonyTitle>{props.ceremony.title}</CeremonyTitle>
 
       <CeremonyDetailsSubSection>
-        <CeremonyDetailsTable>
-          <tr>
-            <td>status</td> <td>completed</td>
-          </tr>
-          <tr>
-            <td>start time</td> <td>{props.ceremony.start}</td>
-          </tr>
-          <tr>
-            <td>end time</td> <td>{props.ceremony.end}</td>
-          </tr>
-          <tr>
-            <td>for participants</td> <td>{"something "}</td>
-          </tr>
-          <tr>
-            <td>hompage</td> <td>{"https://www.google.com"}</td>
-          </tr>
-          <tr>
-            <td>github</td> <td>{"https://github.com.test"}</td>
-          </tr>
-        </CeremonyDetailsTable>
+        <Center>
+          <CeremonyDetailsTable>
+            <tr>
+              <td>status</td> <td>completed</td>
+            </tr>
+            <tr>
+              <td>start time</td> <td>{props.ceremony.start}</td>
+            </tr>
+            <tr>
+              <td>end time</td> <td>{props.ceremony.end}</td>
+            </tr>
+            <tr>
+              <td>for participants</td> <td>{"something "}</td>
+            </tr>
+            <tr>
+              <td>hompage</td> <td>{"https://www.google.com"}</td>
+            </tr>
+            <tr>
+              <td>github</td> <td>{"https://github.com.test"}</td>
+            </tr>
+          </CeremonyDetailsTable>
+        </Center>
       </CeremonyDetailsSubSection>
       <CeremonyDetailsSubSection>
         {props.ceremony.description}
@@ -390,6 +392,13 @@ const HomeLinkContainer = styled.div`
       background-color: ${secondAccent};
     }
   }
+`;
+
+const Center = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 `;
 
 const TableCell = styled.span`
