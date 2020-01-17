@@ -139,7 +139,7 @@ const RegisterPage = () => {
 const LandingPage = () => {
   return (
     <PageContainer>
-      <LandingPageTitle>zkparty</LandingPageTitle>
+      <ZKTitle>zkparty</ZKTitle>
 
       <Tabs titles={["Participants", "Coordinators", "About"]}>
         {[
@@ -359,6 +359,57 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
   );
 };
 
+class ZKTitle extends React.Component {
+  readonly refreshInterval = 1000 / 12;
+  readonly secondsOfLit = 0.5;
+  private interval = null;
+
+  state = {
+    actualText: "zkparty"
+  };
+
+  onClick = () => {
+    if (this.interval == null) {
+      this.interval = setInterval(() => {
+        this.setState({
+          actualText: this.getRandomText()
+        });
+      }, this.refreshInterval);
+
+      setTimeout(() => {
+        clearInterval(this.interval);
+        this.interval = null;
+
+        if (Math.random() < 0.3) {
+          this.setState({
+            actualText: "zkparty"
+          });
+        }
+      }, this.secondsOfLit * 1000);
+    }
+  };
+
+  getRandomText() {
+    let result = "";
+    var characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (let i = 0; i < "zkparty".length; i++) {
+      result += characters[Math.floor(Math.random() * characters.length)];
+    }
+
+    return result;
+  }
+
+  render() {
+    return (
+      <LandingPageTitle onClick={this.onClick}>
+        {this.state.actualText}
+      </LandingPageTitle>
+    );
+  }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 const background = "#081a24";
@@ -440,6 +491,8 @@ const LandingPageTitle = styled.div`
   margin-bottom: 32px;
   font-weight: bold;
   color: ${accentColor};
+  cursor: pointer;
+  user-select: none;
 `;
 
 const CeremonyContiner = styled.div`
