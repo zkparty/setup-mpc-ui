@@ -28,7 +28,7 @@ interface Ceremony {
 const ceremonies: Ceremony[] = [
   {
     id: "one",
-    title: "goblin",
+    title: "ZKSnark Ceremony Number One",
     description:
       "Ingredients. 1 1/2 cups (355 ml) warm water (105°F-115°F) 1 package (2 1/4 teaspoons) of active dry yeast. 3 3/4 cups (490 g) bread flour. 2 tablespoons extra virgin olive oil (omit if cooking pizza in a wood-fired pizza oven) 2 teaspoons salt. 1 teaspoon sugar.",
     start: "2020-01-16",
@@ -95,7 +95,7 @@ const Tabs = (props: { children: ReactNode; titles: string[] }) => {
       <div>
         {props.titles.map((title, i) => (
           <span key={title} onClick={() => updateIndex(i)}>
-            <TabLink selected={i === selectedTitleIndex}>{title}</TabLink>{" "}
+            <TabLink selected={i === selectedTitleIndex}>{title}</TabLink>
           </span>
         ))}
       </div>
@@ -202,12 +202,26 @@ const CeremonyDetails = (props: { ceremony: Ceremony }) => {
       <CeremonyTitle>{props.ceremony.title}</CeremonyTitle>
 
       <CeremonyDetailsSubSection>
-        status: <br />
-        start time: <br />
-        end time: <br />
-        for participants: <br />
-        homepage: <br />
-        github: <br />
+        <CeremonyDetailsTable>
+          <tr>
+            <td>status</td> <td>completed</td>
+          </tr>
+          <tr>
+            <td>start time</td> <td></td>
+          </tr>
+          <tr>
+            <td>end time</td> <td></td>
+          </tr>
+          <tr>
+            <td>for participants</td> <td></td>
+          </tr>
+          <tr>
+            <td>hompage</td> <td></td>
+          </tr>
+          <tr>
+            <td>github</td> <td></td>
+          </tr>
+        </CeremonyDetailsTable>
       </CeremonyDetailsSubSection>
       <CeremonyDetailsSubSection>
         It is a long established fact that a reader will be distracted by the
@@ -217,8 +231,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony }) => {
         look like readable English. Many desktop publishing packages and web
         page editors now use Lorem Ipsum as their default model text, and a
         search for 'lorem ipsum' will uncover many web sites still in their
-        infancy. Various versions have evolved over the years, sometimes by
-        accident, sometimes on purpose (injected humour and the like).
+        infancy.
       </CeremonyDetailsSubSection>
     </CeremonyDetailsContainer>
   );
@@ -344,11 +357,19 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
 
 const background = "#081a24";
 const lighterBackground = color(background)
-  .lighten(0.4)
+  .lighten(0.6)
   .toString();
-const textColor = "#ddd";
+const textColor = "#aaa";
 const accentColor = "#31c41d";
 const secondAccent = "#731dc4";
+
+const CeremonyDetailsTable = styled.table`
+  text-align: right;
+
+  td {
+    padding-left: 10px;
+  }
+`;
 
 const HomeLinkContainer = styled.div`
   position: absolute;
@@ -373,7 +394,7 @@ const TableCell = styled.span`
 
 const TableHeader = styled(TableCell)`
   display: inline-block;
-  color: ${secondAccent};
+  color: ${accentColor};
 `;
 
 const CeremonyDetailsContainer = styled.div`
@@ -443,6 +464,7 @@ const TabLink = styled.span`
       cursor: pointer;
       color: ${props.selected ? "black" : accentColor};
       background-color: ${props.selected ? accentColor : "unset"};
+      margin-right: 16px;
 
       &:hover {
         background-color: ${secondAccent};
