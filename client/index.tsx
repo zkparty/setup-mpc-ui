@@ -344,7 +344,7 @@ const background = "#081a24";
 const lighterBackground = color(background)
   .lighten(0.4)
   .toString();
-const textColor = "#eee";
+const textColor = "#ddd";
 const accentColor = "#31c41d";
 const secondAccent = "#731dc4";
 
