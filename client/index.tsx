@@ -243,6 +243,7 @@ const CeremonyPage = (props: RouteProps) => {
           { title: "org", width: "100px" },
           { title: "status", width: "150px" }
         ]}
+        cols={[p => p.online, p => p.address, p => p.org, p => p.progress]}
       />
     </PageContainer>
   );
@@ -269,6 +270,7 @@ const progressToStatusString = (progress: number) => {
 const ParticipantTable = (props: {
   participants: ParticipantInfo[];
   headers: { title: string; width: string }[];
+  cols: Array<(p: ParticipantInfo) => ReactNode | null>;
 }) => {
   return (
     <div>
@@ -280,13 +282,11 @@ const ParticipantTable = (props: {
           </TableHeader>
         );
       })}
-      <br />
-      <br />
 
-      {props.participants.map((p, i) => (
-        <div>
-          {[p.online, p.address, p.org, progressToStatusString(p.progress)].map(
-            (content, i) => {
+      {participants.map(p => {
+        return (
+          <div>
+            {props.cols.map((col, i) => {
               return (
                 <TableCell
                   style={{
@@ -299,13 +299,13 @@ const ParticipantTable = (props: {
                     position: "relative"
                   }}
                 >
-                  {content + ""}
+                  {col(p) + ""}
                 </TableCell>
               );
-            }
-          )}
-        </div>
-      ))}
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -365,20 +365,6 @@ const CeremonyDetailsSubSection = styled.div`
   display: inline-block;
 `;
 
-const ProgressBar = styled.div`
-  ${(props: { progress: number }) => {
-    return css`
-      width: ${props.progress * 100}%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      background-color: green;
-      z-index: 1;
-    `;
-  }}
-`;
-
 const PageContainer = styled.div`
   display: flex;
   width: 100vw;
@@ -386,8 +372,6 @@ const PageContainer = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
-const LinksContainer = styled.div``;
 
 const LandingPageTitle = styled.div`
   font-size: 50pt;
@@ -425,7 +409,6 @@ const GlobalStyle = createGlobalStyle`
     margin-bottom: 64px;
     font-family: 'Inconsolata', monospace;
     font-size: 11pt;
-
   }
 `;
 
