@@ -254,7 +254,7 @@ const CeremonyPage = (props: RouteProps) => {
         <ParticipantTable
           participants={participants}
           headers={[
-            { title: "connection", width: "75px" },
+            { title: "connection", width: "100px" },
             { title: "address", width: "300px" },
             { title: "org", width: "100px" },
             { title: "status", width: "100px" }
@@ -263,7 +263,17 @@ const CeremonyPage = (props: RouteProps) => {
             p => (p.online ? "online" : "offline"),
             p => p.address,
             p => p.org,
-            p => p.progress
+            p => {
+              if (p.progress === 1) {
+                return "completed";
+              }
+
+              if (p.progress === 0) {
+                return "waiting...";
+              }
+
+              return "working: " + Math.round(p.progress * 100) + "%";
+            }
           ]}
         />
       </PageContainer>
