@@ -196,10 +196,11 @@ let participants = [
   }
 ];
 
-interface CeremonyDetails {}
-const CeremonyDetails = (props: CeremonyDetails) => {
+const CeremonyDetails = (props: { ceremony: Ceremony }) => {
   return (
     <CeremonyDetailsContainer>
+      <CeremonyTitle>{props.ceremony.title}</CeremonyTitle>
+
       <CeremonyDetailsSubSection>
         status: <br />
         start time: <br />
@@ -223,34 +224,16 @@ const CeremonyDetails = (props: CeremonyDetails) => {
   );
 };
 
-const CeremonyDetailsContainer = styled.div`
-  width: 80%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-`;
-
-const CeremonyDetailsSubSection = styled.div`
-  width: 50%;
-  height: 100%;
-  flex-grow: 1;
-`;
-
 const CeremonyPage = (props: RouteProps) => {
   let { id } = useParams();
 
+  const ceremony = ceremonies.find(c => c.id == id);
+
   return (
     <PageContainer>
-      <Link to="/"> home</Link>
+      <Link to="/"> </Link>
       <br />
-      <CeremonyDetails></CeremonyDetails>
-      <br />
-      <br />
-      This is the ceremony page for the ceremony of id: {id}
-      <br />
-      <br />
-      participants:
+      <CeremonyDetails ceremony={ceremony}></CeremonyDetails>
       <br />
       <ParticipantTable
         participants={participants}
@@ -349,7 +332,7 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
 
   return (
     <CeremonyContiner onClick={onClick}>
-      <CeremonyLinkTitle>{c.title}</CeremonyLinkTitle>
+      <CeremonyTitle>{c.title}</CeremonyTitle>
       {c.description}
     </CeremonyContiner>
   );
@@ -358,12 +341,25 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 const background = "#081a24";
-const lighterBackgorund = color(background)
+const lighterBackground = color(background)
   .lighten(0.4)
   .toString();
 const textColor = "#eee";
 const accentColor = "#31c41d";
 const secondAccent = "#731dc4";
+
+const CeremonyDetailsContainer = styled.div`
+  width: 80%;
+  background-color: ${lighterBackground};
+  padding: 16px;
+  border-radius: 4px;
+`;
+
+const CeremonyDetailsSubSection = styled.div`
+  width: 50%;
+  height: 100%;
+  display: inline-block;
+`;
 
 const ParticipantContainer = styled.div`
   position: relative;
@@ -404,7 +400,7 @@ const LandingPageTitle = styled.div`
 `;
 
 const CeremonyContiner = styled.div`
-  background-color: ${lighterBackgorund};
+  background-color: ${lighterBackground};
   margin: 10px;
   width: 512px;
   padding: 16px;
@@ -417,7 +413,7 @@ const CeremonyContiner = styled.div`
   }
 `;
 
-const CeremonyLinkTitle = styled.div`
+const CeremonyTitle = styled.div`
   font-size: 18pt;
   margin-bottom: 16px;
   color: ${accentColor};
