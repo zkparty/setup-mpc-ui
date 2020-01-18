@@ -1,0 +1,4 @@
+node_modules
+dist
+.cache
+firebase_skey.json
