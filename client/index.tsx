@@ -154,7 +154,7 @@ const LandingPage = () => {
 const ParticipantsSection = () => {
   const [ceremonies, setCeremonies] = useState([]);
 
-  fetch("http://localhost:3000/api/ceremonies")
+  fetch("http://zkparty.io/api/ceremonies")
     .then(response => {
       return response.json();
     })
@@ -229,7 +229,7 @@ const CeremonyPage = (props: RouteProps) => {
   const [loaded, setLoaded] = useState(false);
   const [ceremony, setCeremony] = useState({});
 
-  fetch(`http://localhost:3000/api/ceremony/${id}`)
+  fetch(`http://zkparty.io/api/ceremony/${id}`)
     .then(response => {
       return response.json();
     })
