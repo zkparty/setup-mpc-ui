@@ -19,7 +19,7 @@ import color from "color";
 
 interface Ceremony {
   id: string;
-  title: string;
+  name: string;
   description: string;
   start: string;
   end: string;
@@ -152,6 +152,20 @@ const LandingPage = () => {
   );
 };
 const ParticipantsSection = () => {
+  const [ceremonies, setCeremonies] = useState([]);
+
+  fetch("http://localhost:3000/api/ceremonies")
+    .then(response => {
+      return response.json();
+    })
+    .then(json => {
+      console.log(json);
+      setCeremonies(json);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
   return (
     <>
       {ceremonies.map((c, i) => (
@@ -164,64 +178,40 @@ const ParticipantsSection = () => {
 const CoordinatorsSection = () => {
   return (
     <div>
-      wecome to zkparty ... <br />
+      Welcome to zkparty. <br />
       <Link to="/register">register</Link>
     </div>
   );
 };
 
-let participants = [
-  {
-    progress: 1,
-    online: true,
-    address: "0170e419048ced5c40b38a799cb1610586f3c5d4",
-    org: "EF"
-  },
-  {
-    progress: 1,
-    online: false,
-    address: "028857b795e62c83dad97b05de40b45cd6ce20c4",
-    org: "EF"
-  },
-  {
-    progress: 0.3,
-    online: true,
-    address: "848ffc48585880014826034064c9be779b7966d0",
-    org: "EF"
-  },
-  {
-    progress: 0,
-    online: false,
-    address: "16dd8577e8af7b74796130f53bb03d599f2e3253",
-    org: "EF"
-  }
-];
-
-const CeremonyDetails = (props: { ceremony: Ceremony }) => {
+const CeremonyDetails = (props: { ceremony: any }) => {
   return (
     <CeremonyDetailsContainer>
-      <CeremonyTitle>{props.ceremony.title}</CeremonyTitle>
+      <CeremonyTitle>{props.ceremony.name}</CeremonyTitle>
 
       <CeremonyDetailsSubSection>
         <Center>
           <CeremonyDetailsTable>
             <tr>
-              <td>status</td> <td>completed</td>
+              <td>status</td> <td>{props.ceremony.status}</td>
             </tr>
             <tr>
-              <td>start time</td> <td>{props.ceremony.start}</td>
+              <td>start time</td> <td>{props.ceremony.startTime}</td>
             </tr>
             <tr>
-              <td>end time</td> <td>{props.ceremony.end}</td>
+              <td>end time</td> <td>{props.ceremony.endTime}</td>
             </tr>
             <tr>
-              <td>for participants</td> <td>{"something "}</td>
+              <td>hompage</td>{" "}
+              <td>
+                <a href={props.ceremony.homepage}>HOMEPAGE</a>
+              </td>
             </tr>
             <tr>
-              <td>hompage</td> <td>{"https://www.google.com"}</td>
-            </tr>
-            <tr>
-              <td>github</td> <td>{"https://github.com.test"}</td>
+              <td>github</td>{" "}
+              <td>
+                <a href={props.ceremony.github}>GITHUB</a>
+              </td>
             </tr>
           </CeremonyDetailsTable>
         </Center>
@@ -236,64 +226,69 @@ const CeremonyDetails = (props: { ceremony: Ceremony }) => {
 const CeremonyPage = (props: RouteProps) => {
   let { id } = useParams();
 
-  const ceremony = ceremonies.find(c => c.id == id);
+  const [loaded, setLoaded] = useState(false);
+  const [ceremony, setCeremony] = useState({});
+
+  fetch(`http://localhost:3000/api/ceremony/${id}`)
+    .then(response => {
+      return response.json();
+    })
+    .then(json => {
+      setLoaded(true);
+      setCeremony(json);
+    })
+    .catch(err => {
+      console.log(err);
+    });
 
   return (
     <>
       <HomeLinkContainer>
         <Link to="/">home</Link>
       </HomeLinkContainer>
-      <PageContainer>
-        <br />
-        <CeremonyDetails ceremony={ceremony}></CeremonyDetails>
-        <br />
-        <ParticipantTable
-          participants={participants}
-          headers={[
-            { title: "connection", width: "100px" },
-            { title: "address", width: "300px" },
-            { title: "org", width: "100px" },
-            { title: "status", width: "100px" }
-          ]}
-          cols={[
-            p => (p.online ? "online" : "offline"),
-            p => p.address,
-            p => p.org,
-            p => {
-              if (p.progress === 1) {
-                return "completed";
-              }
-
-              if (p.progress === 0) {
-                return "waiting...";
-              }
-
-              return "working: " + Math.round(p.progress * 100) + "%";
-            }
-          ]}
-        />
-      </PageContainer>
+      {loaded ? (
+        <PageContainer>
+          <br />
+          <CeremonyDetails ceremony={ceremony}></CeremonyDetails>
+          <br />
+          <ParticipantTable
+            participants={ceremony.participants ? ceremony.participants : []}
+            headers={[
+              { title: "connection", width: "100px" },
+              { title: "address", width: "400px" },
+              { title: "status", width: "100px" }
+            ]}
+            cols={[
+              p => (p.online ? "online" : "offline"),
+              p => p.address,
+              participantStatusString
+            ]}
+          />
+        </PageContainer>
+      ) : null}
     </>
   );
 };
 
 interface ParticipantInfo {
-  progress: number; // 0 to 1
+  computeProgress: number; // 0 to 100
   online: boolean;
   address: string;
-  org: string;
+  state: "WAITING" | "RUNNING" | "COMPLETE" | "INVALIDATED";
 }
 
-const progressToStatusString = (progress: number) => {
-  if (progress === 0) {
-    return "Waiting";
+const participantStatusString = (participant: ParticipantInfo) => {
+  let statusString: string = participant.state;
+  if (participant.state === "RUNNING" && participant.computeProgress < 1) {
+    statusString = `RUNNING: ${Math.round(participant.computeProgress)}%`;
+  } else if (
+    participant.state === "RUNNING" &&
+    participant.computeProgress === 1
+  ) {
+    statusString = "VERIFYING";
   }
 
-  if (progress === 1) {
-    return "Complete";
-  }
-
-  return `Running (${Math.round(progress * 100)}%)`;
+  return statusString;
 };
 const ParticipantTable = (props: {
   participants: ParticipantInfo[];
@@ -303,15 +298,15 @@ const ParticipantTable = (props: {
   return (
     <div>
       <br />
-      {props.headers.map(header => {
+      {props.headers.map((header, i) => {
         return (
-          <TableHeader style={{ width: header.width }}>
+          <TableHeader key={i} style={{ width: header.width }}>
             {header.title}
           </TableHeader>
         );
       })}
 
-      {participants.map(p => {
+      {props.participants.map(p => {
         return (
           <div>
             {props.cols.map((col, i) => {
@@ -326,6 +321,7 @@ const ParticipantTable = (props: {
                     zIndex: 100,
                     position: "relative"
                   }}
+                  key={i}
                 >
                   {col(p) + ""}
                 </TableCell>
@@ -353,7 +349,7 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
 
   return (
     <CeremonyContiner onClick={onClick}>
-      <CeremonyTitle>{c.title}</CeremonyTitle>
+      <CeremonyTitle>{c.name}</CeremonyTitle>
       {c.description}
     </CeremonyContiner>
   );
@@ -471,6 +467,7 @@ const CeremonyDetailsContainer = styled.div`
 `;
 
 const CeremonyDetailsSubSection = styled.div`
+  width: 80%;
   display: inline-block;
   padding: 16px;
   box-sizing: border-box;

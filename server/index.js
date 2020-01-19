@@ -1,7 +1,7 @@
 const admin = require("firebase-admin");
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = 80;
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios").default;
@@ -14,30 +14,12 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-let counter = 0;
+app.use((req, res, next) => {
+  res.set({
+    "Access-Control-Allow-Origin": "*"
+  });
 
-app.get("/s1", (req, res) => {
-  res.send(`
-    <h1>hello world for the ${counter++} time</h1>
-    <script>
-      document.querySelector("h1").innerText += ", goons";
-    </script>
-  `);
-});
-
-app.get("/s2", (req, res) => {
-  const fileContents = fs.readFileSync("./index.js");
-
-  res.send(fileContents.toString());
-});
-
-app.get("/s3*", (req, res) => {
-  const requestPath = req.path.slice("/s3".length);
-  const serverPath = __dirname;
-  const completePath = path.join(serverPath, requestPath);
-
-  const fileContents = fs.readFileSync(completePath).toString();
-  res.send(fileContents);
+  next();
 });
 
 app.use("/", express.static(path.join(__dirname, "../client/dist")));
@@ -48,6 +30,7 @@ app.get("/api/ceremonies", async (req, res) => {
   snapshot.forEach(async doc => {
     const ceremony = doc.data();
     ceremony.status = "DISCONNECTED";
+    ceremony.id = doc.id;
     const ceremonyPromise = axios
       .get(ceremony.ip + "/api/state")
       .then(response => {
@@ -83,13 +66,14 @@ app.get("/api/ceremony/:id", async (req, res) => {
       .catch(err => {
         return { ceremonyState: "DISCONNECTED" };
       });
+    delete mpcState.name;
     ceremony = {
       ...ceremony,
-      ...mpcState
+      ...mpcState,
+      id: req.params.id
     };
     ceremony.status = ceremony.ceremonyState;
     delete ceremony.ceremonyState;
-    console.log(mpcState);
     res.json(ceremony);
   }
 });
