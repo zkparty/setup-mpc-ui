@@ -1,4 +1,4 @@
-import color from "color";
+import * as color from "color";
 import styled from "styled-components";
 
 export const background = "#081a24";
