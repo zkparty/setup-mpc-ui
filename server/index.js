@@ -5,6 +5,7 @@ const port = 80;
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios").default;
+const morgan = require("morgan");
 const serviceAccount = require("./firebase_skey.json");
 
 admin.initializeApp({
@@ -14,13 +15,17 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-app.use((req, res, next) => {
-  res.set({
-    "Access-Control-Allow-Origin": "*"
-  });
+if (process.env.NODE_ENV !== "production") {
+  app.use((req, res, next) => {
+    res.set({
+      "Access-Control-Allow-Origin": "*"
+    });
 
-  next();
-});
+    next();
+  });
+}
+
+app.use(morgan("dev"));
 
 app.use("/", express.static(path.join(__dirname, "../client/dist")));
 
@@ -52,9 +57,8 @@ app.get("/api/ceremony/:id", async (req, res) => {
     .doc(req.params.id)
     .get();
   if (!doc.exists) {
-    res.json({
-      exists: false
-    });
+    // should return 404
+    res.status(404).send("Ceremony not found.");
   } else {
     let ceremony = doc.data();
     ceremony.status = "DISCONNECTED";
@@ -72,8 +76,6 @@ app.get("/api/ceremony/:id", async (req, res) => {
       ...mpcState,
       id: req.params.id
     };
-    ceremony.status = ceremony.ceremonyState;
-    delete ceremony.ceremonyState;
     res.json(ceremony);
   }
 });

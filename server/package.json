@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^0.19.1",
     "express": "^4.17.1",
-    "firebase-admin": "^8.9.1"
+    "firebase-admin": "^8.9.1",
+    "morgan": "^1.9.1"
   }
 }

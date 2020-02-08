@@ -71,7 +71,7 @@ export const LandingPage = () => {
   );
 };
 
-const Tabs = (props: { children: ReactNode; titles: string[] }) => {
+const Tabs = (props: { children: ReactNode[]; titles: string[] }) => {
   const [selectedTitleIndex, updateIndex] = useState(0);
 
   return (

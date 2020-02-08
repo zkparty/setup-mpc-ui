@@ -1,18 +1,7 @@
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  HashRouter,
-  RouteProps,
-  useParams,
-  withRouter,
-  RouteComponentProps,
-  useHistory
-} from "react-router-dom";
+import { Link, RouteProps, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import * as React from "react";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import { ReactNode } from "react";
 import {
   textColor,
@@ -23,14 +12,8 @@ import {
   CeremonyTitle,
   Center
 } from "../../styles";
-
-interface Ceremony {
-  id: string;
-  name: string;
-  description: string;
-  start: string;
-  end: string;
-}
+import { Ceremony, Participant } from "../types/ceremony";
+import { getCeremonyData } from "../api/ZKPartyApi";
 
 const CeremonyDetailsTable = styled.table`
   text-align: right;
@@ -68,6 +51,14 @@ const TableHeader = styled(TableCell)`
   color: ${accentColor};
 `;
 
+const NotFoundContainer = styled.div`
+  width: 512px;
+  background-color: ${lighterBackground};
+  padding: 16px;
+  border-radius: 4px;
+  text-align: center;
+`;
+
 const CeremonyDetailsContainer = styled.div`
   width: 512px;
   background-color: ${lighterBackground};
@@ -82,30 +73,29 @@ const CeremonyDetailsSubSection = styled.div`
   box-sizing: border-box;
 `;
 
-export const CeremonyPage = (props: RouteProps) => {
+export const CeremonyPage = () => {
   let { id } = useParams();
 
-  const [loaded, setLoaded] = useState(false);
-  const [ceremony, setCeremony] = useState<any>({});
+  const [loaded, setLoaded] = useState<boolean>(false);
+  const [ceremony, setCeremony] = useState<null | Ceremony>(null);
 
-  fetch(`http://zkparty.io/api/ceremony/${id}`)
-    .then(response => {
-      return response.json();
-    })
-    .then(json => {
-      setLoaded(true);
-      setCeremony(json);
-    })
-    .catch(err => {
-      console.log(err);
-    });
+  useEffect(() => {
+    getCeremonyData(id)
+      .then(ceremonyData => {
+        setCeremony(ceremonyData);
+        setLoaded(true);
+      })
+      .catch(() => {
+        setLoaded(true);
+      });
+  }, [loaded]);
 
   return (
     <>
       <HomeLinkContainer>
         <Link to="/">home</Link>
       </HomeLinkContainer>
-      {loaded ? (
+      {ceremony ? (
         <PageContainer>
           <br />
           <CeremonyDetails ceremony={ceremony}></CeremonyDetails>
@@ -124,12 +114,19 @@ export const CeremonyPage = (props: RouteProps) => {
             ]}
           />
         </PageContainer>
-      ) : null}
+      ) : (
+        <PageContainer>
+          <br />
+          <NotFoundContainer>
+            {loaded ? "Ceremony not found." : "Loading..."}
+          </NotFoundContainer>
+        </PageContainer>
+      )}
     </>
   );
 };
 
-const CeremonyDetails = (props: { ceremony: any }) => {
+const CeremonyDetails = (props: { ceremony: Ceremony }) => {
   return (
     <CeremonyDetailsContainer>
       <CeremonyTitle>{props.ceremony.name}</CeremonyTitle>
@@ -137,27 +134,32 @@ const CeremonyDetails = (props: { ceremony: any }) => {
       <CeremonyDetailsSubSection>
         <Center>
           <CeremonyDetailsTable>
-            <tr>
-              <td>status</td> <td>{props.ceremony.status}</td>
-            </tr>
-            <tr>
-              <td>start time</td> <td>{props.ceremony.startTime}</td>
-            </tr>
-            <tr>
-              <td>end time</td> <td>{props.ceremony.endTime}</td>
-            </tr>
-            <tr>
-              <td>hompage</td>{" "}
-              <td>
-                <a href={props.ceremony.homepage}>HOMEPAGE</a>
-              </td>
-            </tr>
-            <tr>
-              <td>github</td>{" "}
-              <td>
-                <a href={props.ceremony.github}>GITHUB</a>
-              </td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>status</td>
+                <td>{props.ceremony.ceremonyState}</td>
+              </tr>
+              <tr>
+                <td>start time</td>
+                <td>{props.ceremony.startTime}</td>
+              </tr>
+              <tr>
+                <td>end time</td>
+                <td>{props.ceremony.endTime}</td>
+              </tr>
+              <tr>
+                <td>hompage</td>
+                <td>
+                  <a href={props.ceremony.homepage}>HOMEPAGE</a>
+                </td>
+              </tr>
+              <tr>
+                <td>github</td>
+                <td>
+                  <a href={props.ceremony.github}>GITHUB</a>
+                </td>
+              </tr>
+            </tbody>
           </CeremonyDetailsTable>
         </Center>
       </CeremonyDetailsSubSection>
@@ -168,14 +170,7 @@ const CeremonyDetails = (props: { ceremony: any }) => {
   );
 };
 
-interface ParticipantInfo {
-  computeProgress: number; // 0 to 100
-  online: boolean;
-  address: string;
-  state: "WAITING" | "RUNNING" | "COMPLETE" | "INVALIDATED";
-}
-
-const participantStatusString = (participant: ParticipantInfo) => {
+const participantStatusString = (participant: Participant) => {
   let statusString: string = participant.state;
   if (participant.state === "RUNNING" && participant.computeProgress < 1) {
     statusString = `RUNNING: ${Math.round(participant.computeProgress)}%`;
@@ -189,9 +184,9 @@ const participantStatusString = (participant: ParticipantInfo) => {
   return statusString;
 };
 const ParticipantTable = (props: {
-  participants: ParticipantInfo[];
+  participants: Participant[];
   headers: { title: string; width: string }[];
-  cols: Array<(p: ParticipantInfo) => ReactNode | null>;
+  cols: Array<(p: Participant) => ReactNode | null>;
 }) => {
   return (
     <div>
@@ -204,9 +199,9 @@ const ParticipantTable = (props: {
         );
       })}
 
-      {props.participants.map(p => {
+      {props.participants.map((p, j) => {
         return (
-          <div>
+          <div key={j}>
             {props.cols.map((col, i) => {
               return (
                 <TableCell
