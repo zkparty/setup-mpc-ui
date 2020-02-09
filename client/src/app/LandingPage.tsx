@@ -12,6 +12,7 @@ import {
   SectionContainer,
   CeremonyTitle
 } from "../../styles";
+import { getCeremonySummaries } from "../api/ZKPartyApi";
 
 const TabLink = styled.span`
   ${(props: { selected: boolean }) => {
@@ -91,18 +92,19 @@ const Tabs = (props: { children: ReactNode[]; titles: string[] }) => {
 
 const ParticipantsSection = () => {
   const [ceremonies, setCeremonies] = useState([]);
+  const [loaded, setLoaded] = useState(false);
   console.log("ParticipantSection");
 
   useEffect(() => {
-    fetch("http://zkparty.io/api/ceremonies")
-      .then(response => {
-        return response.json();
+    getCeremonySummaries()
+      .then(ceremonies => {
+        setCeremonies(ceremonies);
+        setLoaded(true);
       })
-      .then(json => {
-        console.log(json);
-        setCeremonies(json);
+      .catch(() => {
+        setLoaded(true);
       });
-  }, []);
+  }, [loaded]);
 
   return (
     <>

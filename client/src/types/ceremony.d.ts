@@ -1,54 +1,79 @@
+import { Moment } from "moment";
+
+export type CeremonyState =
+  | "PRESELECTION"
+  | "SELECTED"
+  | "RUNNING"
+  | "COMPLETE"
+  | "UNKNOWN";
+export type ParticipantState =
+  | "WAITING"
+  | "RUNNING"
+  | "COMPLETE"
+  | "INVALIDATED";
+export type ParticipantRunningState =
+  | "OFFLINE"
+  | "WAITING"
+  | "RUNNING"
+  | "COMPLETE";
+export type TranscriptState = "WAITING" | "VERIFYING" | "COMPLETE";
+
 export interface Ceremony {
+  // firebase-only data
   id: string;
+  serverURL: string;
   description: string;
-  ip: string;
-  github?: string;
-  homepage?: string;
-  // copied from setup-mpc-common
-  name: string;
-  ceremonyState: string;
+  instructions: string;
+  github: string;
+  homepage: string;
+  adminAddr: string;
+  lastParticipantsUpdate: Moment;
+  lastSummaryUpdate: Moment;
+
+  // fetched from mpc server, cached by zkp server for when / if mpc server is disconnected
+  ceremonyState: CeremonyState;
+  startTime: Moment;
+  endTime: Moment;
+  completedAt?: Moment;
   paused: boolean;
-  maxTier2: number;
-  minParticipants: number;
-  startTime: string;
-  endTime: string;
-  latestBlock: number;
   selectBlock: number;
-  completedAt?: string;
-  participants: Participant[];
+  minParticipants: number;
+  maxTier2: number;
+  sequence: number;
+  ceremonyProgress: number; // this is only returned by /api/state-summary, else must be computed by us
+  numParticipants: number; // this is only returned by /api/state-summary, else must be computed by us
+  participants?: Participant[]; // we only request this field when needed
 }
 
 export interface Participant {
-  // Server controlled data.
-  sequence: number;
+  // Coordinator server controlled data.
   address: string;
-  state: string;
-  // Position in the queue (can vary due to online/offline changes), or position computation took place (fixed).
+  state: ParticipantState; // is participant queued, currently computing, done, or invalidated?
+  runningState: ParticipantRunningState; // if the participant is computing, are they computing offline? (or maybe they are queued or invalidated)
   position: number;
-  // Priority is randomised at the selection date, after which it is fixed. It's used to determine position.
   priority: number;
   tier: number;
   verifyProgress: number;
-  lastVerified?: string;
-  addedAt: string;
-  startedAt?: string;
-  completedAt?: string;
+  lastVerified?: Moment;
+  addedAt: Moment;
+  startedAt?: Moment;
+  completedAt?: Moment;
   error?: string;
   online: boolean;
-  lastUpdate?: string;
+  lastUpdate?: Moment;
   location?: ParticipantLocation;
   invalidateAfter?: number;
-
-  // Client controlled data.
-  runningState: string;
+  sequence: number;
   transcripts: Transcript[]; // Except 'complete' participants
   computeProgress: number;
-  fast: boolean;
+
+  // ZKParty data
+  messages: Message[];
 }
 
 export interface Transcript {
   // Server controlled data.
-  state: string;
+  state: TranscriptState;
   // Client controlled data.
   num: number;
   fromAddress?: string;
@@ -65,13 +90,8 @@ export interface ParticipantLocation {
   longitude?: number;
 }
 
-export interface CeremonySummary {
-  id: string;
-  name: string;
-  description: string;
-  start: string;
-  end: string;
-  ip: string;
-  github?: string;
-  homepage?: string;
+export interface Message {
+  content: string;
+  timestamp: string;
+  signature: string;
 }

@@ -1,4 +1,5 @@
 import { CeremonySummary, Ceremony } from "../types/ceremony";
+import moment from "moment";
 
 const url = process.env.API_URL ? process.env.API_URL : "http://localhost:80";
 
@@ -29,4 +30,38 @@ export function getCeremonyData(id: string): Promise<Ceremony | null> {
       console.error(err);
       throw err;
     });
+}
+
+function jsonToCeremony(json: any): Ceremony {
+  // throws if ceremony is malformed
+
+  const {
+    lastFullUpdate,
+    lastSummaryUpdate,
+    startTime,
+    endTime,
+    completedAt,
+    participants,
+    messages,
+    ...rest
+  } = json;
+
+  return {
+    ...rest,
+    lastFullUpdate: moment(lastFullUpdate),
+    lastSummaryUpdate: moment(lastSummaryUpdate),
+    startTime: moment(startTime),
+    endTime: moment(endTime),
+    completedAt: completedAt ? moment(completedAt) : undefined,
+    messages: messages || [],
+    participants: participants.map(
+      ({ startedAt, lastUpdate, completedAt, addedAt, ...rest }: any) => ({
+        ...rest,
+        addedAt: moment(addedAt),
+        startedAt: startedAt ? moment(startedAt) : undefined,
+        lastUpdate: lastUpdate ? moment(lastUpdate) : undefined,
+        completedAt: completedAt ? moment(completedAt) : undefined
+      })
+    )
+  };
 }
