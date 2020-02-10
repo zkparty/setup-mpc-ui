@@ -28,7 +28,7 @@ async function getAndUpdateStaleSummaries() {
     let summary = summaries[i];
     if (
       summary.lastSummaryUpdate &&
-      new Date() - summary.lastSummaryUpdate > 5000
+      new Date() - summary.lastSummaryUpdate > 5 * 60 * 1000
     ) {
       updatePromises.push(
         getMPCSummary(summary.serverURL)

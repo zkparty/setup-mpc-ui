@@ -39,23 +39,45 @@ app.post("/api/add-ceremony", async (req, res) => {
 });
 
 app.get("/api/ceremonies-cached", async (req, res) => {
-  const summaries = await getCachedSummaries();
-  res.json(summaries);
+  try {
+    const summaries = await getCachedSummaries();
+    res.json(summaries);
+  } catch (e) {
+    console.error(e);
+    res.status(400).send(e);
+  }
 });
 
 app.get("/api/ceremonies", async (req, res) => {
-  const summaries = await getAndUpdateStaleSummaries();
-  res.json(summaries);
+  try {
+    const summaries = await getAndUpdateStaleSummaries();
+    res.json(summaries);
+  } catch (e) {
+    console.error(e);
+    res.status(400).send(e);
+  }
 });
 
 app.get("/api/ceremony-cached/:id", async (req, res) => {
-  const ceremony = await getCachedCeremony(req.params.id);
-  res.json(ceremony);
+  try {
+    const ceremony = await getCachedCeremony(req.params.id);
+    res.json(ceremony);
+  } catch (e) {
+    // probably ceremony doesn't exist
+    console.error(e);
+    res.status(404).send(e);
+  }
 });
 
 app.get("/api/ceremony/:id", async (req, res) => {
-  const ceremony = await getAndUpdateStaleCeremony(req.params.id);
-  res.json(ceremony);
+  try {
+    const ceremony = await getAndUpdateStaleCeremony(req.params.id);
+    res.json(ceremony);
+  } catch (e) {
+    // probably ceremony doesn't exist
+    console.error(e);
+    res.status(404).send(e);
+  }
 });
 
 app.listen(port, () => console.log(`App listening on port ${port}!`));
