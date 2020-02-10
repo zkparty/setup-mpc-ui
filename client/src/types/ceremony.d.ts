@@ -1,5 +1,3 @@
-import { Moment } from "moment";
-
 export type CeremonyState =
   | "PRESELECTION"
   | "SELECTED"
@@ -27,14 +25,14 @@ export interface Ceremony {
   github: string;
   homepage: string;
   adminAddr: string;
-  lastParticipantsUpdate: Moment;
-  lastSummaryUpdate: Moment;
+  lastParticipantsUpdate: Date;
+  lastSummaryUpdate: Date;
 
   // fetched from mpc server, cached by zkp server for when / if mpc server is disconnected
   ceremonyState: CeremonyState;
-  startTime: Moment;
-  endTime: Moment;
-  completedAt?: Moment;
+  startTime: Date;
+  endTime: Date;
+  completedAt?: Date;
   paused: boolean;
   selectBlock: number;
   minParticipants: number;
@@ -54,13 +52,13 @@ export interface Participant {
   priority: number;
   tier: number;
   verifyProgress: number;
-  lastVerified?: Moment;
-  addedAt: Moment;
-  startedAt?: Moment;
-  completedAt?: Moment;
+  lastVerified?: Date;
+  addedAt: Date;
+  startedAt?: Date;
+  completedAt?: Date;
   error?: string;
   online: boolean;
-  lastUpdate?: Moment;
+  lastUpdate?: Date;
   location?: ParticipantLocation;
   invalidateAfter?: number;
   sequence: number;

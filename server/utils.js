@@ -18,7 +18,7 @@ function shallowPick(obj, requiredProps, optionalProps) {
   const ret = {};
   for (const prop of requiredProps) {
     if (obj[prop] === undefined) {
-      throw new Error("required prop missing");
+      throw new Error(`required prop ${prop} missing`);
     }
     ret[prop] = obj[prop];
   }

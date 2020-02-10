@@ -6,8 +6,9 @@ const path = require("path");
 const morgan = require("morgan");
 const {
   getCachedSummaries,
-  getCachedSummary,
+  getAndUpdateStaleSummaries,
   getCachedCeremony,
+  getAndUpdateStaleCeremony,
   addCeremony
 } = require("./ZKPartyServer");
 
@@ -43,13 +44,18 @@ app.get("/api/ceremonies-cached", async (req, res) => {
 });
 
 app.get("/api/ceremonies", async (req, res) => {
-  const summaries = await getCachedSummaries();
+  const summaries = await getAndUpdateStaleSummaries();
   res.json(summaries);
 });
 
-app.get("/api/ceremony/:id", async (req, res) => {
+app.get("/api/ceremony-cached/:id", async (req, res) => {
   const ceremony = await getCachedCeremony(req.params.id);
   res.json(ceremony);
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.get("/api/ceremony/:id", async (req, res) => {
+  const ceremony = await getAndUpdateStaleCeremony(req.params.id);
+  res.json(ceremony);
+});
+
+app.listen(port, () => console.log(`App listening on port ${port}!`));

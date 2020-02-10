@@ -5,18 +5,23 @@ const { shallowPick } = require("./utils");
 async function getMPCSummary(url) {
   // gets an mpcState object from an mpc server and transforms it into a partial Ceremony object (containing all non-firebase fields)
   // throws if request fails, or if response does not conform to expectation
-  const response = await axios.get(url + "/api/state-summary", {
+  const config = {
     timeout: 2000
-  });
+  };
+  const response = await axios.get(url + "/api/state-summary", config);
   return stateSummaryJsonToCeremonyPartial(response.data);
 }
 
-async function getMPCCeremony(url) {
+async function getMPCCeremony(url, sequence) {
   // gets an mpcState object from an mpc server and transforms it into a partial Ceremony object (containing all non-firebase fields)
   // throws if request fails, or if response does not conform to expectation
-  const response = await axios.get(url + "/api/state", {
-    timeout: 2000
-  });
+  const config = {
+    timeout: 5000
+  };
+  if (sequence) {
+    config.params = { sequence };
+  }
+  const response = await axios.get(url + "/api/state", config);
   return stateJsonToCeremonyPartial(response.data);
 }
 
@@ -34,7 +39,6 @@ function stateSummaryJsonToCeremonyPartial(json) {
     "minParticipants",
     "maxTier2",
     "sequence",
-    "participants",
     "numParticipants",
     "ceremonyProgress"
   ];
@@ -45,10 +49,12 @@ function stateSummaryJsonToCeremonyPartial(json) {
     optionalCeremonyFields
   );
 
-  // cast string -> moment
-  for (let castToMoment of ["startTime", "endTime", "completedAt"]) {
-    if (ceremonyPartial[castToMoment] !== undefined) {
-      ceremonyPartial[castToMoment] = moment(ceremonyPartial[castToMoment]);
+  // cast string -> date
+  for (let castToDate of ["startTime", "endTime", "completedAt"]) {
+    if (ceremonyPartial[castToDate] !== undefined) {
+      ceremonyPartial[castToDate] = moment(
+        ceremonyPartial[castToDate]
+      ).toDate();
     }
   }
 
@@ -60,7 +66,7 @@ function stateJsonToCeremonyPartial(json) {
   // DOES include full participants data
   // throws if json is missing required fields
 
-  // get and validate all the relevant fields
+  // validate ceremony fields
   const requiredCeremonyFields = [
     "ceremonyState",
     "startTime",
@@ -78,6 +84,8 @@ function stateJsonToCeremonyPartial(json) {
     requiredCeremonyFields,
     optionalCeremonyFields
   );
+
+  // validate participant fields
   for (let i = 0; i < ceremonyPartial.participants.length; i += 1) {
     let participant = ceremonyPartial.participants[i];
     const requiredParticipantFields = [
@@ -109,6 +117,21 @@ function stateJsonToCeremonyPartial(json) {
       optionalParticipantFields
     );
     participant = ceremonyPartial.participants[i];
+
+    // cast string -> date for participant fields
+    for (let castToDate of [
+      "lastVerified",
+      "addedAt",
+      "startedAt",
+      "completedAt",
+      "lastUpdate"
+    ]) {
+      if (participant[castToDate] !== undefined) {
+        participant[castToDate] = moment(participant[castToDate]).toDate();
+      }
+    }
+
+    // validate transcript fields
     for (let i = 0; i < participant.transcripts.length; i += 1) {
       const transcript = participant.transcripts[i];
       const requiredTranscriptFields = [
@@ -134,7 +157,7 @@ function stateJsonToCeremonyPartial(json) {
   }
   let ceremonyProgress = Math.min(
     99,
-    (100 * completedParticipants) / numParticipants
+    (100 * completedParticipants) / ceremonyPartial.minParticipants
   );
   if (ceremonyPartial.ceremonyState === "COMPLETE") {
     ceremonyProgress = 100;
@@ -142,10 +165,12 @@ function stateJsonToCeremonyPartial(json) {
   ceremonyPartial.numParticipants = numParticipants;
   ceremonyPartial.ceremonyProgress = ceremonyProgress;
 
-  // cast string -> moment
-  for (let castToMoment of ["startTime", "endTime", "completedAt"]) {
-    if (ceremonyPartial[castToMoment] !== undefined) {
-      ceremonyPartial[castToMoment] = moment(ceremonyPartial[castToMoment]);
+  // cast string -> date
+  for (let castToDate of ["startTime", "endTime", "completedAt"]) {
+    if (ceremonyPartial[castToDate] !== undefined) {
+      ceremonyPartial[castToDate] = moment(
+        ceremonyPartial[castToDate]
+      ).toDate();
     }
   }
 

@@ -1,14 +1,15 @@
 const { isURL, isGithubURL, isAddr } = require("./utils");
-const { getMPCCeremony } = require("./MpcServerApi");
+const { getMPCCeremony, getMPCSummary } = require("./MpcServerApi");
 const {
   fbCeremonyExists,
   addFBCeremony,
   getFBSummaries,
   getFBSummary,
-  getFBCeremony
+  getFBCeremony,
+  updateFBSummary,
+  updateFBCeremony
 } = require("./FirebaseApi");
 const { shallowPick } = require("./utils");
-const moment = require("moment");
 
 async function getCachedSummaries() {
   // return array of all ceremonies (WITHOUT detailed participant data), from firebase
@@ -20,7 +21,36 @@ async function getCachedSummary(id) {
 }
 
 async function getAndUpdateStaleSummaries() {
-  // find all ceremonies that haven't been updated in the last 1m, update them, and return their summaries
+  // find all ceremonies that haven't been updated in the last 5m, update them, and then return all summaries
+  const summaries = await getFBSummaries();
+  const updatePromises = [];
+  for (let i = 0; i < summaries.length; i += 1) {
+    let summary = summaries[i];
+    if (
+      summary.lastSummaryUpdate &&
+      new Date() - summary.lastSummaryUpdate > 5000
+    ) {
+      updatePromises.push(
+        getMPCSummary(summary.serverURL)
+          .then(newSummary => {
+            return updateFBSummary({ ...newSummary, id: summary.id });
+          })
+          .then(() => {
+            return getFBSummary(summary.id);
+          })
+          .then(summary => {
+            summaries[i] = summary;
+          })
+          .catch(err => {
+            console.error(
+              `error updating ceremony summary with id ${summary.id}: ${err}`
+            );
+          })
+      );
+    }
+  }
+  await Promise.all(updatePromises);
+  return summaries;
 }
 
 async function getParticipantMessages(ceremonyId, participantAddress) {
@@ -32,26 +62,30 @@ async function getCachedCeremony(id) {
   return getFBCeremony(id);
 }
 
-async function getandUpdateStaleCeremony(id) {
+async function getAndUpdateStaleCeremony(id) {
   // get full ceremony data, from mpc server
+  const summary = await getFBSummary(id);
+  const mpcCeremony = await getMPCCeremony(summary.serverURL, summary.sequence);
+  await updateFBCeremony({ ...mpcCeremony, id });
+  const updatedCeremony = await getFBCeremony(id);
+  return updatedCeremony;
 }
 
 async function addCeremony(addCeremonyJson) {
   // add a new ceremony. throws if fields are missing or malformed, or if can't connect to MPC server, or if such id already exists
   const addCeremonyData = validateAddCeremonyJson(addCeremonyJson);
   const ceremony = await getMPCCeremony(addCeremonyData.serverURL);
+  const { participants, ...rest } = ceremony;
 
-  const firebaseData = {
+  const summaryData = {
     ...addCeremonyData,
-    ...ceremony,
-    lastSummaryUpdate: moment(),
-    lastParticipantsUpdate: moment()
+    ...rest
   };
 
-  if (await fbCeremonyExists(firebaseData.id)) {
+  if (await fbCeremonyExists(summaryData.id)) {
     throw new Error("ceremony with this id already exists");
   }
-  await addFBCeremony(firebaseData, ceremony.participants);
+  await addFBCeremony(summaryData, participants);
 }
 
 function validateAddCeremonyJson(addCeremonyJson) {
@@ -85,7 +119,8 @@ function validateAddCeremonyJson(addCeremonyJson) {
 
 module.exports = {
   getCachedSummaries,
-  getCachedSummary,
   getCachedCeremony,
+  getAndUpdateStaleSummaries,
+  getAndUpdateStaleCeremony,
   addCeremony
 };

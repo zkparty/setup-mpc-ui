@@ -1,4 +1,3 @@
-const moment = require("moment");
 const admin = require("firebase-admin");
 const serviceAccount = require("./firebase_skey.json");
 
@@ -40,7 +39,7 @@ async function getFBCeremony(id) {
   const missingParticipants = firebaseCeremonyJsonToSummary(doc.data());
   const participants = [];
   const participantsSnapshot = await db
-    .collection("ceremonies")
+    .collection("ceremonyParticipants")
     .doc(id)
     .collection("participants")
     .orderBy("position")
@@ -55,22 +54,79 @@ async function getFBCeremony(id) {
   return ceremony;
 }
 
-async function updateCachedSummary(newCeremonySummary) {}
+async function updateFBSummary(newCeremonySummary) {
+  // updates firebase ceremony doc by updating the fields present in newCeremonySummary
+  // we never delete fields
+  const docRef = await db.collection("ceremonies").doc(newCeremonySummary.id);
+  const doc = await docRef.get();
+  if (!doc.exists) {
+    throw new Error(
+      `ceremony with id ${newCeremonySummary.id} does not exist.`
+    );
+  }
+  await docRef.set(
+    {
+      ...newCeremonySummary,
+      lastSummaryUpdate: new Date()
+    },
+    { merge: true }
+  );
+}
 
-async function updateCachedCeremony(newCeremony) {}
+async function updateFBCeremony(newCeremony) {
+  // updates firebase ceremony doc by updating the fields present in newCeremony
+  // updates the participants in newCeremony.participants in firebase ceremony's participants subsection (present fields only)
+  // we never delete fields
+  const docRef = db.collection("ceremonies").doc(newCeremony.id);
+  const doc = await docRef.get();
+  if (!doc.exists) {
+    throw new Error(`ceremony with id ${newCeremony.id} does not exist.`);
+  }
+  const { participants, ...rest } = newCeremony;
+  const summaryUpdatePromise = docRef.set(
+    {
+      ...rest,
+      lastSummaryUpdate: new Date(),
+      lastParticipantsUpdate: new Date()
+    },
+    { merge: true }
+  );
+  const participantUpdatesPromises = [];
+  for (const participant of newCeremony.participants) {
+    const participantDocRef = db
+      .collection("ceremonyParticipants")
+      .doc(newCeremony.id)
+      .collection("participants")
+      .doc(participant.address.toLowerCase());
+    participantUpdatesPromises.push(
+      participantDocRef.set(participant, { merge: true })
+    );
+  }
+  await Promise.all([summaryUpdatePromise, ...participantUpdatesPromises]);
+}
 
 async function fbCeremonyExists(id) {
   const docRef = db.collection("ceremonies").doc(id);
   return (await docRef.get()).exists;
 }
 
-async function addFBCeremony(ceremonyData, participants) {
+async function addFBCeremony(summaryData, participants) {
   try {
-    const docRef = db.collection("ceremonies").doc(ceremonyData.id);
-    await docRef.set(ceremonyData);
+    const docRef = db.collection("ceremonies").doc(summaryData.id);
+    await docRef.set({
+      ...summaryData,
+      lastSummaryUpdate: new Date(),
+      lastParticipantsUpdate: new Date()
+    });
+    const ceremonyParticipantsDocRef = db
+      .collection("ceremonyParticipants")
+      .doc(summaryData.id);
+    await ceremonyParticipantsDocRef.set({
+      id: summaryData.id
+    });
     const participantPromises = [];
     for (const participant of participants) {
-      participantPromises.push(addParticipant(ceremonyData.id, participant));
+      participantPromises.push(addParticipant(summaryData.id, participant));
     }
     await Promise.all(participantPromises);
     return;
@@ -82,7 +138,7 @@ async function addFBCeremony(ceremonyData, participants) {
 async function addParticipant(ceremonyId, participant) {
   participant.messages = [];
   const participantRef = db
-    .collection("ceremonies")
+    .collection("ceremonyParticipants")
     .doc(ceremonyId)
     .collection("participants")
     .doc(participant.address.toLowerCase());
@@ -98,7 +154,7 @@ function firebaseCeremonyJsonToSummary(json) {
     "completedAt"
   ]) {
     if (json[prop] !== undefined) {
-      json[prop] = moment(json[prop]);
+      json[prop] = json[prop].toDate();
     }
   }
   return json;
@@ -113,7 +169,7 @@ function firebaseParticipantJsonToParticipant(json) {
     "lastUpdate"
   ]) {
     if (json[prop] !== undefined) {
-      json[prop] = moment(json[prop]);
+      json[prop] = json[prop].toDate();
     }
   }
   return json;
@@ -123,6 +179,8 @@ module.exports = {
   getFBSummaries,
   getFBSummary,
   getFBCeremony,
+  updateFBSummary,
+  updateFBCeremony,
   fbCeremonyExists,
   addFBCeremony
 };
