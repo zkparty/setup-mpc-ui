@@ -12,7 +12,12 @@ import {
   SectionContainer,
   CeremonyTitle
 } from "../../styles";
-import { getCeremonySummaries } from "../api/ZKPartyApi";
+import {
+  getCeremonySummaries,
+  getCeremonySummariesCached
+} from "../api/ZKPartyApi";
+import { Ceremony } from "../types/ceremony";
+import { format } from "timeago.js";
 
 const TabLink = styled.span`
   ${(props: { selected: boolean }) => {
@@ -95,11 +100,24 @@ const ParticipantsSection = () => {
   const [loaded, setLoaded] = useState(false);
   console.log("ParticipantSection");
 
-  useEffect(() => {
+  const refreshCeremonySummaries = () => {
     getCeremonySummaries()
       .then(ceremonies => {
         setCeremonies(ceremonies);
+      })
+      .catch(err => {
+        console.error(`error getting ceremonies: ${err}`);
+      });
+  };
+
+  useEffect(() => {
+    getCeremonySummariesCached()
+      .then(ceremonies => {
+        setCeremonies(ceremonies);
         setLoaded(true);
+        refreshCeremonySummaries();
+        // TODO: clear interval with returned function for useEffect
+        setInterval(refreshCeremonySummaries, 30000);
       })
       .catch(() => {
         setLoaded(true);
@@ -128,7 +146,7 @@ const AboutSection = () => {
   return <div>this is the about</div>;
 };
 
-const CeremonySummary = (props: { ceremony } & RouteProps) => {
+const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
   const c = props.ceremony;
 
   let history = useHistory();
@@ -139,8 +157,15 @@ const CeremonySummary = (props: { ceremony } & RouteProps) => {
 
   return (
     <CeremonyContainer onClick={onClick}>
-      <CeremonyTitle>{c.name}</CeremonyTitle>
+      <CeremonyTitle>{c.title}</CeremonyTitle>
+      {`STATUS: ${c.ceremonyState}` +
+        (c.ceremonyState === "RUNNING" ? ` (${c.ceremonyProgress}%)` : "")}
+      <br />
+      <br />
       {c.description}
+      <br />
+      <br />
+      {`Last updated: ${format(c.lastSummaryUpdate)}`}
     </CeremonyContainer>
   );
 };
@@ -148,7 +173,7 @@ const CeremonySummary = (props: { ceremony } & RouteProps) => {
 class ZKTitle extends React.Component {
   readonly refreshInterval = 1000 / 12;
   readonly secondsOfLit = 0.5;
-  private interval = null;
+  private interval: number | null = null;
 
   state = {
     actualText: "zkparty"

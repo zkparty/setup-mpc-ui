@@ -22,7 +22,13 @@ async function getMPCCeremony(url, sequence) {
     config.params = { sequence };
   }
   const response = await axios.get(url + "/api/state", config);
-  return stateJsonToCeremonyPartial(response.data);
+  const ret = stateJsonToCeremonyPartial(response.data);
+  const summaryResponse = await getMPCSummary(url); // this is wasteful, but we have to get the other two fields so oh well
+  return {
+    ...ret,
+    numParticipants: summaryResponse.numParticipants,
+    ceremonyProgress: summaryResponse.ceremonyProgress
+  };
 }
 
 function stateSummaryJsonToCeremonyPartial(json) {
@@ -62,8 +68,9 @@ function stateSummaryJsonToCeremonyPartial(json) {
 }
 
 function stateJsonToCeremonyPartial(json) {
-  // returns a json with all fields that are not firebase-only
-  // DOES include full participants data
+  // returns a json with all fields that are not firebase-only, minus numParticipants and ceremonyProgress
+  // DOES include participants data of all participants who have changed since last sequence
+  // DOES NOT include numParticipants or ceremonyProgress
   // throws if json is missing required fields
 
   // validate ceremony fields
@@ -148,22 +155,6 @@ function stateJsonToCeremonyPartial(json) {
       );
     }
   }
-
-  // calculate numParticipants and ceremonyProgress, and put them in return json
-  const numParticipants = ceremonyPartial.participants.length;
-  let completedParticipants = 0;
-  for (const participant of ceremonyPartial.participants) {
-    completedParticipants += participant.state === "COMPLETE" ? 1 : 0;
-  }
-  let ceremonyProgress = Math.min(
-    99,
-    (100 * completedParticipants) / ceremonyPartial.minParticipants
-  );
-  if (ceremonyPartial.ceremonyState === "COMPLETE") {
-    ceremonyProgress = 100;
-  }
-  ceremonyPartial.numParticipants = numParticipants;
-  ceremonyPartial.ceremonyProgress = ceremonyProgress;
 
   // cast string -> date
   for (let castToDate of ["startTime", "endTime", "completedAt"]) {

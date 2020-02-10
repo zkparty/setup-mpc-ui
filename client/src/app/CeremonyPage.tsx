@@ -67,7 +67,7 @@ const CeremonyDetailsContainer = styled.div`
 `;
 
 const CeremonyDetailsSubSection = styled.div`
-  width: 80%;
+  width: 100%;
   display: inline-block;
   padding: 16px;
   box-sizing: border-box;
@@ -127,9 +127,10 @@ export const CeremonyPage = () => {
 };
 
 const CeremonyDetails = (props: { ceremony: Ceremony }) => {
+  console.log(props.ceremony);
   return (
     <CeremonyDetailsContainer>
-      <CeremonyTitle>{props.ceremony.name}</CeremonyTitle>
+      <CeremonyTitle>{props.ceremony.title}</CeremonyTitle>
 
       <CeremonyDetailsSubSection>
         <Center>
@@ -141,22 +142,24 @@ const CeremonyDetails = (props: { ceremony: Ceremony }) => {
               </tr>
               <tr>
                 <td>start time</td>
-                <td>{props.ceremony.startTime}</td>
+                <td>{props.ceremony.startTime.toLocaleString()}</td>
               </tr>
               <tr>
                 <td>end time</td>
-                <td>{props.ceremony.endTime}</td>
+                <td>{props.ceremony.endTime.toLocaleString()}</td>
               </tr>
               <tr>
                 <td>hompage</td>
                 <td>
-                  <a href={props.ceremony.homepage}>HOMEPAGE</a>
+                  <a href={props.ceremony.homepage}>
+                    {props.ceremony.homepage}
+                  </a>
                 </td>
               </tr>
               <tr>
                 <td>github</td>
                 <td>
-                  <a href={props.ceremony.github}>GITHUB</a>
+                  <a href={props.ceremony.github}>{props.ceremony.github}</a>
                 </td>
               </tr>
             </tbody>

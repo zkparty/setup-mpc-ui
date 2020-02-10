@@ -32,6 +32,6 @@ export const Center = styled.div`
 
 export const CeremonyTitle = styled.div`
   font-size: 18pt;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   color: ${accentColor};
 `;

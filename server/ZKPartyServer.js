@@ -13,7 +13,19 @@ const { shallowPick } = require("./utils");
 
 async function getCachedSummaries() {
   // return array of all ceremonies (WITHOUT detailed participant data), from firebase
-  return getFBSummaries();
+  const summaries = await getFBSummaries();
+  summaries.sort((a, b) => {
+    let aProgress = a.ceremonyProgress;
+    if (a.ceremonyState === "PRESELECTION") {
+      aProgress = -1;
+    }
+    let bProgress = b.ceremonyProgress;
+    if (b.ceremonyState === "PRESELECTION") {
+      bProgress = -1;
+    }
+    return aProgress - bProgress;
+  });
+  return summaries;
 }
 
 async function getCachedSummary(id) {
@@ -22,17 +34,20 @@ async function getCachedSummary(id) {
 
 async function getAndUpdateStaleSummaries() {
   // find all ceremonies that haven't been updated in the last 5m, update them, and then return all summaries
+
+  // TODO: put a lock on ceremonies that are already being updated / already have requests sent out!
   const summaries = await getFBSummaries();
   const updatePromises = [];
   for (let i = 0; i < summaries.length; i += 1) {
     let summary = summaries[i];
     if (
       summary.lastSummaryUpdate &&
-      new Date() - summary.lastSummaryUpdate > 5 * 60 * 1000
+      new Date() - summary.lastSummaryUpdate > 60 * 1000
     ) {
       updatePromises.push(
         getMPCSummary(summary.serverURL)
           .then(newSummary => {
+            delete newSummary.sequence; // otherwise we will advance sequence without having updated participants properly!
             return updateFBSummary({ ...newSummary, id: summary.id });
           })
           .then(() => {
@@ -50,6 +65,17 @@ async function getAndUpdateStaleSummaries() {
     }
   }
   await Promise.all(updatePromises);
+  summaries.sort((a, b) => {
+    let aProgress = a.ceremonyProgress;
+    if (a.ceremonyState === "PRESELECTION") {
+      aProgress = -1;
+    }
+    let bProgress = b.ceremonyProgress;
+    if (b.ceremonyState === "PRESELECTION") {
+      bProgress = -1;
+    }
+    return aProgress - bProgress;
+  });
   return summaries;
 }
 
@@ -91,6 +117,7 @@ async function addCeremony(addCeremonyJson) {
 function validateAddCeremonyJson(addCeremonyJson) {
   const requiredProps = [
     "id",
+    "title",
     "serverURL",
     "description",
     "instructions",

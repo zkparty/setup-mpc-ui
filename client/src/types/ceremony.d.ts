@@ -19,6 +19,7 @@ export type TranscriptState = "WAITING" | "VERIFYING" | "COMPLETE";
 export interface Ceremony {
   // firebase-only data
   id: string;
+  title: string;
   serverURL: string;
   description: string;
   instructions: string;
