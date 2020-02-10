@@ -13,7 +13,7 @@ import {
   Center
 } from "../../styles";
 import { Ceremony, Participant } from "../types/ceremony";
-import { getCeremonyData } from "../api/ZKPartyApi";
+import { getCeremonyData, getCeremonyDataCached } from "../api/ZKPartyApi";
 
 const CeremonyDetailsTable = styled.table`
   text-align: right;
@@ -79,11 +79,24 @@ export const CeremonyPage = () => {
   const [loaded, setLoaded] = useState<boolean>(false);
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
 
-  useEffect(() => {
+  const refreshCeremony = () => {
     getCeremonyData(id)
+      .then(ceremony => {
+        setCeremony(ceremony);
+      })
+      .catch(err => {
+        console.error(`error getting ceremony: ${err}`);
+      });
+  };
+
+  useEffect(() => {
+    getCeremonyDataCached(id)
       .then(ceremonyData => {
         setCeremony(ceremonyData);
         setLoaded(true);
+        refreshCeremony();
+        // TODO: clear interval with returned function for useEffect
+        setInterval(refreshCeremony, 15000);
       })
       .catch(() => {
         setLoaded(true);
@@ -127,7 +140,6 @@ export const CeremonyPage = () => {
 };
 
 const CeremonyDetails = (props: { ceremony: Ceremony }) => {
-  console.log(props.ceremony);
   return (
     <CeremonyDetailsContainer>
       <CeremonyTitle>{props.ceremony.title}</CeremonyTitle>

@@ -60,8 +60,6 @@ const LandingPageTitle = styled.div`
 `;
 
 export const LandingPage = () => {
-  console.log("LandingPage");
-
   return (
     <PageContainer>
       <ZKTitle>zkparty</ZKTitle>
@@ -98,7 +96,6 @@ const Tabs = (props: { children: ReactNode[]; titles: string[] }) => {
 const ParticipantsSection = () => {
   const [ceremonies, setCeremonies] = useState([]);
   const [loaded, setLoaded] = useState(false);
-  console.log("ParticipantSection");
 
   const refreshCeremonySummaries = () => {
     getCeremonySummaries()
@@ -111,14 +108,13 @@ const ParticipantsSection = () => {
   };
 
   useEffect(() => {
-    console.log("useEffect");
     getCeremonySummariesCached()
       .then(ceremonies => {
         setCeremonies(ceremonies);
         setLoaded(true);
         refreshCeremonySummaries();
         // TODO: clear interval with returned function for useEffect
-        setInterval(refreshCeremonySummaries, 30000);
+        setInterval(refreshCeremonySummaries, 15000);
       })
       .catch(() => {
         setLoaded(true);
