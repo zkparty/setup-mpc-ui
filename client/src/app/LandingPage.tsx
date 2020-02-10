@@ -66,7 +66,7 @@ export const LandingPage = () => {
     <PageContainer>
       <ZKTitle>zkparty</ZKTitle>
 
-      <Tabs titles={["Participants", "Coordinators", "About"]}>
+      <Tabs titles={["Ceremonies", "Coordinators", "About"]}>
         {[
           <ParticipantsSection key="participants" />,
           <CoordinatorsSection key="coordinators" />,
@@ -111,6 +111,7 @@ const ParticipantsSection = () => {
   };
 
   useEffect(() => {
+    console.log("useEffect");
     getCeremonySummariesCached()
       .then(ceremonies => {
         setCeremonies(ceremonies);
@@ -135,9 +136,9 @@ const ParticipantsSection = () => {
 
 const CoordinatorsSection = () => {
   return (
-    <div>
-      Welcome to zkparty. <br />
-      <Link to="/register">register</Link>
+    <div style={{ width: "512px" }}>
+      Welcome to zkparty. This page will allow MPC coordinators to register/list
+      their ceremonies, and verify their identities. <br />
     </div>
   );
 };
