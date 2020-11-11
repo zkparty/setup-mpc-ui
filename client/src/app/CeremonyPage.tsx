@@ -75,7 +75,7 @@ const CeremonyDetailsSubSection = styled.div`
 `;
 
 export const CeremonyPage = () => {
-  let { id } = useParams();
+  let { id } = useParams<{ id: string }>();
 
   const [loaded, setLoaded] = useState<boolean>(false);
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
