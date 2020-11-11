@@ -11,7 +11,7 @@ import {
   lighterBackground,
   SectionContainer,
   CeremonyTitle
-} from "../../styles";
+} from "../styles";
 import {
   getCeremonySummaries,
   getCeremonySummariesCached
@@ -19,22 +19,28 @@ import {
 import { Ceremony } from "../types/ceremony";
 import { format } from "timeago.js";
 
-const TabLink = styled.span`
-  ${(props: { selected: boolean }) => {
-    return css`
-      text-decoration: ${props.selected ? "underline" : "none"};
+ const TabLink = styled.span`
+      text-decoration: "none";
       cursor: pointer;
-      color: ${props.selected ? "black" : accentColor};
-      background-color: ${props.selected ? accentColor : "unset"};
-      margin-right: 16px;
+      color: "black" ;
+      background-color: accentColor ;
+      margin-right: 16px;   
+ `;
+//   ${(props: { selected: boolean }) => {
+//     return css`
+//       text-decoration: ${props.selected ? "underline" : "none"};
+//       cursor: pointer;
+//       color: ${props.selected ? "black" : accentColor};
+//       background-color: ${props.selected ? accentColor : "unset"};
+//       margin-right: 16px;
 
-      &:hover {
-        background-color: ${secondAccent};
-        color: ${textColor};
-      }
-    `;
-  }}
-`;
+//       &:hover {
+//         background-color: ${secondAccent};
+//         color: ${textColor};
+//       }
+//     `;
+//   }}
+// `;
 
 const CeremonyContainer = styled.div`
   background-color: ${lighterBackground};
@@ -83,7 +89,7 @@ const Tabs = (props: { children: ReactNode[]; titles: string[] }) => {
       <div>
         {props.titles.map((title, i) => (
           <span key={title} onClick={() => updateIndex(i)}>
-            <TabLink selected={i === selectedTitleIndex}>{title}</TabLink>
+            {/* <TabLink selected={i === selectedTitleIndex} >{title}</TabLink> */}
           </span>
         ))}
       </div>
@@ -94,7 +100,7 @@ const Tabs = (props: { children: ReactNode[]; titles: string[] }) => {
 };
 
 const ParticipantsSection = () => {
-  const [ceremonies, setCeremonies] = useState([]);
+  const [ceremonies, setCeremonies] = useState<Ceremony[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   const refreshCeremonySummaries = () => {
@@ -168,9 +174,16 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
 };
 
 class ZKTitle extends React.Component {
-  readonly refreshInterval = 1000 / 12;
-  readonly secondsOfLit = 0.5;
-  private interval: number | null = null;
+  refreshInterval: number;
+  secondsOfLit: number;
+  interval: number | undefined; 
+
+  constructor(props: any) {
+    super(props);
+    this.refreshInterval = 1000 / 12;
+    this.secondsOfLit = 0.5;
+    this.interval = undefined;
+  }
 
   state = {
     actualText: "zkparty"
@@ -186,7 +199,7 @@ class ZKTitle extends React.Component {
 
       setTimeout(() => {
         clearInterval(this.interval);
-        this.interval = null;
+        this.interval = undefined;
 
         if (Math.random() < 0.3) {
           this.setState({

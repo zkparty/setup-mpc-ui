@@ -1,7 +1,7 @@
 import { Switch, Route, HashRouter } from "react-router-dom";
 import * as React from "react";
 import { createGlobalStyle } from "styled-components";
-import { textColor } from "../../styles";
+import { textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
 import { CeremonyPage } from "./CeremonyPage";
 import { RegisterPage } from "./RegisterPage";

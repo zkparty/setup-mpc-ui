@@ -1,4 +1,4 @@
-import { PageContainer } from "../../styles";
+import { PageContainer } from "../styles";
 import { Link } from "react-router-dom";
 import * as React from "react";
 

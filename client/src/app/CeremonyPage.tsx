@@ -11,7 +11,7 @@ import {
   secondAccent,
   CeremonyTitle,
   Center
-} from "../../styles";
+} from "../styles";
 import { Ceremony, Participant } from "../types/ceremony";
 import { getCeremonyData, getCeremonyDataCached } from "../api/ZKPartyApi";
 
@@ -46,10 +46,11 @@ const TableCell = styled.span`
   text-overflow: ellipsis;
 `;
 
-const TableHeader = styled(TableCell)`
+const TableHeader = styled.span`
   display: inline-block;
-  color: ${accentColor};
+  color: "white";
 `;
+//  color: ${props => props.accentColor};
 
 const NotFoundContainer = styled.div`
   width: 512px;

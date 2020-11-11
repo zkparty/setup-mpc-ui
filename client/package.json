@@ -1,10 +1,12 @@
 {
-  "name": "zk-party-frontend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "trusted-setup-frontend",
+  "version": "0.0.1",
+  "description": "Trusted Setup multi-party computation user interface",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "keywords": [],
   "author": "",
@@ -26,5 +28,17 @@
     "@types/color": "^3.0.1",
     "@types/react-router-dom": "^5.1.3",
     "typescript": "^3.7.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

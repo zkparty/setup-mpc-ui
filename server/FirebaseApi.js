@@ -3,7 +3,7 @@ const serviceAccount = require("./firebase_skey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://zkparty-14974.firebaseio.com"
+  databaseURL: "https://trustedsetup-a86f4.firebaseio.com"
 });
 
 const db = admin.firestore();
