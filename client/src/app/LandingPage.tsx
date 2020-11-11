@@ -1,8 +1,9 @@
 import { Link, RouteProps, useHistory } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import * as React from "react";
 import styled, { css } from "styled-components";
 import { ReactNode } from "react";
+import SiteMenu from "./Menu";
 import {
   accentColor,
   secondAccent,
@@ -19,28 +20,22 @@ import {
 import { Ceremony } from "../types/ceremony";
 import { format } from "timeago.js";
 
- const TabLink = styled.span`
-      text-decoration: "none";
+ const TabLink = styled.span<any>`
+  ${(props: { selected: boolean }) => {
+    return css`
+      text-decoration: ${props.selected ? "underline" : "none"};
       cursor: pointer;
-      color: "black" ;
-      background-color: accentColor ;
-      margin-right: 16px;   
- `;
-//   ${(props: { selected: boolean }) => {
-//     return css`
-//       text-decoration: ${props.selected ? "underline" : "none"};
-//       cursor: pointer;
-//       color: ${props.selected ? "black" : accentColor};
-//       background-color: ${props.selected ? accentColor : "unset"};
-//       margin-right: 16px;
+      color: ${props.selected ? "black" : accentColor};
+      background-color: ${props.selected ? accentColor : "unset"};
+      margin-right: 16px;
 
-//       &:hover {
-//         background-color: ${secondAccent};
-//         color: ${textColor};
-//       }
-//     `;
-//   }}
-// `;
+      &:hover {
+        background-color: ${secondAccent};
+        color: ${textColor};
+      }
+    `;
+  }}
+`;
 
 const CeremonyContainer = styled.div`
   background-color: ${lighterBackground};
@@ -89,7 +84,7 @@ const Tabs = (props: { children: ReactNode[]; titles: string[] }) => {
       <div>
         {props.titles.map((title, i) => (
           <span key={title} onClick={() => updateIndex(i)}>
-            {/* <TabLink selected={i === selectedTitleIndex} >{title}</TabLink> */}
+            { <TabLink selected={i === selectedTitleIndex} >{title}</TabLink> }
           </span>
         ))}
       </div>
@@ -224,9 +219,12 @@ class ZKTitle extends React.Component {
 
   render() {
     return (
-      <LandingPageTitle onClick={this.onClick}>
-        {this.state.actualText}
-      </LandingPageTitle>
+      <Fragment>
+        <LandingPageTitle onClick={this.onClick}>
+          {this.state.actualText}
+        </LandingPageTitle>
+        <SiteMenu />
+      </Fragment>
     );
   }
 }
