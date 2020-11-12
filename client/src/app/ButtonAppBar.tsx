@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link as RouterLink } from "react-router-dom";
 import { withStyles, makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import Menu, { MenuProps } from '@material-ui/core/Menu';
@@ -81,7 +82,14 @@ export default function ButtonAppBar() {
     <div className={classes.root}>
       <AppBar position="static" color="transparent">
         <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+          <IconButton 
+            edge="start" 
+            className={classes.menuButton} 
+            color="inherit" 
+            aria-label="menu"
+            aria-haspopup="true"
+            onClick={handleClick}
+            >
             <MenuIcon style={{ color: accentColor }}/>
           </IconButton>
           <StyledMenu
@@ -113,11 +121,11 @@ export default function ButtonAppBar() {
           <ZKTitle />
           <Button
             aria-controls="github-login"
-            aria-haspopup="true"
             color="inherit"
-            onClick={handleClick}
             endIcon={<GitHubIcon >Login</GitHubIcon>}
             style={{ color: accentColor }}
+            component={RouterLink}
+            to="/login"
           >
             Login
           </Button>
