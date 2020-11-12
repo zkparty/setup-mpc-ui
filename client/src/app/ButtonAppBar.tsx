@@ -13,6 +13,12 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import InfoIcon from '@material-ui/icons/Info';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import { ZKTitle } from "./Title";
+import {
+  accentColor,
+  secondAccent,
+  textColor,
+} from "../styles";
+import { Button } from '@material-ui/core';
 
 const StyledMenu = withStyles({
   paper: {
@@ -37,9 +43,9 @@ const StyledMenu = withStyles({
 const StyledMenuItem = withStyles((theme) => ({
   root: {
     '&:focus': {
-      backgroundColor: theme.palette.primary.main,
+      backgroundColor: "unset",
       '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-        color: theme.palette.common.white,
+        color: textColor,
       },
     },
   },
@@ -73,10 +79,10 @@ export default function ButtonAppBar() {
     
     return (
     <div className={classes.root}>
-      <AppBar position="static">
+      <AppBar position="static" color="transparent">
         <Toolbar>
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <MenuIcon />
+            <MenuIcon style={{ color: accentColor }}/>
           </IconButton>
           <StyledMenu
             id="customized-menu"
@@ -86,33 +92,35 @@ export default function ButtonAppBar() {
             onClose={handleClose}
           >
             <StyledMenuItem>
-            <ListItemIcon>
-                <SettingsIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Coordinator Settings" />
-            </StyledMenuItem>
-            <StyledMenuItem>
-            <ListItemIcon>
-                <InfoIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="About" />
-            </StyledMenuItem>
-            <StyledMenuItem>
-            <ListItemIcon>
-                <ExitToAppIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Sign Out" />
-            </StyledMenuItem>
-          </StyledMenu>
+              <ListItemIcon>
+                  <SettingsIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="Coordinator Settings" />
+              </StyledMenuItem>
+              <StyledMenuItem>
+              <ListItemIcon>
+                  <InfoIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="About" />
+              </StyledMenuItem>
+              <StyledMenuItem>
+              <ListItemIcon>
+                  <ExitToAppIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="Sign Out" />
+              </StyledMenuItem>
+            </StyledMenu>
           <ZKTitle />
-          <IconButton
-            aria-controls="github-signon"
+          <Button
+            aria-controls="github-login"
             aria-haspopup="true"
             color="inherit"
             onClick={handleClick}
+            endIcon={<GitHubIcon >Login</GitHubIcon>}
+            style={{ color: accentColor }}
           >
-        <GitHubIcon />
-      </IconButton>
+            Login
+          </Button>
         </Toolbar>
       </AppBar>
     </div>

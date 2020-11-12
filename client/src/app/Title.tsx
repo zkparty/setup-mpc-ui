@@ -11,6 +11,7 @@ const LandingPageTitle = styled.div`
   color: ${accentColor};
   cursor: pointer;
   user-select: none;
+  flex: 1;
 `;
 
 const TITLE_TEXT = "zkparty";

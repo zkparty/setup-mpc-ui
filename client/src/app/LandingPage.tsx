@@ -62,16 +62,18 @@ const LandingPageTitle = styled.div`
 
 export const LandingPage = () => {
   return (
-    <PageContainer>
+    <Fragment>
       <ButtonAppBar />
-      <Tabs titles={["Ceremonies", "Coordinators", "About"]}>
-        {[
-          <ParticipantsSection key="participants" />,
-          <CoordinatorsSection key="coordinators" />,
-          <AboutSection key="about" />
-        ]}
-      </Tabs>
-    </PageContainer>
+      <PageContainer>
+        <Tabs titles={["Ceremonies", "Coordinators", "About"]}>
+          {[
+            <ParticipantsSection key="participants" />,
+            <CoordinatorsSection key="coordinators" />,
+            <AboutSection key="about" />
+          ]}
+        </Tabs>
+      </PageContainer>
+    </Fragment>
   );
 };
 
