@@ -3,7 +3,7 @@ import { useState, useEffect, Fragment } from "react";
 import * as React from "react";
 import styled, { css } from "styled-components";
 import { ReactNode } from "react";
-import ButtonAppBar from "./ButtonAppBar";
+import ButtonAppBar from "../components/ButtonAppBar";
 import {
   accentColor,
   secondAccent,
@@ -51,25 +51,15 @@ const CeremonyContainer = styled.div`
   }
 `;
 
-const LandingPageTitle = styled.div`
-  font-size: 50pt;
-  margin-bottom: 32px;
-  font-weight: bold;
-  color: ${accentColor};
-  cursor: pointer;
-  user-select: none;
-`;
-
 export const LandingPage = () => {
   return (
     <Fragment>
       <ButtonAppBar />
       <PageContainer>
-        <Tabs titles={["Ceremonies", "Coordinators", "About"]}>
+        <Tabs titles={[ "Ceremonies", "Participate" ]}>
           {[
             <ParticipantsSection key="participants" />,
-            <CoordinatorsSection key="coordinators" />,
-            <AboutSection key="about" />
+            <CeremoniesSection key="ceremonies" />
           ]}
         </Tabs>
       </PageContainer>
@@ -132,7 +122,7 @@ const ParticipantsSection = () => {
   );
 };
 
-const CoordinatorsSection = () => {
+const CeremoniesSection = () => {
   return (
     <div style={{ width: "512px" }}>
       Welcome to zkparty. This page will allow MPC coordinators to register/list

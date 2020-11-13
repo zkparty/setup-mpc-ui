@@ -14,7 +14,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import InfoIcon from '@material-ui/icons/Info';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import { ZKTitle } from "./Title";
-import { AuthContext } from "./App";
+import { AuthContext } from "../app/App";
 import {
   accentColor,
   secondAccent,

@@ -5,14 +5,9 @@ import firebase from "firebase";
 import { textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
 import { CeremonyPage } from "./CeremonyPage";
-import { RegisterPage } from "./RegisterPage";
-import Login from "./Login";
-import Join from "./Join";
 import firebaseConfig from "./firebaseConfig";
 
 firebase.initializeApp(firebaseConfig);
-
-console.log(`firebase API key: ${firebaseConfig.apiKey}`);
 
 export interface AuthContextInterface {
   isLoggedIn: boolean,
@@ -47,9 +42,6 @@ const App = () => {
       <HashRouter>
         <GlobalStyle />
         <Switch>
-          <Route exact path="/register">
-            <RegisterPage />
-          </Route>
           <Route exact path="/ceremony/:id">
             <CeremonyPage />
           </Route>

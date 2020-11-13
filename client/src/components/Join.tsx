@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 //import { createBrowserHistory } from "history";
-import { AuthContext } from "./App";
+import { AuthContext } from "../app/App";
 import Button from "@material-ui/core/Button";
 import GitHubIcon from "@material-ui/icons/GitHub";
 import firebase from "firebase";
