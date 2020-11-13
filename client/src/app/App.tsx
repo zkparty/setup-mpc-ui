@@ -8,18 +8,42 @@ import { CeremonyPage } from "./CeremonyPage";
 import { RegisterPage } from "./RegisterPage";
 import Login from "./Login";
 import Join from "./Join";
-import * as firebaseConfig from "./firebaseConfig";
+import firebaseConfig from "./firebaseConfig";
 
 firebase.initializeApp(firebaseConfig);
 
-export const AuthContext = React.createContext({ setLoggedIn: (b: boolean) => {}, isLoggedIn: false });
+console.log(`firebase API key: ${firebaseConfig.apiKey}`);
 
+export interface AuthContextInterface {
+  isLoggedIn: boolean,
+  setLoggedIn: (b: boolean) => void,
+  authUser: any,
+  setAuthUser: (u: any | null) => void
+};
+const defaultAuth: AuthContextInterface = {
+  isLoggedIn: false,
+  setLoggedIn: () => false,
+  authUser: {},
+  setAuthUser: () => null
+};
+export const AuthContext = React.createContext<AuthContextInterface>(defaultAuth);
+
+function useAuthContextValue(): AuthContextInterface {
+  const [isLoggedIn, setLoggedIn] = React.useState( false );
+  const [authUser, setAuthUser] = React.useState( {} );
+
+  return {
+    isLoggedIn,
+    setLoggedIn,
+    authUser,
+    setAuthUser
+  }
+}
 
 const App = () => {
-  const [isLoggedIn, setLoggedIn] = React.useState(false);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setLoggedIn }}>
+    <AuthContext.Provider value={ useAuthContextValue() }>
       <HashRouter>
         <GlobalStyle />
         <Switch>

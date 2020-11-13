@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link as RouterLink } from "react-router-dom";
 import { withStyles, makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -14,6 +14,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import InfoIcon from '@material-ui/icons/Info';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import { ZKTitle } from "./Title";
+import { AuthContext } from "./App";
 import {
   accentColor,
   secondAccent,
@@ -65,6 +66,36 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   }),
 );
+
+const Auth = useContext(AuthContext);
+
+const LoginButton = () => {
+  return (
+    Auth.isLoggedIn ?
+      <Button
+        aria-controls="github-login"
+        color="inherit"
+        endIcon={<GitHubIcon />}
+        style={{ color: accentColor }}
+        component={RouterLink}
+        to="/logout"
+        >
+        {Auth.authUser.user.displayName}
+      </Button>
+    : 
+      <Button
+        aria-controls="github-login"
+        color="inherit"
+        endIcon={<GitHubIcon >Login</GitHubIcon>}
+        style={{ color: accentColor }}
+        component={RouterLink}
+        to="/login"
+        >
+        Login
+      </Button>
+  );
+};
+
 
 export default function ButtonAppBar() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -119,16 +150,7 @@ export default function ButtonAppBar() {
               </StyledMenuItem>
             </StyledMenu>
           <ZKTitle />
-          <Button
-            aria-controls="github-login"
-            color="inherit"
-            endIcon={<GitHubIcon >Login</GitHubIcon>}
-            style={{ color: accentColor }}
-            component={RouterLink}
-            to="/login"
-          >
-            Login
-          </Button>
+          <LoginButton/>
         </Toolbar>
       </AppBar>
     </div>

@@ -6,16 +6,9 @@ import firebase from "firebase";
 import { accentColor } from "../styles";
 
 const Join = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setErrors] = useState("");
 
   const Auth = useContext(AuthContext);
-  const handleForm = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log(Auth);
-    Auth.setLoggedIn(true);
-  };
 
   const handleGithubLogin = () => {
     const provider = new firebase.auth.GithubAuthProvider();
@@ -30,7 +23,8 @@ const Join = () => {
         .then((result: any) => {
           console.log(result)
           //history.push('/')
-          Auth.setLoggedIn(true)
+          Auth.setLoggedIn(true);
+          Auth.setAuthUser(result);
         })
         .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
       })
@@ -39,30 +33,13 @@ const Join = () => {
 
   return (
     <div>
-      <h1>Join</h1>
-      <form onSubmit={e => handleForm(e)}>
-        <input
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          name="email"
-          type="email"
-          placeholder="email"
-        />
-        <input
-          onChange={e => setPassword(e.target.value)}
-          name="password"
-          value={password}
-          type="password"
-          placeholder="password"
-        />
-        <hr />
+      <h1>Login</h1>
         <Button onClick={() => handleGithubLogin()} style={{ color: accentColor }}>
           <GitHubIcon />
           Login With GitHub
         </Button>
 
         <span>{error}</span>
-      </form>
     </div>
   );
 };
