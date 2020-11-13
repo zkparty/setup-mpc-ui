@@ -21,6 +21,7 @@ import {
   textColor,
 } from "../styles";
 import { Button } from '@material-ui/core';
+import Join from './Join';
 
 const StyledMenu = withStyles({
   paper: {
@@ -67,9 +68,10 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const Auth = useContext(AuthContext);
+// AppBar shows LOGIN or username alongside Github icon
+const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined; }) => {
+  const Auth = useContext(AuthContext);
 
-const LoginButton = () => {
   return (
     Auth.isLoggedIn ?
       <Button
@@ -77,10 +79,9 @@ const LoginButton = () => {
         color="inherit"
         endIcon={<GitHubIcon />}
         style={{ color: accentColor }}
-        component={RouterLink}
-        to="/logout"
+        onClick={props.onClick}
         >
-        {Auth.authUser.user.displayName}
+        {Auth.authUser.user.displayName || "-"}
       </Button>
     : 
       <Button
@@ -88,28 +89,91 @@ const LoginButton = () => {
         color="inherit"
         endIcon={<GitHubIcon >Login</GitHubIcon>}
         style={{ color: accentColor }}
-        component={RouterLink}
-        to="/login"
+        onClick={props.onClick}
         >
         Login
       </Button>
   );
 };
 
+const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; }) => {
+  return (
+    <StyledMenu
+    id="customized-menu"
+    anchorEl={props.anchorEl}
+    keepMounted
+    open={Boolean(props.anchorEl)}
+    onClose={props.handleClose}
+  >
+    <StyledMenuItem>
+      <ListItemIcon>
+          <SettingsIcon fontSize="small" />
+      </ListItemIcon>
+      <ListItemText primary="Coordinator Settings" />
+      </StyledMenuItem>
+      <StyledMenuItem>
+      <ListItemIcon>
+          <InfoIcon fontSize="small" />
+      </ListItemIcon>
+      <ListItemText primary="About" />
+      </StyledMenuItem>
+    </StyledMenu>
+
+  );
+};
+
+const LoginMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: (() => void) | undefined; }) => {
+  const Auth = useContext(AuthContext);
+
+  return (
+    <StyledMenu
+      id="customized-menu"
+      anchorEl={props.anchorEl}
+      keepMounted
+      open={Boolean(props.anchorEl)}
+      onClose={props.handleClose}
+    >
+      <StyledMenuItem>
+        {Auth.isLoggedIn ?
+          (<div>
+            <ListItemIcon>
+              <ExitToAppIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Log Out" />
+          </div>
+        ) : (
+          <Join close={props.handleClose}/>
+        )}
+      </StyledMenuItem>
+    </StyledMenu>
+
+  );
+};
+
+
 
 export default function ButtonAppBar() {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [loginAnchorEl, setLoginAnchorEl] = React.useState<null | HTMLElement>(null);
     const classes = useStyles();
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-      };
+    const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+        setMenuAnchorEl(event.currentTarget);
+    };
     
-      const handleClose = () => {
-        setAnchorEl(null);
-      };
-    
-    return (
+    const handleMenuClose = () => {
+      setMenuAnchorEl(null);
+    };
+        
+    const handleLoginClick = (event: React.MouseEvent<HTMLElement>) => {
+      setLoginAnchorEl(event.currentTarget);
+  };
+  
+  const handleLoginClose = () => {
+    setLoginAnchorEl(null);
+  };
+      
+  return (
     <div className={classes.root}>
       <AppBar position="static" color="transparent">
         <Toolbar>
@@ -119,38 +183,14 @@ export default function ButtonAppBar() {
             color="inherit" 
             aria-label="menu"
             aria-haspopup="true"
-            onClick={handleClick}
+            onClick={handleMenuClick}
             >
             <MenuIcon style={{ color: accentColor }}/>
           </IconButton>
-          <StyledMenu
-            id="customized-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <StyledMenuItem>
-              <ListItemIcon>
-                  <SettingsIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText primary="Coordinator Settings" />
-              </StyledMenuItem>
-              <StyledMenuItem>
-              <ListItemIcon>
-                  <InfoIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText primary="About" />
-              </StyledMenuItem>
-              <StyledMenuItem>
-              <ListItemIcon>
-                  <ExitToAppIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText primary="Sign Out" />
-              </StyledMenuItem>
-            </StyledMenu>
+          <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} />
           <ZKTitle />
-          <LoginButton/>
+          <LoginButton onClick={handleLoginClick}/>
+          <LoginMenu anchorEl={loginAnchorEl} handleClose={handleLoginClose} />
         </Toolbar>
       </AppBar>
     </div>

@@ -56,9 +56,6 @@ const App = () => {
           <Route exact path="/">
             <LandingPage />
           </Route>
-          <Route exact path="/login">
-            <Join />
-          </Route>
         </Switch>
       </HashRouter>
     </AuthContext.Provider>
