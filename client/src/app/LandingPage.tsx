@@ -4,6 +4,9 @@ import * as React from "react";
 import styled, { css } from "styled-components";
 import { ReactNode } from "react";
 import ButtonAppBar from "../components/ButtonAppBar";
+import CeremonySummary from "../components/CeremonySummary";
+import Typography from "@material-ui/core/Typography";
+
 import {
   accentColor,
   secondAccent,
@@ -18,7 +21,7 @@ import {
   getCeremonySummariesCached
 } from "../api/ZKPartyApi";
 import { Ceremony } from "../types/ceremony";
-import { format } from "timeago.js";
+import FileUploader from "../components/FileUploader";
 
  const TabLink = styled.span<any>`
   ${(props: { selected: boolean }) => {
@@ -37,19 +40,6 @@ import { format } from "timeago.js";
   }}
 `;
 
-const CeremonyContainer = styled.div`
-  background-color: ${lighterBackground};
-  margin: 10px;
-  width: 512px;
-  padding: 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  border: 2px solid transparent;
-
-  &:hover {
-    border: 2px solid ${secondAccent};
-  }
-`;
 
 export const LandingPage = () => {
   return (
@@ -125,36 +115,11 @@ const ParticipantsSection = () => {
 const CeremoniesSection = () => {
   return (
     <div style={{ width: "512px" }}>
-      Welcome to zkparty. This page will allow MPC coordinators to register/list
-      their ceremonies, and verify their identities. <br />
+      <Typography variant="body1">
+        Welcome to zkparty. This page will allow you to participate in the ceremony. Once you agree, your computation will commence. 
+      </Typography>
+      <FileUploader />
     </div>
   );
 };
 
-const AboutSection = () => {
-  return <div>this is the about</div>;
-};
-
-const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
-  const c = props.ceremony;
-
-  let history = useHistory();
-
-  const onClick = () => {
-    history.push(`/ceremony/${c.id}`);
-  };
-
-  return (
-    <CeremonyContainer onClick={onClick}>
-      <CeremonyTitle>{c.title}</CeremonyTitle>
-      {`STATUS: ${c.ceremonyState}` +
-        (c.ceremonyState === "RUNNING" ? ` (${c.ceremonyProgress}%)` : "")}
-      <br />
-      <br />
-      {c.description}
-      <br />
-      <br />
-      {`Last updated: ${format(c.lastSummaryUpdate)}`}
-    </CeremonyContainer>
-  );
-};
