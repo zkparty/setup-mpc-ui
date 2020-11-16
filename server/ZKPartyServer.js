@@ -91,10 +91,13 @@ async function getCachedCeremony(id) {
 async function getAndUpdateStaleCeremony(id) {
   // get full ceremony data, from mpc server
   const summary = await getFBSummary(id);
-  const mpcCeremony = await getMPCCeremony(summary.serverURL, summary.sequence);
-  await updateFBCeremony({ ...mpcCeremony, id });
-  const updatedCeremony = await getFBCeremony(id);
-  return updatedCeremony;
+  console.log(`getAndUpdateStaleCeremony - got summary`);
+  // TODO - get server status - or make this push updates??
+  //const mpcCeremony = await getMPCCeremony(summary.serverURL, summary.sequence);
+  //await updateFBCeremony({ ...mpcCeremony, id });
+  //const updatedCeremony = await getFBCeremony(id);
+  //return updatedCeremony;
+  return summary;
 }
 
 async function addCeremony(addCeremonyJson) {

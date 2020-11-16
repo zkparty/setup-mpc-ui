@@ -2,10 +2,11 @@ import { Link, RouteProps, useHistory } from "react-router-dom";
 import { useState, useEffect, Fragment } from "react";
 import * as React from "react";
 import styled, { css } from "styled-components";
+import Typography from "@material-ui/core/Typography";
 import { ReactNode } from "react";
 import ButtonAppBar from "../components/ButtonAppBar";
 import CeremonySummary from "../components/CeremonySummary";
-import Typography from "@material-ui/core/Typography";
+import { ParticipantSection } from "./ParticipantPage";
 
 import {
   accentColor,
@@ -48,8 +49,8 @@ export const LandingPage = () => {
       <PageContainer>
         <Tabs titles={[ "Ceremonies", "Participate" ]}>
           {[
-            <ParticipantsSection key="participants" />,
-            <CeremoniesSection key="ceremonies" />
+            <SummarySection key="summary" />,
+            <ParticipantSection key="participants" />
           ]}
         </Tabs>
       </PageContainer>
@@ -75,7 +76,7 @@ const Tabs = (props: { children: ReactNode[]; titles: string[] }) => {
   );
 };
 
-const ParticipantsSection = () => {
+const SummarySection = () => {
   const [ceremonies, setCeremonies] = useState<Ceremony[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -112,14 +113,4 @@ const ParticipantsSection = () => {
   );
 };
 
-const CeremoniesSection = () => {
-  return (
-    <div style={{ width: "512px" }}>
-      <Typography variant="body1">
-        Welcome to zkparty. This page will allow you to participate in the ceremony. Once you agree, your computation will commence. 
-      </Typography>
-      <FileUploader />
-    </div>
-  );
-};
 

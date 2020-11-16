@@ -35,6 +35,8 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
     const onClick = () => {
       history.push(`/ceremony/${c.id}`);
     };
+
+    console.log(`ceremony id: ${c.id}`);
   
     return (
       <CeremonyContainer onClick={onClick}>

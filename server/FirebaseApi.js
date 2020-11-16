@@ -12,7 +12,7 @@ async function getFBSummaries() {
   const ceremonySummariesSnapshot = await db.collection("ceremonies").get();
   const fbSummaries = [];
   ceremonySummariesSnapshot.forEach(doc => {
-    fbSummaries.push(firebaseCeremonyJsonToSummary(doc.data()));
+    fbSummaries.push(firebaseCeremonyJsonToSummary({id: doc.id, ...doc.data()}));
   });
   return fbSummaries;
 }
@@ -25,7 +25,7 @@ async function getFBSummary(id) {
   if (!doc.exists) {
     throw new Error("ceremony not found");
   }
-  return firebaseCeremonyJsonToSummary(doc.data());
+  return firebaseCeremonyJsonToSummary({id: doc.id, ...doc.data()});
 }
 
 async function getFBCeremony(id) {
@@ -36,6 +36,7 @@ async function getFBCeremony(id) {
   if (!doc.exists) {
     throw new Error("ceremony not found");
   }
+  console.log(`getFBCeremony ${doc.exists}`);
   const missingParticipants = firebaseCeremonyJsonToSummary(doc.data());
   const participants = [];
   const participantsSnapshot = await db
