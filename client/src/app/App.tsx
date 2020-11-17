@@ -5,6 +5,7 @@ import firebase from "firebase";
 import { textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
 import { CeremonyPage } from "./CeremonyPage";
+import { AddCeremonyPage } from "./AddCeremony";
 import firebaseConfig from "./firebaseConfig";
 
 firebase.initializeApp(firebaseConfig);
@@ -42,6 +43,9 @@ const App = () => {
       <HashRouter>
         <GlobalStyle />
         <Switch>
+          <Route exact path="/ceremony/add">
+            <AddCeremonyPage />
+          </Route>
           <Route exact path="/ceremony/:id">
             <CeremonyPage />
           </Route>

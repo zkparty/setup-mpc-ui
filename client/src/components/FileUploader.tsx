@@ -2,7 +2,7 @@ import React from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import firebase from "firebase";
-import { EmojiFoodBeverageOutlined } from '@material-ui/icons';
+import { CloudUpload } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -12,6 +12,9 @@ const useStyles = makeStyles((theme: Theme) =>
         width: '25ch',
       },
     },
+    button: {
+        margin: theme.spacing(1),
+      },
   }),
 );
 
@@ -47,10 +50,10 @@ export default function FileUploader() {
     <form className={classes.root} noValidate autoComplete="off">
         <Button
             variant="contained"
-            component="label"
-        >
-        Upload File
-        <input
+            color="default"
+            className={classes.button}
+            startIcon={<CloudUpload />}
+        >Upload<input
             type="file"
             hidden
             onChange={handleFile}

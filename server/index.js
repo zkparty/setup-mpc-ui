@@ -15,7 +15,8 @@ const {
 if (process.env.NODE_ENV !== "production") {
   app.use((req, res, next) => {
     res.set({
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "*",
     });
 
     next();
@@ -30,8 +31,9 @@ app.use("/", express.static(path.join(__dirname, "../client/dist")));
 app.post("/api/add-ceremony", async (req, res) => {
   const addCeremonyData = req.body;
   try {
-    await addCeremony(addCeremonyData);
-    res.sendStatus(200);
+    const id = await addCeremony(addCeremonyData);
+    res.send(JSON.stringify({id}));
+    //res.sendStatus(200);
   } catch (e) {
     console.error(e);
     res.status(400).send(e);

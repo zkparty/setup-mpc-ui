@@ -22,6 +22,7 @@ export interface Ceremony {
   title: string;
   serverURL: string;
   description: string;
+  circuitFileName: string;
   instructions: string;
   github: string;
   homepage: string;

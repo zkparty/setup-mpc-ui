@@ -103,30 +103,25 @@ async function getAndUpdateStaleCeremony(id) {
 async function addCeremony(addCeremonyJson) {
   // add a new ceremony. throws if fields are missing or malformed, or if can't connect to MPC server, or if such id already exists
   const addCeremonyData = validateAddCeremonyJson(addCeremonyJson);
-  const ceremony = await getMPCCeremony(addCeremonyData.serverURL);
-  const { participants, ...rest } = ceremony;
+  //const ceremony = await getMPCCeremony(addCeremonyData.serverURL);
+  //const { participants, ...rest } = ceremony;
 
-  const summaryData = {
-    ...addCeremonyData,
-    ...rest
-  };
+  //const summaryData = {
+  //  ...addCeremonyData,
+  //  ...rest
+  //};
 
-  if (await fbCeremonyExists(summaryData.id)) {
-    throw new Error("ceremony with this id already exists");
-  }
-  await addFBCeremony(summaryData, participants);
+  //if (await fbCeremonyExists(summaryData.id)) {
+  //  throw new Error("ceremony with this id already exists");
+  //}
+  const id = await addFBCeremony(addCeremonyData);
+  return id;
 }
 
 function validateAddCeremonyJson(addCeremonyJson) {
   const requiredProps = [
-    "id",
     "title",
-    "serverURL",
     "description",
-    "instructions",
-    "github",
-    "homepage",
-    "adminAddr"
   ];
 
   const addCeremonyData = shallowPick(addCeremonyJson, requiredProps, []);
@@ -135,14 +130,14 @@ function validateAddCeremonyJson(addCeremonyJson) {
     addCeremonyData[property] = addCeremonyData[property].toString();
   }
 
-  if (
-    !isURL(addCeremonyData.serverURL) ||
-    !isGithubURL(addCeremonyData.github) ||
-    !isURL(addCeremonyData.homepage) ||
-    !isAddr(addCeremonyData.adminAddr)
-  ) {
-    throw new Error("ceremony creation data is invalid");
-  }
+  //if (
+    //!isURL(addCeremonyData.serverURL) ||
+    //!isGithubURL(addCeremonyData.github) ||
+    //!isURL(addCeremonyData.homepage) ||
+    //!isAddr(addCeremonyData.adminAddr)
+  //) {
+  //  throw new Error("ceremony creation data is invalid");
+  //}
 
   return addCeremonyData;
 }

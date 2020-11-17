@@ -76,7 +76,27 @@ export function getCeremonyData(id: string): Promise<Ceremony | null> {
       console.error(err);
       throw err;
     });
-}
+};
+
+export function addCeremony(ceremony: Ceremony): Promise<string> {
+  // throws if fetch error
+  return fetch(`${url}/api/add-ceremony`, {
+    method: "post",
+    body: JSON.stringify(ceremony),
+    headers: { "Content-Type": "application/json" }
+  })
+    .then(response => {
+      return response.json();
+    })
+    .then(json => {
+      return json.id;
+    })
+    .catch(err => {
+      console.error("Error occurred posting ceremony:");
+      console.error(err);
+      throw err;
+    });
+};
 
 function jsonToCeremony(json: any): Ceremony {
   // throws if ceremony is malformed

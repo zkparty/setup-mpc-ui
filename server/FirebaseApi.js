@@ -111,26 +111,28 @@ async function fbCeremonyExists(id) {
   return (await docRef.get()).exists;
 }
 
-async function addFBCeremony(summaryData, participants) {
+async function addFBCeremony(summaryData) {
   try {
-    const docRef = db.collection("ceremonies").doc(summaryData.id);
-    await docRef.set({
-      ...summaryData,
-      lastSummaryUpdate: new Date(),
-      lastParticipantsUpdate: new Date()
-    });
-    const ceremonyParticipantsDocRef = db
-      .collection("ceremonyParticipants")
-      .doc(summaryData.id);
-    await ceremonyParticipantsDocRef.set({
-      id: summaryData.id
-    });
-    const participantPromises = [];
-    for (const participant of participants) {
-      participantPromises.push(addParticipant(summaryData.id, participant));
-    }
-    await Promise.all(participantPromises);
-    return;
+    const doc = await db.collection("ceremonies").add(summaryData);
+
+    console.log(`new ceremony added with id ${doc.id}`)
+    // await docRef.set({
+    //   ...summaryData,
+    //   lastSummaryUpdate: new Date(),
+    //   lastParticipantsUpdate: new Date()
+    // });
+    // const ceremonyParticipantsDocRef = db
+    //   .collection("ceremonyParticipants")
+    //   .doc(summaryData.id);
+    // await ceremonyParticipantsDocRef.set({
+    //   id: summaryData.id
+    // });
+    // const participantPromises = [];
+    // for (const participant of participants) {
+    //   participantPromises.push(addParticipant(summaryData.id, participant));
+    // }
+    // await Promise.all(participantPromises);
+    return doc.id;
   } catch (e) {
     throw new Error(`error adding ceremony data to firebase: ${e}`);
   }
