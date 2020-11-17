@@ -103,6 +103,9 @@ async function getAndUpdateStaleCeremony(id) {
 async function addCeremony(addCeremonyJson) {
   // add a new ceremony. throws if fields are missing or malformed, or if can't connect to MPC server, or if such id already exists
   const addCeremonyData = validateAddCeremonyJson(addCeremonyJson);
+  addCeremonyData.ceremonyState = "NOT_RUNNING";
+  addCeremonyData.paused = false;
+  addCeremonyData.ceremonyProgress = 0;
   //const ceremony = await getMPCCeremony(addCeremonyData.serverURL);
   //const { participants, ...rest } = ceremony;
 
@@ -124,7 +127,18 @@ function validateAddCeremonyJson(addCeremonyJson) {
     "description",
   ];
 
-  const addCeremonyData = shallowPick(addCeremonyJson, requiredProps, []);
+  const optionalProps = [
+    "circuitFileName",
+    "startTime",
+    "endTime",
+    "minParticipants", 
+    "ceremonyState",
+    "paused",
+    "selectBlock",
+    "ceremonyProgress",
+  ];
+
+  const addCeremonyData = shallowPick(addCeremonyJson, requiredProps, optionalProps);
 
   for (const property of requiredProps) {
     addCeremonyData[property] = addCeremonyData[property].toString();

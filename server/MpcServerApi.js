@@ -83,7 +83,8 @@ function stateJsonToCeremonyPartial(json) {
     "minParticipants",
     "maxTier2",
     "sequence",
-    "participants"
+    "participants",
+    "circuitFileName",
   ];
   const optionalCeremonyFields = ["completedAt"];
   const ceremonyPartial = shallowPick(

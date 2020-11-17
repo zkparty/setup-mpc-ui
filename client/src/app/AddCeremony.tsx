@@ -6,6 +6,7 @@ import FormControl from '@material-ui/core/FormControl';
 import TextField, { FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps } from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import InputLabel from "@material-ui/core/InputLabel";
+import firebase from "firebase";
 
 import {
   textColor,
@@ -167,23 +168,43 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
       switch (e.target.id) {
         case 'title': newCeremony.title = e.target.value; break;
         case 'description': newCeremony.description = e.target.value; break;
-        case 'circuitFileName': newCeremony.circuitFileName = e.target.value; break;
         case 'start-time': newCeremony.startTime = new Date(Date.parse(e.target.value)); break;
         case 'end-time': newCeremony.endTime = new Date(Date.parse(e.target.value)); break;
         case 'min-participants': newCeremony.minParticipants = parseInt(e.target.value); break;
       }
   };
 
+  const handleFileUpload = (f: File) => {
+      console.log(`handleFileUpload`);
+      newCeremony.circuitFile = f;
+  }
+
   const handleSubmit = () => {
       console.log('submit ....');
     // validate
+    if (newCeremony.circuitFile) {
+  
+        // Firebase storage ref for the new file
+        newCeremony.circuitFileName = newCeremony.circuitFile.name;
+    };
     // insert new DB record. Get id
     addCeremony(newCeremony).then((id: string) => {
         console.log(`ceremony added: ${id}`);
 
         // upload circuit file
+        const storageRef = firebase.storage().ref();
+        const ceremonyDataRef = storageRef.child(`ceremony_data/${id}`);
 
-
+        const fileReader = new FileReader();
+        if (newCeremony.circuitFile) {
+  
+          // Firebase storage ref for the new file
+          const fbFileRef = ceremonyDataRef.child(newCeremony.circuitFile.name);
+          
+          fbFileRef.put(newCeremony.circuitFile).then((snapshot) => {
+              console.log('Uploaded file!');
+          });
+        }
     });
   }
 
@@ -195,9 +216,9 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
             <br />
             <CssTextField id="description" label="Description" defaultValue={props.ceremony?.description} onChange={handleChange}/>
             <br />
-            <span>
+            <span style={{ display: "flow"}}>
                 <InputLabel variant="standard" style={{ color: accentColor }}>Circuit File:</InputLabel>
-                <FileUploader />
+                <FileUploader id="circuitFileName" onChange={handleFileUpload} />
                 <label>{props.ceremony?.circuitFileName}</label>
             </span>
             <br />
