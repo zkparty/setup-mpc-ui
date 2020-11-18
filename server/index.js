@@ -11,6 +11,7 @@ const {
   getAndUpdateStaleCeremony,
   addCeremony
 } = require("./ZKPartyServer");
+const { getCircuitInfo, openR1csFile } = require("./CircuitHandler");
 
 if (process.env.NODE_ENV !== "production") {
   app.use((req, res, next) => {
@@ -75,6 +76,19 @@ app.get("/api/ceremony/:id", async (req, res) => {
   try {
     const ceremony = await getAndUpdateStaleCeremony(req.params.id);
     res.json(ceremony);
+  } catch (e) {
+    // probably ceremony doesn't exist
+    console.error(e);
+    res.status(404).send(e);
+  }
+});
+
+app.get("/api/prepare-ceremony/:id", async (req, res) => {
+  try {
+    console.log(`${req.params.id}`)
+    await openR1csFile(req.params.id);
+    res.json({ok: true});
+    //res.json(ceremony);
   } catch (e) {
     // probably ceremony doesn't exist
     console.error(e);

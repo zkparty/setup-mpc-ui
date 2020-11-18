@@ -11,16 +11,23 @@ const {
 } = require("./FirebaseApi");
 const { shallowPick } = require("./utils");
 
+const CeremonyStates = {
+  PRESELECTION: "PRESELECTION",
+  RUNNING: "RUNNING",
+  PAUSED: "PAUSED",
+  COMPLETED: "COMPLETED",
+};
+
 async function getCachedSummaries() {
   // return array of all ceremonies (WITHOUT detailed participant data), from firebase
   const summaries = await getFBSummaries();
   summaries.sort((a, b) => {
     let aProgress = a.ceremonyProgress;
-    if (a.ceremonyState === "PRESELECTION") {
+    if (a.ceremonyState === CeremonyStates.PRESELECTION) {
       aProgress = -1;
     }
     let bProgress = b.ceremonyProgress;
-    if (b.ceremonyState === "PRESELECTION") {
+    if (b.ceremonyState === CeremonyStates.PRESELECTION) {
       bProgress = -1;
     }
     return aProgress - bProgress;
@@ -67,11 +74,11 @@ async function getAndUpdateStaleSummaries() {
   await Promise.all(updatePromises);
   summaries.sort((a, b) => {
     let aProgress = a.ceremonyProgress;
-    if (a.ceremonyState === "PRESELECTION") {
+    if (a.ceremonyState === CeremonyStates.PRESELECTION) {
       aProgress = -1;
     }
     let bProgress = b.ceremonyProgress;
-    if (b.ceremonyState === "PRESELECTION") {
+    if (b.ceremonyState === CeremonyStates.PRESELECTION) {
       bProgress = -1;
     }
     return aProgress - bProgress;
@@ -103,7 +110,7 @@ async function getAndUpdateStaleCeremony(id) {
 async function addCeremony(addCeremonyJson) {
   // add a new ceremony. throws if fields are missing or malformed, or if can't connect to MPC server, or if such id already exists
   const addCeremonyData = validateAddCeremonyJson(addCeremonyJson);
-  addCeremonyData.ceremonyState = "NOT_RUNNING";
+  addCeremonyData.ceremonyState = CeremonyStates.PRESELECTION;
   addCeremonyData.paused = false;
   addCeremonyData.ceremonyProgress = 0;
   //const ceremony = await getMPCCeremony(addCeremonyData.serverURL);
