@@ -2,6 +2,12 @@
 const r1csfile = require("r1csfile");
 const fs = require("fs");
 const firebase = require("firebase");
+const {Storage} = require("@google-cloud/storage");
+const fbSkey = require("./firebase_skey.json");
+
+const storage = new Storage({keyFilename: '/home/geoff/setup-mpc-ui/server/firebase_skey.json', projectId: fbSkey.project_id });
+
+//const bucket = gcs.bucket('');
 
 async function getCircuitInfo(ceremonyId) {
     await openR1csFile(ceremonyId);
@@ -9,12 +15,20 @@ async function getCircuitInfo(ceremonyId) {
 };
 
 async function openR1csFile(ceremonyId) {
-    const storageRef = firebase.storage().ref();
-    const ceremonyDataRef = storageRef.child(`ceremony_data/${ceremonyId}`);
-
-    return ceremonyDataRef.ListAll().then((res) => {
-        res.items.forEach((i) => console.log(`list result: ${i}`));
+    console.log(`project id ${fbSkey.project_id}`);
+    const [files] = await storage.bucket(`${fbSkey.project_id}.appspot.com`).getFiles({
+        prefix: 'ceremony_data/', 
+        delimiter: '/'
     });
+    console.log('Files:');
+    files.forEach(file => {
+        console.log(file.name);
+    });
+    //const ceremonyDataRef = storageRef.child(`ceremony_data/${ceremonyId}`);
+
+    //return ceremonyDataRef.ListAll().then((res) => {
+      //  res.items.forEach((i) => console.log(`list result: ${i}`));
+    //});
 };
 
 async function prepareCircuit(circuitId) {
@@ -37,4 +51,6 @@ async function prepareCircuit(circuitId) {
 
 module.exports = {
     openR1csFile,
+    prepareCircuit,
+    getCircuitInfo,
 }
