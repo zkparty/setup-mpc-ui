@@ -1,9 +1,12 @@
-//import snarkjs from "snarkjs";
+const snarkjs = require("snarkjs");
 const r1csfile = require("r1csfile");
 const fs = require("fs");
 const firebase = require("firebase");
 const {Storage} = require("@google-cloud/storage");
 const fbSkey = require("./firebase_skey.json");
+const Logger = require("js-logger");
+
+Logger.useDefaults();
 
 const storage = new Storage({keyFilename: '/home/geoff/setup-mpc-ui/server/firebase_skey.json', projectId: fbSkey.project_id });
 
@@ -20,15 +23,22 @@ async function openR1csFile(ceremonyId) {
         prefix: 'ceremony_data/', 
         delimiter: '/'
     });
-    console.log('Files:');
-    files.forEach(file => {
-        console.log(file.name);
+    //console.log('Files:');
+    const r1csFiles = files.filter(file => {
+        return file.name.toLowerCase().endsWith('.r1cs');
     });
-    //const ceremonyDataRef = storageRef.child(`ceremony_data/${ceremonyId}`);
+    if (r1csFiles.length > 0) {
+        console.log(`found R1CS file ${r1csFiles[0].name}`);
+        const destFile = `./data/${r1csFiles[0].name}`;
+        const file = await r1csFiles[0].download({
+            destination: destFile,
+        });
+        console.log(`Downloaded ${destFile}`);
 
-    //return ceremonyDataRef.ListAll().then((res) => {
-      //  res.items.forEach((i) => console.log(`list result: ${i}`));
-    //});
+        await snarkjs.r1cs.info(destFile, Logger);
+    } else {
+        console.log(`no R1CS file found for ${ceremonyId}.`);        
+    }
 };
 
 async function prepareCircuit(circuitId) {
