@@ -3,13 +3,13 @@ const r1csfile = require("r1csfile");
 const fs = require("fs");
 const firebase = require("firebase");
 const {Storage} = require("@google-cloud/storage");
-const fbSkey = require("./firebase_skey.json");
 const Logger = require("js-logger");
+const fbSkey = require("./firebase_skey.json");
+const { updateFBCeremony } = require("./FirebaseApi");
 
 var logCatcher = [];
 Logger.useDefaults();
 Logger.setHandler((messages, context) => {
-    console.log(`messages: ${messages[0]} ${context.level.toString()}`);
     if (context.level === Logger.INFO) {
         logCatcher.push(messages[0]);
     }
@@ -49,6 +49,17 @@ async function openR1csFile(ceremonyId) {
             if (result && result.length > 1) numConstraints = result[1];
         });
         console.log(`#Constraints: ${numConstraints}`);
+        const powers = Math.ceil(Math.log2(numConstraints));
+        console.log(`Powers needed: ${powers}`);
+        // Update ceremony in firebase store
+        const ceremonyUpdate = {
+            id: ceremonyId,
+            numConstraints: parseInt(numConstraints),
+            powersNeeded: powers,
+            participants: [],
+        };
+        await updateFBCeremony(ceremonyUpdate);
+        console.log('Ceremony updated');
     } else {
         console.log(`no R1CS file found for ${ceremonyId}.`);        
     }
