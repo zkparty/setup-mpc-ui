@@ -6,11 +6,16 @@ const {Storage} = require("@google-cloud/storage");
 const fbSkey = require("./firebase_skey.json");
 const Logger = require("js-logger");
 
+var logCatcher = [];
 Logger.useDefaults();
+Logger.setHandler((messages, context) => {
+    console.log(`messages: ${messages[0]} ${context.level.toString()}`);
+    if (context.level === Logger.INFO) {
+        logCatcher.push(messages[0]);
+    }
+});
 
 const storage = new Storage({keyFilename: '/home/geoff/setup-mpc-ui/server/firebase_skey.json', projectId: fbSkey.project_id });
-
-//const bucket = gcs.bucket('');
 
 async function getCircuitInfo(ceremonyId) {
     await openR1csFile(ceremonyId);
@@ -34,8 +39,16 @@ async function openR1csFile(ceremonyId) {
             destination: destFile,
         });
         console.log(`Downloaded ${destFile}`);
-
+        // Get circuit info
+        logCatcher = [];
         await snarkjs.r1cs.info(destFile, Logger);
+        var numConstraints = 0;
+        logCatcher.forEach(m => {
+            console.log(`m: ${m}`);
+            const result = m.match(/Constraints: ([0-9]+)/);
+            if (result && result.length > 1) numConstraints = result[1];
+        });
+        console.log(`#Constraints: ${numConstraints}`);
     } else {
         console.log(`no R1CS file found for ${ceremonyId}.`);        
     }
