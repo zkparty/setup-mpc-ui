@@ -1,4 +1,5 @@
 const admin = require("firebase-admin");
+//const { prepareCircuit } = require("./CircuitHandler");
 const serviceAccount = require("./firebase_skey.json");
 
 admin.initializeApp({
@@ -189,14 +190,27 @@ function firebaseParticipantJsonToParticipant(json) {
   return json;
 }
 
-const ceremonyEventListener = async () => {
-  const query = db.collection('ceremonyEvents');
+const ceremonyEventListener = async (circuitFileUpdateHandler) => {
+  const eventsCollection = db.collection('ceremonyEvents');
+  const query = eventsCollection.where('acknowledged', 'in', [false, null]);
 
   query.onSnapshot(querySnapshot => {
-    console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
-    for (let doc of querySnapshot.docs) {
-      console.log(`Event: ${JSON.stringify(doc)}`);
-    }
+    //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
+    querySnapshot.forEach(docSnapshot => {
+      var event = docSnapshot.data();
+      console.log(`Event: ${JSON.stringify(event)}`);
+      switch (event.eventType) {
+        case 'CIRCUIT_FILE_UPLOAD': {
+          // Coordinator advises that r1cs file has been uploaded
+          // Handle the r1cs file
+          circuitFileUpdateHandler(event.ceremonyId); // This happens asynchronously
+          docSnapshot.ref.update({acknowledged: true});
+          break;
+        }
+        case 'PREPARED': {}
+        case 'CREATE': {}
+      }
+    });
   }, err => {
     console.log(`Error while listening for ceremony events`);
   });

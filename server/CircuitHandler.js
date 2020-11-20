@@ -1,5 +1,5 @@
 const snarkjs = require("snarkjs");
-const r1csfile = require("r1csfile");
+//const r1csfile = require("r1csfile");
 const fs = require("fs");
 const firebase = require("firebase");
 const {Storage} = require("@google-cloud/storage");
@@ -48,12 +48,8 @@ const checkAndDownloadFromStorage = async (prefix, fileNameFilter, deriveLocalPa
     }
 };
 
-async function getCircuitInfo(ceremonyId) {
-    await openR1csFile(ceremonyId);
-    //r1csfile.load()
-};
-
-async function openR1csFile(ceremonyId) {
+async function prepareCircuit(ceremonyId) {
+    console.log(`prepareCircuit ${ceremonyId}`);
     const r1csFile = await checkAndDownloadFromStorage(
         `ceremony_data/${ceremonyId}/`,
         filename => filename.toLowerCase().endsWith('.r1cs'),
@@ -113,26 +109,6 @@ async function openR1csFile(ceremonyId) {
     }
 };
 
-async function prepareCircuit(circuitId) {
-    const { proof, publicSignals } = await snarkjs.groth16.fullProve({a: 10, b: 21}, "circuit.wasm", "circuit_final.zkey");
-
-    console.log("Proof: ");
-    console.log(JSON.stringify(proof, null, 1));
-
-    const vKey = JSON.parse(fs.readFileSync("verification_key.json"));
-
-    const res = await snarkjs.groth16.verify(vKey, publicSignals, proof);
-
-    if (res === true) {
-        console.log("Verification OK");
-    } else {
-        console.log("Invalid proof");
-    }
-
-}
-
 module.exports = {
-    openR1csFile,
     prepareCircuit,
-    getCircuitInfo,
 }
