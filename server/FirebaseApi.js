@@ -148,6 +148,17 @@ async function addParticipant(ceremonyId, participant) {
   return participantRef.set(participant);
 }
 
+async function addCeremonyEvent(event) {
+  try {
+    const doc = await db
+      .collection("ceremonyEvents")
+      .add(event);
+    console.log(`Event added for ceremony ${event.ceremonyId}. Id: ${doc.id()}`);
+  } catch (e) {
+    throw new Error(`error adding ceremony event to firebase: ${e}`);
+  }
+};
+
 function firebaseCeremonyJsonToSummary(json) {
   for (const prop of [
     "lastParticipantsUpdate",
@@ -178,6 +189,19 @@ function firebaseParticipantJsonToParticipant(json) {
   return json;
 }
 
+const ceremonyEventListener = async () => {
+  const query = db.collection('ceremonyEvents');
+
+  query.onSnapshot(querySnapshot => {
+    console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
+    for (let doc of querySnapshot.docs) {
+      console.log(`Event: ${JSON.stringify(doc)}`);
+    }
+  }, err => {
+    console.log(`Error while listening for ceremony events`);
+  });
+};
+
 module.exports = {
   getFBSummaries,
   getFBSummary,
@@ -185,5 +209,7 @@ module.exports = {
   updateFBSummary,
   updateFBCeremony,
   fbCeremonyExists,
-  addFBCeremony
+  addFBCeremony,
+  addCeremonyEvent,
+  ceremonyEventListener,
 };

@@ -11,7 +11,9 @@ const {
   getAndUpdateStaleCeremony,
   addCeremony
 } = require("./ZKPartyServer");
-const { getCircuitInfo, openR1csFile } = require("./CircuitHandler");
+const { prepareCircuit } = require("./CircuitHandler");
+const { ceremonyEventListener } = require("./FirebaseApi");
+
 
 if (process.env.NODE_ENV !== "production") {
   app.use((req, res, next) => {
@@ -86,7 +88,7 @@ app.get("/api/ceremony/:id", async (req, res) => {
 app.get("/api/prepare-ceremony/:id", async (req, res) => {
   try {
     console.log(`${req.params.id}`)
-    await openR1csFile(req.params.id);
+    await prepareCircuit(req.params.id);
     res.json({ok: true});
     //res.json(ceremony);
   } catch (e) {
@@ -97,3 +99,5 @@ app.get("/api/prepare-ceremony/:id", async (req, res) => {
 });
 
 app.listen(port, () => console.log(`App listening on port ${port}!`));
+
+ceremonyEventListener();

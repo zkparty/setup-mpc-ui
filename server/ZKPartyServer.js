@@ -168,5 +168,6 @@ module.exports = {
   getCachedCeremony,
   getAndUpdateStaleSummaries,
   getAndUpdateStaleCeremony,
-  addCeremony
+  addCeremony,
+  CeremonyStates,
 };
