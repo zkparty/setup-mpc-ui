@@ -71,6 +71,15 @@ export interface Participant {
   messages: Message[];
 }
 
+export interface CeremonyEvent {
+  ceremonyId: string;
+  sender: string;
+  eventType: string;
+  timestamp: timestamp;
+  message: string;
+  acknowledged: boolean;
+}
+
 export interface Transcript {
   // Server controlled data.
   state: TranscriptState;

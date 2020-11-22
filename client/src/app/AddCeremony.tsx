@@ -17,8 +17,9 @@ import {
   CeremonyTitle,
   Center
 } from "../styles";
-import { Ceremony } from "../types/ceremony";
+import { Ceremony, CeremonyEvent } from "../types/ceremony";
 import { addCeremony } from "../api/ZKPartyApi";
+import { addCeremonyEvent } from "./../api/FirebaseApi";
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
 
@@ -203,6 +204,15 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
           
           fbFileRef.put(newCeremony.circuitFile).then((snapshot) => {
               console.log('Uploaded file!');
+              const event: CeremonyEvent = {
+                ceremonyId: id,
+                sender: "COORDINATOR",
+                eventType: "CIRCUIT_FILE_UPLOAD",
+                timestamp: new Date(),
+                message: "",
+                acknowledged: false,
+              }
+              addCeremonyEvent(event);
           });
         }
     });

@@ -100,4 +100,4 @@ app.get("/api/prepare-ceremony/:id", async (req, res) => {
 
 app.listen(port, () => console.log(`App listening on port ${port}!`));
 
-ceremonyEventListener();
+ceremonyEventListener(prepareCircuit);
