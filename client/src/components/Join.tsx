@@ -14,6 +14,10 @@ const Join = (props: { close: any }) => {
 
   //const history = createBrowserHistory();
 
+  const getUserPrivs = async (userId: string): Promise<string> => {
+    return getUserPrivs(userId);
+  }
+
   const handleGithubLogin = () => {
     const provider = new firebase.auth.GithubAuthProvider();
 
@@ -29,6 +33,8 @@ const Join = (props: { close: any }) => {
           //this.props.history.push('/')
           Auth.setAuthUser(result);
           Auth.setLoggedIn(true);
+          // Get user privileges
+          console.log(`privs: ${getUserPrivs(Auth.authUser.user.email)}`);
           props.close();
         })
         .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))

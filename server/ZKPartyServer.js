@@ -174,6 +174,24 @@ function validateAddCeremonyJson(addCeremonyJson) {
   return addCeremonyData;
 }
 
+const getUserStatus = (userId) => {
+  // userId will contain either user (e.g. github email, or a signature)
+  console.log(userId);
+  var status = 'USER';
+  console.log(`status for ${userId.userid} - ${process.env.COORDINATOR_USERS}`);
+  if (userId.userid) {
+    if (process.env.COORDINATOR_USERS.indexOf(userId.userid) > 0) {
+      status = 'COORDINATOR'
+    };
+  };
+  if (status === 'USER' && userId.signature) {
+    // ecrecover signature. Compare to configured admin address
+    const adminAddress = process.env.ADMIN_ADDRESS;
+
+  };
+  return status;
+};
+
 module.exports = {
   getCachedSummaries,
   getCachedCeremony,
@@ -181,4 +199,5 @@ module.exports = {
   getAndUpdateStaleCeremony,
   addCeremony,
   CeremonyStates,
+  getUserStatus,
 };

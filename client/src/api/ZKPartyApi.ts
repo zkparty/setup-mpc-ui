@@ -98,6 +98,23 @@ export function addCeremony(ceremony: Ceremony): Promise<string> {
     });
 };
 
+export function getUserPrivs(userId: string): Promise<string> {
+  // throws if fetch error
+  return fetch(`${url}/api/get-user-status`, {
+    method: "post",
+    body: JSON.stringify({ userId }),
+    headers: { "Content-Type": "application/json" }
+  })
+    .then(response => {
+      return response.text();
+    })
+    .catch(err => {
+      console.error("Error occurred posting ceremony:");
+      console.error(err);
+      throw err;
+    });
+};
+
 function jsonToCeremony(json: any): Ceremony {
   // throws if ceremony is malformed
 

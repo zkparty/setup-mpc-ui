@@ -9,11 +9,13 @@ const {
   getAndUpdateStaleSummaries,
   getCachedCeremony,
   getAndUpdateStaleCeremony,
-  addCeremony
+  addCeremony,
+  getUserStatus,
 } = require("./ZKPartyServer");
 const { prepareCircuit } = require("./CircuitHandler");
 const { ceremonyEventListener } = require("./FirebaseApi");
 
+require("dotenv").config();
 
 if (process.env.NODE_ENV !== "production") {
   app.use((req, res, next) => {
@@ -30,6 +32,11 @@ app.use(bodyParser.json());
 app.use(morgan("dev"));
 
 app.use("/", express.static(path.join(__dirname, "../client/dist")));
+
+app.post("/api/get-user-status", async (req, res) => {
+  const userId = req.body;
+  res.send(JSON.stringify(getUserStatus(userId))); 
+});
 
 app.post("/api/add-ceremony", async (req, res) => {
   const addCeremonyData = req.body;
