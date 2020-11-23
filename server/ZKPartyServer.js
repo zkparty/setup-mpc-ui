@@ -128,6 +128,14 @@ async function addCeremony(addCeremonyJson) {
   return id;
 }
 
+const parseDate = (dateString) => {
+  try {
+    return Date.parse(dateString);
+  } catch (err) {
+    console.log(`Error parsing date: ${err.message}`);
+  };
+}
+
 function validateAddCeremonyJson(addCeremonyJson) {
   const requiredProps = [
     "title",
@@ -144,6 +152,9 @@ function validateAddCeremonyJson(addCeremonyJson) {
     "selectBlock",
     "ceremonyProgress",
   ];
+
+  if (addCeremonyJson.startTime) { addCeremonyJson.startTime = parseDate(addCeremonyJson.startTime); };
+  if (addCeremonyJson.endTime) { addCeremonyJson.endTime = parseDate(addCeremonyJson.endTime); };
 
   const addCeremonyData = shallowPick(addCeremonyJson, requiredProps, optionalProps);
 
