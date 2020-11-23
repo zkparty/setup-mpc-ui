@@ -149,16 +149,38 @@ async function addParticipant(ceremonyId, participant) {
   return participantRef.set(participant);
 }
 
+//TODO - deprecated  - use ceremonies/*/events
 async function addCeremonyEvent(event) {
   try {
     const doc = await db
       .collection("ceremonyEvents")
       .add(event);
-    console.log(`Event added for ceremony ${event.ceremonyId}. Id: ${doc.id()}`);
+    console.log(`Event added for ceremony ${event.ceremonyId}. Id: ${doc.id}`);
   } catch (e) {
     throw new Error(`error adding ceremony event to firebase: ${e}`);
   }
 };
+
+async function addStatusUpdateEvent(ceremonyId, message) {
+  try {
+    const event = {
+      timestamp: new Date(),
+      acknowledged: false,
+      eventType: 'STATUS_UPDATE',
+      sender: 'SERVER',
+      message,
+    }
+    const doc = await db
+      .collection("ceremonies")
+      .doc(ceremonyId)
+      .collection('events')
+      .add(event);
+    console.log(`Event added for ceremony ${ceremonyId}. Id: ${doc.id}`);
+  } catch (e) {
+    throw new Error(`error adding ceremony event to firebase: ${e}`);
+  }
+
+}
 
 function firebaseCeremonyJsonToSummary(json) {
   for (const prop of [
@@ -191,19 +213,20 @@ function firebaseParticipantJsonToParticipant(json) {
 }
 
 const ceremonyEventListener = async (circuitFileUpdateHandler) => {
-  const eventsCollection = db.collection('ceremonyEvents');
-  const query = eventsCollection.where('acknowledged', 'in', [false, null]);
+  const eventsCollection = db.collectionGroup("events");
+  const query = eventsCollection.where('acknowledged', '==', false);
 
   query.onSnapshot(querySnapshot => {
     //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
     querySnapshot.forEach(docSnapshot => {
       var event = docSnapshot.data();
-      console.log(`Event: ${JSON.stringify(event)}`);
+      const ceremony = docSnapshot.ref.parent.parent;
+      console.log(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony.id}`);
       switch (event.eventType) {
         case 'CIRCUIT_FILE_UPLOAD': {
           // Coordinator advises that r1cs file has been uploaded
           // Handle the r1cs file
-          circuitFileUpdateHandler(event.ceremonyId); // This happens asynchronously
+          circuitFileUpdateHandler(ceremony.id); // This happens asynchronously
           docSnapshot.ref.update({acknowledged: true});
           break;
         }
@@ -212,7 +235,7 @@ const ceremonyEventListener = async (circuitFileUpdateHandler) => {
       }
     });
   }, err => {
-    console.log(`Error while listening for ceremony events`);
+    console.log(`Error while listening for ceremony events ${err}`);
   });
 };
 
@@ -226,4 +249,5 @@ module.exports = {
   addFBCeremony,
   addCeremonyEvent,
   ceremonyEventListener,
+  addStatusUpdateEvent,
 };

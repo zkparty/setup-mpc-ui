@@ -72,7 +72,7 @@ export interface Participant {
 }
 
 export interface CeremonyEvent {
-  ceremonyId: string;
+  //ceremonyId: string;
   sender: string;
   eventType: string;
   timestamp: timestamp;

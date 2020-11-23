@@ -1,12 +1,15 @@
 import { Switch, Route, HashRouter } from "react-router-dom";
 import * as React from "react";
 import { createGlobalStyle } from "styled-components";
-import firebase from "firebase";
 import { textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
 import { CeremonyPage } from "./CeremonyPage";
 import { AddCeremonyPage } from "./AddCeremony";
+import firebase from "firebase/app";
 import firebaseConfig from "./firebaseConfig";
+import "firebase/auth";
+import "firebase/firestore";
+import "firebase/storage";
 
 firebase.initializeApp(firebaseConfig);
 
@@ -37,7 +40,7 @@ function useAuthContextValue(): AuthContextInterface {
 }
 
 const App = () => {
-
+  console.log(`Firebase inited ${firebase.app.name}`);
   return (
     <AuthContext.Provider value={ useAuthContextValue() }>
       <HashRouter>

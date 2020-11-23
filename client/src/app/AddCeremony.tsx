@@ -6,7 +6,8 @@ import FormControl from '@material-ui/core/FormControl';
 import TextField, { FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps } from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import InputLabel from "@material-ui/core/InputLabel";
-import firebase from "firebase";
+import firebase from "firebase/app";
+import "firebase/storage";
 
 import {
   textColor,
@@ -205,14 +206,13 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
           fbFileRef.put(newCeremony.circuitFile).then((snapshot) => {
               console.log('Uploaded file!');
               const event: CeremonyEvent = {
-                ceremonyId: id,
                 sender: "COORDINATOR",
                 eventType: "CIRCUIT_FILE_UPLOAD",
                 timestamp: new Date(),
                 message: "",
                 acknowledged: false,
               }
-              addCeremonyEvent(event);
+              addCeremonyEvent(id, event);
           });
         }
     });

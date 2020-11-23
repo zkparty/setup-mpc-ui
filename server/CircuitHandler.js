@@ -1,11 +1,15 @@
 const snarkjs = require("snarkjs");
 //const r1csfile = require("r1csfile");
 const fs = require("fs");
+const path = require("path");
+const util = require("util");
 const firebase = require("firebase");
 const {Storage} = require("@google-cloud/storage");
 const Logger = require("js-logger");
 const fbSkey = require("./firebase_skey.json");
-const { updateFBCeremony } = require("./FirebaseApi");
+const { updateFBCeremony, addStatusUpdateEvent } = require("./FirebaseApi");
+
+const mkdirAsync = util.promisify(fs.mkdir);
 
 var logCatcher = [];
 const captureHandler = (messages, context) => {
@@ -37,12 +41,17 @@ const checkAndDownloadFromStorage = async (prefix, fileNameFilter, deriveLocalPa
     if (matchFiles.length > 0) {
         console.log(`found matching file ${matchFiles[0].name}`);
         const destFile = deriveLocalPath(matchFiles[0].name);
+        // mkdir ceremony_data/<id>
+        const dataPath = path.join(__dirname, 'data', prefix);
+        await mkdirAsync(dataPath, { recursive: true })
+            .catch(err => console.error(err));
+        console.log(`${dataPath} created`); 
         const file = await matchFiles[0].download({
             destination: destFile,
         });
         console.log(`Downloaded ${destFile}`);
         return destFile;
-    } else {
+} else {
         console.log(`no matching file found.`);
         return false;
     }
@@ -53,7 +62,7 @@ async function prepareCircuit(ceremonyId) {
     const r1csFile = await checkAndDownloadFromStorage(
         `ceremony_data/${ceremonyId}/`,
         filename => filename.toLowerCase().endsWith('.r1cs'),
-        filename => `./data/${filename}`
+        filename => path.join(__dirname, 'data', filename)
     );
     if (r1csFile) {
         console.log(`Downloaded ${r1csFile}`);
@@ -70,6 +79,7 @@ async function prepareCircuit(ceremonyId) {
         console.log(`#Constraints: ${numConstraints}`);
         const powers = Math.ceil(Math.log2(numConstraints));
         console.log(`Powers needed: ${powers}`);
+
         // Update ceremony in firebase store
         const ceremonyUpdate = {
             id: ceremonyId,
@@ -78,6 +88,7 @@ async function prepareCircuit(ceremonyId) {
             participants: [],
         };
         await updateFBCeremony(ceremonyUpdate);
+        addStatusUpdateEvent(ceremonyId, `Circuit file parsed. The circuit has ${numConstraints} constraints. It will require 2**${powers} powers of tau.`);
         console.log('Ceremony updated');
 
         // Prepare zkey file
@@ -95,14 +106,17 @@ async function prepareCircuit(ceremonyId) {
                     filename => filename.endsWith(potFile),
                     () => potPath
                 );
-                // TODO - put these status messages in a status field on tghe FB ceremony doc
+                // TODO - put these status messages in a status field on the FB ceremony doc
                 if (!potFileLocal) throw `Couldn't find or download download PoT file`;
+                addStatusUpdateEvent(ceremonyId, `Powers-of-tau file is available: ${potFileLocal}`);
+
             } else throw err;
 
             // Have PoT & r1cs files. Now make the zkey file.
-            const zkeyFile = `./data/ceremony_data/${ceremonyId}/ph2_0000.zkey`;
+            const zkeyFile = path.join(__dirname, 'data', 'ceremony_data', ceremonyId, 'ph2_0000.zkey');
             await snarkjs.zKey.newZKey(r1csFile, potPath, zkeyFile, consoleLogger);
             console.log(`Zkey file generated: ${zkeyFile}`);
+            addStatusUpdateEvent(ceremonyId, `zKey file has been created.  ${zkeyFile}`);
         });
     } else {
         console.log(`no R1CS file found for ${ceremonyId}.`);        
