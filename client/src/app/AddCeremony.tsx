@@ -85,8 +85,8 @@ const StyledTextField2 = (props: (JSX.IntrinsicAttributes & StandardTextFieldPro
 
 export const AddCeremonyPage = () => {
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
-  const Auth = useContext(AuthContext);
-  const isCoordinator = () => { return "COORDINATOR" === Auth.authUser.privileges };
+  //const Auth = useContext(AuthContext);
+  const isCoordinator = (user: any) => { console.log(`coordinator? ${user?.privileges} `); return "COORDINATOR" === user?.privileges };
   /*
   const refreshCeremony = () => {
     getCeremonyData(id)
@@ -113,20 +113,24 @@ export const AddCeremonyPage = () => {
   }, [loaded]);
 */
   return (    
-      <>
-      <HomeLinkContainer>
-        <Link to="/">home</Link>
-      </HomeLinkContainer>
-        <PageContainer>
-          {isCoordinator() ? (
-            <><br />
-              <CeremonyDetails ceremony={ceremony}></CeremonyDetails> 
-            </>
-          ) : (
-            <div>Sorry. This page has restricted access.</div>
-          )}
-       </PageContainer>
-       </>
+      <AuthContext.Consumer>
+        {(Auth) => (
+          <>
+            <HomeLinkContainer>
+              <Link to="/">home</Link>
+            </HomeLinkContainer>
+              <PageContainer>
+                {isCoordinator(Auth.authUser) ? (
+                  <><br />
+                    <CeremonyDetails ceremony={ceremony}></CeremonyDetails> 
+                  </>
+                ) : (
+                  <div>Sorry. This page has restricted access.</div>
+                )}
+            </PageContainer>
+          </>
+        )}
+      </AuthContext.Consumer>
   );
 };
 

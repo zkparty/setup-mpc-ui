@@ -23,6 +23,7 @@ import {
 } from "../api/ZKPartyApi";
 import { Ceremony } from "../types/ceremony";
 import FileUploader from "../components/FileUploader";
+import { ceremonyListener } from "../api/FirebaseApi";
 
  const TabLink = styled.span<any>`
   ${(props: { selected: boolean }) => {
@@ -80,14 +81,27 @@ const SummarySection = () => {
   const [ceremonies, setCeremonies] = useState<Ceremony[]>([]);
   const [loaded, setLoaded] = useState(false);
 
+  const updateCeremony = (ceremony: Ceremony) => {
+    //console.log(`${ceremony}`);
+    const i = ceremonies.findIndex(val => val.id === ceremony.id);
+    if (i >= 0) {
+      ceremonies[i] = ceremony;
+    } else {
+      ceremonies.push(ceremony);
+    }
+    setCeremonies(ceremonies);
+  };
+
   const refreshCeremonySummaries = () => {
-    getCeremonySummaries()
+    // Firestore listener
+    ceremonyListener(updateCeremony);
+    /*getCeremonySummaries()
       .then(ceremonies => {
         setCeremonies(ceremonies);
       })
       .catch(err => {
         console.error(`error getting ceremonies: ${err}`);
-      });
+      }); */
   };
 
   useEffect(() => {
@@ -97,7 +111,8 @@ const SummarySection = () => {
         setLoaded(true);
         refreshCeremonySummaries();
         // TODO: clear interval with returned function for useEffect
-        setInterval(refreshCeremonySummaries, 15000);
+        //setInterval(refreshCeremonySummaries, 15000);
+
       })
       .catch(() => {
         setLoaded(true);

@@ -115,7 +115,7 @@ export function getUserPrivs(userId: string): Promise<string> {
     });
 };
 
-function jsonToCeremony(json: any): Ceremony {
+export function jsonToCeremony(json: any): Ceremony {
   // throws if ceremony is malformed
 
   const {

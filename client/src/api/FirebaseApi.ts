@@ -1,6 +1,7 @@
-import { CeremonyEvent } from './../types/ceremony';
+import { Ceremony, CeremonyEvent } from './../types/ceremony';
 import firebase from 'firebase/app';
 import "firebase/firestore";
+import { jsonToCeremony } from './ZKPartyApi';
 
 //const serviceAccount = require( 'firebase_skey.json');
 
@@ -18,7 +19,7 @@ export const addCeremonyEvent = async (ceremonyId: string, event: CeremonyEvent)
     } catch (e) { throw new Error(`Error adding event: ${e.message}`);}
 };
 
-const ceremonyEventListener = async () => {
+export const ceremonyEventListener = async () => {
     const db = firebase.firestore();
     const eventsCollection = db.collectionGroup("events");
     const query = eventsCollection.where('acknowledged', '==', false);
@@ -40,6 +41,21 @@ const ceremonyEventListener = async () => {
     }, err => {
       console.log(`Error while listening for ceremony events ${err}`);
     });
-  };
+};
   
+export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
+    const db = firebase.firestore();
+    const query = db.collectionGroup("ceremonies");
+  
+    query.onSnapshot(querySnapshot => {
+      //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
+      querySnapshot.forEach(docSnapshot => {
+        var ceremony = docSnapshot.data();
+        console.log(`Ceremony: ${docSnapshot.id}`);
+        callback(jsonToCeremony({id: docSnapshot.id, ...ceremony}));
+      });
+    }, err => {
+      console.log(`Error while listening for ceremony changes ${err}`);
+    });
+};
   
