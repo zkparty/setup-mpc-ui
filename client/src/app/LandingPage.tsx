@@ -46,45 +46,42 @@ import { AuthContext } from "./App";
   }}
 `;
 
-
 export const LandingPage = () => {
-  const [activeTab, setActiveTab] = useState("1");
+    const [activeTab, setActiveTab] = useState("1");
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
-    setActiveTab(newValue);
-  };
+    const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
+      setActiveTab(newValue);
+    };
 
-  const isCoordinator = (user: any) => "COORDINATOR" === user?.privileges;
-
-  return (
-    <AuthContext.Consumer>
-      {(Auth) => (
-        <Fragment>
-          <ButtonAppBar />
-          <PageContainer>
-            <MuiTabs 
-              value={activeTab} 
-              onChange={handleChange}
-              centered
-              style = {{ color: accentColor }}
-            >
-              <Tab label="Ceremonies" value="1" />
-              <Tab label="Participate" value="2" />
-              {isCoordinator(Auth.authUser) ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
-            </MuiTabs>
-            <TabPanel value={activeTab} index="1">
-              <SummarySection key="summary" />
-            </TabPanel>
-            <TabPanel value={activeTab} index="2">
-              <ParticipantSection key="participants" />
-            </TabPanel>
-            <TabPanel value={activeTab} index="3">
-              New
-            </TabPanel>
-          </PageContainer>
-        </Fragment>
-      )}
-    </AuthContext.Consumer>
+    return (
+      <AuthContext.Consumer>
+        {(Auth) => {console.log(`landing page: ${Auth.isCoordinator}`); return (
+          <Fragment>
+            <ButtonAppBar />
+            <PageContainer>
+              <MuiTabs 
+                value={activeTab} 
+                onChange={handleChange}
+                centered
+                style = {{ color: accentColor }}
+              >
+                <Tab label="Ceremonies" value="1" />
+                <Tab label="Participate" value="2" />
+                {Auth.isCoordinator ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
+              </MuiTabs>
+              <TabPanel value={activeTab} index="1">
+                <SummarySection key="summary" />
+              </TabPanel>
+              <TabPanel value={activeTab} index="2">
+                <ParticipantSection key="participants" />
+              </TabPanel>
+              <TabPanel value={activeTab} index="3">
+                New
+              </TabPanel>
+            </PageContainer>
+          </Fragment>
+        )}}
+      </AuthContext.Consumer>
   );
 };
 

@@ -19,6 +19,14 @@ const Join = (props: { close: any }) => {
     if (user) {
       if (Auth.setAuthUser) Auth.setAuthUser(user);
       if (Auth.setLoggedIn) Auth.setLoggedIn(true);
+      // Get user privileges
+      if (user.email) {
+        getUserPrivs(user.email)
+        .then((resp: string) => {
+          console.log(`privs: ${resp}`);
+          Auth.setCoordinator("COORDINATOR" === resp);
+        });
+      }
     }
   });
   
@@ -43,7 +51,7 @@ const Join = (props: { close: any }) => {
           getUserPrivs(result.user.email)
             .then((resp: string) => {
               console.log(`privs: ${resp}`);
-              Auth.authUser.privileges = resp;
+              Auth.setCoordinator("COORDINATOR" === resp);
           });
           props.close();
         })

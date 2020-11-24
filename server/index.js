@@ -35,7 +35,7 @@ app.use("/", express.static(path.join(__dirname, "../client/dist")));
 
 app.post("/api/get-user-status", async (req, res) => {
   const userId = req.body;
-  res.send(JSON.stringify(getUserStatus(userId))); 
+  res.send(getUserStatus(userId)); 
 });
 
 app.post("/api/add-ceremony", async (req, res) => {
