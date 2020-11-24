@@ -14,6 +14,12 @@ const Join = (props: { close: any }) => {
 
   const Auth = useContext(AuthContext);
 
+  firebase.auth().onAuthStateChanged(user => {
+    console.log(`auth state changed: ${user?.displayName}`);
+    const setUser = Auth.setAuthUser;
+    if (user && setUser) setUser(user);
+  });
+  
   //const history = createBrowserHistory();
 
   const handleGithubLogin = () => {

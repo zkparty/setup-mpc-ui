@@ -21,15 +21,15 @@ export interface AuthContextInterface {
 };
 const defaultAuth: AuthContextInterface = {
   isLoggedIn: false,
-  setLoggedIn: () => false,
+  setLoggedIn: () => null,
   authUser: {},
-  setAuthUser: () => null
+  setAuthUser: () => null,
 };
 export const AuthContext = React.createContext<AuthContextInterface>(defaultAuth);
 
 function useAuthContextValue(): AuthContextInterface {
   const [isLoggedIn, setLoggedIn] = React.useState( false );
-  const [authUser, setAuthUser] = React.useState( {} );
+  const [authUser, setAuthUser] = React.useState( null );
 
   return {
     isLoggedIn,
@@ -41,6 +41,7 @@ function useAuthContextValue(): AuthContextInterface {
 
 const App = () => {
   console.log(`Firebase inited ${firebase.app.name}`);
+  console.log(`auth user: ${firebase.auth().currentUser?.displayName}`);
   return (
     <AuthContext.Provider value={ useAuthContextValue() }>
       <HashRouter>

@@ -70,29 +70,31 @@ const useStyles = makeStyles((theme: Theme) =>
 
 // AppBar shows LOGIN or username alongside Github icon
 const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined; }) => {
-  const Auth = useContext(AuthContext);
 
   return (
-    Auth.isLoggedIn ?
-      <Button
-        aria-controls="github-login"
-        color="inherit"
-        endIcon={<GitHubIcon />}
-        style={{ color: accentColor }}
-        onClick={props.onClick}
-        >
-        {Auth.authUser.user.displayName || "-"}
-      </Button>
-    : 
-      <Button
-        aria-controls="github-login"
-        color="inherit"
-        endIcon={<GitHubIcon >Login</GitHubIcon>}
-        style={{ color: accentColor }}
-        onClick={props.onClick}
-        >
-        Login
-      </Button>
+    <AuthContext.Consumer>
+      {(Auth) => {return Auth.isLoggedIn ?
+        (<Button
+          aria-controls="github-login"
+          color="inherit"
+          endIcon={<GitHubIcon />}
+          style={{ color: accentColor }}
+          onClick={props.onClick}
+          >
+          {Auth.authUser.user.displayName || "-"}
+        </Button>)
+      : 
+        (<Button
+          aria-controls="github-login"
+          color="inherit"
+          endIcon={<GitHubIcon >Login</GitHubIcon>}
+          style={{ color: accentColor }}
+          onClick={props.onClick}
+          >
+          Login
+        </Button>)
+      }}
+    </AuthContext.Consumer>
   );
 };
 
