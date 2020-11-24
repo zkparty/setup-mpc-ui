@@ -3,6 +3,8 @@ import { useState, useEffect, Fragment } from "react";
 import * as React from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
+import MuiTabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 import { ReactNode } from "react";
 import ButtonAppBar from "../components/ButtonAppBar";
 import CeremonySummary from "../components/CeremonySummary";
@@ -24,6 +26,7 @@ import {
 import { Ceremony } from "../types/ceremony";
 import FileUploader from "../components/FileUploader";
 import { ceremonyListener } from "../api/FirebaseApi";
+import { AuthContext } from "./App";
 
  const TabLink = styled.span<any>`
   ${(props: { selected: boolean }) => {
@@ -44,19 +47,53 @@ import { ceremonyListener } from "../api/FirebaseApi";
 
 
 export const LandingPage = () => {
+  const [activeTab, setActiveTab] = useState(1);
+
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
+  const isCoordinator = (userPrivs: string) => "COORDINATOR" === userPrivs;
+
   return (
-    <Fragment>
-      <ButtonAppBar />
-      <PageContainer>
-        <Tabs titles={[ "Ceremonies", "Participate" ]}>
-          {[
-            <SummarySection key="summary" />,
-            <ParticipantSection key="participants" />
-          ]}
-        </Tabs>
-      </PageContainer>
-    </Fragment>
+    <AuthContext.Consumer>
+      {(Auth) => (
+        <Fragment>
+          <ButtonAppBar />
+          <PageContainer>
+            <MuiTabs 
+              value={activeTab} 
+              onChange={handleChange}
+              centered
+              style = {{ color: accentColor }}
+            >
+              <Tab label="Ceremonies" />
+              <Tab label="Participate" />
+              {isCoordinator(Auth.authUser?.privileges) ? (<Tab label="New Ceremony" />) : (<></>) }
+            </MuiTabs>
+          </PageContainer>
+        </Fragment>
+      )}
+    </AuthContext.Consumer>
   );
+};
+
+const BodySection = (activeTab: number) => {
+  switch (activeTab) {
+    case 1: { 
+      return (<SummarySection key="summary" />);      
+    }
+    case 2: {
+      return (
+        <ParticipantSection key="participants" />
+      );
+    }
+    case 3: {
+      return (
+        <div>New</div>
+      );
+    }
+  };
 };
 
 const Tabs = (props: { children: ReactNode[]; titles: string[] }) => {
