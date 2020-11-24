@@ -16,8 +16,10 @@ const Join = (props: { close: any }) => {
 
   firebase.auth().onAuthStateChanged(user => {
     console.log(`auth state changed: ${user?.displayName}`);
-    const setUser = Auth.setAuthUser;
-    if (user && setUser) setUser(user);
+    if (user) {
+      if (Auth.setAuthUser) Auth.setAuthUser(user);
+      if (Auth.setLoggedIn) Auth.setLoggedIn(true);
+    }
   });
   
   //const history = createBrowserHistory();
@@ -35,7 +37,7 @@ const Join = (props: { close: any }) => {
         .then((result: any) => {
           console.log(result);
           //this.props.history.push('/')
-          Auth.setAuthUser(result);
+          Auth.setAuthUser(result.user);
           Auth.setLoggedIn(true);
           // Get user privileges
           getUserPrivs(result.user.email)
