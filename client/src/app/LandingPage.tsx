@@ -5,6 +5,7 @@ import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
 import MuiTabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import Box from "@material-ui/core/Box";
 import { ReactNode } from "react";
 import ButtonAppBar from "../components/ButtonAppBar";
 import CeremonySummary from "../components/CeremonySummary";
@@ -47,13 +48,13 @@ import { AuthContext } from "./App";
 
 
 export const LandingPage = () => {
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState("1");
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setActiveTab(newValue);
   };
 
-  const isCoordinator = (userPrivs: string) => "COORDINATOR" === userPrivs;
+  const isCoordinator = (user: any) => "COORDINATOR" === user?.privileges;
 
   return (
     <AuthContext.Consumer>
@@ -67,10 +68,19 @@ export const LandingPage = () => {
               centered
               style = {{ color: accentColor }}
             >
-              <Tab label="Ceremonies" />
-              <Tab label="Participate" />
-              {isCoordinator(Auth.authUser?.privileges) ? (<Tab label="New Ceremony" />) : (<></>) }
+              <Tab label="Ceremonies" value="1" />
+              <Tab label="Participate" value="2" />
+              {isCoordinator(Auth.authUser) ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
             </MuiTabs>
+            <TabPanel value={activeTab} index="1">
+              <SummarySection key="summary" />
+            </TabPanel>
+            <TabPanel value={activeTab} index="2">
+              <ParticipantSection key="participants" />
+            </TabPanel>
+            <TabPanel value={activeTab} index="3">
+              New
+            </TabPanel>
           </PageContainer>
         </Fragment>
       )}
@@ -78,23 +88,50 @@ export const LandingPage = () => {
   );
 };
 
-const BodySection = (activeTab: number) => {
-  switch (activeTab) {
-    case 1: { 
-      return (<SummarySection key="summary" />);      
-    }
-    case 2: {
-      return (
-        <ParticipantSection key="participants" />
-      );
-    }
-    case 3: {
-      return (
-        <div>New</div>
-      );
-    }
-  };
-};
+// const BodySection = (activeTab: number) => {
+//   switch (activeTab) {
+//     case 1: { 
+//       return (<SummarySection key="summary" />);      
+//     }
+//     case 2: {
+//       return (
+//         <ParticipantSection key="participants" />
+//       );
+//     }
+//     case 3: {
+//       return (
+//         <div>New</div>
+//       );
+//     }
+//   };
+// };
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`wrapped-tabpanel-${index}`}
+      aria-labelledby={`wrapped-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
 
 const Tabs = (props: { children: ReactNode[]; titles: string[] }) => {
   const [selectedTitleIndex, updateIndex] = useState(0);
