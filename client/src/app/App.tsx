@@ -17,7 +17,7 @@ export interface AuthContextInterface {
   isLoggedIn: boolean,
   setLoggedIn: (b: boolean) => void,
   authUser: any,
-  setAuthUser: (u: any | null) => void
+  setAuthUser: (u: any | null) => void,
 };
 const defaultAuth: AuthContextInterface = {
   isLoggedIn: false,

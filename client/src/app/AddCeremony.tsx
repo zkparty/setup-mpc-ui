@@ -1,14 +1,13 @@
 import { Link, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import * as React from "react";
 import styled from "styled-components";
-import FormControl from '@material-ui/core/FormControl';
 import TextField, { FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps } from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import InputLabel from "@material-ui/core/InputLabel";
 import firebase from "firebase/app";
 import "firebase/storage";
-
+import { AuthContext } from "./App";
 import {
   textColor,
   lighterBackground,
@@ -23,6 +22,7 @@ import { addCeremony } from "../api/ZKPartyApi";
 import { addCeremonyEvent } from "./../api/FirebaseApi";
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
+
 
 const HomeLinkContainer = styled.div`
   position: absolute;
@@ -84,10 +84,10 @@ const StyledTextField2 = (props: (JSX.IntrinsicAttributes & StandardTextFieldPro
 }
 
 export const AddCeremonyPage = () => {
-  //let { id } = useParams<{ id: string }>();
-  //const [loaded, setLoaded] = useState<boolean>(false);
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
-    /*
+  const Auth = useContext(AuthContext);
+  const isCoordinator = () => { return "COORDINATOR" === Auth.authUser.privileges };
+  /*
   const refreshCeremony = () => {
     getCeremonyData(id)
       .then(ceremony => {
@@ -118,8 +118,13 @@ export const AddCeremonyPage = () => {
         <Link to="/">home</Link>
       </HomeLinkContainer>
         <PageContainer>
-          <br />
-          <CeremonyDetails ceremony={ceremony}></CeremonyDetails> 
+          {isCoordinator() ? (
+            <><br />
+              <CeremonyDetails ceremony={ceremony}></CeremonyDetails> 
+            </>
+          ) : (
+            <div>Sorry. This page has restricted access.</div>
+          )}
        </PageContainer>
        </>
   );

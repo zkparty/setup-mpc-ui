@@ -6,6 +6,8 @@ import GitHubIcon from "@material-ui/icons/GitHub";
 import firebase from "firebase";
 import { accentColor } from "../styles";
 import ListItem from "@material-ui/core/ListItem";
+import { Autorenew } from "@material-ui/icons";
+import { getUserPrivs } from "./../api/ZKPartyApi";
 
 const Join = (props: { close: any }) => {
   const [error, setErrors] = useState("");
@@ -14,27 +16,27 @@ const Join = (props: { close: any }) => {
 
   //const history = createBrowserHistory();
 
-  const getUserPrivs = async (userId: string): Promise<string> => {
-    return getUserPrivs(userId);
-  }
-
   const handleGithubLogin = () => {
     const provider = new firebase.auth.GithubAuthProvider();
 
     firebase
     .auth()
-    .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+    .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
       .then(() => {
         firebase
         .auth()
         .signInWithPopup(provider)
         .then((result: any) => {
-          console.log(result)
+          console.log(result);
           //this.props.history.push('/')
           Auth.setAuthUser(result);
           Auth.setLoggedIn(true);
           // Get user privileges
-          console.log(`privs: ${getUserPrivs(Auth.authUser.user.email)}`);
+          getUserPrivs(result.user.email)
+            .then((resp: string) => {
+              console.log(`privs: ${resp}`);
+              Auth.authUser.privileges = resp;
+          });
           props.close();
         })
         .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))

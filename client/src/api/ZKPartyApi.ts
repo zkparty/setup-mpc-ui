@@ -102,14 +102,14 @@ export function getUserPrivs(userId: string): Promise<string> {
   // throws if fetch error
   return fetch(`${url}/api/get-user-status`, {
     method: "post",
-    body: JSON.stringify({ userId }),
+    body: JSON.stringify({ userid: userId }),
     headers: { "Content-Type": "application/json" }
   })
     .then(response => {
       return response.text();
     })
     .catch(err => {
-      console.error("Error occurred posting ceremony:");
+      console.error("Error occurred getting privs");
       console.error(err);
       throw err;
     });
