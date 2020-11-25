@@ -1,4 +1,5 @@
 import { Ceremony } from "../types/ceremony";
+import { addCeremony as addCeremonyToDB } from "./FirebaseApi";
 
 const url = process.env.API_URL ? process.env.API_URL : "http://localhost:80";
 
@@ -79,23 +80,24 @@ export function getCeremonyData(id: string): Promise<Ceremony | null> {
 };
 
 export function addCeremony(ceremony: Ceremony): Promise<string> {
+  return addCeremonyToDB(ceremony);
   // throws if fetch error
-  return fetch(`${url}/api/add-ceremony`, {
-    method: "post",
-    body: JSON.stringify(ceremony),
-    headers: { "Content-Type": "application/json" }
-  })
-    .then(response => {
-      return response.json();
-    })
-    .then(json => {
-      return json.id;
-    })
-    .catch(err => {
-      console.error("Error occurred posting ceremony:");
-      console.error(err);
-      throw err;
-    });
+  // return fetch(`${url}/api/add-ceremony`, {
+  //   method: "post",
+  //   body: JSON.stringify(ceremony),
+  //   headers: { "Content-Type": "application/json" }
+  // })
+  //   .then(response => {
+  //     return response.json();
+  //   })
+  //   .then(json => {
+  //     return json.id;
+  //   })
+  //   .catch(err => {
+  //     console.error("Error occurred posting ceremony:");
+  //     console.error(err);
+  //     throw err;
+  //   });
 };
 
 export function getUserPrivs(userId: string): Promise<string> {

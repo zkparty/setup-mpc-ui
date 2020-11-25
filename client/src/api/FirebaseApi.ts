@@ -4,7 +4,18 @@ import "firebase/firestore";
 import { jsonToCeremony } from './ZKPartyApi';
 
 //const serviceAccount = require( 'firebase_skey.json');
-
+export async function addCeremony(ceremony: Ceremony) {
+    const db = firebase.firestore();
+    try {
+      const doc = await db.collection("ceremonies").add(ceremony);
+  
+      console.log(`new ceremony added with id ${doc.id}`)
+      return doc.id;
+    } catch (e) {
+      throw new Error(`error adding ceremony data to firebase: ${e}`);
+    }
+};
+  
 export const addCeremonyEvent = async (ceremonyId: string, event: CeremonyEvent) => {
     const db = firebase.firestore();
 

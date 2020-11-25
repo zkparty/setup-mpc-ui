@@ -17,7 +17,7 @@ import {
   Center
 } from "../styles";
 import { Ceremony, CeremonyEvent } from "../types/ceremony";
-import { addCeremony } from "../api/ZKPartyApi";
+import { addCeremony, jsonToCeremony } from "../api/ZKPartyApi";
 import { addCeremonyEvent, ceremonyEventListener } from "./../api/FirebaseApi";
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
@@ -129,7 +129,15 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
 
-  var newCeremony: Ceremony | any = {...props.ceremony};
+  var newCeremony: Ceremony | any = {};
+  var circuitFile: File | null = null;
+  if (props.ceremony) {
+    try {
+      newCeremony = jsonToCeremony(props.ceremony);
+    } catch (err) {
+      console.log(`Cannot parse provided ceremony ${err.message}`);
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       console.log(`handleChange ${e.target.id}`);
@@ -145,24 +153,24 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
 
   const handleFileUpload = (f: File) => {
       console.log(`handleFileUpload`);
-      newCeremony.circuitFile = f;
+      circuitFile = f;
   }
 
   const validateInput = () => {
     var isValid = true;
-    if (!newCeremony.title || newCeremony.title.length > 0) {enqueueSnackbar("Must have a title"); isValid = false;}
-    if (!newCeremony.description || newCeremony.description.length > 0) {enqueueSnackbar("Must have a description"); isValid = false;};
+    if (!newCeremony.title || newCeremony.title.length == 0) {enqueueSnackbar("Must have a title"); isValid = false;}
+    if (!newCeremony.description || newCeremony.description.length == 0) {enqueueSnackbar("Must have a description"); isValid = false;};
     return isValid;
   };
 
   const handleSubmit = () => {
-    console.log('submit ....');
+    console.log(`submit ....`);
     // validate
     if (!validateInput()) return;
 
-    if (newCeremony.circuitFile) {
+    if (circuitFile) {
         // Firebase storage ref for the new file
-        newCeremony.circuitFileName = newCeremony.circuitFile.name;
+        newCeremony.circuitFileName = circuitFile.name;
     };
     // insert new DB record. Get id
     addCeremony(newCeremony).then((id: string) => {
@@ -173,12 +181,11 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
         const ceremonyDataRef = storageRef.child(`ceremony_data/${id}`);
 
         const fileReader = new FileReader();
-        if (newCeremony.circuitFile) {
-  
+        if (circuitFile) {  
           // Firebase storage ref for the new file
-          const fbFileRef = ceremonyDataRef.child(newCeremony.circuitFile.name);
+          const fbFileRef = ceremonyDataRef.child(circuitFile.name);
           
-          fbFileRef.put(newCeremony.circuitFile).then((snapshot) => {
+          fbFileRef.put(circuitFile).then((snapshot) => {
               console.log('Uploaded file!');
               const event: CeremonyEvent = {
                 sender: "COORDINATOR",
