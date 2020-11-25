@@ -3,7 +3,7 @@ import { useState, useEffect, Fragment } from "react";
 import * as React from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
-import MuiTabs from "@material-ui/core/Tabs";
+import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Box from "@material-ui/core/Box";
 import { ReactNode } from "react";
@@ -25,10 +25,11 @@ import {
   getCeremonySummariesCached
 } from "../api/ZKPartyApi";
 import { Ceremony } from "../types/ceremony";
-import FileUploader from "../components/FileUploader";
 import { ceremonyListener } from "../api/FirebaseApi";
 import { AuthContext } from "./AuthContext";
 import AddCeremonyPage from "./AddCeremony";
+import Modal from "@material-ui/core/Modal";
+import { CeremonyPage } from "./CeremonyPage";
 
  const TabLink = styled.span<any>`
   ${(props: { selected: boolean }) => {
@@ -47,62 +48,70 @@ import AddCeremonyPage from "./AddCeremony";
   }}
 `;
 
+export interface SelectedCeremonyContextInterface {
+  selectedCeremony: string,
+  setSelectedCeremony: (id: string) => void,
+};
+const defaultSelection: SelectedCeremonyContextInterface = {
+  selectedCeremony: "",
+  setSelectedCeremony: () => null,
+};
+export const SelectedCeremonyContext = React.createContext<SelectedCeremonyContextInterface>(defaultSelection);
+
 export const LandingPage = () => {
     const [activeTab, setActiveTab] = useState("1");
+    const [openModal, setOpenModal] = React.useState(false);
+    const [selectedCeremony, setSelectedCeremony] = React.useState("");
 
     const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
       setActiveTab(newValue);
     };
 
+    const openCeremonyModal = () => {setOpenModal(true)};
+
+    const closeCeremonyModal = () => {setOpenModal(false)};
+
     return (
-      <AuthContext.Consumer>
-        {(Auth) => {console.log(`landing page: ${Auth.isCoordinator}`); return (
-          <Fragment>
-            <ButtonAppBar />
-            <PageContainer>
-              <MuiTabs 
-                value={activeTab} 
-                onChange={handleChange}
-                centered
-                style = {{ color: accentColor }}
-              >
-                <Tab label="Ceremonies" value="1" />
-                <Tab label="Participate" value="2" />
-                {Auth.isCoordinator ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
-              </MuiTabs>
-              <TabPanel value={activeTab} index="1">
-                <SummarySection key="summary" />
-              </TabPanel>
-              <TabPanel value={activeTab} index="2">
-                <ParticipantSection key="participants" />
-              </TabPanel>
-              <TabPanel value={activeTab} index="3">
-                <AddCeremonyPage />
-              </TabPanel>
-            </PageContainer>
-          </Fragment>
-        )}}
-      </AuthContext.Consumer>
+      <SelectedCeremonyContext.Provider value={{selectedCeremony, setSelectedCeremony}}>
+        <AuthContext.Consumer>
+          {(Auth) => {console.log(`landing page: ${Auth.isCoordinator}`); return (
+            <Fragment>
+              <ButtonAppBar />
+              <PageContainer>
+                <Tabs 
+                  value={activeTab} 
+                  onChange={handleChange}
+                  centered
+                  style = {{ color: accentColor }}
+                >
+                  <Tab label="Ceremonies" value="1" />
+                  <Tab label="Participate" value="2" />
+                  {Auth.isCoordinator ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
+                </Tabs>
+                <TabPanel value={activeTab} index="1">
+                  <SummarySection key="summary" onClick={openCeremonyModal}/>
+                </TabPanel>
+                <TabPanel value={activeTab} index="2">
+                  <ParticipantSection key="participants" />
+                </TabPanel>
+                <TabPanel value={activeTab} index="3">
+                  <AddCeremonyPage onSubmit={openCeremonyModal}/>
+                </TabPanel>
+                <Modal
+                  open={openModal}
+                  onClose={closeCeremonyModal}
+                  aria-labelledby="simple-modal-title"
+                  aria-describedby="simple-modal-description"
+                >
+                  <CeremonyPage id={selectedCeremony}/>
+                </Modal>
+              </PageContainer>
+            </Fragment>
+          )}}
+        </AuthContext.Consumer>
+      </SelectedCeremonyContext.Provider>
   );
 };
-
-// const BodySection = (activeTab: number) => {
-//   switch (activeTab) {
-//     case 1: { 
-//       return (<SummarySection key="summary" />);      
-//     }
-//     case 2: {
-//       return (
-//         <ParticipantSection key="participants" />
-//       );
-//     }
-//     case 3: {
-//       return (
-//         <div>New</div>
-//       );
-//     }
-//   };
-// };
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -130,26 +139,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-
-const Tabs = (props: { children: ReactNode[]; titles: string[] }) => {
-  const [selectedTitleIndex, updateIndex] = useState(0);
-
-  return (
-    <>
-      <div>
-        {props.titles.map((title, i) => (
-          <span key={title} onClick={() => updateIndex(i)}>
-            { <TabLink selected={i === selectedTitleIndex} >{title}</TabLink> }
-          </span>
-        ))}
-      </div>
-
-      <SectionContainer>{props.children[selectedTitleIndex]}</SectionContainer>
-    </>
-  );
-};
-
-const SummarySection = () => {
+const SummarySection = (props: any) => {
   const [ceremonies, setCeremonies] = useState<Ceremony[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -167,13 +157,6 @@ const SummarySection = () => {
   const refreshCeremonySummaries = () => {
     // Firestore listener
     ceremonyListener(updateCeremony);
-    /*getCeremonySummaries()
-      .then(ceremonies => {
-        setCeremonies(ceremonies);
-      })
-      .catch(err => {
-        console.error(`error getting ceremonies: ${err}`);
-      }); */
   };
 
   useEffect(() => {
@@ -182,9 +165,6 @@ const SummarySection = () => {
         setCeremonies(ceremonies);
         setLoaded(true);
         refreshCeremonySummaries();
-        // TODO: clear interval with returned function for useEffect
-        //setInterval(refreshCeremonySummaries, 15000);
-
       })
       .catch(() => {
         setLoaded(true);
@@ -194,10 +174,8 @@ const SummarySection = () => {
   return (
     <>
       {ceremonies.map((c, i) => (
-        <CeremonySummary key={i} ceremony={c} />
+        <CeremonySummary key={i} ceremony={c} onClick={props.onClick} />
       ))}
     </>
   );
 };
-
-

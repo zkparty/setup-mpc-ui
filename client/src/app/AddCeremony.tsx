@@ -21,6 +21,7 @@ import { addCeremony, jsonToCeremony } from "../api/ZKPartyApi";
 import { addCeremonyEvent, ceremonyEventListener } from "./../api/FirebaseApi";
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
+import { SelectedCeremonyContext } from "./LandingPage";
 
 
 const HomeLinkContainer = styled.div`
@@ -75,11 +76,14 @@ const StyledTextField = styled(TextField)`
 
 `;
 
-const AddCeremonyPage = () => {
+const AddCeremonyPage = (props: any) => {
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
 
   return (
-      <CeremonyDetails ceremony={ceremony}></CeremonyDetails> 
+    <SelectedCeremonyContext.Consumer>{(value) => {return (
+      <CeremonyDetails ceremony={ceremony} onSubmit={props.onSubmit}></CeremonyDetails> 
+    )}}
+    </SelectedCeremonyContext.Consumer>
   );
 };
 
@@ -118,7 +122,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
+const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => void}) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -196,6 +200,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
                 acknowledged: false,
               }
               addCeremonyEvent(id, event);
+              props.onSubmit();
           });
         }
     });

@@ -24,7 +24,9 @@ const Join = (props: { close: any }) => {
         getUserPrivs(user.email)
         .then((resp: string) => {
           console.log(`privs: ${resp}`);
-          Auth.setCoordinator("COORDINATOR" === resp);
+          //Auth.setCoordinator("COORDINATOR" === resp);
+          // TODO - revert to correct test. temporary for testing
+          Auth.setCoordinator(true);
         });
       }
     }

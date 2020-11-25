@@ -74,8 +74,8 @@ const CeremonyDetailsSubSection = styled.div`
   box-sizing: border-box;
 `;
 
-export const CeremonyPage = () => {
-  let { id } = useParams<{ id: string }>();
+export const CeremonyPage = (props: {id: string}) => {
+  let { id } = props;
   console.log(`have id ${id}`);
 
   const [loaded, setLoaded] = useState<boolean>(false);
@@ -107,9 +107,9 @@ export const CeremonyPage = () => {
 
   return (
     <>
-      <HomeLinkContainer>
+    { /* <HomeLinkContainer>
         <Link to="/">home</Link>
-      </HomeLinkContainer>
+      </HomeLinkContainer>*/}
       {ceremony ? (
         <PageContainer>
           <br />

@@ -24,7 +24,7 @@ const App = () => {
           <GlobalStyle />
           <Switch>
             <Route exact path="/ceremony/:id">
-              <CeremonyPage />
+              
             </Route>
             <Route exact path="/">
               <LandingPage />

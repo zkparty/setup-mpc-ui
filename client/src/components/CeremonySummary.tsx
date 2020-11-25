@@ -12,6 +12,8 @@ import {
 } from "../styles";
 import { Ceremony } from "../types/ceremony";
 import { format } from "timeago.js";
+import { SelectedCeremonyContext } from "../app/LandingPage";
+import { useContext } from "react";
 
 const CeremonyContainer = styled.div`
   background-color: ${lighterBackground};
@@ -27,13 +29,15 @@ const CeremonyContainer = styled.div`
   }
 `;
 
-const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
+const CeremonySummary = (props: { ceremony: Ceremony, onClick: () => void } & RouteProps) => {
     const c = props.ceremony;
+    const { setSelectedCeremony } = useContext(SelectedCeremonyContext);
   
-    let history = useHistory();
+    //let history = useHistory();
   
     const onClick = () => {
-      history.push(`/ceremony/${c.id}`);
+      setSelectedCeremony(c.id);
+      props.onClick();
     };
 
     console.log(`ceremony id: ${c.id}`);
