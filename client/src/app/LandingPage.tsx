@@ -27,7 +27,8 @@ import {
 import { Ceremony } from "../types/ceremony";
 import FileUploader from "../components/FileUploader";
 import { ceremonyListener } from "../api/FirebaseApi";
-import { AuthContext } from "./App";
+import { AuthContext } from "./AuthContext";
+import AddCeremonyPage from "./AddCeremony";
 
  const TabLink = styled.span<any>`
   ${(props: { selected: boolean }) => {
@@ -76,7 +77,7 @@ export const LandingPage = () => {
                 <ParticipantSection key="participants" />
               </TabPanel>
               <TabPanel value={activeTab} index="3">
-                New
+                <AddCeremonyPage />
               </TabPanel>
             </PageContainer>
           </Fragment>

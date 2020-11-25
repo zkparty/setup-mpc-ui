@@ -19,10 +19,10 @@ export const addCeremonyEvent = async (ceremonyId: string, event: CeremonyEvent)
     } catch (e) { throw new Error(`Error adding event: ${e.message}`);}
 };
 
-export const ceremonyEventListener = async () => {
+export const ceremonyEventListener = async (ceremonyId: string | undefined, callback: (e: any) => void) => {
     const db = firebase.firestore();
-    const eventsCollection = db.collectionGroup("events");
-    const query = eventsCollection.where('acknowledged', '==', false);
+    const query = db.collectionGroup("events");
+    //const query = eventsCollection.where(, '==', ceremonyId);
   
     query.onSnapshot(querySnapshot => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
@@ -30,12 +30,14 @@ export const ceremonyEventListener = async () => {
         var event = docSnapshot.data();
         const ceremony = docSnapshot.ref.parent.parent;
         console.log(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
-        switch (event.eventType) {
-          case 'CIRCUIT_FILE_UPLOAD': {
-            break;
-          }
-          case 'PREPARED': {break;}
-          case 'CREATE': {break;}
+        if (ceremony?.id === ceremonyId) {
+            switch (event.eventType) {
+                case 'PREPARED': {break;}
+                case 'STATUS_UPDATE': {
+                    callback(event);
+                    break;
+                }
+            }
         }
       });
     }, err => {

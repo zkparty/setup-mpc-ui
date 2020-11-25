@@ -1,13 +1,12 @@
-import { Link, useParams } from "react-router-dom";
 import { useState, useContext } from "react";
 import * as React from "react";
 import styled from "styled-components";
 import TextField, { FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps } from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import InputLabel from "@material-ui/core/InputLabel";
+import { useSnackbar, withSnackbar } from 'notistack';
 import firebase from "firebase/app";
 import "firebase/storage";
-import { AuthContext } from "./App";
 import {
   textColor,
   lighterBackground,
@@ -19,7 +18,7 @@ import {
 } from "../styles";
 import { Ceremony, CeremonyEvent } from "../types/ceremony";
 import { addCeremony } from "../api/ZKPartyApi";
-import { addCeremonyEvent } from "./../api/FirebaseApi";
+import { addCeremonyEvent, ceremonyEventListener } from "./../api/FirebaseApi";
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
 
@@ -76,63 +75,21 @@ const StyledTextField = styled(TextField)`
 
 `;
 
+const statusUpdate = (event: CeremonyEvent) => {
+  const { enqueueSnackbar } = useSnackbar();
+  enqueueSnackbar(event.message);
+};
 
-const StyledTextField2 = (props: (JSX.IntrinsicAttributes & StandardTextFieldProps) | (JSX.IntrinsicAttributes & FilledTextFieldProps) | (JSX.IntrinsicAttributes & OutlinedTextFieldProps)) => {
-    return <StyledTextField {...props} InputLabelProps={{
-        style: { color: accentColor },
-      }}/>
-}
-
-export const AddCeremonyPage = () => {
+const AddCeremonyPage = () => {
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
-  //const Auth = useContext(AuthContext);
-  const isCoordinator = (user: any) => { console.log(`coordinator? ${user?.privileges} `); return "COORDINATOR" === user?.privileges };
-  /*
-  const refreshCeremony = () => {
-    getCeremonyData(id)
-      .then(ceremony => {
-        setCeremony(ceremony);
-      })
-      .catch(err => {
-        console.error(`error getting ceremony: ${err}`);
-      });
-  };
 
-  useEffect(() => {
-    getCeremonyDataCached(id)
-      .then(ceremonyData => {
-        setCeremony(ceremonyData);
-        setLoaded(true);
-        refreshCeremony();
-        // TODO: clear interval with returned function for useEffect
-        setInterval(refreshCeremony, 15000);
-      })
-      .catch(() => {
-        setLoaded(true);
-      });
-  }, [loaded]);
-*/
-  return (    
-      <AuthContext.Consumer>
-        {(Auth) => (
-          <>
-            <HomeLinkContainer>
-              <Link to="/">home</Link>
-            </HomeLinkContainer>
-              <PageContainer>
-                {isCoordinator(Auth.authUser) ? (
-                  <><br />
-                    <CeremonyDetails ceremony={ceremony}></CeremonyDetails> 
-                  </>
-                ) : (
-                  <div>Sorry. This page has restricted access.</div>
-                )}
-            </PageContainer>
-          </>
-        )}
-      </AuthContext.Consumer>
+  ceremonyEventListener(ceremony?.id, statusUpdate);
+
+  return (
+      <CeremonyDetails ceremony={ceremony}></CeremonyDetails> 
   );
 };
+
 
 const CssTextField = withStyles({
     root: {
@@ -170,6 +127,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
 
   var newCeremony: Ceremony | any = {...props.ceremony};
 
@@ -190,11 +148,19 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
       newCeremony.circuitFile = f;
   }
 
+  const validateInput = () => {
+    var isValid = true;
+    if (!newCeremony.title || newCeremony.title.length > 0) {enqueueSnackbar("Must have a title"); isValid = false;}
+    if (!newCeremony.description || newCeremony.description.length > 0) {enqueueSnackbar("Must have a description"); isValid = false;};
+    return isValid;
+  };
+
   const handleSubmit = () => {
-      console.log('submit ....');
+    console.log('submit ....');
     // validate
+    if (!validateInput()) return;
+
     if (newCeremony.circuitFile) {
-  
         // Firebase storage ref for the new file
         newCeremony.circuitFileName = newCeremony.circuitFile.name;
     };
@@ -270,3 +236,5 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
     </CeremonyDetailsContainer>
   );
 };
+
+export default withSnackbar(AddCeremonyPage);
