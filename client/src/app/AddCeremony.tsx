@@ -75,15 +75,8 @@ const StyledTextField = styled(TextField)`
 
 `;
 
-const statusUpdate = (event: CeremonyEvent) => {
-  const { enqueueSnackbar } = useSnackbar();
-  enqueueSnackbar(event.message);
-};
-
 const AddCeremonyPage = () => {
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
-
-  ceremonyEventListener(ceremony?.id, statusUpdate);
 
   return (
       <CeremonyDetails ceremony={ceremony}></CeremonyDetails> 
@@ -139,14 +132,20 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
     }
   }
 
+  const statusUpdate = (event: CeremonyEvent) => {
+    enqueueSnackbar(event.message);
+  };
+
+  if (props.ceremony) ceremonyEventListener(props.ceremony.id, statusUpdate);
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       console.log(`handleChange ${e.target.id}`);
 
       switch (e.target.id) {
         case 'title': newCeremony.title = e.target.value; break;
         case 'description': newCeremony.description = e.target.value; break;
-        case 'start-time': newCeremony.startTime = new Date(Date.parse(e.target.value)); break;
-        case 'end-time': newCeremony.endTime = new Date(Date.parse(e.target.value)); break;
+        case 'start-time': newCeremony.startTime = Date.parse(e.target.value); break;
+        case 'end-time': newCeremony.endTime = Date.parse(e.target.value); break;
         case 'min-participants': newCeremony.minParticipants = parseInt(e.target.value); break;
       }
   };
@@ -175,6 +174,8 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null}) => {
     // insert new DB record. Get id
     addCeremony(newCeremony).then((id: string) => {
         console.log(`ceremony added: ${id}`);
+
+        ceremonyEventListener(id, statusUpdate);
 
         // upload circuit file
         const storageRef = firebase.storage().ref();
