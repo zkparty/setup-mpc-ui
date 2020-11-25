@@ -1,9 +1,7 @@
-import { Switch, Route, HashRouter } from "react-router-dom";
 import * as React from "react";
 import { createGlobalStyle } from "styled-components";
 import { textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
-import { CeremonyPage } from "./CeremonyPage";
 import { AuthContext, useAuthContextValue } from "./AuthContext";
 import firebase from "firebase/app";
 import firebaseConfig from "./firebaseConfig";
@@ -20,17 +18,8 @@ const App = () => {
   return (
     <AuthContext.Provider value={ useAuthContextValue() }>
       <SnackbarProvider maxSnack={4}>
-        <HashRouter>
           <GlobalStyle />
-          <Switch>
-            <Route exact path="/ceremony/:id">
-              
-            </Route>
-            <Route exact path="/">
-              <LandingPage />
-            </Route>
-          </Switch>
-        </HashRouter>
+          <LandingPage />
       </SnackbarProvider>
     </AuthContext.Provider>
   );
