@@ -1,8 +1,8 @@
-//import * as phase2 from "./pkg/phase2.js";
+//import * as phase2 from "./pkg";
 
 export async function main() {
     console.log('phase2.js.main()');
-    const phase2 = require("./pkg/phase2.js")
+    const phase2 = await require("./pkg")
     let data = await fetch('./circom1.params')
     data = await data.arrayBuffer()
     data = new Uint8Array(data)
