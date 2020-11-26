@@ -3,7 +3,7 @@ import { useState, useEffect, Fragment } from "react";
 import * as React from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
-import { main } from "./../packages/phase2/main";
+//import { main } from "./../packages/phase2/main";
 
 import {
   accentColor,
@@ -21,10 +21,13 @@ import {
 import { Ceremony } from "../types/ceremony";
 import Button from "@material-ui/core/Button";
 
+
+
 export const ParticipantSection = () => {
 
   const run = () => {
-    main();
+    window.wasmPhase2 = window.wasmPhase2 || {};
+    window.wasmPhase2();
   };
 
   return (

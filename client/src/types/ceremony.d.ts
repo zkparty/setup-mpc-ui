@@ -104,3 +104,8 @@ export interface Message {
   timestamp: string;
   signature: string;
 }
+
+declare global {
+  interface Window { wasmPhase2: any; }
+}
+
