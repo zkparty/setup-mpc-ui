@@ -21,13 +21,31 @@ import {
 import { Ceremony } from "../types/ceremony";
 import Button from "@material-ui/core/Button";
 
+const Loaded = ({ wasm }: { wasm: any}) => (<Button onClick={wasm.contribute} style={{color: 'white'}}>Contribute</Button>);
 
+const Unloaded = (props: { loading: boolean, loadWasm: any }) => {
+  return props.loading ? (
+    <div>Loading...</div>
+  ) : (
+    <button onClick={props.loadWasm}>Load library</button>
+  );
+};
 
 export const ParticipantSection = () => {
+  const [loading, setLoading] = React.useState(false);
+  const [wasm, setWasm] = React.useState<any | null>(null);
+
+  const loadWasm = async () => {
+    try {
+      setLoading(true);
+      const wasm = await import('phase2');
+      setWasm(wasm);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const run = () => {
-    window.wasmPhase2 = window.wasmPhase2 || {};
-    window.wasmPhase2();
   };
 
   return (
@@ -35,7 +53,11 @@ export const ParticipantSection = () => {
       <Typography variant="body1">
         Welcome to zkparty. This page will allow you to participate in the ceremony. Once you agree, your computation will commence. 
       </Typography>
-      <Button onClick={run}>Run</Button>
+      {wasm ? (
+          <Loaded wasm={wasm} />
+        ) : (
+          <Unloaded loading={loading} loadWasm={loadWasm} />
+        )}
     </div>
   );
 };
