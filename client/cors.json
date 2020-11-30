@@ -1,0 +1,7 @@
+[
+    {
+      "origin": ["https://trustedsetup-a86f4.web.app", "http://localhost:5000"],
+      "method": ["GET"],
+      "maxAgeSeconds": 3600
+    }
+  ]

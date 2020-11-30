@@ -13,47 +13,42 @@ export const GetParamsFile = async (ceremonyId: string, index: number): Promise<
             console.log(`Expected params file doesn't exist? ${err.message}`); 
             throw err;
     });
+    
     const url = await fileRef.getDownloadURL();
     console.log(`Fetching ${url}  ${metadata.size} `);
 
-    const paramsFile = await fetch(url, {mode: 'no-cors'});
-    //const buffer = await new Response(await paramsFile.blob()).arrayBuffer();
-    const body = paramsFile.body;
-    console.log(`body? ${body}`);
-    let arr: Uint8Array = new Uint8Array(metadata.size);
-    let i = 0;
-    const fr = body?.getReader();
+    const paramsFile = await fetch(url, {mode: 'cors'});
 
-    
-    let p = new Promise<any>((resolve, reject) => {
-        console.log('enter promise');
-        let isDone: boolean = false;
-        const readChunk = (res: ReadableStreamReadResult<Uint8Array>) => {
-            console.log(`result: ${res?.done ? 'done' : res?.value}`);
-            if (!res.done) {arr.set(res.value, i);
-                i += res.value.length;
-                fr?.read().then(res => readChunk(res));
-            } else {
-                isDone = true;
-                resolve(arr);
-            }
-        };
-        console.log(`read 1st chunk: ${fr ? 'have fr': 'no fr!'}`);
-        fr?.read().then(res => readChunk(res));
-    });
+    //let paramData = await paramsFile.arrayBuffer();
+    return new Uint8Array(await paramsFile.arrayBuffer());
+
+    // Using streamed read:
+    //const buffer = await new Response(await paramsFile.blob()).arrayBuffer();
+
+    // const body = paramsFile.body;
+    // console.log(`body? ${body}`);
+    // let arr: Uint8Array = new Uint8Array(metadata.size);
+    // let i = 0;
+    // const fr = body?.getReader();
+   
+    // let p = new Promise<any>((resolve, reject) => {
+    //     let isDone: boolean = false;
+    //     const readChunk = (res: ReadableStreamReadResult<Uint8Array>) => {
+    //         console.log(`result: ${res?.done ? 'done' : 'chunk...'}`);
+    //         if (!res.done) {arr.set(res.value, i);
+    //             i += res.value.length;
+    //             fr?.read().then(res => readChunk(res));
+    //         } else {
+    //             isDone = true;
+    //             resolve(arr);
+    //         }
+    //     };
+    //     console.log(`read 1st chunk: ${fr ? 'have fileReader': 'no fileReader!'}`);
+    //     fr?.read().then(res => readChunk(res));
+    // });
 
         
-    //     fr.onloadend = async event => {
-    //         console.log(`loadend ${event.type}`);
-    //         console.log(`blob: ${fr.result}`);
-    //         const buffer: string | ArrayBuffer | null = fr.result;
-    //             //console.log(`resolve: ${buffer.length}`);
-    //             resolve( fr.result);
-    //     };
-
-    //     fr.onerror = event => reject();
-     //});
-     return p;
+    //  return p;
     // //fr.result
     // fr.readAsBinaryString(blob);
 
@@ -62,7 +57,7 @@ export const GetParamsFile = async (ceremonyId: string, index: number): Promise<
     //return new Uint8Array(blob);
 };
 
-export const UploadCircuitFile = async (ceremonyId: string, circuitFile: File): Promise<firebase.storage.UploadTask> => {
+export const UploadCircuitFile = async (ceremonyId: string, circuitFile: File): Promise<firebase.storage.UploadTaskSnapshot> => {
     // upload circuit file
     const storageRef = firebase.storage().ref();
     const ceremonyDataRef = storageRef.child(`ceremony_data/${ceremonyId}`);
