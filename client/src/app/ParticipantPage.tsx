@@ -3,7 +3,7 @@ import { useState, useEffect, Fragment } from "react";
 import * as React from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
-//import { main } from "./../packages/phase2/main";
+import { GetParamsFile } from "../api/FileApi";
 
 import {
   accentColor,
@@ -37,6 +37,14 @@ export const ParticipantSection = () => {
   const [wasm, setWasm] = React.useState<any | null>(null);
   const [data, setData] = React.useState<Uint8Array | null>(null);
   const [running, setRunning] = React.useState(false);
+  const [entropy, setEntropy] = React.useState(new Uint8Array(64));
+
+  const getEntropy = () => {
+    const s = entropy.map((v, i) => Math.random() * 256);
+    console.log(`entropy: ${s.toString()}`);
+    setEntropy(s);
+    return s;
+  };
 
   const loadWasm = async () => {
     try {
@@ -44,22 +52,46 @@ export const ParticipantSection = () => {
       // ignore syntax check error. Make sure to *npm link* phase2 in ../lib/pkg
       const wasm = await import('phase2');
       setWasm(wasm);
-      let paramData: any = await fetch('/zk_transaction_1_2.params');
-      paramData = await paramData.arrayBuffer();
-      paramData = new Uint8Array(paramData);
+      //let paramData: any = await fetch('/zk_transaction_1_2.params');
+      //paramData = await paramData.arrayBuffer();
+      //paramData = new Uint8Array(paramData);
+      const ceremonyId = "E2F5wqJvxbKVcl9Mv2aD";
+      const index: number = 1;
+      const paramData = await  GetParamsFile(ceremonyId, index);
       console.log('Source params', paramData);
       setData(paramData);
-      } finally {
+      getEntropy();
+    } finally {
       setLoading(false);
     }
   };
 
+  const compute = () => {
+    if (running) {
+      console.log('running computation...');
+      const result = wasm.contribute(data, Buffer.from(getEntropy()));
+      console.log('Updated params', result)
+      setRunning(false);
+    }
+  };
+
+  compute();
+
   const run = () => {
     setRunning(true);
-    const result = wasm.contribute(data);
-    console.log('Updated params', result)
-    setRunning(false);
   };
+
+  const serviceWorker = () => { 
+    navigator.serviceWorker.ready.then(() => {
+      console.log('service worker ready');
+      navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
+      navigator.serviceWorker.addEventListener('message', event => {
+        console.log(`message from service worker ${event.data.type}`);
+      });
+    });
+  };
+
+  serviceWorker();
 
   return (
     <div style={{ width: "512px" }}>
