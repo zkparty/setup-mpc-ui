@@ -57,7 +57,7 @@ export const ParticipantSection = () => {
       //paramData = new Uint8Array(paramData);
       const ceremonyId = "E2F5wqJvxbKVcl9Mv2aD";
       const index: number = 1;
-      const paramData = await  GetParamsFile(ceremonyId, index);
+      const paramData = await GetParamsFile(ceremonyId, index);
       console.log('Source params', paramData);
       setData(paramData);
       getEntropy();

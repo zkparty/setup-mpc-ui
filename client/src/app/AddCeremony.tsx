@@ -22,6 +22,7 @@ import { addCeremonyEvent, ceremonyEventListener } from "./../api/FirebaseApi";
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
 import { SelectedCeremonyContext } from "./LandingPage";
+import { UploadCircuitFile } from "../api/FileApi";
 
 
 const HomeLinkContainer = styled.div`
@@ -181,16 +182,8 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
 
         ceremonyEventListener(id, statusUpdate);
 
-        // upload circuit file
-        const storageRef = firebase.storage().ref();
-        const ceremonyDataRef = storageRef.child(`ceremony_data/${id}`);
-
-        const fileReader = new FileReader();
-        if (circuitFile) {  
-          // Firebase storage ref for the new file
-          const fbFileRef = ceremonyDataRef.child(circuitFile.name);
-          
-          fbFileRef.put(circuitFile).then((snapshot) => {
+        if (circuitFile) {          
+          UploadCircuitFile(id, circuitFile).then((snapshot) => {
               console.log('Uploaded file!');
               const event: CeremonyEvent = {
                 sender: "COORDINATOR",
