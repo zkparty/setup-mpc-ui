@@ -3,7 +3,7 @@ import { useState, useEffect, Fragment } from "react";
 import * as React from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
-import { GetParamsFile } from "../api/FileApi";
+import { GetParamsFile, UploadParams } from "../api/FileApi";
 
 import {
   accentColor,
@@ -38,6 +38,8 @@ export const ParticipantSection = () => {
   const [data, setData] = React.useState<Uint8Array | null>(null);
   const [running, setRunning] = React.useState(false);
   const [entropy, setEntropy] = React.useState(new Uint8Array(64));
+  const ceremonyId = "E2F5wqJvxbKVcl9Mv2aD";
+  let index: number = 1;
 
   const getEntropy = () => {
     const s = entropy.map((v, i) => Math.random() * 256);
@@ -55,8 +57,6 @@ export const ParticipantSection = () => {
       //let paramData: any = await fetch('/zk_transaction_1_2.params');
       //paramData = await paramData.arrayBuffer();
       //paramData = new Uint8Array(paramData);
-      const ceremonyId = "E2F5wqJvxbKVcl9Mv2aD";
-      const index: number = 1;
       const paramData = await GetParamsFile(ceremonyId, index);
       console.log('Source params', paramData);
       setData(paramData);
@@ -71,6 +71,8 @@ export const ParticipantSection = () => {
       console.log('running computation...');
       const result = wasm.contribute(data, Buffer.from(getEntropy()));
       console.log('Updated params', result)
+      const paramsFile = UploadParams(ceremonyId, ++index, result);
+      // Add event to notify status and params file name
       setRunning(false);
     }
   };

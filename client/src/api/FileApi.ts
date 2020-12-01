@@ -2,12 +2,16 @@ import firebase from 'firebase/app';
 import "firebase/storage";
 import { resolve } from 'path';
 
+const FormatParamsFileName = (index: number): string => {
+    var tmp = "000" + index.toString();
+    var padIndex = tmp.substr(tmp.length-4);
+    return `ph2_${padIndex}.params`;
+};
+
 export const GetParamsFile = async (ceremonyId: string, index: number): Promise<any> => {
     const storage = firebase.storage();
 
-    var tmp = "000" + index.toString();
-    var padIndex = tmp.substr(tmp.length-4);
-    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/ph2_${padIndex}.params`);
+    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${FormatParamsFileName(index)}`);
     const metadata = await fileRef.getMetadata()
         .catch((err: any) => { 
             console.log(`Expected params file doesn't exist? ${err.message}`); 
@@ -55,6 +59,14 @@ export const GetParamsFile = async (ceremonyId: string, index: number): Promise<
     //const buffer = await blob.arrayBuffer();
     //console.log(`paramsFile length ${buffer.byteLength}`);
     //return new Uint8Array(blob);
+};
+
+export const UploadParams = async (ceremonyId: string, index: number, params: Uint8Array): Promise<string> => {
+    const storage = firebase.storage();
+    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${FormatParamsFileName(index)}`);
+    const snapshot = await fileRef.put(params);
+    console.log(`Params uploaded to ${snapshot.metadata.fullPath}. ${snapshot.totalBytes} bytes`);
+    return snapshot.metadata.fullPath;
 };
 
 export const UploadCircuitFile = async (ceremonyId: string, circuitFile: File): Promise<firebase.storage.UploadTaskSnapshot> => {
