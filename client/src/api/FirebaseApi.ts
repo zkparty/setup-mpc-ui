@@ -1,4 +1,4 @@
-import { Ceremony, CeremonyEvent } from './../types/ceremony';
+import { Ceremony, CeremonyEvent, ContributionSummary } from './../types/ceremony';
 import firebase from 'firebase/app';
 import "firebase/firestore";
 import { jsonToCeremony } from './ZKPartyApi';
@@ -71,4 +71,17 @@ export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
       console.log(`Error while listening for ceremony changes ${err}`);
     });
 };
-  
+
+export const addOrUpdateContributionSummary = async (ceremonyId: string, contribution: ContributionSummary) => {
+  const db = firebase.firestore();
+  try {
+    const doc = await db
+        .doc(`ceremonies/${ceremonyId}`)
+        .collection("contributions")
+        .doc();
+    
+    await doc.set(contribution);
+    console.log(`added contribution summary ${doc.id}`);
+  } catch (e) { throw new Error(`Error adding contribution summary: ${e.message}`);}
+
+}

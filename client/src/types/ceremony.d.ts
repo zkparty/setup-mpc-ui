@@ -109,3 +109,14 @@ declare global {
   interface Window { wasmPhase2: any; }
 }
 
+export interface ContributionSummary {
+  participantId: string;
+  queueIndex?: number;
+  lastSeen?: timestamp;
+  timeAdded?: timestamp;
+  status: string;
+  index?: number;
+  paramsFile?: string;
+  timeCompleted?: timestamp;
+  hash?: string;
+}

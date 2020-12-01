@@ -18,10 +18,10 @@ import {
   getCeremonySummaries,
   getCeremonySummariesCached
 } from "../api/ZKPartyApi";
-import { Ceremony, CeremonyEvent } from "../types/ceremony";
+import { Ceremony, CeremonyEvent, ContributionSummary } from "../types/ceremony";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { addCeremonyEvent } from "../api/FirebaseApi";
+import { addCeremonyEvent, addOrUpdateContributionSummary } from "../api/FirebaseApi";
 
 const Loaded = ({ wasm, contribute }: { wasm: any, contribute: () => any}) => (<Button onClick={contribute} style={{color: 'white'}}>Contribute</Button>);
 
@@ -41,7 +41,19 @@ const CreateCeremonyEvent = (eventType: string, message: string): CeremonyEvent 
     message,
     acknowledged: false,  
   };
-}
+};
+
+const CreateContributionSummary = (participantId: string, status: string, paramsFile: string, index: number, hash: string): ContributionSummary => {
+  return {
+    lastSeen: new Date(),
+    hash,
+    paramsFile,
+    index,
+    participantId,
+    status,
+    timeCompleted: new Date(),
+  }
+};
 
 interface ComputeStatus {
   running: boolean,
@@ -134,6 +146,8 @@ export const ParticipantSection = () => {
           "PARAMS_UPLOADED", 
           `Parameters for participant ${newIndex} uploaded to ${paramsFile}`
         ));
+        const contribution = CreateContributionSummary( '???', 'COMPLETED', paramsFile, newIndex, '???hash');
+        await addOrUpdateContributionSummary(ceremonyId, contribution);
         setComputeStatus({...computeStatus, running: false, uploaded: true, newParams: new Uint8Array()});
       }
     }
