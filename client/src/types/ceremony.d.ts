@@ -4,11 +4,12 @@ export type CeremonyState =
   | "RUNNING"
   | "COMPLETE"
   | "UNKNOWN";
-export type ParticipantState =
-  | "WAITING"
-  | "RUNNING"
-  | "COMPLETE"
-  | "INVALIDATED";
+export enum ParticipantState {
+  WAITING = "WAITING",
+  RUNNING = "RUNNING",
+  COMPLETE = "COMPLETE",
+  INVALIDATED = "INVALIDATED",
+};
 export type ParticipantRunningState =
   | "OFFLINE"
   | "WAITING"
@@ -115,7 +116,7 @@ export interface Contribution {
   queueIndex?: number;
   lastSeen?: timestamp;
   timeAdded?: timestamp;
-  status: string;
+  status: ParticipantState;
   index?: number;
 }
 
@@ -123,4 +124,13 @@ export interface ContributionSummary extends Contribution {
   paramsFile?: string;
   timeCompleted?: timestamp;
   hash?: string;
+}
+
+export interface ContributionState {
+  ceremony: Ceremony;
+  queueIndex: number;
+  currentIndex: number;
+  averageSecondsPerContribution: number;
+  expectedStartTime?: timestamp;
+  status: ParticipantState;
 }

@@ -19,7 +19,7 @@ import {
   getCeremonySummaries,
   getCeremonySummariesCached
 } from "../api/ZKPartyApi";
-import { Ceremony, CeremonyEvent, ContributionSummary, Participant } from "../types/ceremony";
+import { CeremonyEvent, ContributionState, ContributionSummary, Participant, ParticipantState } from "./../types/ceremony";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, ceremonyContributionListener } from "../api/FirebaseApi";
@@ -44,7 +44,7 @@ const CreateCeremonyEvent = (eventType: string, message: string): CeremonyEvent 
   };
 };
 
-const CreateContributionSummary = (participantId: string, status: string, paramsFile: string, index: number, hash: string): ContributionSummary => {
+const CreateContributionSummary = (participantId: string, status: ParticipantState, paramsFile: string, index: number, hash: string): ContributionSummary => {
   return {
     lastSeen: new Date(),
     hash,
@@ -81,7 +81,7 @@ const newParticipant = (uid: string): Participant => {
     tier: 1,
     online: true,
     addedAt: new Date(),
-    state: 'WAITING',
+    state: ParticipantState.WAITING,
     computeProgress: 0,
   }
 }
@@ -103,7 +103,7 @@ export const ParticipantSection = () => {
   const [entropy, setEntropy] = React.useState(new Uint8Array(64));
   const [computeStatus, setComputeStatus] = React.useState<ComputeStatus>(initialComputeStatus);
   const [participant, setParticipant] = React.useState<Participant | null>(null);
-  const [ceremony, setCeremony] = React.useState<Ceremony | null>(null);
+  const [contributionState, setContributionState] = React.useState<ContributionState | null>(null);
   const [ceremonyId, setCeremonyId] = React.useState<string | null>(null);
   const Auth = React.useContext(AuthContext);
   //const [index, setIndex] = React.useState(1);
@@ -115,7 +115,7 @@ export const ParticipantSection = () => {
     let p: Participant = newParticipant(Auth.authUser.uid);
     setParticipant(p);
     // Now that we have the participant ID, start looking for a ceremony to contribute to
-    ceremonyContributionListener(p.uid, setCeremony);
+    ceremonyContributionListener(p.uid, setContributionState);
   };
 
   if (!participant) getParticipant();
@@ -176,7 +176,7 @@ export const ParticipantSection = () => {
           "PARAMS_UPLOADED", 
           `Parameters for participant ${newIndex} uploaded to ${paramsFile}`
         ));
-        const contribution = CreateContributionSummary( participant ? participant.uid : '??', 'COMPLETED', paramsFile, newIndex, '???hash');
+        const contribution = CreateContributionSummary( participant ? participant.uid : '??', ParticipantState.COMPLETE, paramsFile, newIndex, '???hash');
         await addOrUpdateContribution(ceremonyId, contribution);
         setComputeStatus({...computeStatus, running: false, uploaded: true, newParams: new Uint8Array()});
       }

@@ -1,4 +1,6 @@
-import { Ceremony, CeremonyEvent, Contribution, ContributionSummary, Participant } from './../types/ceremony';
+import { Ceremony, CeremonyEvent, CeremonyState, 
+  Contribution, ContributionState, ContributionSummary, 
+  Participant, ParticipantState } from './../types/ceremony';
 import firebase from 'firebase/app';
 import "firebase/firestore";
 import { jsonToCeremony } from './ZKPartyApi';
@@ -75,7 +77,7 @@ export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
 
 // Listens for updates to eligible ceremonies that a participant may contribut to.
 // The first such ceremony found will be returned in the callback
-export const ceremonyContributionListener = async (participantId: string, callback: (c: Ceremony) => void) => {
+export const ceremonyContributionListener = async (participantId: string, callback: (c: ContributionState) => void) => {
   let contributedCeremonies: string[] = [];
   const db = firebase.firestore();
   // Get running ceremonies
@@ -102,7 +104,7 @@ export const ceremonyContributionListener = async (participantId: string, callba
           // We have a ceremony to contribute to
           let contribution: Contribution = {
             participantId,
-            status: 'WAITING',
+            status: ParticipantState.WAITING,
             lastSeen: new Date(),
             timeAdded: new Date(),            
           }
@@ -111,8 +113,11 @@ export const ceremonyContributionListener = async (participantId: string, callba
           // Save the contribution record
           addOrUpdateContribution(ceremonyId, contribution);
 
-          // TODO send  contribution? with ceremonyId. Or ceremony status?
-          callback(jsonToCeremony({id: ceremonyId, ...ceremony}));
+          const cs = await getContributionState(
+            jsonToCeremony({id: ceremonyId, ...ceremony}), 
+            contribution);
+
+          callback(cs);
           return false; // exits the every() loop
         }
       };
@@ -137,6 +142,63 @@ export const getNextQueueIndex = async (ceremonyId: string): Promise<number> => 
     const lastCont = snapshot.docs[0];
     return lastCont.get('queueIndex') + 1;
   }
+};
+
+export const getContributionState = async (ceremony: Ceremony, contribution: Contribution): Promise<ContributionState> => {
+  let contState = {
+    ceremony,
+    participantId: contribution.participantId,    
+    queueIndex: contribution.queueIndex ? contribution.queueIndex : 1,
+    status: ParticipantState.WAITING,
+  };
+  // Get current contributor's index
+  // Get average time per contribution & expected wait time
+  const stats = await getCeremonyStats(ceremony.id);
+  const cs: ContributionState = {
+    ...contState,
+    currentIndex: stats.currentIndex,
+    averageSecondsPerContribution: stats.averageSecondsPerContribution,
+    expectedStartTime: stats.expectedStartTime,
+  }
+
+  return cs;
+};
+
+const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
+  let contributionStats = {
+    currentIndex: 0,
+    averageSecondsPerContribution: 0,
+  };
+  const db = firebase.firestore();
+  const query = db.collection("ceremonies")
+    .doc(ceremonyId)
+    .collection('contributions')
+    .orderBy('queueIndex', 'asc');
+  
+  const snapshot = await query.get();
+  snapshot.forEach( docSnapshot => {
+    const cont = docSnapshot.data() as Contribution;
+    if (cont.status === ParticipantState.COMPLETE
+        || cont.status === ParticipantState.INVALIDATED
+        || cont.status === ParticipantState.RUNNING) {
+      if (cont.queueIndex) contributionStats.currentIndex = cont.queueIndex;
+    }
+  });
+
+  // Average time calcs
+  let totalSecs = 0;
+  let numContribs = 0;
+  const eventsQuery = db.collection("ceremonies")
+    .doc(ceremonyId)
+    .collection('events')
+    .orderBy('timestamp', 'asc');
+  const events = await eventsQuery.get();
+  events.forEach( docSnapshot => {
+    const event = docSnapshot.data();
+
+  });
+
+  return contributionStats;
 };
 
 export const addOrUpdateContribution = async (ceremonyId: string, contribution: Contribution) => {
