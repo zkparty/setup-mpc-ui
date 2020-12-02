@@ -104,7 +104,7 @@ export const ceremonyContributionListener = async (participantId: string, callba
           // We have a ceremony to contribute to
           let contribution: Contribution = {
             participantId,
-            status: ParticipantState.WAITING,
+            status: "WAITING",
             lastSeen: new Date(),
             timeAdded: new Date(),            
           }
@@ -149,13 +149,14 @@ export const getContributionState = async (ceremony: Ceremony, contribution: Con
     ceremony,
     participantId: contribution.participantId,    
     queueIndex: contribution.queueIndex ? contribution.queueIndex : 1,
-    status: ParticipantState.WAITING,
+    //status: "WAITING",
   };
   // Get current contributor's index
   // Get average time per contribution & expected wait time
   const stats = await getCeremonyStats(ceremony.id);
   const cs: ContributionState = {
     ...contState,
+    status: "WAITING",
     currentIndex: stats.currentIndex,
     averageSecondsPerContribution: stats.averageSecondsPerContribution,
     expectedStartTime: stats.expectedStartTime,
@@ -177,10 +178,10 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   
   const snapshot = await query.get();
   snapshot.forEach( docSnapshot => {
-    const cont = docSnapshot.data() as Contribution;
-    if (cont.status === ParticipantState.COMPLETE
-        || cont.status === ParticipantState.INVALIDATED
-        || cont.status === ParticipantState.RUNNING) {
+    const cont = docSnapshot.data();
+    if (cont.status === "COMPLETE"
+        || cont.status === "INVALIDATED"
+        || cont.status === "RUNNING") {
       if (cont.queueIndex) contributionStats.currentIndex = cont.queueIndex;
     }
   });

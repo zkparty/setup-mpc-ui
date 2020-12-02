@@ -81,7 +81,7 @@ const newParticipant = (uid: string): Participant => {
     tier: 1,
     online: true,
     addedAt: new Date(),
-    state: ParticipantState.WAITING,
+    state: "WAITING",
     computeProgress: 0,
   }
 }
@@ -129,18 +129,14 @@ export const ParticipantSection = () => {
 
   const loadWasm = async () => {
     try {
-      if (ceremonyId) {
-        setLoading(true);
-        if (participant) await addOrUpdateParticipant(participant);
-        // ignore syntax check error. Make sure to *npm link* phase2 in ../lib/pkg
-        const wasm = await import('phase2');
-        setWasm(wasm);
-        const paramData = await GetParamsFile(ceremonyId, index);
-        addCeremonyEvent(ceremonyId, CreateCeremonyEvent( "PARAMS_DOWNLOADED", `Parameters from participant ${index} downloaded OK`));
-        console.log('Source params', paramData);
-        setData(paramData);
-        getEntropy();
-      }
+      //if (ceremonyId) {
+      setLoading(true);
+      if (participant) await addOrUpdateParticipant(participant);
+      // ignore syntax check error. Make sure to *npm link* phase2 in ../lib/pkg
+      const wasm = await import('phase2');
+      setWasm(wasm);
+      console.log('wasm set');
+      //}
     } finally {
       setLoading(false);
     }
@@ -151,6 +147,11 @@ export const ParticipantSection = () => {
     console.log(`compute step: ${running? 'running' : '-'} ${running && downloaded && !computed ? 'computing': running && computed && !uploaded ? 'uploaded' : 'inactive'}`);
     if (running && ceremonyId) {
       if (!downloaded) {
+        const paramData = await GetParamsFile(ceremonyId, index);
+        addCeremonyEvent(ceremonyId, CreateCeremonyEvent( "PARAMS_DOWNLOADED", `Parameters from participant ${index} downloaded OK`));
+        console.log('Source params', paramData);
+        setData(paramData);
+        getEntropy();
         setComputeStatus({...computeStatus, downloaded: true});
       }
       if (downloaded && !computed) {
@@ -176,9 +177,10 @@ export const ParticipantSection = () => {
           "PARAMS_UPLOADED", 
           `Parameters for participant ${newIndex} uploaded to ${paramsFile}`
         ));
-        const contribution = CreateContributionSummary( participant ? participant.uid : '??', ParticipantState.COMPLETE, paramsFile, newIndex, '???hash');
+        const contribution = CreateContributionSummary( participant ? participant.uid : '??', "COMPLETE", paramsFile, newIndex, '???hash');
         await addOrUpdateContribution(ceremonyId, contribution);
         setComputeStatus({...computeStatus, running: false, uploaded: true, newParams: new Uint8Array()});
+        setCeremonyId(null);
       }
     }
   };
@@ -188,6 +190,15 @@ export const ParticipantSection = () => {
   const run = () => {
     setComputeStatus({...initialComputeStatus, running: true });
   };
+
+  if (wasm && !computeStatus.running && contributionState) {
+    console.log(`contribution state: ${JSON.stringify(contributionState)}`);
+    if (contributionState.status === "WAITING") {
+      console.log('ready to go');
+      setCeremonyId(contributionState.ceremony.id);
+      setComputeStatus({...initialComputeStatus, running: true });
+    }
+  }
 
   // const serviceWorker = () => { 
   //   navigator.serviceWorker.ready.then(() => {

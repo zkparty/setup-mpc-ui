@@ -4,17 +4,19 @@ export type CeremonyState =
   | "RUNNING"
   | "COMPLETE"
   | "UNKNOWN";
-export enum ParticipantState {
-  WAITING = "WAITING",
-  RUNNING = "RUNNING",
-  COMPLETE = "COMPLETE",
-  INVALIDATED = "INVALIDATED",
-};
+
+  export type ParticipantState =
+    | "WAITING"
+    | "RUNNING"
+    | "COMPLETE"
+    | "INVALIDATED";
+
 export type ParticipantRunningState =
   | "OFFLINE"
   | "WAITING"
   | "RUNNING"
   | "COMPLETE";
+
 export type TranscriptState = "WAITING" | "VERIFYING" | "COMPLETE";
 
 export interface Ceremony {
