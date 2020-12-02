@@ -48,12 +48,13 @@ export interface Ceremony {
 export interface Participant {
   // Coordinator server controlled data.
   address: string;
+  uid: string; // Firebase.auth uid. Also firestore document id.
   state: ParticipantState; // is participant queued, currently computing, done, or invalidated?
-  runningState: ParticipantRunningState; // if the participant is computing, are they computing offline? (or maybe they are queued or invalidated)
-  position: number;
-  priority: number;
+  //runningState: ParticipantRunningState; // if the participant is computing, are they computing offline? (or maybe they are queued or invalidated)
+  //position: number;
+  //priority: number;
   tier: number;
-  verifyProgress: number;
+  //verifyProgress: number;
   lastVerified?: Date;
   addedAt: Date;
   startedAt?: Date;
@@ -61,14 +62,14 @@ export interface Participant {
   error?: string;
   online: boolean;
   lastUpdate?: Date;
-  location?: ParticipantLocation;
-  invalidateAfter?: number;
-  sequence: number;
-  transcripts: Transcript[]; // Except 'complete' participants
+  //location?: ParticipantLocation;
+  //invalidateAfter?: number;
+  //sequence: number;
+  //transcripts: Transcript[]; // Except 'complete' participants
   computeProgress: number;
 
   // ZKParty data
-  messages: Message[];
+  //messages: Message[];
 }
 
 export interface CeremonyEvent {
@@ -105,17 +106,20 @@ export interface Message {
   signature: string;
 }
 
-declare global {
-  interface Window { wasmPhase2: any; }
-}
+//declare global {
+//  interface Window { wasmPhase2: any; }
+//}
 
-export interface ContributionSummary {
+export interface Contribution {
   participantId: string;
   queueIndex?: number;
   lastSeen?: timestamp;
   timeAdded?: timestamp;
   status: string;
   index?: number;
+}
+
+export interface ContributionSummary extends Contribution {
   paramsFile?: string;
   timeCompleted?: timestamp;
   hash?: string;
