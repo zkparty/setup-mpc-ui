@@ -18,7 +18,7 @@ import { CeremonyEvent, ContributionState, ContributionSummary, Participant, Par
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, ceremonyContributionListener, ceremonyQueueListener } from "../api/FirebaseApi";
-import VirtualList, { addMessage, clearMessages } from "./../components/MessageList";
+import VirtualList from "./../components/MessageList";
 
 const Acknowledge = ({ contribute }: { contribute: () => void}) => (<Button onClick={contribute} style={{color: 'white'}}>Contribute</Button>);
 
@@ -113,6 +113,7 @@ const stepText = (step: string) => (<Typography>{step}</Typography>);
 export const ParticipantSection = () => {
   const [step, setStep] = React.useState(Step.NOT_ACKNOWLEDGED);
   const [computeStatus, setComputeStatus] = React.useState<ComputeStatus>(initialComputeStatus);
+  const [messages, setMessages] = useState<string[]>([]);
   const wasm = useRef<any | null>(null);
   const data = useRef<Uint8Array | null>(null);
   const entropy = useRef(new Uint8Array());
@@ -120,6 +121,16 @@ export const ParticipantSection = () => {
   const contributionState = useRef<ContributionState | null>(null);
   const Auth = React.useContext(AuthContext);
   const index = 1;
+
+  const addMessage = (msg: string) => {
+    const newMessages = messages;
+    newMessages.push(msg);
+    setMessages(newMessages);
+  }
+
+  const clearMessages = () => {
+      setMessages([]);
+  }
 
   const getParticipant = async () => {
     console.log(`uid: ${Auth.authUser.uid}`);
@@ -254,6 +265,7 @@ export const ParticipantSection = () => {
       // start looking for a ceremony to contribute to
       if (participant.current) ceremonyContributionListener(participant.current.uid, setContribution);
       content = stepText('Starting listener...');
+      addMessage('Initialised.');
       setStep(Step.WAITING);
       break;
     }
@@ -319,7 +331,7 @@ export const ParticipantSection = () => {
   return (
       <div style={{ width: "512px" }}>
         {content}
-        <VirtualList />
+        <VirtualList messages={messages}/>
       </div>
   );
 };
