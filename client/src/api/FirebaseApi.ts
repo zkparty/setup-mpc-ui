@@ -78,6 +78,7 @@ export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
 // Listens for updates to eligible ceremonies that a participant may contribut to.
 // The first such ceremony found will be returned in the callback
 export const ceremonyContributionListener = async (participantId: string, callback: (c: ContributionState) => void) => {
+  console.log(`listening for contributions for ${participantId}`);
   let contributedCeremonies: string[] = [];
   const db = firebase.firestore();
   // Get running ceremonies
@@ -94,13 +95,15 @@ export const ceremonyContributionListener = async (participantId: string, callba
         //console.log(`Ceremony: ${docSnapshot.id}`);
         // Get any contributions for this participant
         const participantQuery = ceremonySnapshot.ref.collection('contributions')
-          .where('participantId', '==', participantId);
+          .where('participantId', '==', participantId)
+          .where('status', "!=", "WAITING");
         const contSnapshot = await participantQuery.get();
         if (!contSnapshot.empty) {
           // Add to cache
           contributedCeremonies.push(ceremonySnapshot.id);
           return true;
         } else {
+          console.log(`found ceremony ${ceremonyId} to contribute to`);
           // We have a ceremony to contribute to
           let contribution: Contribution = {
             participantId,
@@ -205,14 +208,28 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
 export const addOrUpdateContribution = async (ceremonyId: string, contribution: Contribution) => {
   const db = firebase.firestore();
   try {
-    const doc = await db
-        .doc(`ceremonies/${ceremonyId}`)
-        .collection("contributions")
-        .doc();
-    
-    await doc.set(contribution);
-    console.log(`added contribution summary ${doc.id}`);
-  } catch (e) { throw new Error(`Error adding contribution summary: ${e.message}`);}
+    // Existing contributor - update the record
+    const eventsQuery = db.collection("ceremonies")
+      .doc(ceremonyId)
+      .collection('contributions')
+      .where('participantId', '==', contribution.participantId)
+      .limit(1);
+    const participantContrib = await eventsQuery.get();
+    if (participantContrib.empty) {
+      // New contributor
+      const doc = await db
+          .doc(`ceremonies/${ceremonyId}`)
+          .collection("contributions")
+          .doc();
+      
+      await doc.set(contribution);
+      console.log(`added contribution summary ${doc.id}`);
+    } else {
+      // Update existing contributor
+      const doc = participantContrib.docs[0].ref;
+      await doc.update(contribution);
+    }
+  } catch (e) { throw new Error(`Error adding/updating contribution summary: ${e.message}`);}
 
 };
 
