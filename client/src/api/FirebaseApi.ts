@@ -5,6 +5,9 @@ import firebase from 'firebase/app';
 import "firebase/firestore";
 import { jsonToCeremony } from './ZKPartyApi';
 
+const COMPLETE = "COMPLETE";
+const INVALIDATED = "INVALIDATED";
+
 //const serviceAccount = require( 'firebase_skey.json');
 export async function addCeremony(ceremony: Ceremony) {
     const db = firebase.firestore();
@@ -75,7 +78,7 @@ export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
     });
 };
 
-// Listens for updates to eligible ceremonies that a participant may contribut to.
+// Listens for updates to eligible ceremonies that a participant may contribute to.
 // The first such ceremony found will be returned in the callback
 export const ceremonyContributionListener = async (participantId: string, callback: (c: ContributionState) => void) => {
   console.log(`listening for contributions for ${participantId}`);
@@ -182,7 +185,7 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   const snapshot = await query.get();
   snapshot.forEach( docSnapshot => {
     const cont = docSnapshot.data();
-    if (cont.status === "COMPLETE"
+    if (cont.status === COMPLETE
         || cont.status === "INVALIDATED"
         || cont.status === "RUNNING") {
       if (cont.queueIndex) contributionStats.currentIndex = cont.queueIndex;
@@ -203,6 +206,37 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   });
 
   return contributionStats;
+};
+
+// Listens for ceremony events, to track progress
+export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: any) => void) => {
+  console.log(`listening for events for ${ceremonyId}`);
+  let lastQueueIndex = -1;
+  const db = firebase.firestore();
+  // Get running ceremonies
+  const query = db.collection("ceremonies")
+                .doc(ceremonyId)
+                .collection("contributions")
+                .where("status", "in", [COMPLETE, INVALIDATED]);
+
+  query.onSnapshot(querySnapshot => {
+    let found = false;
+    querySnapshot.docs.forEach(async contSnapshot => {
+      var cont = contSnapshot.data();
+      const contId = cont.id;
+
+      if (cont.queueIndex > lastQueueIndex) {
+        lastQueueIndex = cont.queueIndex;
+        found = true;
+      } 
+    });
+    if (found) {
+      let cs = {
+        currentIndex: lastQueueIndex,
+      }
+      callback(cs);
+    }
+  });
 };
 
 export const addOrUpdateContribution = async (ceremonyId: string, contribution: Contribution) => {

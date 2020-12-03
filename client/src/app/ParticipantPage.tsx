@@ -17,7 +17,8 @@ import {
 import { CeremonyEvent, ContributionState, ContributionSummary, Participant, ParticipantState } from "./../types/ceremony";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, ceremonyContributionListener } from "../api/FirebaseApi";
+import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, ceremonyContributionListener, ceremonyQueueListener } from "../api/FirebaseApi";
+import VirtualList, { addMessage, clearMessages } from "./../components/MessageList";
 
 const Acknowledge = ({ contribute }: { contribute: () => void}) => (<Button onClick={contribute} style={{color: 'white'}}>Contribute</Button>);
 
@@ -102,24 +103,22 @@ enum Step {
   INITIALISED,
   ENTROPY_COLLECTED,
   WAITING,
+  QUEUED,
   RUNNING,
 }
 
 const stepText = (step: string) => (<Typography>{step}</Typography>);
 
+
 export const ParticipantSection = () => {
   const [step, setStep] = React.useState(Step.NOT_ACKNOWLEDGED);
-  //const [loading, setLoading] = React.useState(false);
   const [computeStatus, setComputeStatus] = React.useState<ComputeStatus>(initialComputeStatus);
-  const contributionState = useRef<ContributionState | null>(null);
   const wasm = useRef<any | null>(null);
   const data = useRef<Uint8Array | null>(null);
   const entropy = useRef(new Uint8Array());
   const participant = useRef<Participant | null>(null);
-  //const [ceremonyId, setCeremonyId] = React.useState<string | null>(null);
+  const contributionState = useRef<ContributionState | null>(null);
   const Auth = React.useContext(AuthContext);
-  //const [index, setIndex] = React.useState(1);
-  //const ceremonyId = "Qiu6eLsJDyMokvJ7sGzH";
   const index = 1;
 
   const getParticipant = async () => {
@@ -148,12 +147,22 @@ export const ParticipantSection = () => {
 
   const setContribution = (cs: ContributionState) => {
     // Only accept new tasks if we're waiting
-    if (step !== Step.RUNNING) {
+    if (step !== Step.RUNNING && step !== Step.QUEUED) {
       contributionState.current = cs;
-      setComputeStatus({...computeStatus, running: true});
-      setStep(Step.RUNNING);
+      addMessage(`You are in the queue for ceremony ${cs.ceremony.title}`);
+      ceremonyQueueListener(cs.ceremony.id, updateQueue);
+      setStep(Step.QUEUED);
     } else {
       console.log(`Contribution candidate received while running another. ${step}`);
+    }
+  }
+
+  const updateQueue = (update: any) => {
+    contributionState.current = {...contributionState.current, ...update};
+    if (contributionState.current?.queueIndex === contributionState.current?.currentIndex) {
+      addMessage(`The time for your contribution has arrived.`);
+      setComputeStatus({...computeStatus, running: true});
+      setStep(Step.RUNNING);
     }
   }
 
@@ -167,6 +176,7 @@ export const ParticipantSection = () => {
           addCeremonyEvent(ceremonyId, createCeremonyEvent( "PARAMS_DOWNLOADED", `Parameters from participant ${index} downloaded OK`));
           console.log('Source params', paramData);
           data.current = paramData;
+          addMessage(`Parameters downloaded.`);
           setComputeStatus({...computeStatus, downloaded: true});
         })
       }
@@ -180,6 +190,7 @@ export const ParticipantSection = () => {
                 "COMPUTE_CONTRIBUTION", 
                 `Contribution for participant ${index + 1} completed OK`
               ));
+              addMessage(`Computation completed.`);
               entropy.current = new Uint8Array(); // Reset now that it has been used
               setComputeStatus({...computeStatus, computed: true, newParams});
           })};
@@ -195,6 +206,7 @@ export const ParticipantSection = () => {
             "PARAMS_UPLOADED", 
             `Parameters for participant ${newIndex} uploaded to ${paramsFile}`
           ));
+          addMessage(`Parameters uploaded.`);
           const contribution = createContributionSummary( participant.current ? participant.current.uid : '??', "COMPLETE", paramsFile, newIndex, '???hash');
           await addOrUpdateContribution(ceremonyId, contribution);
         } finally {
@@ -249,14 +261,26 @@ export const ParticipantSection = () => {
       // Waiting for a ceremony
       if (!computeStatus.running && contributionState.current) {
         console.log(`contribution state: ${JSON.stringify(contributionState.current)}`);
-        if (contributionState.current.status === "WAITING") {
+        if (contributionState.current.queueIndex === contributionState.current.currentIndex) {
           console.log('ready to go');
-          //setCeremonyId(contributionState.ceremony.id);
           setComputeStatus({...initialComputeStatus, running: true });
         }
       }
     
       content = stepText('Waiting...');
+      break;
+    }
+    case (Step.QUEUED): {
+      // Waiting for a ceremony
+      if (!computeStatus.running && contributionState.current) {
+        console.log(`contribution state: ${JSON.stringify(contributionState.current)}`);
+        if (contributionState.current.queueIndex === contributionState.current.currentIndex) {
+          console.log('ready to go');
+          setComputeStatus({...initialComputeStatus, running: true });
+        }
+      }
+    
+      content = stepText('Queue position allocated ...');
       break;
     }
     case (Step.RUNNING): {
@@ -295,6 +319,7 @@ export const ParticipantSection = () => {
   return (
       <div style={{ width: "512px" }}>
         {content}
+        <VirtualList />
       </div>
   );
 };
