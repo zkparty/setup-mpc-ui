@@ -90,8 +90,10 @@ export const ceremonyContributionListener = async (participantId: string, callba
     .orderBy('startTime', 'asc');
 
   query.onSnapshot(querySnapshot => {
+    //TODO docChanges()
     querySnapshot.docs.every(async ceremonySnapshot => {
-      // First check cached ceremonies
+      // First check cached ceremonies. These are ceremonies that this participant 
+      // has already contributed to, so they aren't eligible for selection.
       if (!contributedCeremonies.includes(ceremonySnapshot.id)) {
         var ceremony = ceremonySnapshot.data();
         const ceremonyId = ceremonySnapshot.id;
@@ -115,7 +117,7 @@ export const ceremonyContributionListener = async (participantId: string, callba
             timeAdded: new Date(),            
           }
           // Allocate a position in the queue
-          contribution.queueIndex = await getNextQueueIndex(ceremonyId);
+          contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
           // Save the contribution record
           addOrUpdateContribution(ceremonyId, contribution);
 
@@ -133,20 +135,24 @@ export const ceremonyContributionListener = async (participantId: string, callba
   });
 };
 
-export const getNextQueueIndex = async (ceremonyId: string): Promise<number> => {
+export const getNextQueueIndex = async (ceremonyId: string, participantId: string): Promise<number> => {
   const db = firebase.firestore();
   const query = db.collection("ceremonies")
     .doc(ceremonyId)
     .collection('contributions')
-    .orderBy('queueIndex', 'desc')
-    .limit(1);
+    .orderBy('queueIndex', 'desc');
   
   const snapshot = await query.get();
   if (snapshot.empty) {
     return 1;
   } else {
-    const lastCont = snapshot.docs[0];
-    return lastCont.get('queueIndex') + 1;
+    const cont = snapshot.docs[0];
+    // If the last entry is for this participant, reuse it.
+    // TODO - should reuse earlier entries if they are still pending
+    if (cont.get('participantId') == participantId) {
+      return cont.get('queueIndex');
+    }
+    return cont.get('queueIndex') + 1;
   }
 };
 
@@ -157,7 +163,7 @@ export const getContributionState = async (ceremony: Ceremony, contribution: Con
     queueIndex: contribution.queueIndex ? contribution.queueIndex : 1,
     //status: "WAITING",
   };
-  // Get current contributor's index
+  // Get currently running contributor's index
   // Get average time per contribution & expected wait time
   const stats = await getCeremonyStats(ceremony.id);
   const cs: ContributionState = {
@@ -186,7 +192,7 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   snapshot.forEach( docSnapshot => {
     const cont = docSnapshot.data();
     if (cont.status === COMPLETE
-        || cont.status === "INVALIDATED"
+        || cont.status === INVALIDATED
         || cont.status === "RUNNING") {
       if (cont.queueIndex) contributionStats.currentIndex = cont.queueIndex;
     }
@@ -208,6 +214,8 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   return contributionStats;
 };
 
+export var ceremonyQueueListenerUnsub: () => void;
+
 // Listens for ceremony events, to track progress
 export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: any) => void) => {
   console.log(`listening for events for ${ceremonyId}`);
@@ -219,20 +227,21 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
                 .collection("contributions")
                 .where("status", "in", [COMPLETE, INVALIDATED]);
 
-  query.onSnapshot(querySnapshot => {
+  ceremonyQueueListenerUnsub = query.onSnapshot(querySnapshot => {0
+    console.log(`queue listener doc: ${querySnapshot.size}`);
     let found = false;
-    querySnapshot.docs.forEach(async contSnapshot => {
-      var cont = contSnapshot.data();
-      const contId = cont.id;
+    querySnapshot.docChanges().forEach(async docData => {
+      const cont: any = docData.doc.data();
+      console.log(`queue listener doc change index: ${cont.queueIndex}`);
 
-      if (cont.queueIndex > lastQueueIndex) {
+      if (cont.queueIndex && cont.queueIndex > lastQueueIndex) {
         lastQueueIndex = cont.queueIndex;
         found = true;
       } 
     });
     if (found) {
       let cs = {
-        currentIndex: lastQueueIndex,
+        currentIndex: lastQueueIndex + 1,
       }
       callback(cs);
     }

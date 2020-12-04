@@ -17,7 +17,8 @@ import {
 import { CeremonyEvent, ContributionState, ContributionSummary, Participant, ParticipantState } from "./../types/ceremony";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, ceremonyContributionListener, ceremonyQueueListener } from "../api/FirebaseApi";
+import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, 
+  ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirebaseApi";
 import VirtualList from "./../components/MessageList";
 
 const Acknowledge = ({ contribute }: { contribute: () => void}) => (<Button onClick={contribute} style={{color: 'white'}}>Contribute</Button>);
@@ -172,6 +173,7 @@ export const ParticipantSection = () => {
     contributionState.current = {...contributionState.current, ...update};
     if (contributionState.current?.queueIndex === contributionState.current?.currentIndex) {
       addMessage(`The time for your contribution has arrived.`);
+      if (ceremonyQueueListenerUnsub) ceremonyQueueListenerUnsub(); // Stop listening for updates
       setComputeStatus({...computeStatus, running: true});
       setStep(Step.RUNNING);
     }
@@ -273,7 +275,7 @@ export const ParticipantSection = () => {
       // Waiting for a ceremony
       if (!computeStatus.running && contributionState.current) {
         console.log(`contribution state: ${JSON.stringify(contributionState.current)}`);
-        if (contributionState.current.queueIndex === contributionState.current.currentIndex) {
+        if (contributionState.current.queueIndex == contributionState.current.currentIndex) {
           console.log('ready to go');
           setComputeStatus({...initialComputeStatus, running: true });
         }
