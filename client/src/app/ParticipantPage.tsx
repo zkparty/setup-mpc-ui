@@ -17,11 +17,13 @@ import {
 import { CeremonyEvent, ContributionState, ContributionSummary, Participant, ParticipantState } from "./../types/ceremony";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, 
-  ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirebaseApi";
 import VirtualList from "./../components/MessageList";
 import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+
+import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, 
+  ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirebaseApi";
+import QueueProgress from './../components/QueueProgress';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -116,6 +118,14 @@ enum Step {
 }
 
 const stepText = (step: string) => (<Typography>{step}</Typography>);
+
+const queueProgressCard = (contrib: ContributionState) => {
+  return (
+  <QueueProgress 
+    {...contrib}
+  >
+  </QueueProgress>
+)};
 
 
 export const ParticipantSection = () => {
@@ -300,9 +310,9 @@ export const ParticipantSection = () => {
           console.log('ready to go');
           setComputeStatus({...initialComputeStatus, running: true });
         }
+        content = queueProgressCard(contributionState.current);
       }
     
-      content = stepText('Queue position allocated ...');
       break;
     }
     case (Step.RUNNING): {
