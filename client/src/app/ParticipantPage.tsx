@@ -20,16 +20,23 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, 
   ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirebaseApi";
 import VirtualList from "./../components/MessageList";
+import Paper from "@material-ui/core/Paper";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      width: '100%',
+      height: 200,
+      maxWidth: 650,
+      backgroundColor: lighterBackground,
+      color: textColor,
+    },
+  }),
+);
+
 
 const Acknowledge = ({ contribute }: { contribute: () => void}) => (<Button onClick={contribute} style={{color: 'white'}}>Contribute</Button>);
-
-// const Unloaded = (props: { loading: boolean, loadWasm: any }) => {
-//   return props.loading ? (
-//     <div>Loading...</div>
-//   ) : (
-//     <Button onClick={props.loadWasm} style={{color: 'white'}}>Load library</Button>
-//   );
-// };
 
 const createCeremonyEvent = (eventType: string, message: string): CeremonyEvent => {
   return {
@@ -121,6 +128,7 @@ export const ParticipantSection = () => {
   const participant = useRef<Participant | null>(null);
   const contributionState = useRef<ContributionState | null>(null);
   const Auth = React.useContext(AuthContext);
+  const classes = useStyles();
   const index = 1;
 
   const addMessage = (msg: string) => {
@@ -331,9 +339,13 @@ export const ParticipantSection = () => {
   //serviceWorker();
 
   return (
-      <div style={{ width: "512px" }}>
-        {content}
-        <VirtualList messages={messages}/>
+      <div className={classes.root}>
+        <Paper variant="outlined" className={classes.root}>
+          {content}
+        </Paper>
+        <Paper variant="outlined" className={classes.root}>
+          <VirtualList messages={messages}/>
+        </Paper>
       </div>
   );
 };

@@ -40,8 +40,8 @@ export default function VirtualizedList(props: {messages: string[]}) {
   const {messages} = props;
 
   return (
-    <div className={classes.root}>
-      <FixedSizeList height={100} width={300} itemSize={25} itemCount={messages.length} itemData={messages}>
+    <div>
+      <FixedSizeList height={200} width={600} itemSize={25} itemCount={messages.length} itemData={messages}>
         {renderRow}
       </FixedSizeList>
     </div>
