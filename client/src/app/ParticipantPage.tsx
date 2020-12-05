@@ -24,6 +24,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, 
   ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirebaseApi";
 import QueueProgress from './../components/QueueProgress';
+import Divider from "@material-ui/core/Divider";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,19 +35,24 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: lighterBackground,
       color: textColor,
     },
+    divider: {
+      color: accentColor,
+      padding: '20px',
+    }
   }),
 );
 
 
-const Acknowledge = ({ contribute }: { contribute: () => void}) => (<Button onClick={contribute} style={{color: 'white'}}>Contribute</Button>);
+const Acknowledge = ({ contribute }: { contribute: () => void}) => (<Button onClick={contribute} style={{color: 'white'}}>Launch</Button>);
 
-const createCeremonyEvent = (eventType: string, message: string): CeremonyEvent => {
+const createCeremonyEvent = (eventType: string, message: string, index: number | undefined): CeremonyEvent => {
   return {
     sender: "PARTICIPANT",
+    index,
     eventType,
     timestamp: new Date(),
     message,
-    acknowledged: false,  
+    acknowledged: false,
   };
 };
 
@@ -91,10 +97,15 @@ const newParticipant = (uid: string): Participant => {
     computeProgress: 0,
   }
 }
+const setHash = (hash: number) => {
+  try {
+    console.log(`setHash: ${hash}`);
+  } catch (err) { console.log(err.message); }
+}
 
 const doComputation = (wasm: any, params: Uint8Array, entropy: Buffer) => new Promise<Uint8Array>((resolve, reject) => {
   try {
-    const newParams = wasm.contribute(params, entropy);
+    const newParams = wasm.contribute(params, entropy, setHash);
     console.log('Updated params', newParams);
     resolve(newParams);
   } catch (err) {
@@ -103,7 +114,7 @@ const doComputation = (wasm: any, params: Uint8Array, entropy: Buffer) => new Pr
 });
 
 const welcomeText = (
-  <Typography variant="body1">
+  <Typography variant="body1" align="center">
   Welcome to zkparty. This page will allow you to participate in the ceremony. Click to your commence your contribution. 
   </Typography>);
 
@@ -117,7 +128,7 @@ enum Step {
   RUNNING,
 }
 
-const stepText = (step: string) => (<Typography>{step}</Typography>);
+const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
 
 const queueProgressCard = (contrib: ContributionState) => {
   return (
@@ -189,11 +200,19 @@ export const ParticipantSection = () => {
 
   const updateQueue = (update: any) => {
     contributionState.current = {...contributionState.current, ...update};
-    if (contributionState.current?.queueIndex === contributionState.current?.currentIndex) {
-      addMessage(`The time for your contribution has arrived.`);
+    if (contributionState.current) {
+      const contrib = contributionState.current;
+      if (contrib.queueIndex === contrib.currentIndex) {
+        addMessage(`It's your turn to contribute`);
+        addCeremonyEvent(contrib.ceremony.id, createCeremonyEvent(
+          "START_CONTRIBUTION",
+          `Starting turn for index ${contrib.currentIndex}`,
+          contrib.queueIndex
+      ));
       if (ceremonyQueueListenerUnsub) ceremonyQueueListenerUnsub(); // Stop listening for updates
-      setComputeStatus({...computeStatus, running: true});
-      setStep(Step.RUNNING);
+        setComputeStatus({...computeStatus, running: true});
+        setStep(Step.RUNNING);
+      }
     }
   }
 
@@ -204,7 +223,11 @@ export const ParticipantSection = () => {
     if (running && contributionState.current && ceremonyId) {
       if (!downloaded) {
         GetParamsFile(ceremonyId, index).then( (paramData) => {
-          addCeremonyEvent(ceremonyId, createCeremonyEvent( "PARAMS_DOWNLOADED", `Parameters from participant ${index} downloaded OK`));
+          addCeremonyEvent(ceremonyId, createCeremonyEvent(
+             "PARAMS_DOWNLOADED",
+             `Parameters from participant ${index} downloaded OK`,
+             contributionState.current?.queueIndex
+          ));
           console.log('Source params', paramData);
           data.current = paramData;
           addMessage(`Parameters downloaded.`);
@@ -219,7 +242,8 @@ export const ParticipantSection = () => {
               console.log('DoComputation finished');
               await addCeremonyEvent(ceremonyId, createCeremonyEvent(
                 "COMPUTE_CONTRIBUTION", 
-                `Contribution for participant ${index + 1} completed OK`
+                `Contribution for participant ${index + 1} completed OK`,
+                contributionState.current?.queueIndex
               ));
               addMessage(`Computation completed.`);
               entropy.current = new Uint8Array(); // Reset now that it has been used
@@ -235,11 +259,13 @@ export const ParticipantSection = () => {
           // Add event to notify status and params file name
           await addCeremonyEvent(ceremonyId, createCeremonyEvent(
             "PARAMS_UPLOADED", 
-            `Parameters for participant ${newIndex} uploaded to ${paramsFile}`
+            `Parameters for participant ${newIndex} uploaded to ${paramsFile}`,
+            contributionState.current?.queueIndex
           ));
           addMessage(`Parameters uploaded.`);
           const contribution = createContributionSummary( participant.current ? participant.current.uid : '??', "COMPLETE", paramsFile, newIndex, '???hash');
           await addOrUpdateContribution(ceremonyId, contribution);
+          addMessage(`Thank you for your contribution.`)
         } finally {
           setComputeStatus({...computeStatus, running: false, uploaded: true, newParams: new Uint8Array()});
           //setCeremonyId(null);
@@ -299,7 +325,7 @@ export const ParticipantSection = () => {
         }
       }
     
-      content = stepText('Waiting...');
+      content = stepText('No ceremonies are ready to accept your contribution at the moment.');
       break;
     }
     case (Step.QUEUED): {
@@ -323,7 +349,7 @@ export const ParticipantSection = () => {
       // Upload
       compute();
 
-      content = (<><CircularProgress />{
+      content = (<><CircularProgress disableShrink />{
            !computeStatus.downloaded ? stepText('Downloading ...') 
          : !computeStatus.computed ? stepText('Calculating ...')
          : stepText('Uploading ...') 
@@ -353,6 +379,7 @@ export const ParticipantSection = () => {
         <Paper variant="outlined" className={classes.root}>
           {content}
         </Paper>
+        <Divider className={classes.divider}/>
         <Paper variant="outlined" className={classes.root}>
           <VirtualList messages={messages}/>
         </Paper>

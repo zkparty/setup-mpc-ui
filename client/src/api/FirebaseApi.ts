@@ -7,6 +7,8 @@ import { jsonToCeremony } from './ZKPartyApi';
 
 const COMPLETE = "COMPLETE";
 const INVALIDATED = "INVALIDATED";
+const RUNNING = "RUNNING";
+const WAITING = "WAITING";
 
 //const serviceAccount = require( 'firebase_skey.json');
 export async function addCeremony(ceremony: Ceremony) {
@@ -86,7 +88,7 @@ export const ceremonyContributionListener = async (participantId: string, callba
   const db = firebase.firestore();
   // Get running ceremonies
   const query = db.collection("ceremonies")
-    .where('ceremonyState', '==', 'RUNNING')
+    .where('ceremonyState', '==', RUNNING)
     .orderBy('startTime', 'asc');
 
   query.onSnapshot(querySnapshot => {
@@ -101,7 +103,7 @@ export const ceremonyContributionListener = async (participantId: string, callba
         // Get any contributions for this participant
         const participantQuery = ceremonySnapshot.ref.collection('contributions')
           .where('participantId', '==', participantId)
-          .where('status', "!=", "WAITING");
+          .where('status', "!=", WAITING);
         const contSnapshot = await participantQuery.get();
         if (!contSnapshot.empty) {
           // Add to cache
@@ -112,7 +114,7 @@ export const ceremonyContributionListener = async (participantId: string, callba
           // We have a ceremony to contribute to
           let contribution: Contribution = {
             participantId,
-            status: "WAITING",
+            status: WAITING,
             lastSeen: new Date(),
             timeAdded: new Date(),            
           }
@@ -166,12 +168,15 @@ export const getContributionState = async (ceremony: Ceremony, contribution: Con
   // Get currently running contributor's index
   // Get average time per contribution & expected wait time
   const stats = await getCeremonyStats(ceremony.id);
+
+  // expected start time = now + (queueIndex - currentIndex) x av secs per contrib
+  const estStartTime = Date.now() + 1000 * ((contState.queueIndex - stats.currentIndex) * stats.averageSecondsPerContribution);
   const cs: ContributionState = {
     ...contState,
-    status: "WAITING",
+    status: WAITING,
     currentIndex: stats.currentIndex,
     averageSecondsPerContribution: stats.averageSecondsPerContribution,
-    expectedStartTime: stats.expectedStartTime,
+    expectedStartTime: estStartTime,
   }
 
   return cs;
@@ -193,7 +198,7 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
     const cont = docSnapshot.data();
     if (cont.status === COMPLETE
         || cont.status === INVALIDATED
-        || cont.status === "RUNNING") {
+        || cont.status === RUNNING) {
       if (cont.queueIndex) contributionStats.currentIndex = cont.queueIndex;
     }
   });
@@ -201,15 +206,29 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   // Average time calcs
   let totalSecs = 0;
   let numContribs = 0;
+  let lastIndex = -1;
+  let lastTime: number | null = null;
   const eventsQuery = db.collection("ceremonies")
     .doc(ceremonyId)
     .collection('events')
-    .orderBy('timestamp', 'asc');
+    .orderBy('timestamp', 'asc')
+    .where('eventType', '==', 'PARAMS_DOWNLOADED');
   const events = await eventsQuery.get();
   events.forEach( docSnapshot => {
     const event = docSnapshot.data();
-
+    if (event.index > lastIndex) {
+      numContribs++;
+      lastIndex = event.index;
+    }
+    if (lastTime) {
+      totalSecs += (event.timestamp - lastTime);
+      lastTime = event.timestamp;
+    }
   });
+  contributionStats.averageSecondsPerContribution = 
+      (numContribs > 0) ? 
+        Math.floor(totalSecs / numContribs) 
+      : 90; // or some other sensible default
 
   return contributionStats;
 };

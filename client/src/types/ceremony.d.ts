@@ -81,6 +81,7 @@ export interface CeremonyEvent {
   eventType: string;
   timestamp: timestamp;
   message: string;
+  index?: number;
   acknowledged: boolean;
 }
 
