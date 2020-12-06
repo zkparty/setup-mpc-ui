@@ -97,15 +97,15 @@ const newParticipant = (uid: string): Participant => {
     computeProgress: 0,
   }
 }
-const setHash = (hash: number) => {
-  try {
-    console.log(`setHash: ${hash}`);
-  } catch (err) { console.log(err.message); }
-}
 
-const doComputation = (wasm: any, params: Uint8Array, entropy: Buffer) => new Promise<Uint8Array>((resolve, reject) => {
+const reportProgress = async (count: number, totExponents: number) => {
+  console.log(`progress: ${count} of ${totExponents}`);
+  //await  new Promise(resolve => setTimeout(resolve, 100));
+};
+
+const doComputation = (wasm: any, params: Uint8Array, entropy: Buffer, setHash: (h: string) => void) => new Promise<Uint8Array>((resolve, reject) => {
   try {
-    const newParams = wasm.contribute(params, entropy, setHash);
+    const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
     console.log('Updated params', newParams);
     resolve(newParams);
   } catch (err) {
@@ -115,7 +115,7 @@ const doComputation = (wasm: any, params: Uint8Array, entropy: Buffer) => new Pr
 
 const welcomeText = (
   <Typography variant="body1" align="center">
-  Welcome to zkparty. This page will allow you to participate in the ceremony. Click to your commence your contribution. 
+  Welcome to zkparty. This page will allow you to participate in a ceremony. Click to your commence your contribution. 
   </Typography>);
 
 enum Step {
@@ -148,6 +148,7 @@ export const ParticipantSection = () => {
   const entropy = useRef(new Uint8Array());
   const participant = useRef<Participant | null>(null);
   const contributionState = useRef<ContributionState | null>(null);
+  const hash = useRef<string>('');
   const Auth = React.useContext(AuthContext);
   const classes = useStyles();
   const index = 1;
@@ -238,7 +239,7 @@ export const ParticipantSection = () => {
         if (!started) {
           console.log('running computation......');
           if (data.current) {
-            doComputation(wasm.current, data.current, Buffer.from(entropy.current)).then(async (newParams) => {
+            doComputation(wasm.current, data.current, Buffer.from(entropy.current), setHash).then(async (newParams) => {
               console.log('DoComputation finished');
               await addCeremonyEvent(ceremonyId, createCeremonyEvent(
                 "COMPUTE_CONTRIBUTION", 
@@ -263,7 +264,7 @@ export const ParticipantSection = () => {
             contributionState.current?.queueIndex
           ));
           addMessage(`Parameters uploaded.`);
-          const contribution = createContributionSummary( participant.current ? participant.current.uid : '??', "COMPLETE", paramsFile, newIndex, '???hash');
+          const contribution = createContributionSummary( participant.current ? participant.current.uid : '??', "COMPLETE", paramsFile, newIndex, hash.current);
           await addOrUpdateContribution(ceremonyId, contribution);
           addMessage(`Thank you for your contribution.`)
         } finally {
@@ -276,6 +277,14 @@ export const ParticipantSection = () => {
     }
   }; 
 
+  const setHash = (resultHash: string) => {
+    try {
+      console.log(`setHash: ${resultHash}`);
+      addMessage(`Hash: ${resultHash}`);
+      hash.current = resultHash;
+    } catch (err) { console.log(err.message); }
+  }
+  
   let content = (<></>);
   if (!Auth.isLoggedIn) {
     content = (<Typography>Sorry, please login to access this page</Typography>);

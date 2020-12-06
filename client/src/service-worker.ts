@@ -13,7 +13,7 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
-//import * as wasm from 'phase2';
+import * as wasm from 'phase2';
 
 declare const self: ServiceWorkerGlobalScope;
 
