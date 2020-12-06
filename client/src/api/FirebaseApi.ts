@@ -163,7 +163,6 @@ export const getContributionState = async (ceremony: Ceremony, contribution: Con
     ceremony,
     participantId: contribution.participantId,    
     queueIndex: contribution.queueIndex ? contribution.queueIndex : 1,
-    //status: "WAITING",
   };
   // Get currently running contributor's index
   // Get average time per contribution & expected wait time
@@ -175,6 +174,7 @@ export const getContributionState = async (ceremony: Ceremony, contribution: Con
     ...contState,
     status: WAITING,
     currentIndex: stats.currentIndex,
+    lastValidIndex: stats.lastValidIndex,
     averageSecondsPerContribution: stats.averageSecondsPerContribution,
     expectedStartTime: estStartTime,
   }
@@ -186,6 +186,7 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   let contributionStats = {
     currentIndex: 0,
     averageSecondsPerContribution: 0,
+    lastValidIndex: 0,
   };
   const db = firebase.firestore();
   const query = db.collection("ceremonies")
@@ -199,7 +200,10 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
     if (cont.status === COMPLETE
         || cont.status === INVALIDATED
         || cont.status === RUNNING) {
-      if (cont.queueIndex) contributionStats.currentIndex = cont.queueIndex;
+      if (cont.queueIndex) {
+        contributionStats.currentIndex = cont.queueIndex;
+        if (cont.status === COMPLETE) contributionStats.lastValidIndex = cont.queueIndex;
+      }
     }
   });
 

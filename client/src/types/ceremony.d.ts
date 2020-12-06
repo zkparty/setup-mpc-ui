@@ -133,6 +133,7 @@ export interface ContributionState {
   ceremony: Ceremony;
   queueIndex: number;
   currentIndex: number;
+  lastValidIndex: number;
   averageSecondsPerContribution: number;
   expectedStartTime?: timestamp;
   status: ParticipantState;

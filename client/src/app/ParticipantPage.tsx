@@ -151,7 +151,7 @@ export const ParticipantSection = () => {
   const hash = useRef<string>('');
   const Auth = React.useContext(AuthContext);
   const classes = useStyles();
-  const index = 1;
+  //const index = 1;
 
   const addMessage = (msg: string) => {
     const newMessages = messages;
@@ -183,7 +183,7 @@ export const ParticipantSection = () => {
   };
 
   const getEntropy = () => {
-    entropy.current = new Uint8Array(64).map((v, i) => Math.random() * 256);
+    entropy.current = new Uint8Array(64).map(() => Math.random() * 256);
     console.log(`entropy set`);
   };
 
@@ -221,12 +221,13 @@ export const ParticipantSection = () => {
     const { running, downloaded, started, computed, uploaded, newParams } = computeStatus;
     console.log(`compute step: ${running? 'running' : '-'} ${running && downloaded && !computed ? 'computing': running && computed && !uploaded ? 'uploaded' : 'inactive'}`);
     const ceremonyId = contributionState.current?.ceremony.id;
+
     if (running && contributionState.current && ceremonyId) {
       if (!downloaded) {
-        GetParamsFile(ceremonyId, index).then( (paramData) => {
+        GetParamsFile(ceremonyId, contributionState.current.lastValidIndex).then( (paramData) => {
           addCeremonyEvent(ceremonyId, createCeremonyEvent(
              "PARAMS_DOWNLOADED",
-             `Parameters from participant ${index} downloaded OK`,
+             `Parameters from participant ${contributionState.current?.lastValidIndex} downloaded OK`,
              contributionState.current?.queueIndex
           ));
           console.log('Source params', paramData);
@@ -243,7 +244,7 @@ export const ParticipantSection = () => {
               console.log('DoComputation finished');
               await addCeremonyEvent(ceremonyId, createCeremonyEvent(
                 "COMPUTE_CONTRIBUTION", 
-                `Contribution for participant ${index + 1} completed OK`,
+                `Contribution for participant ${contributionState.current?.queueIndex} completed OK`,
                 contributionState.current?.queueIndex
               ));
               addMessage(`Computation completed.`);
@@ -255,7 +256,7 @@ export const ParticipantSection = () => {
       }
       if (computed && !uploaded) {
         try {
-          const newIndex = index+1;
+          const newIndex = contributionState.current?.queueIndex;
           const paramsFile = await UploadParams(ceremonyId, newIndex, newParams);
           // Add event to notify status and params file name
           await addCeremonyEvent(ceremonyId, createCeremonyEvent(
@@ -271,6 +272,7 @@ export const ParticipantSection = () => {
           setComputeStatus({...computeStatus, running: false, uploaded: true, newParams: new Uint8Array()});
           //setCeremonyId(null);
           contributionState.current = null;
+          hash.current = '';
           setStep(Step.WAITING);
         }
       }
