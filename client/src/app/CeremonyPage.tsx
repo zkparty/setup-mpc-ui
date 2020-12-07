@@ -1,8 +1,9 @@
 import { Link, RouteProps, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as React from "react";
 import styled from "styled-components";
 import { ReactNode } from "react";
+import { DataGrid, ColDef, ValueGetterParams } from '@material-ui/data-grid';
 import {
   textColor,
   lighterBackground,
@@ -12,8 +13,37 @@ import {
   CeremonyTitle,
   Center
 } from "../styles";
-import { Ceremony, Participant } from "../types/ceremony";
-import { getCeremonyData, getCeremonyDataCached } from "../api/ZKPartyApi";
+import { Ceremony, Contribution, ContributionSummary, Participant } from "../types/ceremony";
+import { ceremonyUpdateListener, contributionUpdateListener, getCeremony } from "../api/FirebaseApi";
+import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core";
+import moment from "moment";
+
+const useStyles = makeStyles((theme: Theme) => 
+  createStyles({
+    root: {
+      // width: '100%',
+      height: 600,
+      maxWidth: 800,
+      backgroundColor: lighterBackground,
+      color: textColor,
+      border: accentColor,
+    },
+    colCell: {
+      color: 'white',
+    },
+    cell: {
+      color: textColor,
+    },
+    footer: {
+      color: textColor,
+    },
+
+    divider: {
+      color: accentColor,
+      padding: '20px',
+    }
+}));
+
 
 const CeremonyDetailsTable = styled.table`
   text-align: right;
@@ -22,21 +52,6 @@ const CeremonyDetailsTable = styled.table`
 
   td {
     padding-left: 10px;
-  }
-`;
-
-const HomeLinkContainer = styled.div`
-  position: absolute;
-  top: 16px;
-  left: 16px;
-
-  a {
-    color: ${accentColor};
-
-    &:hover {
-      color: ${textColor};
-      background-color: ${secondAccent};
-    }
   }
 `;
 
@@ -80,30 +95,64 @@ export const CeremonyPage = (props: {id: string}) => {
 
   const [loaded, setLoaded] = useState<boolean>(false);
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
+  const [contributions, setContributions] = useState<ContributionSummary[]>([]);
+  const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
+  const contributionListenerUnsub = useRef<(() => void) | null>(null);
+  const loadingContributions = useRef(false);
 
-  const refreshCeremony = () => {
-    getCeremonyData(id)
-      .then(ceremony => {
-        setCeremony(ceremony);
-      })
-      .catch(err => {
-        console.error(`error getting ceremony: ${err}`);
-      });
+  const refreshCeremony = async () => {
+    const c = await getCeremony(id);
+    if (c !== undefined) setCeremony(c);
   };
 
-  useEffect(() => {
-    getCeremonyDataCached(id)
-      .then(ceremonyData => {
-        setCeremony(ceremonyData);
-        setLoaded(true);
-        refreshCeremony();
-        // TODO: clear interval with returned function for useEffect
-        setInterval(refreshCeremony, 15000);
-      })
-      .catch(() => {
-        setLoaded(true);
-      });
-  }, [loaded]);
+  const updateContribution = (doc: ContributionSummary, changeType: string, oldIndex?: number) => {
+    // A contribution has been updated
+    console.log(`contribution update: ${doc.queueIndex} ${changeType}`);
+    let newContributions = contributions;
+    switch (changeType) {
+      case 'added': {
+        newContributions.push(doc);
+        break;
+      }
+      case 'modified': {
+        if (oldIndex !== undefined) newContributions[oldIndex] = doc;
+        break;
+      }
+      case 'removed': {
+        if (oldIndex !== undefined) newContributions.splice(oldIndex, 1);
+        break;
+      }
+    }
+    setContributions(newContributions);
+  }
+
+  if (!loaded) {
+    refreshCeremony()
+      .then(() => setLoaded(true));
+  }
+
+
+  if (!ceremonyListenerUnsub.current) {
+    // Start ceremony listener
+    ceremonyUpdateListener(id, setCeremony)
+        .then(unsub => ceremonyListenerUnsub.current = unsub);
+  }
+
+  if (!loadingContributions.current) {
+    // Start contribution listener
+    contributionUpdateListener(id, updateContribution)
+        .then(unsub => contributionListenerUnsub.current = unsub);
+    loadingContributions.current = true;
+  }
+
+  const gridRows = contributions.map(v => {
+    return {
+      ...v, 
+      id: v.queueIndex,
+      time: v.timeCompleted ? moment(v.timeCompleted).format() : '',
+
+    }
+  });
 
   return (
     <>
@@ -115,7 +164,8 @@ export const CeremonyPage = (props: {id: string}) => {
           <br />
           <CeremonyDetails ceremony={ceremony}></CeremonyDetails>
           <br />
-          <ParticipantTable
+          <ContributionsGrid contributions={gridRows} />
+          {/* <ParticipantTable
             participants={ceremony.participants ? ceremony.participants : []}
             headers={[
               { title: "connection", width: "100px" },
@@ -127,7 +177,7 @@ export const CeremonyPage = (props: {id: string}) => {
               p => p.address,
               participantStatusString
             ]}
-          />
+          /> */}
         </PageContainer>
       ) : (
         <PageContainer>
@@ -200,6 +250,7 @@ const participantStatusString = (participant: Participant) => {
 
   return statusString;
 };
+
 const ParticipantTable = (props: {
   participants: Participant[];
   headers: { title: string; width: string }[];
@@ -243,3 +294,30 @@ const ParticipantTable = (props: {
     </div>
   );
 };
+
+const columns: ColDef[] = [
+  { field: 'queueIndex', headerName: 'Position', type: 'number', width: 30 },
+  { field: 'timestamp', headerName: 'Time', type: 'timestamp', width: 130 },
+  { field: 'status', headerName: 'Status', width: 120, sortable: false },
+  { field: 'duration', headerName: 'Duration', type: 'number', width: 90, sortable: false },
+  { field: 'hash', 
+    headerName: 'Hash',
+    description: 'The hash resulting from this contribution',
+    sortable: false,
+    width: 180,
+    //valueGetter: (params: ValueGetterParams) =>
+    //  `${params.getValue('hash')}`,
+  },
+];
+
+const ContributionsGrid = (props: {contributions: any[]}) => {
+  const classes = useStyles();
+  return (
+    <DataGrid 
+      rows={props.contributions} 
+      columns={columns} 
+      pageSize={5} 
+      className={classes.root} 
+    />
+  );
+}

@@ -3,26 +3,77 @@ import { Ceremony, CeremonyEvent, CeremonyState,
   Participant, ParticipantState } from './../types/ceremony';
 import firebase from 'firebase/app';
 import "firebase/firestore";
-import { jsonToCeremony } from './ZKPartyApi';
+import { jsonToCeremony, JsonToContribution } from './ZKPartyApi';
 
 const COMPLETE = "COMPLETE";
 const INVALIDATED = "INVALIDATED";
 const RUNNING = "RUNNING";
 const WAITING = "WAITING";
 
-//const serviceAccount = require( 'firebase_skey.json');
+const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
+  toFirestore: (c: Ceremony) => {
+    return c;
+  },
+  fromFirestore: (
+    snapshot: firebase.firestore.QueryDocumentSnapshot,
+    options: firebase.firestore.SnapshotOptions): Ceremony => {
+    return jsonToCeremony({id: snapshot.id, ...snapshot.data(options)});
+  }
+}
+
+const contributionConverter: firebase.firestore.FirestoreDataConverter<ContributionSummary> = {
+  toFirestore: (c: ContributionSummary) => {
+    return c;
+  },
+  fromFirestore: (
+    snapshot: firebase.firestore.QueryDocumentSnapshot,
+    options: firebase.firestore.SnapshotOptions): ContributionSummary => {
+    return JsonToContribution(snapshot.data(options));
+  }
+}
+
 export async function addCeremony(ceremony: Ceremony) {
     const db = firebase.firestore();
     try {
-      const doc = await db.collection("ceremonies").add(ceremony);
+      const doc = await db.collection("ceremonies")
+        .withConverter(ceremonyConverter)
+        .add(ceremony);
   
-      console.log(`new ceremony added with id ${doc.id}`)
+      console.log(`new ceremony added with id ${doc.id}`);
       return doc.id;
     } catch (e) {
       throw new Error(`error adding ceremony data to firebase: ${e}`);
     }
 };
-  
+
+export async function getCeremony(id: string): Promise<Ceremony | undefined> {
+  const db = firebase.firestore();
+  const doc = await db
+    .collection("ceremonies")
+    .withConverter(ceremonyConverter)
+    .doc(id)
+    .get();
+  if (doc === undefined) {
+    throw new Error("ceremony not found");
+  }
+  console.log(`getCeremony ${doc.exists}`);
+  return doc.data();
+}
+
+export async function getCeremonyContributions(id: string): Promise<ContributionSummary[]> {
+  // Return all contributions, in reverse time order
+  const db = firebase.firestore();
+  const docSnapshot = await db
+    .collection("ceremonies")
+    .doc(id)
+    .collection("contributions")
+    .withConverter(contributionConverter)
+    .orderBy("timestamp", "desc")
+    .get();
+  let contribs = docSnapshot.docs.map(v => v.data());
+  return contribs;
+}
+
 export const addCeremonyEvent = async (ceremonyId: string, event: CeremonyEvent) => {
     const db = firebase.firestore();
 
@@ -66,19 +117,69 @@ export const ceremonyEventListener = async (ceremonyId: string | undefined, call
 // Listens for updates to ceremony data, to suit the front page ceremony list.
 export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
     const db = firebase.firestore();
-    const query = db.collectionGroup("ceremonies");
+    const query = db.collectionGroup("ceremonies")
+        .withConverter(ceremonyConverter);
   
     query.onSnapshot(querySnapshot => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
       querySnapshot.forEach(docSnapshot => {
         var ceremony = docSnapshot.data();
         console.log(`Ceremony: ${docSnapshot.id}`);
-        callback(jsonToCeremony({id: docSnapshot.id, ...ceremony}));
+        callback(ceremony);
       });
     }, err => {
       console.log(`Error while listening for ceremony changes ${err}`);
     });
 };
+
+// Listens for updates to a ceremony
+export const ceremonyUpdateListener = async (id: string, callback: (c: Ceremony) => void): Promise<()=>void> => {
+  const db = firebase.firestore();
+  const ceremonyData = db.collection("ceremonies")
+                .withConverter(ceremonyConverter)
+                .doc(id);
+
+  return ceremonyData.onSnapshot(querySnapshot => {
+    const c = querySnapshot.data();
+    if (c !== undefined) callback(c);
+  }, err => {
+    console.log(`Error while listening for ceremony changes ${err}`);
+  });
+};
+
+// Listens for updates to a ceremony
+export const contributionUpdateListener = async (
+    id: string, 
+    callback: (c: ContributionSummary,
+      type: string,
+      oldIndex?: number
+      ) => void,
+    ): Promise<()=>void> => {
+  console.log(`contributionUpdateListener ${id}`);
+  const db = firebase.firestore();
+  const query = db.collection("ceremonies")
+                .doc(id)
+                .collection("contributions")
+                .withConverter(contributionConverter)
+                .orderBy("queueIndex", "asc");
+  
+  // First time, get all docs
+  const querySnapshot = await query.get();
+  console.log(`query snapshot ${querySnapshot.size}`);
+  querySnapshot.docs.forEach(doc => 
+    callback(doc.data(), 'added')
+  );
+
+  return query.onSnapshot(querySnapshot => {
+    console.log(`contribData snapshot ${querySnapshot.size}`);
+    querySnapshot.docChanges().forEach(contrib => {
+      callback(contrib.doc.data(), contrib.type, contrib.oldIndex);
+    });
+  }, err => {
+    console.log(`Error while listening for ceremony changes ${err}`);
+  });
+};
+
 
 // Listens for updates to eligible ceremonies that a participant may contribute to.
 // The first such ceremony found will be returned in the callback
@@ -88,6 +189,7 @@ export const ceremonyContributionListener = async (participantId: string, callba
   const db = firebase.firestore();
   // Get running ceremonies
   const query = db.collection("ceremonies")
+    .withConverter(ceremonyConverter)
     .where('ceremonyState', '==', RUNNING)
     .orderBy('startTime', 'asc');
 
@@ -99,15 +201,15 @@ export const ceremonyContributionListener = async (participantId: string, callba
       if (!contributedCeremonies.includes(ceremonySnapshot.id)) {
         var ceremony = ceremonySnapshot.data();
         const ceremonyId = ceremonySnapshot.id;
-        //console.log(`Ceremony: ${docSnapshot.id}`);
         // Get any contributions for this participant
         const participantQuery = ceremonySnapshot.ref.collection('contributions')
+          .withConverter(contributionConverter)
           .where('participantId', '==', participantId)
           .where('status', "!=", WAITING);
         const contSnapshot = await participantQuery.get();
         if (!contSnapshot.empty) {
           // Add to cache
-          contributedCeremonies.push(ceremonySnapshot.id);
+          contributedCeremonies.push(ceremonyId);
           return true;
         } else {
           console.log(`found ceremony ${ceremonyId} to contribute to`);
@@ -124,7 +226,7 @@ export const ceremonyContributionListener = async (participantId: string, callba
           addOrUpdateContribution(ceremonyId, contribution);
 
           const cs = await getContributionState(
-            jsonToCeremony({id: ceremonyId, ...ceremony}), 
+            ceremony,
             contribution);
 
           callback(cs);
@@ -142,19 +244,20 @@ export const getNextQueueIndex = async (ceremonyId: string, participantId: strin
   const query = db.collection("ceremonies")
     .doc(ceremonyId)
     .collection('contributions')
+    .withConverter(contributionConverter)
     .orderBy('queueIndex', 'desc');
   
   const snapshot = await query.get();
   if (snapshot.empty) {
     return 1;
   } else {
-    const cont = snapshot.docs[0];
+    const cont = snapshot.docs[0].data();
     // If the last entry is for this participant, reuse it.
     // TODO - should reuse earlier entries if they are still pending
-    if (cont.get('participantId') == participantId) {
-      return cont.get('queueIndex');
+    if (cont.participantId == participantId && cont.queueIndex) {
+      return cont.queueIndex;
     }
-    return cont.get('queueIndex') + 1;
+    return cont.queueIndex ? cont.queueIndex + 1 : 1;
   }
 };
 
@@ -192,6 +295,7 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   const query = db.collection("ceremonies")
     .doc(ceremonyId)
     .collection('contributions')
+    .withConverter(contributionConverter)
     .orderBy('queueIndex', 'asc');
   
   const snapshot = await query.get();
@@ -237,24 +341,27 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   return contributionStats;
 };
 
+// Will refer to the unsub function for the latest ceremony queue listener, if any
+// A client may import this and use it to unsubscribe
 export var ceremonyQueueListenerUnsub: () => void;
 
 // Listens for ceremony events, to track progress
 export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: any) => void) => {
-  console.log(`listening for events for ${ceremonyId}`);
+  console.log(`listening for queue activity for ${ceremonyId}`);
   let lastQueueIndex = -1;
   const db = firebase.firestore();
   // Get running ceremonies
   const query = db.collection("ceremonies")
                 .doc(ceremonyId)
                 .collection("contributions")
+                .withConverter(contributionConverter)
                 .where("status", "in", [COMPLETE, INVALIDATED]);
 
   ceremonyQueueListenerUnsub = query.onSnapshot(querySnapshot => {0
     console.log(`queue listener doc: ${querySnapshot.size}`);
     let found = false;
     querySnapshot.docChanges().forEach(async docData => {
-      const cont: any = docData.doc.data();
+      const cont = docData.doc.data();
       console.log(`queue listener doc change index: ${cont.queueIndex}`);
 
       if (cont.queueIndex && cont.queueIndex > lastQueueIndex) {
@@ -278,6 +385,7 @@ export const addOrUpdateContribution = async (ceremonyId: string, contribution: 
     const eventsQuery = db.collection("ceremonies")
       .doc(ceremonyId)
       .collection('contributions')
+      .withConverter(contributionConverter)
       .where('participantId', '==', contribution.participantId)
       .limit(1);
     const participantContrib = await eventsQuery.get();
@@ -286,6 +394,7 @@ export const addOrUpdateContribution = async (ceremonyId: string, contribution: 
       const doc = await db
           .doc(`ceremonies/${ceremonyId}`)
           .collection("contributions")
+          .withConverter(contributionConverter)
           .doc();
       
       await doc.set(contribution);

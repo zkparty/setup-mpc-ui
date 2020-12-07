@@ -1,4 +1,4 @@
-import { Ceremony } from "../types/ceremony";
+import { Ceremony, Contribution } from "../types/ceremony";
 import { addCeremony as addCeremonyToDB } from "./FirebaseApi";
 
 const url = process.env.API_URL ? process.env.API_URL : "http://localhost:80";
@@ -163,4 +163,10 @@ export function jsonToCeremony(json: any): Ceremony {
         )
       : undefined
   };
+}
+
+export const JsonToContribution = (json: any): Contribution => {
+  return {
+    ...json
+  }
 }
