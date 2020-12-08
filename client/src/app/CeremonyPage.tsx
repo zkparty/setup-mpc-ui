@@ -15,18 +15,26 @@ import {
 } from "../styles";
 import { Ceremony, Contribution, ContributionSummary, Participant } from "../types/ceremony";
 import { ceremonyUpdateListener, contributionUpdateListener, getCeremony } from "../api/FirebaseApi";
-import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core";
+import { createStyles, makeStyles, Theme, Typography, withStyles } from "@material-ui/core";
 import moment from "moment";
+import './styles.css';
 
 const useStyles = makeStyles((theme: Theme) => 
   createStyles({
     root: {
       // width: '100%',
-      height: 600,
+      height: 450,
       maxWidth: 800,
       backgroundColor: lighterBackground,
       color: textColor,
       border: accentColor,
+
+      "& $columnsContainer": {
+        color: accentColor,
+      },
+    },
+    columnsContainer: {
+
     },
     colCell: {
       color: 'white',
@@ -37,13 +45,43 @@ const useStyles = makeStyles((theme: Theme) =>
     footer: {
       color: textColor,
     },
-
+    iconSeparator: {
+      color: accentColor,
+    },
     divider: {
       color: accentColor,
       padding: '20px',
     }
 }));
 
+const StyledDataGrid = styled(DataGrid)`
+  height: 600,
+  maxWidth: 800,
+  backgroundColor: lighterBackground,
+  color: textColor,
+  border: accentColor;
+
+  & > .MuiDataGrid-root {
+    height: 600,
+    maxWidth: 800,
+    backgroundColor: lighterBackground,
+    color: textColor,
+    border: accentColor,
+  }
+
+  & > .MuiDataGrid-columnsContainer {
+    color: accentColor,
+  }
+
+  & .MuiDataGrid-iconSeparator {
+    color: accentColor,
+  }
+
+  & > .MuiDataGrid-footer {
+    color: accentColor,
+  }
+});
+`
 
 const CeremonyDetailsTable = styled.table`
   text-align: right;
@@ -149,7 +187,7 @@ export const CeremonyPage = (props: {id: string}) => {
     return {
       ...v, 
       id: v.queueIndex,
-      time: v.timeCompleted ? moment(v.timeCompleted).format() : '',
+      timestamp: v.timeCompleted ? moment(v.timeCompleted).format() : '',
 
     }
   });
@@ -296,8 +334,8 @@ const ParticipantTable = (props: {
 };
 
 const columns: ColDef[] = [
-  { field: 'queueIndex', headerName: 'Position', type: 'number', width: 30 },
-  { field: 'timestamp', headerName: 'Time', type: 'timestamp', width: 130 },
+  { field: 'queueIndex', headerName: 'Position', type: 'number', width: 50 },
+  { field: 'timestamp', headerName: 'Time', width: 130 },
   { field: 'status', headerName: 'Status', width: 120, sortable: false },
   { field: 'duration', headerName: 'Duration', type: 'number', width: 90, sortable: false },
   { field: 'hash', 
@@ -311,13 +349,15 @@ const columns: ColDef[] = [
 ];
 
 const ContributionsGrid = (props: {contributions: any[]}) => {
-  const classes = useStyles();
+  //const classes = useStyles();
   return (
-    <DataGrid 
-      rows={props.contributions} 
-      columns={columns} 
-      pageSize={5} 
-      className={classes.root} 
-    />
+    <div style={{ height: 450, width: 800 }}>
+      <Typography variant="h5" style={{ color: accentColor, background: lighterBackground }}>Contributions</Typography>
+      <DataGrid 
+        rows={props.contributions} 
+        columns={columns} 
+        pageSize={5}
+      />
+    </div>
   );
 }

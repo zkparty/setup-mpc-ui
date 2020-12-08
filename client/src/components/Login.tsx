@@ -3,13 +3,16 @@ import React, { useState, useContext } from "react";
 import { AuthContext } from "../app/AuthContext";
 import Button from "@material-ui/core/Button";
 import GitHubIcon from "@material-ui/icons/GitHub";
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import firebase from "firebase";
-import { accentColor } from "../styles";
+import { accentColor, lighterBackground } from "../styles";
 import ListItem from "@material-ui/core/ListItem";
-import { Autorenew } from "@material-ui/icons";
-import { getUserPrivs } from "./../api/ZKPartyApi";
+import { getUserPrivs } from "../api/ZKPartyApi";
+import { ListItemIcon } from "@material-ui/core";
 
-const Join = (props: { close: any }) => {
+
+
+const Login = (props: { close: any }) => {
   const [error, setErrors] = useState("");
 
   const Auth = useContext(AuthContext);
@@ -29,6 +32,9 @@ const Join = (props: { close: any }) => {
           Auth.setCoordinator(true);
         });
       }
+    } else {
+      Auth.setLoggedIn(false);
+      Auth.setAuthUser(null);
     }
   });
   
@@ -58,16 +64,25 @@ const Join = (props: { close: any }) => {
           props.close();
         })
         .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
-      })
- 
-  }
+      }) 
+  };
+
+  const logOut = () => {
+    firebase.auth().signOut();
+  };
 
   return (
-        <ListItem button={true} onClick={() => handleGithubLogin()} style={{ color: accentColor }}>
-          <GitHubIcon />
-          Login With GitHub
-        </ListItem>
+    (Auth.isLoggedIn) ? 
+      (<ListItemIcon  onClick={logOut} style={{ color: accentColor, background: lighterBackground }}>
+        <ExitToAppIcon fontSize="small" />
+        Log Out
+      </ListItemIcon>)
+    : 
+      (<ListItem button={true} onClick={handleGithubLogin} style={{ color: accentColor, background: lighterBackground }}>
+        <GitHubIcon />
+        Login With GitHub
+      </ListItem>)      
   );
 };
 
-export default Join;
+export default Login;

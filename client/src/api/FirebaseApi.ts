@@ -60,6 +60,16 @@ export async function getCeremony(id: string): Promise<Ceremony | undefined> {
   return doc.data();
 }
 
+export const getCeremonies = async (): Promise<Ceremony[]> => {
+  const db = firebase.firestore();
+  const ceremonySnapshot = await db
+      .collection("ceremonies")
+      .withConverter(ceremonyConverter)
+      .get();
+
+  return ceremonySnapshot.docs.map(v => v.data());
+}
+
 export async function getCeremonyContributions(id: string): Promise<ContributionSummary[]> {
   // Return all contributions, in reverse time order
   const db = firebase.firestore();
@@ -95,9 +105,9 @@ export const ceremonyEventListener = async (ceremonyId: string | undefined, call
   
     query.onSnapshot(querySnapshot => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
-      querySnapshot.forEach(docSnapshot => {
-        var event = docSnapshot.data();
-        const ceremony = docSnapshot.ref.parent.parent;
+      querySnapshot.docChanges().forEach(docSnapshot => {
+        var event = docSnapshot.doc.data();
+        const ceremony = docSnapshot.doc.ref.parent.parent;
         console.log(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
         if (ceremony?.id === ceremonyId) {
             switch (event.eventType) {
@@ -122,10 +132,12 @@ export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
   
     query.onSnapshot(querySnapshot => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
-      querySnapshot.forEach(docSnapshot => {
-        var ceremony = docSnapshot.data();
-        console.log(`Ceremony: ${docSnapshot.id}`);
-        callback(ceremony);
+      querySnapshot.docChanges().forEach(docSnapshot => {
+        if (docSnapshot.type === 'modified' || docSnapshot.type === 'added') {
+          var ceremony = docSnapshot.doc.data();
+          console.log(`Ceremony: ${docSnapshot.doc.id}`);
+          callback(ceremony);
+        }
       });
     }, err => {
       console.log(`Error while listening for ceremony changes ${err}`);
@@ -147,7 +159,7 @@ export const ceremonyUpdateListener = async (id: string, callback: (c: Ceremony)
   });
 };
 
-// Listens for updates to a ceremony
+// Listens for updates to ceremony contributions
 export const contributionUpdateListener = async (
     id: string, 
     callback: (c: ContributionSummary,

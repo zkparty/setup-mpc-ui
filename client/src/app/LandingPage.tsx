@@ -25,7 +25,7 @@ import {
   getCeremonySummariesCached
 } from "../api/ZKPartyApi";
 import { Ceremony } from "../types/ceremony";
-import { ceremonyListener } from "../api/FirebaseApi";
+import { ceremonyListener, getCeremonies } from "../api/FirebaseApi";
 import { AuthContext } from "./AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
@@ -160,10 +160,11 @@ const SummarySection = (props: any) => {
   };
 
   useEffect(() => {
-    getCeremonySummariesCached()
+    getCeremonies()
       .then(ceremonies => {
         setCeremonies(ceremonies);
         setLoaded(true);
+        // Subscribe to ceremony updates
         refreshCeremonySummaries();
       })
       .catch(() => {

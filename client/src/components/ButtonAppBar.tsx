@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import { Link as RouterLink } from "react-router-dom";
 import { withStyles, makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import Menu, { MenuProps } from '@material-ui/core/Menu';
@@ -10,7 +9,6 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from '@material-ui/core/Toolbar';
 import MenuIcon from '@material-ui/icons/MenuOutlined';
 import SettingsIcon from '@material-ui/icons/Settings';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import InfoIcon from '@material-ui/icons/Info';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import { ZKTitle } from "./Title";
@@ -21,7 +19,7 @@ import {
   textColor,
 } from "../styles";
 import { Button } from '@material-ui/core';
-import Join from './Join';
+import Login from './Login';
 
 const StyledMenu = withStyles({
   paper: {
@@ -125,8 +123,6 @@ const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) |
 };
 
 const LoginMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: (() => void) | undefined; }) => {
-  const Auth = useContext(AuthContext);
-
   return (
     <StyledMenu
       id="customized-menu"
@@ -136,16 +132,7 @@ const LoginMenu = (props: { anchorEl: Element | ((element: Element) => Element) 
       onClose={props.handleClose}
     >
       <StyledMenuItem>
-        {Auth.isLoggedIn ?
-          (<div>
-            <ListItemIcon>
-              <ExitToAppIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Log Out" />
-          </div>
-        ) : (
-          <Join close={props.handleClose}/>
-        )}
+        <Login close={props.handleClose}/>
       </StyledMenuItem>
     </StyledMenu>
 
@@ -157,7 +144,9 @@ const LoginMenu = (props: { anchorEl: Element | ((element: Element) => Element) 
 export default function ButtonAppBar() {
     const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
     const [loginAnchorEl, setLoginAnchorEl] = React.useState<null | HTMLElement>(null);
+    const Auth = React.useContext(AuthContext);
     const classes = useStyles();
+
 
     const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
         setMenuAnchorEl(event.currentTarget);
@@ -174,6 +163,11 @@ export default function ButtonAppBar() {
   const handleLoginClose = () => {
     setLoginAnchorEl(null);
   };
+
+  const handleLogout = () => {
+    console.log('loggin out');
+    Auth.setLoggedIn(false);
+  }
       
   return (
     <div className={classes.root}>
