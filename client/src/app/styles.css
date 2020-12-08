@@ -17,7 +17,7 @@
 /* .MuiDataGrid-columnSeparator {
     color: #31c41d;
 } */
-.MuiDataGrid-iconSeparator {
+.MuiSvgIcon-root .MuiDataGrid-iconSeparator {
     color: #31c41d;
 }
 

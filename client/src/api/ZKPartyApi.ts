@@ -1,5 +1,7 @@
+import { timeStamp } from "console";
 import { Ceremony, Contribution } from "../types/ceremony";
 import { addCeremony as addCeremonyToDB } from "./FirebaseApi";
+import firebase from 'firebase/app';
 
 const url = process.env.API_URL ? process.env.API_URL : "http://localhost:80";
 
@@ -130,38 +132,15 @@ export function jsonToCeremony(json: any): Ceremony {
     ...rest
   } = json;
 
+  //const start: firebase.firestore.Timestamp = startTime;
+  //console.log(`start time ${start ? start.toDate().toLocaleDateString() : '-'}`);
+
   return {
     ...rest,
-    lastParticipantsUpdate: new Date(Date.parse(lastParticipantsUpdate)),
-    lastSummaryUpdate: new Date(Date.parse(lastSummaryUpdate)),
-    startTime: new Date(Date.parse(startTime)),
-    endTime: new Date(Date.parse(endTime)),
-    completedAt: completedAt ? new Date(Date.parse(completedAt)) : undefined,
-    participants: participants
-      ? participants.map(
-          ({
-            addedAt,
-            startedAt,
-            completedAt,
-            lastVerified,
-            lastUpdate,
-            ...rest
-          }: any) => ({
-            ...rest,
-            addedAt: new Date(Date.parse(addedAt)),
-            startedAt: startedAt ? new Date(Date.parse(startedAt)) : undefined,
-            completedAt: completedAt
-              ? new Date(Date.parse(completedAt))
-              : undefined,
-            lastUpdate: lastUpdate
-              ? new Date(Date.parse(lastUpdate))
-              : undefined,
-            lastVerified: lastVerified
-              ? new Date(Date.parse(lastVerified))
-              : undefined
-          })
-        )
-      : undefined
+    lastParticipantsUpdate: lastParticipantsUpdate ? lastParticipantsUpdate.toDate() : undefined,
+    lastSummaryUpdate: lastSummaryUpdate ? lastSummaryUpdate.toDate(): undefined,
+    startTime: startTime ? startTime.toDate() : new Date(),
+    endTime: endTime ? endTime.toDate() : undefined,
   };
 }
 

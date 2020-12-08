@@ -62,6 +62,8 @@ export const CeremonyPage = (props: {id: string}) => {
   const contributionListenerUnsub = useRef<(() => void) | null>(null);
   const loadingContributions = useRef(false);
 
+  console.log('rendering');
+
   const refreshCeremony = async () => {
     const c = await getCeremony(id);
     if (c !== undefined) setCeremony(c);
@@ -115,28 +117,42 @@ export const CeremonyPage = (props: {id: string}) => {
     }
   });
 
+  const contributionStats = (): {completed: number, waiting: number} => {
+    let result = {completed: 0, waiting: 0};
+    contributions.forEach(c => {
+      switch (c.status) {
+        case 'COMPLETE': result.completed++; break;
+        case 'WAITING': result.waiting++; break;
+      }
+    });
+    return result;
+  }
+
+  const contribStats = contributionStats();
+
   return (
     <>
       {ceremony ? (
-        <Container>
+        <PageContainer >
           <br />
-          <CeremonyDetails ceremony={ceremony}></CeremonyDetails>
+          <CeremonyDetails ceremony={ceremony} numContCompleted={contribStats.completed} numContWaiting={contribStats.waiting} ></CeremonyDetails>
           <br />
           <ContributionsGrid contributions={gridRows} />
-        </Container>
+        </PageContainer>
       ) : (
-        <Container>
+        <PageContainer>
           <br />
           <NotFoundContainer>
             {loaded ? "Ceremony not found." : "Loading..."}
           </NotFoundContainer>
-        </Container>
+        </PageContainer>
       )}
     </>
   );
 };
 
-const CeremonyDetails = (props: { ceremony: Ceremony }) => {
+const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, numContWaiting: number  }) => {
+  console.log(`start ${props.ceremony.startTime}`);
   return (
     <CeremonyDetailsContainer>
       <CeremonyTitle>{props.ceremony.title}</CeremonyTitle>
@@ -146,30 +162,25 @@ const CeremonyDetails = (props: { ceremony: Ceremony }) => {
           <CeremonyDetailsTable>
             <tbody>
               <tr>
-                <td>status</td>
+                <td>Status</td>
                 <td>{props.ceremony.ceremonyState}</td>
               </tr>
               <tr>
-                <td>start time</td>
-                <td>{props.ceremony.startTime.toLocaleString()}</td>
+                <td>Start Time</td>
+                <td>{moment(props.ceremony.startTime).format('lll')}</td>
               </tr>
               <tr>
-                <td>end time</td>
-                <td>{props.ceremony.endTime.toLocaleString()}</td>
+                <td>End Time</td>
+                <td>{props.ceremony.endTime ? moment(props.ceremony.endTime).format('lll') : ''}</td>
               </tr>
               <tr>
-                <td>hompage</td>
-                <td>
-                  <a href={props.ceremony.homepage}>
-                    {props.ceremony.homepage}
-                  </a>
-                </td>
+                <td>Minimum Participants</td>
+                <td>{props.ceremony.minParticipants}</td>
               </tr>
               <tr>
-                <td>github</td>
-                <td>
-                  <a href={props.ceremony.github}>{props.ceremony.github}</a>
-                </td>
+                <td>Contributions</td>
+                <td>{props.numContCompleted} completed</td>
+                <td>{props.numContWaiting} waiting</td>
               </tr>
             </tbody>
           </CeremonyDetailsTable>
