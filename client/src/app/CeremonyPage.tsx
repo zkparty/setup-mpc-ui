@@ -16,8 +16,12 @@ import {
 import { Ceremony, Contribution, ContributionSummary, Participant } from "../types/ceremony";
 import { ceremonyUpdateListener, contributionUpdateListener, getCeremony } from "../api/FirebaseApi";
 import { createStyles, makeStyles, Theme, Typography, withStyles, Container } from "@material-ui/core";
+import Fab from '@material-ui/core/Fab';
+import EditIcon from '@material-ui/icons/Edit';
+import CloseIcon from '@material-ui/icons/Close';
 import moment from "moment";
 import './styles.css';
+import { AuthContext } from "./AuthContext";
 
 const CeremonyDetailsTable = styled.table`
   text-align: right;
@@ -51,7 +55,7 @@ const CeremonyDetailsSubSection = styled.div`
   box-sizing: border-box;
 `;
 
-export const CeremonyPage = (props: {id: string}) => {
+export const CeremonyPage = (props: {id: string, onClose: ()=> void }) => {
   let { id } = props;
   console.log(`have id ${id}`);
 
@@ -130,12 +134,26 @@ export const CeremonyPage = (props: {id: string}) => {
 
   const contribStats = contributionStats();
 
+  const handleEdit = () => {};
+
+  const handleClose = () => {
+    if (ceremonyListenerUnsub.current) ceremonyListenerUnsub.current();
+    if (contributionListenerUnsub.current) contributionListenerUnsub.current();
+    props.onClose();
+  };
+
   return (
     <>
       {ceremony ? (
         <PageContainer >
           <br />
-          <CeremonyDetails ceremony={ceremony} numContCompleted={contribStats.completed} numContWaiting={contribStats.waiting} ></CeremonyDetails>
+          <div>
+            <CeremonyDetails 
+              ceremony={ceremony} 
+              numContCompleted={contribStats.completed} 
+              numContWaiting={contribStats.waiting} />
+            <Actions handleEdit={handleEdit} handleClose={handleClose} />
+          </div>
           <br />
           <ContributionsGrid contributions={gridRows} />
         </PageContainer>
@@ -151,12 +169,37 @@ export const CeremonyPage = (props: {id: string}) => {
   );
 };
 
+const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
+  return (
+    <AuthContext.Consumer>{Auth => {
+      return (<div>
+        {Auth.isCoordinator ?
+          (<Fab 
+            variant="round" 
+            onClick={props.handleEdit}
+            aria-label="edit">
+            <EditIcon />
+          </Fab>) 
+          : (<></>)
+        }
+        <Fab 
+          variant="round" 
+          onClick={props.handleClose}
+          aria-label="close">
+          <CloseIcon />
+        </Fab>
+      </div>
+      )}}
+    </AuthContext.Consumer>
+  );
+}
+
 const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, numContWaiting: number  }) => {
   console.log(`start ${props.ceremony.startTime}`);
+
   return (
     <CeremonyDetailsContainer>
       <CeremonyTitle>{props.ceremony.title}</CeremonyTitle>
-
       <CeremonyDetailsSubSection>
         <Center>
           <CeremonyDetailsTable>

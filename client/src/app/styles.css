@@ -21,16 +21,15 @@
     color: #31c41d;
 }
 
-.MuiDataGrid-row {
-    border-width: 0px;    
+* .MuiDataGrid-row {
+    border-bottom: 0px;    
 }
  
-.MuiDataGrid-root .MuiDataGrid-cell {
+* .MuiDataGrid-cell {
     text-overflow: initial;
     overflow-x: auto;
     color: #aaa;
-    border-color: #31c41d;
-    border-bottom-width: 0px;
+    border-bottom: 0px;
 }
 
 .MuiDataGrid-root .MuiDataGrid-columnSeparator {
@@ -45,7 +44,7 @@
     color: #31c41d;
 }
 
-.span  * .MuiTabs-indicator {
+* .MuiTabs-indicator {
     background-color: #731dc4;
 }
   

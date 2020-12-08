@@ -96,7 +96,7 @@ export const LandingPage = () => {
                   aria-labelledby="simple-modal-title"
                   aria-describedby="simple-modal-description"
                 >
-                  <CeremonyPage id={selectedCeremony}/>
+                  <CeremonyPage id={selectedCeremony} onClose={closeCeremonyModal} />
                 </Modal>
               </PageContainer>
             </Fragment>
