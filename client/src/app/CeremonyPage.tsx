@@ -28,8 +28,14 @@ const CeremonyDetailsTable = styled.table`
   font-size: 11pt;
   width: 100%;
 
-  td {
+  td.title {
     padding-left: 10px;
+    color: ${accentColor};
+  }
+  td.content {
+    padding-left: 10px;
+    float: left;
+    color: ${textColor};
   }
 `;
 
@@ -147,12 +153,16 @@ export const CeremonyPage = (props: {id: string, onClose: ()=> void }) => {
       {ceremony ? (
         <PageContainer >
           <br />
-          <div>
-            <CeremonyDetails 
-              ceremony={ceremony} 
-              numContCompleted={contribStats.completed} 
-              numContWaiting={contribStats.waiting} />
-            <Actions handleEdit={handleEdit} handleClose={handleClose} />
+          <div style={{ width: '80%', display: 'flex' }}>
+            <div style={{ marginLeft: 'auto' }}>
+              <CeremonyDetails 
+                ceremony={ceremony} 
+                numContCompleted={contribStats.completed} 
+                numContWaiting={contribStats.waiting} />
+            </div>
+            <div style={{ float: 'right', marginLeft: 'auto' }}>
+              <Actions handleEdit={handleEdit} handleClose={handleClose} />
+            </div>
           </div>
           <br />
           <ContributionsGrid contributions={gridRows} />
@@ -205,25 +215,24 @@ const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, 
           <CeremonyDetailsTable>
             <tbody>
               <tr>
-                <td>Status</td>
-                <td>{props.ceremony.ceremonyState}</td>
+                <td className='title'>Status</td>
+                <td className='content'>{props.ceremony.ceremonyState}</td>
               </tr>
               <tr>
-                <td>Start Time</td>
-                <td>{moment(props.ceremony.startTime).format('lll')}</td>
+                <td className='title'>Start Time</td>
+                <td className='content'>{moment(props.ceremony.startTime).format('lll')}</td>
               </tr>
               <tr>
-                <td>End Time</td>
-                <td>{props.ceremony.endTime ? moment(props.ceremony.endTime).format('lll') : ''}</td>
+                <td className='title'>End Time</td>
+                <td className='content'>{props.ceremony.endTime ? moment(props.ceremony.endTime).format('lll') : ''}</td>
               </tr>
               <tr>
-                <td>Minimum Participants</td>
-                <td>{props.ceremony.minParticipants}</td>
+                <td className='title'>Minimum Participants</td>
+                <td className='content'>{props.ceremony.minParticipants}</td>
               </tr>
               <tr>
-                <td>Contributions</td>
-                <td>{props.numContCompleted} completed</td>
-                <td>{props.numContWaiting} waiting</td>
+                <td className='title'>Contributions</td>
+                <td className='content'>{props.numContCompleted} completed, {props.numContWaiting} waiting</td>
               </tr>
             </tbody>
           </CeremonyDetailsTable>
