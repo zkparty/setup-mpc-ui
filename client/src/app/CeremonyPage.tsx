@@ -15,73 +15,9 @@ import {
 } from "../styles";
 import { Ceremony, Contribution, ContributionSummary, Participant } from "../types/ceremony";
 import { ceremonyUpdateListener, contributionUpdateListener, getCeremony } from "../api/FirebaseApi";
-import { createStyles, makeStyles, Theme, Typography, withStyles } from "@material-ui/core";
+import { createStyles, makeStyles, Theme, Typography, withStyles, Container } from "@material-ui/core";
 import moment from "moment";
 import './styles.css';
-
-const useStyles = makeStyles((theme: Theme) => 
-  createStyles({
-    root: {
-      // width: '100%',
-      height: 450,
-      maxWidth: 800,
-      backgroundColor: lighterBackground,
-      color: textColor,
-      border: accentColor,
-
-      "& $columnsContainer": {
-        color: accentColor,
-      },
-    },
-    columnsContainer: {
-
-    },
-    colCell: {
-      color: 'white',
-    },
-    cell: {
-      color: textColor,
-    },
-    footer: {
-      color: textColor,
-    },
-    iconSeparator: {
-      color: accentColor,
-    },
-    divider: {
-      color: accentColor,
-      padding: '20px',
-    }
-}));
-
-const StyledDataGrid = styled(DataGrid)`
-  height: 600,
-  maxWidth: 800,
-  backgroundColor: lighterBackground,
-  color: textColor,
-  border: accentColor;
-
-  & > .MuiDataGrid-root {
-    height: 600,
-    maxWidth: 800,
-    backgroundColor: lighterBackground,
-    color: textColor,
-    border: accentColor,
-  }
-
-  & > .MuiDataGrid-columnsContainer {
-    color: accentColor,
-  }
-
-  & .MuiDataGrid-iconSeparator {
-    color: accentColor,
-  }
-
-  & > .MuiDataGrid-footer {
-    color: accentColor,
-  }
-});
-`
 
 const CeremonyDetailsTable = styled.table`
   text-align: right;
@@ -92,18 +28,6 @@ const CeremonyDetailsTable = styled.table`
     padding-left: 10px;
   }
 `;
-
-const TableCell = styled.span`
-  padding: 2px 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const TableHeader = styled.span`
-  display: inline-block;
-  color: "white";
-`;
-//  color: ${props => props.accentColor};
 
 const NotFoundContainer = styled.div`
   width: 512px;
@@ -145,7 +69,7 @@ export const CeremonyPage = (props: {id: string}) => {
 
   const updateContribution = (doc: ContributionSummary, changeType: string, oldIndex?: number) => {
     // A contribution has been updated
-    console.log(`contribution update: ${doc.queueIndex} ${changeType}`);
+    console.log(`contribution update: ${doc.queueIndex} ${changeType} ${oldIndex}`);
     let newContributions = contributions;
     switch (changeType) {
       case 'added': {
@@ -187,43 +111,26 @@ export const CeremonyPage = (props: {id: string}) => {
     return {
       ...v, 
       id: v.queueIndex,
-      timestamp: v.timeCompleted ? moment(v.timeCompleted).format() : '',
-
+      timestamp: v.timeCompleted ? moment(v.timeCompleted.toDate()).format('lll') : '',
     }
   });
 
   return (
     <>
-    { /* <HomeLinkContainer>
-        <Link to="/">home</Link>
-      </HomeLinkContainer>*/}
       {ceremony ? (
-        <PageContainer>
+        <Container>
           <br />
           <CeremonyDetails ceremony={ceremony}></CeremonyDetails>
           <br />
           <ContributionsGrid contributions={gridRows} />
-          {/* <ParticipantTable
-            participants={ceremony.participants ? ceremony.participants : []}
-            headers={[
-              { title: "connection", width: "100px" },
-              { title: "address", width: "400px" },
-              { title: "status", width: "100px" }
-            ]}
-            cols={[
-              p => (p.online ? "online" : "offline"),
-              p => p.address,
-              participantStatusString
-            ]}
-          /> */}
-        </PageContainer>
+        </Container>
       ) : (
-        <PageContainer>
+        <Container>
           <br />
           <NotFoundContainer>
             {loaded ? "Ceremony not found." : "Loading..."}
           </NotFoundContainer>
-        </PageContainer>
+        </Container>
       )}
     </>
   );
@@ -275,67 +182,9 @@ const CeremonyDetails = (props: { ceremony: Ceremony }) => {
   );
 };
 
-const participantStatusString = (participant: Participant) => {
-  let statusString: string = participant.state;
-  if (participant.state === "RUNNING" && participant.computeProgress < 1) {
-    statusString = `RUNNING: ${Math.round(participant.computeProgress)}%`;
-  } else if (
-    participant.state === "RUNNING" &&
-    participant.computeProgress === 1
-  ) {
-    statusString = "VERIFYING";
-  }
-
-  return statusString;
-};
-
-const ParticipantTable = (props: {
-  participants: Participant[];
-  headers: { title: string; width: string }[];
-  cols: Array<(p: Participant) => ReactNode | null>;
-}) => {
-  return (
-    <div>
-      <br />
-      {props.headers.map((header, i) => {
-        return (
-          <TableHeader key={i} style={{ width: header.width }}>
-            {header.title}
-          </TableHeader>
-        );
-      })}
-
-      {props.participants.map((p, j) => {
-        return (
-          <div key={j}>
-            {props.cols.map((col, i) => {
-              return (
-                <TableCell
-                  style={{
-                    width: props.headers[i].width,
-                    maxWidth: props.headers[i].width,
-                    overflow: "hidden",
-                    textOverflow: "ellipses",
-                    display: "inline-block",
-                    zIndex: 100,
-                    position: "relative"
-                  }}
-                  key={i}
-                >
-                  {col(p) + ""}
-                </TableCell>
-              );
-            })}
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
 const columns: ColDef[] = [
-  { field: 'queueIndex', headerName: 'Position', type: 'number', width: 50 },
-  { field: 'timestamp', headerName: 'Time', width: 130 },
+  { field: 'queueIndex', headerName: '#', description: 'Queue position', type: 'number', width: 50, sortable: true },
+  { field: 'timestamp', headerName: 'Time', width: 180, sortable: true },
   { field: 'status', headerName: 'Status', width: 120, sortable: false },
   { field: 'duration', headerName: 'Duration', type: 'number', width: 90, sortable: false },
   { field: 'hash', 
@@ -356,7 +205,9 @@ const ContributionsGrid = (props: {contributions: any[]}) => {
       <DataGrid 
         rows={props.contributions} 
         columns={columns} 
-        pageSize={5}
+        pageSize={8}
+        rowHeight={40}
+        sortingMode='server'
       />
     </div>
   );

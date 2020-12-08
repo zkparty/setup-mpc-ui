@@ -4,28 +4,39 @@
     background: #081a24;
     color: #aaa;
     border-color: #31c41d;
-    
 }
 
 .MuiDataGrid-root .MuiDataGrid-columnsContainer {
     color: #31c41d;
 }
 
-.MuiDataGrid-root .MuiDataGrid-columnSeparator {
-    color: #31c41d;
+.MuiDataGrid-mainGridContainer {
+    border-color: #31c41d;
 }
-  
+
 /* .MuiDataGrid-columnSeparator {
     color: #31c41d;
 } */
-  
+.MuiDataGrid-iconSeparator {
+    color: #31c41d;
+}
+
+.MuiDataGrid-row {
+    border-width: 0px;    
+}
+ 
 .MuiDataGrid-root .MuiDataGrid-cell {
     text-overflow: initial;
     overflow-x: auto;
     color: #aaa;
     border-color: #31c41d;
+    border-bottom-width: 0px;
 }
-  
+
+.MuiDataGrid-root .MuiDataGrid-columnSeparator {
+    color: #31c41d;
+}
+
 .MuiDataGrid-root .MuiDataGrid-footer {
     color: #31c41d;
 }
