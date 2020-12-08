@@ -30,33 +30,26 @@ import { AuthContext } from "./AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
 import { CeremonyPage } from "./CeremonyPage";
-
- const TabLink = styled.span<any>`
-  ${(props: { selected: boolean }) => {
-    return css`
-      text-decoration: ${props.selected ? "underline" : "none"};
-      cursor: pointer;
-      color: ${props.selected ? "black" : accentColor};
-      background-color: ${props.selected ? accentColor : "unset"};
-      margin-right: 16px;
-
-      &:hover {
-        background-color: ${secondAccent};
-        color: ${textColor};
-      }
-    `;
-  }}
-`;
+import './styles.css';
+import { withStyles } from "@material-ui/core/styles";
 
 export interface SelectedCeremonyContextInterface {
   selectedCeremony: string,
   setSelectedCeremony: (id: string) => void,
 };
+
 const defaultSelection: SelectedCeremonyContextInterface = {
   selectedCeremony: "",
   setSelectedCeremony: () => null,
 };
 export const SelectedCeremonyContext = React.createContext<SelectedCeremonyContextInterface>(defaultSelection);
+
+const StyledTabs = withStyles(theme => ({
+  indicator: {
+    backgroundColor: secondAccent
+  },
+
+}))(Tabs);
 
 export const LandingPage = () => {
     const [activeTab, setActiveTab] = useState("1");
@@ -78,7 +71,7 @@ export const LandingPage = () => {
             <Fragment>
               <ButtonAppBar />
               <PageContainer>
-                <Tabs 
+                <StyledTabs 
                   value={activeTab} 
                   onChange={handleChange}
                   centered
@@ -87,7 +80,7 @@ export const LandingPage = () => {
                   <Tab label="Ceremonies" value="1" />
                   <Tab label="Participate" value="2" />
                   {Auth.isCoordinator ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
-                </Tabs>
+                </StyledTabs>
                 <TabPanel value={activeTab} index="1">
                   <SummarySection key="summary" onClick={openCeremonyModal}/>
                 </TabPanel>

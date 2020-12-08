@@ -44,4 +44,8 @@
 .MuiTablePagination-toolbar {
     color: #31c41d;
 }
+
+.span  * .MuiTabs-indicator {
+    background-color: #731dc4;
+}
   
