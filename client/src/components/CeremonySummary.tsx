@@ -40,19 +40,21 @@ const CeremonySummary = (props: { ceremony: Ceremony, onClick: () => void } & Ro
       props.onClick();
     };
 
-    console.log(`ceremony id: ${c.id}`);
+    //console.log(`ceremony id: ${c.id}`);
+    const progress = c.complete ? Math.max(100, 100 * c.complete/c.minParticipants) : '';
   
     return (
       <CeremonyContainer onClick={onClick}>
         <CeremonyTitle>{c.title}</CeremonyTitle>
         {`STATUS: ${c.ceremonyState}` +
-          (c.ceremonyState === "RUNNING" ? ` (${c.ceremonyProgress}%)` : "")}
+          (c.ceremonyState === "RUNNING" ? ` (${progress}%)` : "")}
         <br />
         <br />
         {c.description}
         <br />
         <br />
-        {`Last updated: ${format(c.lastSummaryUpdate)}`}
+        {`Contribution Progress: ${(c.complete===undefined) ? '-' : c.complete } completed. 
+                                ${(c.waiting===undefined) ? '-' : c.waiting} waiting`}
       </CeremonyContainer>
     );
   };

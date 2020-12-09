@@ -70,6 +70,33 @@ export const getCeremonies = async (): Promise<Ceremony[]> => {
   return ceremonySnapshot.docs.map(v => v.data());
 }
 
+// COunts the waiting and complete contributions for all ceremonies
+export const getCeremonyCounts = async (callback: (d: any) => void): Promise<void> => {
+  const db = firebase.firestore();
+  const querySnapshot = await db
+    .collection('ceremonies')
+    .withConverter(ceremonyConverter)
+    .get();
+
+  querySnapshot.forEach(async ceremony => {
+    const ceremonyId = ceremony.id;
+    const contribQuery = await db
+      .collection('contributions')
+      .withConverter(contributionConverter);
+
+    let query = await contribQuery  
+      .where('status', '==', 'COMPLETE')
+      .get();
+    const complete = query.size;
+    console.debug(`complete ${ceremony.id} ${query.docs.length}`);
+    query = await contribQuery  
+      .where('status', '==', 'WAITING')
+      .get();
+    const waiting = query.size;
+    callback({ ceremonyId, complete, waiting });
+  });
+}
+
 export async function getCeremonyContributions(id: string): Promise<ContributionSummary[]> {
   // Return all contributions, in reverse time order
   const db = firebase.firestore();
@@ -303,6 +330,10 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
     averageSecondsPerContribution: 0,
     lastValidIndex: 0,
   };
+  // For average time calcs
+  let totalSecs = 0;
+  let numContribs = 0;
+
   const db = firebase.firestore();
   const query = db.collection("ceremonies")
     .doc(ceremonyId)
@@ -320,35 +351,18 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
         contributionStats.currentIndex = cont.queueIndex;
         if (cont.status === COMPLETE) contributionStats.lastValidIndex = cont.queueIndex;
       }
+
+      if (cont.status === COMPLETE && cont.duration) {
+        numContribs++;
+        totalSecs += cont.duration;
+      }
     }
   });
 
-  // Average time calcs
-  let totalSecs = 0;
-  let numContribs = 0;
-  let lastIndex = -1;
-  let lastTime: number | null = null;
-  const eventsQuery = db.collection("ceremonies")
-    .doc(ceremonyId)
-    .collection('events')
-    .orderBy('timestamp', 'asc')
-    .where('eventType', '==', 'PARAMS_DOWNLOADED');
-  const events = await eventsQuery.get();
-  events.forEach( docSnapshot => {
-    const event = docSnapshot.data();
-    if (event.index > lastIndex) {
-      numContribs++;
-      lastIndex = event.index;
-    }
-    if (lastTime) {
-      totalSecs += (event.timestamp - lastTime);
-      lastTime = event.timestamp;
-    }
-  });
   contributionStats.averageSecondsPerContribution = 
       (numContribs > 0) ? 
         Math.floor(totalSecs / numContribs) 
-      : 90; // or some other sensible default
+      : 90; // TODO: calc sensible default based on circuit size
 
   return contributionStats;
 };

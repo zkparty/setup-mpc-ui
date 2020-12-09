@@ -25,7 +25,7 @@ import {
   getCeremonySummariesCached
 } from "../api/ZKPartyApi";
 import { Ceremony } from "../types/ceremony";
-import { ceremonyListener, getCeremonies } from "../api/FirestoreApi";
+import { ceremonyListener, getCeremonies, getCeremonyCounts } from "../api/FirestoreApi";
 import { AuthContext } from "./AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
@@ -136,9 +136,13 @@ const SummarySection = (props: any) => {
   const [ceremonies, setCeremonies] = useState<Ceremony[]>([]);
   const [loaded, setLoaded] = useState(false);
 
+  const findCeremonyIndex = (id: string): number => {
+    return ceremonies.findIndex(val => val.id === id);
+  }
+
   const updateCeremony = (ceremony: Ceremony) => {
     //console.log(`${ceremony}`);
-    const i = ceremonies.findIndex(val => val.id === ceremony.id);
+    const i = findCeremonyIndex(ceremony.id);
     if (i >= 0) {
       ceremonies[i] = ceremony;
     } else {
@@ -152,11 +156,24 @@ const SummarySection = (props: any) => {
     ceremonyListener(updateCeremony);
   };
 
+  const updateCeremonyCounts = (c: any) => {
+    // callback for ceremony counts query
+    // returns {ceremonyId, complete, waiting}
+    console.log(`update count ${c.ceremonyId} ${c.complete}`);
+    const i = findCeremonyIndex(c.ceremonyId);
+    if (i>=0) {
+      ceremonies[i].waiting = c.waiting;
+      ceremonies[i].complete = c.complete;
+    }
+    setCeremonies(ceremonies);
+  }
+
   useEffect(() => {
     getCeremonies()
       .then(ceremonies => {
         setCeremonies(ceremonies);
         setLoaded(true);
+        getCeremonyCounts(updateCeremonyCounts);
         // Subscribe to ceremony updates
         refreshCeremonySummaries();
       })

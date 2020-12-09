@@ -46,6 +46,8 @@ export interface Ceremony {
   ceremonyProgress: number; // this is only returned by /api/state-summary, else must be computed by us
   numParticipants: number; // this is only returned by /api/state-summary, else must be computed by us
   participants?: Participant[]; // we only request this field when needed
+  complete: number;
+  waiting: number;
 }
 
 export interface Participant {
