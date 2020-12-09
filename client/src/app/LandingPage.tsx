@@ -25,7 +25,7 @@ import {
   getCeremonySummariesCached
 } from "../api/ZKPartyApi";
 import { Ceremony } from "../types/ceremony";
-import { ceremonyListener, getCeremonies } from "../api/FirebaseApi";
+import { ceremonyListener, getCeremonies } from "../api/FirestoreApi";
 import { AuthContext } from "./AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";

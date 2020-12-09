@@ -22,7 +22,7 @@ import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, 
-  ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirebaseApi";
+  ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirestoreApi";
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
 
@@ -56,7 +56,7 @@ const createCeremonyEvent = (eventType: string, message: string, index: number |
   };
 };
 
-const createContributionSummary = (participantId: string, status: ParticipantState, paramsFile: string, index: number, hash: string): ContributionSummary => {
+const createContributionSummary = (participantId: string, status: ParticipantState, paramsFile: string, index: number, hash: string, duration: number): ContributionSummary => {
   return {
     lastSeen: new Date(),
     hash,
@@ -65,6 +65,7 @@ const createContributionSummary = (participantId: string, status: ParticipantSta
     participantId,
     status,
     timeCompleted: new Date(),
+    duration,
   }
 };
 
@@ -209,8 +210,9 @@ export const ParticipantSection = () => {
           "START_CONTRIBUTION",
           `Starting turn for index ${contrib.currentIndex}`,
           contrib.queueIndex
-      ));
-      if (ceremonyQueueListenerUnsub) ceremonyQueueListenerUnsub(); // Stop listening for updates
+        ));
+        if (ceremonyQueueListenerUnsub) ceremonyQueueListenerUnsub(); // Stop listening for updates
+        contrib.startTime = Date.now();
         setComputeStatus({...computeStatus, running: true});
         setStep(Step.RUNNING);
       }
@@ -265,7 +267,15 @@ export const ParticipantSection = () => {
             contributionState.current?.queueIndex
           ));
           addMessage(`Parameters uploaded.`);
-          const contribution = createContributionSummary( participant.current ? participant.current.uid : '??', "COMPLETE", paramsFile, newIndex, hash.current);
+          const duration = ((Date.now()) - contributionState.current?.startTime) / 1000;
+          const contribution = createContributionSummary(
+             participant.current ? participant.current.uid : '??',
+             "COMPLETE", 
+             paramsFile, 
+             newIndex, 
+             hash.current,
+             duration
+            );
           await addOrUpdateContribution(ceremonyId, contribution);
           addMessage(`Thank you for your contribution.`)
         } finally {

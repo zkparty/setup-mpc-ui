@@ -18,7 +18,7 @@ import {
 } from "../styles";
 import { Ceremony, CeremonyEvent } from "../types/ceremony";
 import { addCeremony, jsonToCeremony } from "../api/ZKPartyApi";
-import { addCeremonyEvent, ceremonyEventListener } from "./../api/FirebaseApi";
+import { addCeremonyEvent, ceremonyEventListener } from "../api/FirestoreApi";
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
 import { SelectedCeremonyContext } from "./LandingPage";

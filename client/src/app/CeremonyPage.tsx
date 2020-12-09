@@ -14,7 +14,7 @@ import {
   Center
 } from "../styles";
 import { Ceremony, Contribution, ContributionSummary, Participant } from "../types/ceremony";
-import { ceremonyUpdateListener, contributionUpdateListener, getCeremony } from "../api/FirebaseApi";
+import { ceremonyUpdateListener, contributionUpdateListener, getCeremony } from "../api/FirestoreApi";
 import { createStyles, makeStyles, Theme, Typography, withStyles, Container } from "@material-ui/core";
 import Fab from '@material-ui/core/Fab';
 import EditIcon from '@material-ui/icons/Edit';
@@ -124,6 +124,7 @@ export const CeremonyPage = (props: {id: string, onClose: ()=> void }) => {
       ...v, 
       id: v.queueIndex,
       timestamp: v.timeCompleted ? moment(v.timeCompleted.toDate()).format('lll') : '',
+      duration: `${Math.round(moment.duration(v.duration, 'seconds').asMinutes())}m`,
     }
   });
 
@@ -249,7 +250,7 @@ const columns: ColDef[] = [
   { field: 'queueIndex', headerName: '#', description: 'Queue position', type: 'number', width: 50, sortable: true },
   { field: 'timestamp', headerName: 'Time', width: 180, sortable: true },
   { field: 'status', headerName: 'Status', width: 120, sortable: false },
-  { field: 'duration', headerName: 'Duration', type: 'number', width: 90, sortable: false },
+  { field: 'duration', headerName: 'Duration', type: 'string', width: 90, sortable: false },
   { field: 'hash', 
     headerName: 'Hash',
     description: 'The hash resulting from this contribution',

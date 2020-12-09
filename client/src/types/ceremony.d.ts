@@ -127,6 +127,7 @@ export interface ContributionSummary extends Contribution {
   paramsFile?: string;
   timeCompleted?: timestamp;
   hash?: string;
+  duration?: number;
 }
 
 export interface ContributionState {
@@ -137,4 +138,5 @@ export interface ContributionState {
   averageSecondsPerContribution: number;
   expectedStartTime?: timestamp;
   status: ParticipantState;
+  startTime?: date;
 }

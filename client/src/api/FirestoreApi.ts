@@ -1,9 +1,9 @@
 import { Ceremony, CeremonyEvent, CeremonyState, 
   Contribution, ContributionState, ContributionSummary, 
-  Participant, ParticipantState } from './../types/ceremony';
+  Participant, ParticipantState } from '../types/ceremony';
 import firebase from 'firebase/app';
 import "firebase/firestore";
-import { jsonToCeremony, JsonToContribution } from './ZKPartyApi';
+import { jsonToCeremony, jsonToContribution } from './ZKPartyApi';
 
 const COMPLETE = "COMPLETE";
 const INVALIDATED = "INVALIDATED";
@@ -28,7 +28,7 @@ const contributionConverter: firebase.firestore.FirestoreDataConverter<Contribut
   fromFirestore: (
     snapshot: firebase.firestore.QueryDocumentSnapshot,
     options: firebase.firestore.SnapshotOptions): ContributionSummary => {
-    return JsonToContribution(snapshot.data(options));
+    return jsonToContribution(snapshot.data(options));
   }
 }
 
