@@ -157,12 +157,13 @@ export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
   
     query.onSnapshot(querySnapshot => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
-      querySnapshot.docChanges().forEach(docSnapshot => {
+      querySnapshot.docChanges().forEach(async docSnapshot => {
         if (docSnapshot.type === 'modified' || docSnapshot.type === 'added') {
-          console.log(`Ceremony: ${docSnapshot.doc.id}`);
-          const count = getCeremonyCount(docSnapshot.doc.ref);
-          const ceremony = {...docSnapshot.doc.data(), ...count};
-          callback(ceremony);
+          console.debug(`Ceremony: ${docSnapshot.doc.id}`);
+          getCeremonyCount(docSnapshot.doc.ref).then(count => {
+            const ceremony = {...docSnapshot.doc.data(), ...count};
+            callback(ceremony);
+          });
         }
       });
     }, err => {

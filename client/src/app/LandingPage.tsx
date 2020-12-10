@@ -135,7 +135,7 @@ function TabPanel(props: TabPanelProps) {
 const SummarySection = (props: any) => {
   const [ceremonies, setCeremonies] = useState<Ceremony[]>([]);
   const [loaded, setLoaded] = useState(false);
-  console.debug('render summary section');
+  console.debug(`render summary section ${ceremonies.length > 2 ? ceremonies[2].complete : '-'}`);
 
   const findCeremonyIndex = (id: string): number => {
     return ceremonies.findIndex(val => val.id === id);
@@ -146,7 +146,7 @@ const SummarySection = (props: any) => {
     const idx = findCeremonyIndex(ceremony.id);
     const update = (c: Ceremony, i: number) => {
       if (i == idx) {
-        console.debug(`updating ceremony ${c.id} ${c.complete}`);
+        console.debug(`updating ceremony ${ceremony.id} ${ceremony.complete}`);
         return ceremony;
       } else {
         return c;
@@ -158,11 +158,6 @@ const SummarySection = (props: any) => {
       console.debug(`adding ceremony ${ceremony.id} ${ceremony.complete}`);
       setCeremonies(prev => [...prev, ceremony]);
     }
-  };
-
-  const refreshCeremonySummaries = () => {
-    // Firestore listener
-    ceremonyListener(updateCeremony);
   };
 
   // const updateCeremonyCounts = (c: any) => {
@@ -183,7 +178,7 @@ const SummarySection = (props: any) => {
       .then(ceremonies => {
         setCeremonies(ceremonies);
         // Subscribe to ceremony updates
-        refreshCeremonySummaries();
+        ceremonyListener(updateCeremony);
         console.debug('getCeremonies done');
         setLoaded(true);
       })

@@ -29,6 +29,14 @@ const CeremonyContainer = styled.div`
   }
 `;
 
+const Bold = styled.div`
+  font-weight: bold;
+`;
+
+const Flex = styled.div`
+  display: flex;
+`;
+
 const CeremonySummary = (props: { ceremony: Ceremony, onClick: () => void } & RouteProps) => {
     const c = props.ceremony;
     const { setSelectedCeremony } = useContext(SelectedCeremonyContext);
@@ -41,20 +49,25 @@ const CeremonySummary = (props: { ceremony: Ceremony, onClick: () => void } & Ro
     };
 
     //console.log(`ceremony id: ${c.id}`);
-    const progress = c.complete ? Math.max(100, 100 * c.complete/c.minParticipants) : '';
+    const progress = c.complete ? Math.min(100, 100 * c.complete/c.minParticipants) : '';
   
     return (
       <CeremonyContainer onClick={onClick}>
         <CeremonyTitle>{c.title}</CeremonyTitle>
-        {`STATUS: ${c.ceremonyState}` +
-          (c.ceremonyState === "RUNNING" ? ` (${progress}%)` : "")}
-        <br />
-        <br />
         {c.description}
         <br />
         <br />
-        {`Contribution Progress: ${(c.complete===undefined) ? '-' : c.complete } completed. 
-                                ${(c.waiting===undefined) ? '-' : c.waiting} waiting`}
+        <Flex>
+          <Bold>Status:&nbsp;</Bold>{` ${c.ceremonyState}` +
+            (c.ceremonyState === "RUNNING" ? ` (${progress}%)` : "")}
+        </Flex>
+        <br />
+        <Flex>
+          <Bold>Contribution Progress:&nbsp;</Bold>
+          {` ${(c.complete===undefined) ? '-' : c.complete } completed. 
+            ${(c.waiting===undefined) ? '-' : c.waiting} waiting.
+            Target: ${c.minParticipants} `}
+        </Flex>
       </CeremonyContainer>
     );
   };
