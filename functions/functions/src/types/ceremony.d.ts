@@ -77,15 +77,6 @@ export interface Participant {
   //messages: Message[];
 }
 
-export interface CeremonyEvent {
-  ceremonyId?: string;
-  sender: string;
-  eventType: string;
-  timestamp: timestamp;
-  message: string;
-  index?: number;
-  acknowledged: boolean;
-}
 
 export interface Transcript {
   // Server controlled data.
@@ -115,30 +106,3 @@ export interface Message {
 //declare global {
 //  interface Window { wasmPhase2: any; }
 //}
-
-export interface Contribution {
-  participantId: string;
-  queueIndex?: number;
-  lastSeen?: timestamp;
-  timeAdded?: timestamp;
-  status: ParticipantState;
-  index?: number;
-}
-
-export interface ContributionSummary extends Contribution {
-  paramsFile?: string;
-  timeCompleted?: timestamp;
-  hash?: string;
-  duration?: number;
-}
-
-export interface ContributionState {
-  ceremony: Ceremony;
-  queueIndex: number;
-  currentIndex: number;
-  lastValidIndex: number;
-  averageSecondsPerContribution: number;
-  expectedStartTime?: timestamp;
-  status: ParticipantState;
-  startTime?: date;
-}

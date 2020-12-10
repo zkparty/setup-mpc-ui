@@ -1,4 +1,4 @@
-import { Ceremony, Contribution } from "./types/ceremony";
+import { Ceremony } from "./types/ceremony";
 
 
 export function jsonToCeremony(json: any): Ceremony {
@@ -26,8 +26,8 @@ export function jsonToCeremony(json: any): Ceremony {
   };
 }
 
-export const jsonToContribution = (json: any): Contribution => {
-  return {
-    ...json
-  }
-}
+// export const jsonToContribution = (json: any): Contribution => {
+//   return {
+//     ...json
+//   }
+// }
