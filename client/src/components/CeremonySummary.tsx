@@ -49,7 +49,7 @@ const CeremonySummary = (props: { ceremony: Ceremony, onClick: () => void } & Ro
     };
 
     //console.log(`ceremony id: ${c.id}`);
-    const progress = c.complete ? Math.min(100, 100 * c.complete/c.minParticipants) : '';
+    const progress = c.complete ? Math.floor(Math.min(100, 100 * c.complete/c.minParticipants)) : '';
   
     return (
       <CeremonyContainer onClick={onClick}>

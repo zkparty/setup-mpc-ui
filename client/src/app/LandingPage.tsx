@@ -67,7 +67,7 @@ export const LandingPage = () => {
     return (
       <SelectedCeremonyContext.Provider value={{selectedCeremony, setSelectedCeremony}}>
         <AuthContext.Consumer>
-          {(Auth) => {console.log(`landing page: ${Auth.isCoordinator}`); return (
+          {(Auth) => {console.debug(`landing page: ${Auth.isCoordinator}`); return (
             <Fragment>
               <ButtonAppBar />
               <PageContainer>

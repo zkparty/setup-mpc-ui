@@ -72,7 +72,7 @@ export const CeremonyPage = (props: {id: string, onClose: ()=> void }) => {
   const contributionListenerUnsub = useRef<(() => void) | null>(null);
   const loadingContributions = useRef(false);
 
-  console.log('rendering');
+  console.debug('rendering');
 
   const refreshCeremony = async () => {
     const c = await getCeremony(id);
@@ -206,7 +206,7 @@ const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
 }
 
 const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, numContWaiting: number  }) => {
-  console.log(`start ${props.ceremony.startTime}`);
+  console.debug(`start ${props.ceremony.startTime}`);
 
   return (
     <CeremonyDetailsContainer>
