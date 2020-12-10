@@ -67,34 +67,32 @@ export const getCeremonies = async (): Promise<Ceremony[]> => {
       .withConverter(ceremonyConverter)
       .get();
 
-  return ceremonySnapshot.docs.map(v => v.data());
+  const ceremonies = Promise.all(
+    ceremonySnapshot.docs.map(async doc => {
+      const count = await getCeremonyCount(doc.ref);
+      const c: Ceremony = {...doc.data(), ...count}
+      return c;
+    }));
+  return ceremonies;
 }
 
-// COunts the waiting and complete contributions for all ceremonies
-export const getCeremonyCounts = async (callback: (d: any) => void): Promise<void> => {
-  const db = firebase.firestore();
-  const querySnapshot = await db
-    .collection('ceremonies')
-    .withConverter(ceremonyConverter)
+// Counts the waiting and complete contributions for all ceremonies
+export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference<Ceremony>): Promise<any> => {
+  //const db = firebase.firestore();
+  const contribQuery = await ref
+    .collection('contributions')
+    .withConverter(contributionConverter);
+
+  let query = await contribQuery
+    .where('status', '==', 'COMPLETE')
     .get();
-
-  querySnapshot.forEach(async ceremony => {
-    const ceremonyId = ceremony.id;
-    const contribQuery = await db
-      .collection('contributions')
-      .withConverter(contributionConverter);
-
-    let query = await contribQuery  
-      .where('status', '==', 'COMPLETE')
-      .get();
-    const complete = query.size;
-    console.debug(`complete ${ceremony.id} ${query.docs.length}`);
-    query = await contribQuery  
-      .where('status', '==', 'WAITING')
-      .get();
-    const waiting = query.size;
-    callback({ ceremonyId, complete, waiting });
-  });
+  const complete = query.size;
+  query = await contribQuery  
+    .where('status', '==', 'WAITING')
+    .get();
+  const waiting = query.size;
+  console.debug(`complete ${ref.id} ${complete}`);
+  return {complete, waiting};
 }
 
 export async function getCeremonyContributions(id: string): Promise<ContributionSummary[]> {
@@ -161,8 +159,9 @@ export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
       querySnapshot.docChanges().forEach(docSnapshot => {
         if (docSnapshot.type === 'modified' || docSnapshot.type === 'added') {
-          var ceremony = docSnapshot.doc.data();
           console.log(`Ceremony: ${docSnapshot.doc.id}`);
+          const count = getCeremonyCount(docSnapshot.doc.ref);
+          const ceremony = {...docSnapshot.doc.data(), ...count};
           callback(ceremony);
         }
       });

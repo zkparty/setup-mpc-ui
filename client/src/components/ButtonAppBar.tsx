@@ -17,6 +17,7 @@ import {
   accentColor,
   secondAccent,
   textColor,
+  background,
 } from "../styles";
 import { Button } from '@material-ui/core';
 import Login from './Login';
@@ -24,6 +25,8 @@ import Login from './Login';
 const StyledMenu = withStyles({
   paper: {
     border: '1px solid #d3d4d5',
+    background: background,
+    color: accentColor,
   },
 })((props: MenuProps) => (
   <Menu
@@ -99,12 +102,12 @@ const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonEleme
 const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; }) => {
   return (
     <StyledMenu
-    id="customized-menu"
-    anchorEl={props.anchorEl}
-    keepMounted
-    open={Boolean(props.anchorEl)}
-    onClose={props.handleClose}
-  >
+      id="customized-menu"
+      anchorEl={props.anchorEl}
+      keepMounted
+      open={Boolean(props.anchorEl)}
+      onClose={props.handleClose}
+    >
     <StyledMenuItem>
       <ListItemIcon>
           <SettingsIcon fontSize="small" />

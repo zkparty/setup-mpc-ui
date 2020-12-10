@@ -25,7 +25,7 @@ import {
   getCeremonySummariesCached
 } from "../api/ZKPartyApi";
 import { Ceremony } from "../types/ceremony";
-import { ceremonyListener, getCeremonies, getCeremonyCounts } from "../api/FirestoreApi";
+import { ceremonyListener, getCeremonies } from "../api/FirestoreApi";
 import { AuthContext } from "./AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
@@ -135,6 +135,7 @@ function TabPanel(props: TabPanelProps) {
 const SummarySection = (props: any) => {
   const [ceremonies, setCeremonies] = useState<Ceremony[]>([]);
   const [loaded, setLoaded] = useState(false);
+  console.debug('render summary section');
 
   const findCeremonyIndex = (id: string): number => {
     return ceremonies.findIndex(val => val.id === id);
@@ -142,13 +143,21 @@ const SummarySection = (props: any) => {
 
   const updateCeremony = (ceremony: Ceremony) => {
     //console.log(`${ceremony}`);
-    const i = findCeremonyIndex(ceremony.id);
-    if (i >= 0) {
-      ceremonies[i] = ceremony;
-    } else {
-      ceremonies.push(ceremony);
+    const idx = findCeremonyIndex(ceremony.id);
+    const update = (c: Ceremony, i: number) => {
+      if (i == idx) {
+        console.debug(`updating ceremony ${c.id} ${c.complete}`);
+        return ceremony;
+      } else {
+        return c;
+      }
     }
-    setCeremonies(ceremonies);
+    if (idx >= 0) {
+      setCeremonies(prev => prev.map(update));
+    } else {
+      console.debug(`adding ceremony ${ceremony.id} ${ceremony.complete}`);
+      setCeremonies(prev => [...prev, ceremony]);
+    }
   };
 
   const refreshCeremonySummaries = () => {
@@ -156,26 +165,27 @@ const SummarySection = (props: any) => {
     ceremonyListener(updateCeremony);
   };
 
-  const updateCeremonyCounts = (c: any) => {
-    // callback for ceremony counts query
-    // returns {ceremonyId, complete, waiting}
-    console.log(`update count ${c.ceremonyId} ${c.complete}`);
-    const i = findCeremonyIndex(c.ceremonyId);
-    if (i>=0) {
-      ceremonies[i].waiting = c.waiting;
-      ceremonies[i].complete = c.complete;
-    }
-    setCeremonies(ceremonies);
-  }
+  // const updateCeremonyCounts = (c: any) => {
+  //   // callback for ceremony counts query
+  //   // returns {ceremonyId, complete, waiting}
+  //   console.log(`update count ${c.ceremonyId} ${c.complete}`);
+  //   let newCeremonies = ceremonies;
+  //   const i = findCeremonyIndex(c.ceremonyId);
+  //   if (i>=0) {
+  //     newCeremonies[i].waiting = c.waiting;
+  //     newCeremonies[i].complete = c.complete;
+  //   }
+  //   setCeremonies(newCeremonies);
+  // }
 
   useEffect(() => {
     getCeremonies()
       .then(ceremonies => {
         setCeremonies(ceremonies);
-        setLoaded(true);
-        getCeremonyCounts(updateCeremonyCounts);
         // Subscribe to ceremony updates
         refreshCeremonySummaries();
+        console.debug('getCeremonies done');
+        setLoaded(true);
       })
       .catch(() => {
         setLoaded(true);
