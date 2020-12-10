@@ -56,6 +56,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 10 minutes').onR
         };
         const age = (Date.now()/1000 - lastSeen);
         functions.logger.debug(`age ${age} s`);
+        //TODO - base this on calculated contribution duration
         if (age > 300) {
           functions.logger.info(`expired contribution ${contrib.id}`);
           await contrib.ref.update({'status': 'INVALIDATED'});
@@ -71,4 +72,28 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 10 minutes').onR
         }
       }
     });
+});
+
+// Look for ceremonies that have been prepared and have a start time prior to 
+// now, but aren't yet RUNNING. This will kick them off.
+export const CeremonyStarter = functions.pubsub.schedule('every 30 minutes').onRun(async (context) => {
+  const db = firebase.firestore();
+  const snap = await db
+    .collection("ceremonies")
+    .where('ceremonyState', '==', 'PRESELECTION')
+    .where('startTime', '<=', firebase.firestore.Timestamp.now())
+    .get();
+
+  snap.forEach(async ceremony => {
+      functions.logger.debug(`ceremony ${ceremony.id} is ready to start`);
+      await ceremony.ref.update({'ceremonyState': 'RUNNING'});
+      // add event
+      await ceremony.ref.collection('events')
+        .add({
+            eventType: 'SET_RUNNING',
+            sender: 'WATCHDOG',
+            message: `Ceremony started`,
+            timestamp: firebase.firestore.Timestamp.now(),
+          });
+  });
 });
