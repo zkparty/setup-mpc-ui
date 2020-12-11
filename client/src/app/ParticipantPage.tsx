@@ -25,7 +25,6 @@ import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant,
   ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirestoreApi";
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
-import phase2 from "workerize-loader?inline!phase2";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -193,8 +192,16 @@ export const ParticipantSection = () => {
       //  setLoading(true);
         // ignore syntax check error. Make sure to *npm link* phase2 in ../lib/pkg
         //wasm.current = await import('phase2');
-        wasm.current = phase2();
-        console.log('wasm set');
+        //const Worker = require('tiny-worker');
+        //var worker = new Worker("worker"); //, [], {esm: true});
+        //wasm.current = phase2();
+        // worker.onmessage = function (ev: { data: any; }) {
+        //   console.log(ev.data);
+        //   worker.terminate();
+        // };
+        
+        // worker.postMessage("load");
+        console.debug('wasm set');
       //}
     //} finally {
       //setLoading(false);
