@@ -98,24 +98,27 @@ self.addEventListener('message', async (event) => {
     //   contribute: ((a: Uint8Array) => any);
     // }
 
-    // await import('phase2').then(
-    //   async (wasm) => {
-    //     wasm.init();
-    //     //const module = await WebAssembly.compileStreaming(wasm);
-    //     //console.log('instantiate');
-    //     //const instance = await WebAssembly.instantiate(module);
-    //     //const p: any = wasm.exports;
-
-    //     console.log('load params');
-    //     let paramData: any = await fetch('/zk_transaction_1_2.params');
-    //     paramData =  paramData.arrayBuffer();
-    //     paramData = new Uint8Array(paramData);
-    //     console.log('Source params', paramData);
-    //     const result = wasm.contribute(paramData);
-    //     //wasm = import('phase2');
-    //     console.log('WASM module loaded');
-    //   });
+    await import('phase2').then(
+      async (phase2) => {
+        //wasm.init();
+        //const module = await WebAssembly.compileStreaming(wasm);
+        //console.log('instantiate');
+        //const instance = await WebAssembly.instantiate(module);
+        //const p: any = wasm.exports;
+        
+        console.log('load params');
+        let paramData: any = await fetch('/zk_transaction_1_2.params');
+        paramData =  paramData.arrayBuffer();
+        paramData = new Uint8Array(paramData);
+        console.log('Source params', paramData);
+        const result = phase2.contribute(paramData, new Uint8Array(64), reportProgress, setHash);
+        //wasm = import('phase2');
+        console.log('WASM module loaded');
+      });
   };
 
 });
 
+const reportProgress = (a: number, b: number) => {};
+
+const setHash = (h: string) => {};

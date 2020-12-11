@@ -408,17 +408,17 @@ export const ParticipantSection = () => {
   //  setComputeStatus({...initialComputeStatus, running: true });
   //};
 
-  // const serviceWorker = () => { 
-  //   navigator.serviceWorker.ready.then(() => {
-  //     console.log('service worker ready');
-  //     navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
-  //     navigator.serviceWorker.addEventListener('message', event => {
-  //       console.log(`message from service worker ${event.data.type}`);
-  //     });
-  //   });
-  // };
+  const serviceWorker = () => { 
+    navigator.serviceWorker.ready.then(() => {
+      console.log('service worker ready');
+      navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
+      navigator.serviceWorker.addEventListener('message', event => {
+        console.log(`message from service worker ${event.data.type}`);
+      });
+    });
+  };
 
-  //serviceWorker();
+  serviceWorker();
 
   return (
       <div className={classes.root}>
