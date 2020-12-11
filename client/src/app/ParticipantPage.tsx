@@ -42,8 +42,24 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const StyledButton = styled(Button)`
+  color: accentColor;
+  background: lighterBackground;
+  border-width: thin;
+  border-color: accentColor;
 
-const Acknowledge = ({ contribute }: { contribute: () => void}) => (<Button onClick={contribute} style={{color: 'white'}}>Launch</Button>);
+  &:hover {
+    border-color: secondAccent;
+  }
+`
+
+const Acknowledge = ({ contribute }: { contribute: () => void}) => 
+  (<div style={{ display: 'grid', paddingTop: '20px' }}>
+    <StyledButton variant='outlined' onClick={contribute} 
+      style={{color: accentColor, borderWidth: 'thin', borderColor: accentColor }}>
+      Launch
+    </StyledButton>
+   </div>);
 
 const createCeremonyEvent = (eventType: string, message: string, index: number | undefined): CeremonyEvent => {
   return {
