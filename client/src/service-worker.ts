@@ -13,7 +13,7 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
-//import * as wasm from 'phase2';
+import * as wasm from 'phase2';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -99,7 +99,7 @@ self.addEventListener('message', async (event) => {
     // }
 
     await import('phase2').then(
-      async (phase2) => {
+      async (wasm) => {
         //wasm.init();
         //const module = await WebAssembly.compileStreaming(wasm);
         //console.log('instantiate');
@@ -111,7 +111,8 @@ self.addEventListener('message', async (event) => {
         paramData =  paramData.arrayBuffer();
         paramData = new Uint8Array(paramData);
         console.log('Source params', paramData);
-        const result = phase2.contribute(paramData, new Uint8Array(64), reportProgress, setHash);
+        //console.log(`phase2 ${wasm} `);
+        const result = wasm.contribute(paramData, new Uint8Array(64), reportProgress, setHash);
         //wasm = import('phase2');
         console.log('WASM module loaded');
       });

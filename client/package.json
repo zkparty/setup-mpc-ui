@@ -4,7 +4,7 @@
   "description": "Trusted Setup multi-party computation user interface",
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "react-scripts build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "link": "npm link phase2"
@@ -28,6 +28,7 @@
     "moment": "^2.29.1",
     "node-mime": "^1.0.0",
     "notistack": "^1.0.1",
+    "phase2": "^0.0.1",
     "react": "^16.12.0",
     "react-dev-utils": "^11.0.1",
     "react-dom": "^16.12.0",
