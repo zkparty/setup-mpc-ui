@@ -98,9 +98,10 @@ self.addEventListener('message', async (event) => {
     //   contribute: ((a: Uint8Array) => any);
     // }
 
-    import('phase2').then(
-      async (wasm) => {
-        wasm.init();
+    const { contribute } = await import('phase2')
+    //.then(
+      //async ({ contribute }) => {
+        //wasm.init();
         //const module = await WebAssembly.compileStreaming(wasm);
         //console.log('instantiate');
         //const instance = await WebAssembly.instantiate(module);
@@ -111,11 +112,11 @@ self.addEventListener('message', async (event) => {
         paramData =  paramData.arrayBuffer();
         paramData = new Uint8Array(paramData);
         console.log('Source params', paramData);
-        //console.log(`phase2 ${wasm} `);
-        const result = wasm.contribute(paramData, new Uint8Array(64), reportProgress, setHash);
+        //console.log(`phase2  ${wasm.contribute} `);
+        const result = contribute(paramData, new Uint8Array(64), reportProgress, setHash);
         //wasm = import('phase2');
         console.log('WASM module loaded');
-      });
+      //});
   };
 
 });
