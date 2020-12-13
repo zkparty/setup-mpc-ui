@@ -198,7 +198,7 @@ export const ParticipantSection = () => {
       //if (!loading) {
       //  setLoading(true);
         // ignore syntax check error. Make sure to *npm link* phase2 in ../lib/pkg
-        wasm.current = require('phase2');
+        wasm.current = await import('phase2');
         //const Worker = require('tiny-worker');
         //var worker = new Worker("worker"); //, [], {esm: true});
         //wasm.current = phase2();
