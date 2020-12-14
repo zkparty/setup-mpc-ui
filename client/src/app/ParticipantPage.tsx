@@ -25,7 +25,7 @@ import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant,
   ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirestoreApi";
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
-import { runContribute } from '../worker';
+//import { runContribute } from '../worker';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -189,11 +189,14 @@ export const ParticipantSection = () => {
 
   const loadWasm = async () => {
 
-    // const instance = new Worker();
+    const instance = new Worker('phase2', { type: 'module' });
 
-    // await instance.contribute();
-    // console.debug('contribute done');
-    await runContribute();
+    instance.postMessage('LOAD_WASM', []);
+    instance.dispatchEvent(new Event('LOAD_WASM'));
+
+    //await instance.contribute();
+    console.debug(`contribute done`);
+    //await runContribute();
 
     //try {
       //if (!loading) {
