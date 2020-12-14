@@ -218,7 +218,7 @@ export const ParticipantSection = () => {
 
   const updateQueue = (update: any) => {
     contributionState.current = {...contributionState.current, ...update};
-    if (contributionState.current) {
+    if (contributionState.current) { // removes 'could be null' check
       const contrib = contributionState.current;
       if (contrib.queueIndex === contrib.currentIndex) {
         addMessage(`It's your turn to contribute`);

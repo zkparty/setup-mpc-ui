@@ -384,11 +384,11 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
                 .where("status", "in", [COMPLETE, INVALIDATED]);
 
   ceremonyQueueListenerUnsub = query.onSnapshot(querySnapshot => {0
-    console.log(`queue listener doc: ${querySnapshot.size}`);
+    //console.debug(`queue listener doc: ${querySnapshot.size}`);
     let found = false;
     querySnapshot.docChanges().forEach(async docData => {
       const cont = docData.doc.data();
-      console.log(`queue listener doc change index: ${cont.queueIndex}`);
+      console.debug(`queue listener doc change index: ${cont.queueIndex}`);
 
       if (cont.queueIndex && cont.queueIndex > lastQueueIndex) {
         lastQueueIndex = cont.queueIndex;
@@ -396,6 +396,7 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
       } 
     });
     if (found) {
+      console.debug(`new queue index ${lastQueueIndex+1}`);
       let cs = {
         currentIndex: lastQueueIndex + 1,
       }
