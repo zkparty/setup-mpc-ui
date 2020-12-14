@@ -25,7 +25,7 @@ import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant,
   ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirestoreApi";
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
-import Worker from '../worker';
+import { runContribute } from '../worker';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -193,12 +193,13 @@ export const ParticipantSection = () => {
 
     // await instance.contribute();
     // console.debug('contribute done');
+    await runContribute();
 
     //try {
       //if (!loading) {
       //  setLoading(true);
         // ignore syntax check error. Make sure to *npm link* phase2 in ../lib/pkg
-        wasm.current = await import('phase2');
+        //wasm.current = await import('phase2');
         //const Worker = require('tiny-worker');
         //var worker = new Worker("worker"); //, [], {esm: true});
         //wasm.current = phase2();
