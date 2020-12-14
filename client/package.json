@@ -25,6 +25,7 @@
     "color": "^3.1.2",
     "firebase": "^8.0.1",
     "firebase-admin": "^9.4.1",
+    "import-from-worker": "^1.0.1",
     "material-ui": "^0.20.2",
     "moment": "^2.29.1",
     "node-mime": "^1.0.0",
@@ -39,7 +40,6 @@
     "styled-components": "^5.0.0",
     "timeago.js": "^4.0.2",
     "util": "^0.12.3",
-    "wasm-worker": "^0.4.0",
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {

@@ -123,9 +123,9 @@ const reportProgress = async (count: number, totExponents: number) => {
 
 const doComputation = (wasm: any, params: Uint8Array, entropy: Buffer, setHash: (h: string) => void) => new Promise<Uint8Array>((resolve, reject) => {
   try {
-    const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
-    console.log('Updated params', newParams);
-    resolve(newParams);
+    //const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
+    //console.log('Updated params', newParams);
+    resolve(new Uint8Array(64)); //newParams);
   } catch (err) {
     reject(err);
   }
