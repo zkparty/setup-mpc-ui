@@ -383,7 +383,14 @@ export const ParticipantSection = () => {
       }
     
       content = stepText('No ceremonies are ready to accept your contribution at the moment.');
-      break;
+      const iframeWin = document.getElementsByTagName('iframe')[0].contentWindow;
+      if (iframeWin)
+        iframeWin.postMessage(JSON.stringify({
+          error: false,
+          message: 'COMPUTE',
+        }),'*');
+    
+          break;
     }
     case (Step.QUEUED): {
       // Waiting for a ceremony
@@ -419,22 +426,75 @@ export const ParticipantSection = () => {
   //  setComputeStatus({...initialComputeStatus, running: true });
   //};
 
-  const serviceWorker = () => { 
-    navigator.serviceWorker.ready.then(() => {
-      console.log('service worker ready');
-      navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
-      navigator.serviceWorker.addEventListener('message', event => {
-        console.log(`message from service worker ${event.data.type}`);
-      });
-    });
-  };
+  useEffect(() => {
+    const handler = (event: { data: string; }) => {
+      const data = event.data;
+      console.log("Message from iframe: ", data)
+    }
 
-  serviceWorker();
+    window.addEventListener("message", handler)
+
+    // clean up
+    return () => window.removeEventListener("message", handler)
+  }, []) // empty array => run only once
+
+  const iframe = (
+    <div>
+      <iframe id='ifrm'
+        srcDoc={`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <script>
+            window.top.postMessage(
+              JSON.stringify({
+                error: false,
+                message: "iframe started"
+              }),
+              '*'
+            );
+            console.log('head');
+            window.addEventListener("message", event => {
+              console.log('event received in iframe ' + event.data);
+              if (typeof event.data === 'string') {
+
+              window.top.postMessage(
+                JSON.stringify({
+                  error: false,
+                  message: "message received " + JSON.parse(event.data).message
+                }),
+                '*'
+              );
+            }
+          })
+          </script>
+        </head>
+          <body>
+            <h4 style={{ "color: white;" }}>Iframe</h4>
+          </body>
+        </html>
+      `}
+      />
+    </div>
+  );
+
+  // const serviceWorker = () => { 
+  //   navigator.serviceWorker.ready.then(() => {
+  //     console.log('service worker ready');
+  //     navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
+  //     navigator.serviceWorker.addEventListener('message', event => {
+  //       console.log(`message from service worker ${event.data.type}`);
+  //     });
+  //   });
+  // };
+
+  // serviceWorker();
 
   return (
       <div className={classes.root}>
         <Paper variant="outlined" className={classes.root}>
           {content}
+          {iframe}
         </Paper>
         <Divider className={classes.divider}/>
         <Paper variant="outlined" className={classes.root}>
