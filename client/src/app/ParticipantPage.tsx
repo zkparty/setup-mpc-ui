@@ -25,7 +25,7 @@ import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant,
   ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirestoreApi";
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
-//import { runContribute } from '../worker';
+import { LinearProgress } from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -121,16 +121,11 @@ const reportProgress = async (count: number, totExponents: number) => {
   //await  new Promise(resolve => setTimeout(resolve, 100));
 };
 
-const doComputation = (params: Uint8Array, entropy: Buffer, setHash: (h: string) => void) => new Promise<Uint8Array>((resolve, reject) => {
-  try {
-    //const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
-    //console.log('Updated params', newParams);
-    navigator.serviceWorker.controller?.postMessage({type: 'COMPUTE'});
-    resolve(new Uint8Array(64)); //newParams);
-  } catch (err) {
-    reject(err);
-  }
-});
+const startComputation = (params: Uint8Array, entropy: Buffer) => {
+  //const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
+  //console.log('Updated params', newParams);
+  navigator.serviceWorker.controller?.postMessage({type: 'COMPUTE', params, entropy});
+};
 
 const welcomeText = (
   <Typography variant="body1" align="center">
@@ -168,7 +163,7 @@ export const ParticipantSection = () => {
   const contributionState = useRef<ContributionState | null>(null);
   const hash = useRef<string>('');
   const Auth = React.useContext(AuthContext);
-  const [progress, setProgress] = React.useState();
+  const [progress, setProgress] = React.useState({count: 0, total: 0});
   const classes = useStyles();
   //const index = 1;
 
@@ -229,19 +224,53 @@ export const ParticipantSection = () => {
     }
   }
 
+  const setHash = (resultHash: string) => {
+    try {
+      console.log(`setHash: ${resultHash}`);
+      addMessage(`Hash: ${resultHash}`);
+      hash.current = resultHash;
+    } catch (err) { console.log(err.message); }
+  }  
+
   const serviceWorker = () => {
     navigator.serviceWorker.ready.then(() => {
       console.log('service worker ready');
       navigator.serviceWorker.addEventListener('message', event => {
-        const message = JSON.parse(event.data).message;
-        console.log(`message from service worker ${message}`);
-        content = (<Typography>{message}</Typography>);
-        addMessage(message);
-        setProgress(message);
+        const data = JSON.parse(event.data);
+        switch (data.type) {
+          case 'PROGRESS': {            
+            //console.log(`message from service worker ${message}`);
+            //content = (<Typography>{message}</Typography>);
+            //addMessage(message);
+            setProgress({...data});
+            break;
+          }
+          case 'HASH': { 
+            setHash(data.hash);
+            break; 
+          }
+          case 'COMPLETE': { 
+            //const result: Uint8Array = data.result;
+            setComplete(data.result);
+            break; 
+          }
+        }
       });
     });
   };
-  
+
+  const setComplete = async (newParams: Uint8Array): Promise<void> => {
+    const ceremonyId = contributionState.current?.ceremony.id || '';
+    console.log('DoComputation finished');
+    await addCeremonyEvent(ceremonyId, createCeremonyEvent(
+      "COMPUTE_CONTRIBUTION", 
+      `Contribution for participant ${contributionState.current?.queueIndex} completed OK`,
+      contributionState.current?.queueIndex
+    ));
+    addMessage(`Computation completed.`);
+    entropy.current = new Uint8Array(); // Reset now that it has been used
+    setComputeStatus({...computeStatus, computed: true, newParams});
+  };
   
   const compute = async () => {
     const { running, downloaded, started, computed, uploaded, newParams } = computeStatus;
@@ -250,6 +279,7 @@ export const ParticipantSection = () => {
 
     if (running && contributionState.current && ceremonyId) {
       if (!downloaded) {
+        // DATA DOWNLOAD
         GetParamsFile(ceremonyId, contributionState.current.lastValidIndex).then( (paramData) => {
           addCeremonyEvent(ceremonyId, createCeremonyEvent(
              "PARAMS_DOWNLOADED",
@@ -264,23 +294,17 @@ export const ParticipantSection = () => {
       }
       if (downloaded && !computed) {
         if (!started) {
+          // START COMPUTE
           console.log('running computation......');
           if (data.current) {
-            doComputation(data.current, Buffer.from(entropy.current), setHash).then(async (newParams) => {
-              console.log('DoComputation finished');
-              await addCeremonyEvent(ceremonyId, createCeremonyEvent(
-                "COMPUTE_CONTRIBUTION", 
-                `Contribution for participant ${contributionState.current?.queueIndex} completed OK`,
-                contributionState.current?.queueIndex
-              ));
-              addMessage(`Computation completed.`);
-              entropy.current = new Uint8Array(); // Reset now that it has been used
-              setComputeStatus({...computeStatus, computed: true, newParams});
-          })};
-          setComputeStatus({...computeStatus, started: true});
+            startComputation(data.current, Buffer.from(entropy.current));
+
+            setComputeStatus({...computeStatus, started: true});
+          }
         }
       }
       if (computed && !uploaded) {
+        // UPLOAD DATA
         try {
           const newIndex = contributionState.current?.queueIndex;
           const paramsFile = await UploadParams(ceremonyId, newIndex, newParams);
@@ -303,6 +327,7 @@ export const ParticipantSection = () => {
           await addOrUpdateContribution(ceremonyId, contribution);
           addMessage(`Thank you for your contribution.`)
         } finally {
+          // RETURN TO WAIT
           setComputeStatus({...computeStatus, running: false, uploaded: true, newParams: new Uint8Array()});
           //setCeremonyId(null);
           contributionState.current = null;
@@ -313,97 +338,87 @@ export const ParticipantSection = () => {
     }
   }; 
 
-  const setHash = (resultHash: string) => {
-    try {
-      console.log(`setHash: ${resultHash}`);
-      addMessage(`Hash: ${resultHash}`);
-      hash.current = resultHash;
-    } catch (err) { console.log(err.message); }
-  }
-  
   let content = (<></>);
   if (!Auth.isLoggedIn) {
     content = (<Typography>Sorry, please login to access this page</Typography>);
   } else {
     console.log(`step ${step.toString()}`);
-  switch (step) {
-    case (Step.NOT_ACKNOWLEDGED): {
-      // Display welcome text until the 'go ahead' button is clicked.
-      content = (<div>{welcomeText}<Acknowledge contribute={() => setStep(Step.ACKNOWLEDGED)} /></div>);
-      break;
-    }
-    case (Step.ACKNOWLEDGED): {
-      // After 'go ahead' clicked
-      // Display status messages for all remaining conditions
-      // Initialise - get participant ID, load wasm module
-      serviceWorker();
-      const p1 = participant.current ? undefined : getParticipant();
-      const p2 = wasm.current ? undefined : loadWasm();
-      Promise.all([p1, p2]).then(() => {
-        console.log('INITIALISED');
-        setStep(Step.INITIALISED)
-      });
-      content = stepText('Loading compute module...');
-      break;
-    }
-    case (Step.INITIALISED): {
-      // Collect entropy
-      if (entropy.current.length == 0) getEntropy();
-      content = stepText('Collecting entropy...');
-      setStep(Step.ENTROPY_COLLECTED);
-      break;
-    }
-    case (Step.ENTROPY_COLLECTED): {
-      navigator.serviceWorker.controller?.postMessage({type: 'COMPUTE'});
-
-      // start looking for a ceremony to contribute to
-      if (participant.current) ceremonyContributionListener(participant.current.uid, setContribution);
-      content = stepText('Starting listener...');
-      addMessage('Initialised.');
-      setStep(Step.WAITING);
-      break;
-    }
-    case (Step.WAITING): {
-      // Waiting for a ceremony
-      if (!computeStatus.running && contributionState.current) {
-        console.log(`contribution state: ${JSON.stringify(contributionState.current)}`);
-        if (contributionState.current.queueIndex == contributionState.current.currentIndex) {
-          console.log('ready to go');
-          setComputeStatus({...initialComputeStatus, running: true });
-        }
+    switch (step) {
+      case (Step.NOT_ACKNOWLEDGED): {
+        // Display welcome text until the 'go ahead' button is clicked.
+        content = (<div>{welcomeText}<Acknowledge contribute={() => setStep(Step.ACKNOWLEDGED)} /></div>);
+        break;
       }
-    
-      content = stepText('No ceremonies are ready to accept your contribution at the moment.');
-      break;
-    }
-    case (Step.QUEUED): {
-      // Waiting for a ceremony
-      if (!computeStatus.running && contributionState.current) {
-        console.log(`contribution state: ${JSON.stringify(contributionState.current)}`);
-        if (contributionState.current.queueIndex === contributionState.current.currentIndex) {
-          console.log('ready to go');
-          setComputeStatus({...initialComputeStatus, running: true });
-        }
-        content = queueProgressCard(contributionState.current);
+      case (Step.ACKNOWLEDGED): {
+        // After 'go ahead' clicked
+        // Display status messages for all remaining conditions
+        // Initialise - get participant ID, load wasm module
+        serviceWorker();
+        const p1 = participant.current ? undefined : getParticipant();
+        const p2 = wasm.current ? undefined : loadWasm();
+        Promise.all([p1, p2]).then(() => {
+          console.log('INITIALISED');
+          setStep(Step.INITIALISED)
+        });
+        content = stepText('Loading compute module...');
+        break;
       }
-    
-      break;
-    }
-    case (Step.RUNNING): {
-      // We have a ceremony to contribute to. Download parameters
+      case (Step.INITIALISED): {
+        // Collect entropy
+        if (entropy.current.length == 0) getEntropy();
+        content = stepText('Collecting entropy...');
+        setStep(Step.ENTROPY_COLLECTED);
+        break;
+      }
+      case (Step.ENTROPY_COLLECTED): {
+        // start looking for a ceremony to contribute to
+        if (participant.current) ceremonyContributionListener(participant.current.uid, setContribution);
+        content = stepText('Starting listener...');
+        addMessage('Initialised.');
+        setStep(Step.WAITING);
+        break;
+      }
+      case (Step.WAITING): {
+        // Waiting for a ceremony
+        if (!computeStatus.running && contributionState.current) {
+          console.log(`contribution state: ${JSON.stringify(contributionState.current)}`);
+          if (contributionState.current.queueIndex == contributionState.current.currentIndex) {
+            console.log('ready to go');
+            setComputeStatus({...initialComputeStatus, running: true });
+          }
+        }
+      
+        content = stepText('No ceremonies are ready to accept your contribution at the moment.');
+        break;
+      }
+      case (Step.QUEUED): {
+        // Waiting for a ceremony
+        if (!computeStatus.running && contributionState.current) {
+          console.log(`contribution state: ${JSON.stringify(contributionState.current)}`);
+          if (contributionState.current.queueIndex === contributionState.current.currentIndex) {
+            console.log('ready to go');
+            setComputeStatus({...initialComputeStatus, running: true });
+          }
+          content = queueProgressCard(contributionState.current);
+        }
+      
+        break;
+      }
+      case (Step.RUNNING): {
+        // We have a ceremony to contribute to. Download parameters
+        // Compute
+        // Upload
+        compute();
 
-      // Compute
+        const progressPct = progress.total > 0 ? 100 * progress.count / progress.total : 0;
 
-      // Upload
-      compute();
-
-      content = (<><CircularProgress disableShrink />{
-           !computeStatus.downloaded ? stepText('Downloading ...') 
-         : !computeStatus.computed ? stepText('Calculating ...')
-         : stepText('Uploading ...') 
-      }</>);
-      break;
-    }
+        content = (<><LinearProgress variant="determinate" value={progressPct} />{
+            !computeStatus.downloaded ? stepText('Downloading ...')
+          : !computeStatus.computed ? stepText('Calculating ...')
+          : stepText('Uploading ...') 
+        }</>);
+        break;
+      }
   }};
 
   return (

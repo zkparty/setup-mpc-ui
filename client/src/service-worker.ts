@@ -21,33 +21,52 @@ self.importScripts('./pkg/phase2/phase2.js');
 
 // @ts-ignore
 const { contribute } = wasm_bindgen;
-let sourceParams = new Uint8Array();
+//let sourceParams = new Uint8Array();
 let client: Client | any;
 async function run() {
   // @ts-ignore
   await wasm_bindgen('./pkg/phase2/phase2_bg.wasm');
 
-  let data = await fetch('./zk_transaction_1_2.params');
-  let data2 = await data.arrayBuffer()
-  sourceParams = new Uint8Array(data2);
+  // let data = await fetch('./zk_transaction_1_2.params');
+  // let data2 = await data.arrayBuffer()
+  // sourceParams = new Uint8Array(data2);
   console.debug('wasm module loaded');
 }
 
-async function compute() {
-  const result = contribute(sourceParams, new Uint8Array(64), reportProgress, setHash);
+async function compute(sourceParams: Uint8Array, entropy: Buffer) {
+  const result = contribute(sourceParams, entropy, reportProgress, setHash);
   console.log('contribute done');
-}
-
-const setHash = (h: string) => {
-  console.debug(`hash ${h}`);
-};
-const reportProgress = (a: number, b: number) => {
-  console.debug(`sw progress: ${a} of ${b}`);
   if (client)
     client.postMessage(
         JSON.stringify({
             error: false,
-            message: `progress: ${a} of ${b}`
+            type: 'COMPLETE',
+            result: result
+        }),
+    );
+}
+
+const setHash = (h: string) => {
+  console.debug(`hash ${h}`);
+  if (client)
+    client.postMessage(
+        JSON.stringify({
+            error: false,
+            type: 'HASH',
+            hash: h
+        }),
+    );
+};
+
+const reportProgress = (count: number, total: number) => {
+  console.debug(`sw progress: ${count} of ${total}`);
+  if (client)
+    client.postMessage(
+        JSON.stringify({
+            error: false,
+            type: 'PROGRESS',
+            count: count,
+            total: total
         }),
     );
 };
@@ -135,7 +154,9 @@ self.addEventListener('message', async (event) => {
 
   if (event.data && event.data.type === 'COMPUTE') {
     console.log(`COMPUTE in service-worker`);
-    compute();
+    const sourceParams = event.data.params;
+    const entropy = event.data.entropy;
+    compute(sourceParams, entropy);
   };
 
 });
