@@ -1,8 +1,7 @@
-import * as wasm from './phase2_bg.wasm';
 
-const lTextDecoder = typeof TextDecoder === 'undefined' ? require('util').TextDecoder : TextDecoder;
+let wasm;
 
-let cachedTextDecoder = new lTextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 
 cachedTextDecoder.decode();
 
@@ -100,9 +99,7 @@ export function contribute(params, entropy, report_progress, set_hash) {
     }
 }
 
-const lTextEncoder = typeof TextEncoder === 'undefined' ? require('util').TextEncoder : TextEncoder;
-
-let cachedTextEncoder = new lTextEncoder('utf-8');
+let cachedTextEncoder = new TextEncoder('utf-8');
 
 const encodeString = (typeof cachedTextEncoder.encodeInto === 'function'
     ? function (arg, view) {
@@ -159,68 +156,111 @@ function handleError(e) {
     wasm.__wbindgen_exn_store(addHeapObject(e));
 }
 
-export const __wbindgen_string_new = function(arg0, arg1) {
-    var ret = getStringFromWasm0(arg0, arg1);
-    return addHeapObject(ret);
-};
+async function load(module, imports) {
+    if (typeof Response === 'function' && module instanceof Response) {
 
-export const __wbindgen_object_drop_ref = function(arg0) {
-    takeObject(arg0);
-};
+        if (typeof WebAssembly.instantiateStreaming === 'function') {
+            try {
+                return await WebAssembly.instantiateStreaming(module, imports);
 
-export const __wbindgen_number_new = function(arg0) {
-    var ret = arg0;
-    return addHeapObject(ret);
-};
+            } catch (e) {
+                if (module.headers.get('Content-Type') != 'application/wasm') {
+                    console.warn("`WebAssembly.instantiateStreaming` failed because your server does not serve wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n", e);
 
-export const __wbg_new_59cb74e423758ede = function() {
-    var ret = new Error();
-    return addHeapObject(ret);
-};
+                } else {
+                    throw e;
+                }
+            }
+        }
 
-export const __wbg_stack_558ba5917b466edd = function(arg0, arg1) {
-    var ret = getObject(arg1).stack;
-    var ptr0 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    var len0 = WASM_VECTOR_LEN;
-    getInt32Memory0()[arg0 / 4 + 1] = len0;
-    getInt32Memory0()[arg0 / 4 + 0] = ptr0;
-};
+        const bytes = await module.arrayBuffer();
+        return await WebAssembly.instantiate(bytes, imports);
 
-export const __wbg_error_4bb6c2a97407129a = function(arg0, arg1) {
-    try {
-        console.error(getStringFromWasm0(arg0, arg1));
-    } finally {
-        wasm.__wbindgen_free(arg0, arg1);
+    } else {
+
+        const instance = await WebAssembly.instantiate(module, imports);
+
+        if (instance instanceof WebAssembly.Instance) {
+            return { instance, module };
+
+        } else {
+            return instance;
+        }
     }
-};
+}
 
-export const __wbg_log_c180b836187d3c94 = function(arg0) {
-    console.log(getObject(arg0));
-};
-
-export const __wbg_call_1ad0eb4a7ab279eb = function(arg0, arg1, arg2) {
-    try {
-        var ret = getObject(arg0).call(getObject(arg1), getObject(arg2));
+async function init(input) {
+    if (typeof input === 'undefined') {
+        input = import.meta.url.replace(/\.js$/, '_bg.wasm');
+    }
+    const imports = {};
+    imports.wbg = {};
+    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
+        var ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
-    } catch (e) {
-        handleError(e)
-    }
-};
-
-export const __wbg_call_5100c57aba7ad602 = function(arg0, arg1, arg2, arg3) {
-    try {
-        var ret = getObject(arg0).call(getObject(arg1), getObject(arg2), getObject(arg3));
+    };
+    imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
+        takeObject(arg0);
+    };
+    imports.wbg.__wbindgen_number_new = function(arg0) {
+        var ret = arg0;
         return addHeapObject(ret);
-    } catch (e) {
-        handleError(e)
+    };
+    imports.wbg.__wbg_new_59cb74e423758ede = function() {
+        var ret = new Error();
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_stack_558ba5917b466edd = function(arg0, arg1) {
+        var ret = getObject(arg1).stack;
+        var ptr0 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        getInt32Memory0()[arg0 / 4 + 1] = len0;
+        getInt32Memory0()[arg0 / 4 + 0] = ptr0;
+    };
+    imports.wbg.__wbg_error_4bb6c2a97407129a = function(arg0, arg1) {
+        try {
+            console.error(getStringFromWasm0(arg0, arg1));
+        } finally {
+            wasm.__wbindgen_free(arg0, arg1);
+        }
+    };
+    imports.wbg.__wbg_log_c180b836187d3c94 = function(arg0) {
+        console.log(getObject(arg0));
+    };
+    imports.wbg.__wbg_call_1ad0eb4a7ab279eb = function(arg0, arg1, arg2) {
+        try {
+            var ret = getObject(arg0).call(getObject(arg1), getObject(arg2));
+            return addHeapObject(ret);
+        } catch (e) {
+            handleError(e)
+        }
+    };
+    imports.wbg.__wbg_call_5100c57aba7ad602 = function(arg0, arg1, arg2, arg3) {
+        try {
+            var ret = getObject(arg0).call(getObject(arg1), getObject(arg2), getObject(arg3));
+            return addHeapObject(ret);
+        } catch (e) {
+            handleError(e)
+        }
+    };
+    imports.wbg.__wbindgen_throw = function(arg0, arg1) {
+        throw new Error(getStringFromWasm0(arg0, arg1));
+    };
+    imports.wbg.__wbindgen_rethrow = function(arg0) {
+        throw takeObject(arg0);
+    };
+
+    if (typeof input === 'string' || (typeof Request === 'function' && input instanceof Request) || (typeof URL === 'function' && input instanceof URL)) {
+        input = fetch(input);
     }
-};
 
-export const __wbindgen_throw = function(arg0, arg1) {
-    throw new Error(getStringFromWasm0(arg0, arg1));
-};
+    const { instance, module } = await load(await input, imports);
 
-export const __wbindgen_rethrow = function(arg0) {
-    throw takeObject(arg0);
-};
+    wasm = instance.exports;
+    init.__wbindgen_wasm_module = module;
+
+    return wasm;
+}
+
+export default init;
 

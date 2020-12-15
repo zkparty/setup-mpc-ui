@@ -445,7 +445,17 @@ export const ParticipantSection = () => {
         <!DOCTYPE html>
         <html>
         <head>
-          <script>
+          <script type="module">
+            import init, { contribute } from "./pkg/phase2/phase2.js";
+
+            async function run() {
+              await init();
+              console.log('run()');
+              contribute(new Uint8Array(64), new Uint8Array(64), reportProgress, setHash).then(
+                result => { console.log('contribute done'); }
+              );
+            };
+
             window.top.postMessage(
               JSON.stringify({
                 error: false,
@@ -463,12 +473,7 @@ export const ParticipantSection = () => {
               if (typeof event.data === 'string') {
                 const request = JSON.parse(event.data).message;
                 if (request === 'COMPUTE') {
-                  import('./pkg/phase2/phase2.js').then(wasm => {
-                    console.log('imported phase2');
-                    wasm.contribute(new Uint8Array(64), new Uint8Array(64), reportProgress, setHash).then(
-                      result => { console.log('contribute done'); }
-                    );
-                  });
+                  run();  
                 };
                 window.top.postMessage(
                   JSON.stringify({
@@ -477,8 +482,8 @@ export const ParticipantSection = () => {
                   }),
                   '*'
                 );
-            }
-          })
+              }
+            });          
           </script>
         </head>
           <body>
