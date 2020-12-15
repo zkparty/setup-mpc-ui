@@ -39,10 +39,10 @@ async function compute() {
 }
 
 const setHash = (h: string) => {
-  console.log(`hash ${h}`);
+  console.debug(`hash ${h}`);
 };
 const reportProgress = (a: number, b: number) => {
-  console.log(`sw progress: ${a} of ${b}`);
+  console.debug(`sw progress: ${a} of ${b}`);
   if (client)
     client.postMessage(
         JSON.stringify({

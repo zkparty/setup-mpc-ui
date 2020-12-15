@@ -157,7 +157,6 @@ const queueProgressCard = (contrib: ContributionState) => {
   </QueueProgress>
 )};
 
-
 export const ParticipantSection = () => {
   const [step, setStep] = React.useState(Step.NOT_ACKNOWLEDGED);
   const [computeStatus, setComputeStatus] = React.useState<ComputeStatus>(initialComputeStatus);
@@ -169,6 +168,7 @@ export const ParticipantSection = () => {
   const contributionState = useRef<ContributionState | null>(null);
   const hash = useRef<string>('');
   const Auth = React.useContext(AuthContext);
+  const [progress, setProgress] = React.useState();
   const classes = useStyles();
   //const index = 1;
 
@@ -229,6 +229,20 @@ export const ParticipantSection = () => {
     }
   }
 
+  const serviceWorker = () => {
+    navigator.serviceWorker.ready.then(() => {
+      console.log('service worker ready');
+      navigator.serviceWorker.addEventListener('message', event => {
+        const message = JSON.parse(event.data).message;
+        console.log(`message from service worker ${message}`);
+        content = (<Typography>{message}</Typography>);
+        addMessage(message);
+        setProgress(message);
+      });
+    });
+  };
+  
+  
   const compute = async () => {
     const { running, downloaded, started, computed, uploaded, newParams } = computeStatus;
     console.log(`compute step: ${running? 'running' : '-'} ${running && downloaded && !computed ? 'computing': running && computed && !uploaded ? 'uploaded' : 'inactive'}`);
@@ -322,6 +336,7 @@ export const ParticipantSection = () => {
       // After 'go ahead' clicked
       // Display status messages for all remaining conditions
       // Initialise - get participant ID, load wasm module
+      serviceWorker();
       const p1 = participant.current ? undefined : getParticipant();
       const p2 = wasm.current ? undefined : loadWasm();
       Promise.all([p1, p2]).then(() => {
@@ -339,6 +354,8 @@ export const ParticipantSection = () => {
       break;
     }
     case (Step.ENTROPY_COLLECTED): {
+      navigator.serviceWorker.controller?.postMessage({type: 'COMPUTE'});
+
       // start looking for a ceremony to contribute to
       if (participant.current) ceremonyContributionListener(participant.current.uid, setContribution);
       content = stepText('Starting listener...');
@@ -388,17 +405,6 @@ export const ParticipantSection = () => {
       break;
     }
   }};
-
-  const serviceWorker = () => {
-    navigator.serviceWorker.ready.then(() => {
-      console.log('service worker ready');
-      navigator.serviceWorker.addEventListener('message', event => {
-        console.log(`message from service worker ${event.data.type}`);
-      });
-    });
-  };
-
-  serviceWorker();
 
   return (
       <div className={classes.root}>
