@@ -453,18 +453,30 @@ export const ParticipantSection = () => {
               }),
               '*'
             );
+
+            const setHash = () => {};
+            const reportProgress = () => {};
+
             console.log('head');
             window.addEventListener("message", event => {
               console.log('event received in iframe ' + event.data);
               if (typeof event.data === 'string') {
-
-              window.top.postMessage(
-                JSON.stringify({
-                  error: false,
-                  message: "message received " + JSON.parse(event.data).message
-                }),
-                '*'
-              );
+                const request = JSON.parse(event.data).message;
+                if (request === 'COMPUTE') {
+                  import('./pkg/phase2/phase2.js').then(wasm => {
+                    console.log('imported phase2');
+                    wasm.contribute(new Uint8Array(64), new Uint8Array(64), reportProgress, setHash).then(
+                      result => { console.log('contribute done'); }
+                    );
+                  });
+                };
+                window.top.postMessage(
+                  JSON.stringify({
+                    error: false,
+                    message: "message received " + JSON.parse(event.data).message
+                  }),
+                  '*'
+                );
             }
           })
           </script>
