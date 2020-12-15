@@ -121,10 +121,11 @@ const reportProgress = async (count: number, totExponents: number) => {
   //await  new Promise(resolve => setTimeout(resolve, 100));
 };
 
-const doComputation = (wasm: any, params: Uint8Array, entropy: Buffer, setHash: (h: string) => void) => new Promise<Uint8Array>((resolve, reject) => {
+const doComputation = (params: Uint8Array, entropy: Buffer, setHash: (h: string) => void) => new Promise<Uint8Array>((resolve, reject) => {
   try {
     //const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
     //console.log('Updated params', newParams);
+    navigator.serviceWorker.controller?.postMessage({type: 'COMPUTE'});
     resolve(new Uint8Array(64)); //newParams);
   } catch (err) {
     reject(err);
@@ -188,36 +189,8 @@ export const ParticipantSection = () => {
   };
 
   const loadWasm = async () => {
-
-    //const instance = new Worker('phase2', { type: 'module' });
-
-    //instance.postMessage('LOAD_WASM', []);
-    //instance.dispatchEvent(new Event('LOAD_WASM'));
-
-    //await instance.contribute();
-    //console.debug(`contribute done`);
-    //await runContribute();
-
-    //try {
-      //if (!loading) {
-      //  setLoading(true);
-        // ignore syntax check error. Make sure to *npm link* phase2 in ../lib/pkg
-        //wasm.current = await import('phase2');
-        //const Worker = require('tiny-worker');
-        //var worker = new Worker("worker"); //, [], {esm: true});
-        //wasm.current = phase2();
-        // worker.onmessage = function (ev: { data: any; }) {
-        //   console.log(ev.data);
-        //   worker.terminate();
-        // };
-        serviceWorker();
-        
-        // worker.postMessage("load");
-        console.debug('wasm set');
-      //}
-    //} finally {
-      //setLoading(false);
-    //}
+    navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});        
+    console.debug('service worker inited');
   };
 
   const getEntropy = () => {
@@ -279,7 +252,7 @@ export const ParticipantSection = () => {
         if (!started) {
           console.log('running computation......');
           if (data.current) {
-            doComputation(wasm.current, data.current, Buffer.from(entropy.current), setHash).then(async (newParams) => {
+            doComputation(data.current, Buffer.from(entropy.current), setHash).then(async (newParams) => {
               console.log('DoComputation finished');
               await addCeremonyEvent(ceremonyId, createCeremonyEvent(
                 "COMPUTE_CONTRIBUTION", 
@@ -416,41 +389,16 @@ export const ParticipantSection = () => {
     }
   }};
 
-  //const run = () => {
-  //  setComputeStatus({...initialComputeStatus, running: true });
-  //};
-
-  // useEffect(() => {
-  //   const handler = (event: { data: string; }) => {
-  //     const data = event.data;
-  //     console.log("Message from iframe: ", data)
-  //   }
-
-  //   window.addEventListener("message", handler)
-
-  //   // clean up
-  //   return () => window.removeEventListener("message", handler)
-  // }, []) // empty array => run only once
-
-  const iframe = (
-    <div>
-      <iframe id='ifrm'
-        src='./compute.html'
-      />
-      <CircularProgress disableShrink />
-    </div>
-  );
-
-  const serviceWorker = () => { 
+  const serviceWorker = () => {
     navigator.serviceWorker.ready.then(() => {
       console.log('service worker ready');
-      navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
       navigator.serviceWorker.addEventListener('message', event => {
         console.log(`message from service worker ${event.data.type}`);
       });
     });
   };
 
+  serviceWorker();
 
   return (
       <div className={classes.root}>
