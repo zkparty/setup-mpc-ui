@@ -210,6 +210,7 @@ export const ParticipantSection = () => {
         //   console.log(ev.data);
         //   worker.terminate();
         // };
+        serviceWorker();
         
         // worker.postMessage("load");
         console.debug('wasm set');
@@ -383,14 +384,7 @@ export const ParticipantSection = () => {
       }
     
       content = stepText('No ceremonies are ready to accept your contribution at the moment.');
-      const iframeWin = document.getElementsByTagName('iframe')[0].contentWindow;
-      if (iframeWin)
-        iframeWin.postMessage(JSON.stringify({
-          error: false,
-          message: 'COMPUTE',
-        }),'*');
-    
-          break;
+      break;
     }
     case (Step.QUEUED): {
       // Waiting for a ceremony
@@ -457,7 +451,6 @@ export const ParticipantSection = () => {
     });
   };
 
-  serviceWorker();
 
   return (
       <div className={classes.root}>

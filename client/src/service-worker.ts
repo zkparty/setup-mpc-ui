@@ -17,7 +17,35 @@ import { StaleWhileRevalidate } from 'workbox-strategies';
 
 declare const self: ServiceWorkerGlobalScope;
 
-self.importScripts('/pkg/phase2/phase2.js');
+self.importScripts('./pkg/phase2/phase2.js');
+
+// @ts-ignore
+const { contribute } = wasm_bindgen;
+async function run() {
+  // @ts-ignore
+  await wasm_bindgen('./pkg/phase2/phase2_bg.wasm');
+
+  let data = await fetch('./zk_transaction_1_2.params');
+  let data2 = await data.arrayBuffer()
+  let data3 = new Uint8Array(data2)
+  const result = contribute(data3, new Uint8Array(64), reportProgress, setHash);
+  console.log('contribute done');
+}
+
+const setHash = (h: string) => {
+  console.log(`hash ${h}`);
+};
+const reportProgress = (a: number, b: number) => {
+  console.log(`sw progress: ${a} of ${b}`);
+  // window.top.postMessage(
+  //     JSON.stringify({
+  //         error: false,
+  //         message: `progress: ${a} of ${b}`
+  //     }),
+  //     '*'
+  // );
+};
+
 
 clientsClaim();
 
@@ -81,34 +109,6 @@ self.addEventListener('message', (event) => {
   }
 });
 
-async function run() {
-  //const wasm: any = await import("http://localhost:5000/pkg/phase2/phase2.js");
-
-  // @ts-ignore
-  await self.init();
-  console.log('run()');
-  let data = await fetch('./zk_transaction_1_2.params');
-  let dataAb = await data.arrayBuffer();
-  let dataU = new Uint8Array(dataAb);
-  // @ts-ignore
-  const result = self.contribute(dataU, new Uint8Array(64), reportProgress, setHash);
-  console.log('contribute done');
-};
-
-const setHash = (h: string) => {
-  console.log(`hash ${h}`);
-};
-const reportProgress = (a: number, b: number) => {
-  console.log(`progress: ${a} of ${b}`);
-  window.top.postMessage(
-      JSON.stringify({
-          error: false,
-          message: `progress: ${a} of ${b}`
-      }),
-      '*'
-  );
-};
-
 
 
 // Any other custom service worker logic can go here.
@@ -147,6 +147,7 @@ self.addEventListener('message', async (event) => {
         // //wasm = import('phase2');
         // console.log('WASM module loaded');
       //});
+
       run();
   };
 

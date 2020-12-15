@@ -1,18 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <script type="module">
-    import init, { contribute } from "./pkg/phase2/phase2.js";
+    importScripts( "./pkg/phase2/phase2.js");
+    const { add } = wasm_bindgen;
 
     async function run() {
-        await init();
+        await wasm.init();
         console.log('run()');
         let data = await fetch('./zk_transaction_1_2.params');
         data = await data.arrayBuffer()
         data = new Uint8Array(data)
-        contribute(data, new Uint8Array(64), reportProgress, setHash).then(
-        result => { console.log('contribute done'); }
-        );
+        const result = wasm.contribute(data, new Uint8Array(64), reportProgress, setHash);
+        console.log('contribute done');
     };
 
     window.top.postMessage(
@@ -54,9 +50,3 @@
         );
         }
     });          
-    </script>
-</head>
-    <body>
-        <h4 >Iframe</h4>
-    </body>
-</html>

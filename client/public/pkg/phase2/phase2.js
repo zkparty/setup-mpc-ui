@@ -1,36 +1,38 @@
+let wasm_bindgen;
+(function() {
+    const __exports = {};
+    let wasm;
 
-let wasm;
+    let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 
-let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+    cachedTextDecoder.decode();
 
-cachedTextDecoder.decode();
-
-let cachegetUint8Memory0 = null;
-function getUint8Memory0() {
-    if (cachegetUint8Memory0 === null || cachegetUint8Memory0.buffer !== wasm.memory.buffer) {
-        cachegetUint8Memory0 = new Uint8Array(wasm.memory.buffer);
+    let cachegetUint8Memory0 = null;
+    function getUint8Memory0() {
+        if (cachegetUint8Memory0 === null || cachegetUint8Memory0.buffer !== wasm.memory.buffer) {
+            cachegetUint8Memory0 = new Uint8Array(wasm.memory.buffer);
+        }
+        return cachegetUint8Memory0;
     }
-    return cachegetUint8Memory0;
-}
 
-function getStringFromWasm0(ptr, len) {
-    return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
-}
+    function getStringFromWasm0(ptr, len) {
+        return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
+    }
 
-const heap = new Array(32).fill(undefined);
+    const heap = new Array(32).fill(undefined);
 
-heap.push(undefined, null, true, false);
+    heap.push(undefined, null, true, false);
 
-let heap_next = heap.length;
+    let heap_next = heap.length;
 
-function addHeapObject(obj) {
-    if (heap_next === heap.length) heap.push(heap.length + 1);
-    const idx = heap_next;
-    heap_next = heap[idx];
+    function addHeapObject(obj) {
+        if (heap_next === heap.length) heap.push(heap.length + 1);
+        const idx = heap_next;
+        heap_next = heap[idx];
 
-    heap[idx] = obj;
-    return idx;
-}
+        heap[idx] = obj;
+        return idx;
+    }
 
 function getObject(idx) { return heap[idx]; }
 
@@ -81,7 +83,7 @@ function getArrayU8FromWasm0(ptr, len) {
 * @param {Function} set_hash
 * @returns {Uint8Array}
 */
-export function contribute(params, entropy, report_progress, set_hash) {
+__exports.contribute = function(params, entropy, report_progress, set_hash) {
     try {
         var ptr0 = passArray8ToWasm0(params, wasm.__wbindgen_malloc);
         var len0 = WASM_VECTOR_LEN;
@@ -97,7 +99,7 @@ export function contribute(params, entropy, report_progress, set_hash) {
         heap[stack_pointer++] = undefined;
         heap[stack_pointer++] = undefined;
     }
-}
+};
 
 let cachedTextEncoder = new TextEncoder('utf-8');
 
@@ -191,7 +193,13 @@ async function load(module, imports) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = import.meta.url.replace(/\.js$/, '_bg.wasm');
+        let src;
+        if (typeof document === 'undefined') {
+            src = location.href;
+        } else {
+            src = document.currentScript.src;
+        }
+        input = src.replace(/\.js$/, '_bg.wasm');
     }
     const imports = {};
     imports.wbg = {};
@@ -262,5 +270,6 @@ async function init(input) {
     return wasm;
 }
 
-export default init;
+wasm_bindgen = Object.assign(init, __exports);
 
+})();
