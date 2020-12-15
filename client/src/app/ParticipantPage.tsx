@@ -189,13 +189,13 @@ export const ParticipantSection = () => {
 
   const loadWasm = async () => {
 
-    const instance = new Worker('phase2', { type: 'module' });
+    //const instance = new Worker('phase2', { type: 'module' });
 
-    instance.postMessage('LOAD_WASM', []);
-    instance.dispatchEvent(new Event('LOAD_WASM'));
+    //instance.postMessage('LOAD_WASM', []);
+    //instance.dispatchEvent(new Event('LOAD_WASM'));
 
     //await instance.contribute();
-    console.debug(`contribute done`);
+    //console.debug(`contribute done`);
     //await runContribute();
 
     //try {
@@ -426,92 +426,43 @@ export const ParticipantSection = () => {
   //  setComputeStatus({...initialComputeStatus, running: true });
   //};
 
-  useEffect(() => {
-    const handler = (event: { data: string; }) => {
-      const data = event.data;
-      console.log("Message from iframe: ", data)
-    }
+  // useEffect(() => {
+  //   const handler = (event: { data: string; }) => {
+  //     const data = event.data;
+  //     console.log("Message from iframe: ", data)
+  //   }
 
-    window.addEventListener("message", handler)
+  //   window.addEventListener("message", handler)
 
-    // clean up
-    return () => window.removeEventListener("message", handler)
-  }, []) // empty array => run only once
+  //   // clean up
+  //   return () => window.removeEventListener("message", handler)
+  // }, []) // empty array => run only once
 
   const iframe = (
     <div>
       <iframe id='ifrm'
-        srcDoc={`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <script type="module">
-            import init, { contribute } from "./pkg/phase2/phase2.js";
-
-            async function run() {
-              await init();
-              console.log('run()');
-              contribute(new Uint8Array(64), new Uint8Array(64), reportProgress, setHash).then(
-                result => { console.log('contribute done'); }
-              );
-            };
-
-            window.top.postMessage(
-              JSON.stringify({
-                error: false,
-                message: "iframe started"
-              }),
-              '*'
-            );
-
-            const setHash = () => {};
-            const reportProgress = () => {};
-
-            console.log('head');
-            window.addEventListener("message", event => {
-              console.log('event received in iframe ' + event.data);
-              if (typeof event.data === 'string') {
-                const request = JSON.parse(event.data).message;
-                if (request === 'COMPUTE') {
-                  run();  
-                };
-                window.top.postMessage(
-                  JSON.stringify({
-                    error: false,
-                    message: "message received " + JSON.parse(event.data).message
-                  }),
-                  '*'
-                );
-              }
-            });          
-          </script>
-        </head>
-          <body>
-            <h4 style={{ "color: white;" }}>Iframe</h4>
-          </body>
-        </html>
-      `}
+        src='./compute.html'
       />
+      <CircularProgress disableShrink />
     </div>
   );
 
-  // const serviceWorker = () => { 
-  //   navigator.serviceWorker.ready.then(() => {
-  //     console.log('service worker ready');
-  //     navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
-  //     navigator.serviceWorker.addEventListener('message', event => {
-  //       console.log(`message from service worker ${event.data.type}`);
-  //     });
-  //   });
-  // };
+  const serviceWorker = () => { 
+    navigator.serviceWorker.ready.then(() => {
+      console.log('service worker ready');
+      navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
+      navigator.serviceWorker.addEventListener('message', event => {
+        console.log(`message from service worker ${event.data.type}`);
+      });
+    });
+  };
 
-  // serviceWorker();
+  serviceWorker();
 
   return (
       <div className={classes.root}>
         <Paper variant="outlined" className={classes.root}>
-          {content}
-          {iframe}
+          {content}         
         </Paper>
         <Divider className={classes.divider}/>
         <Paper variant="outlined" className={classes.root}>

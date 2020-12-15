@@ -13,9 +13,11 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
-//import * as wasm from 'phase2';
+//import init, { contribute } from "./pkg/phase2/phase2.js";
 
 declare const self: ServiceWorkerGlobalScope;
+
+self.importScripts('/pkg/phase2/phase2.js');
 
 clientsClaim();
 
@@ -79,7 +81,35 @@ self.addEventListener('message', (event) => {
   }
 });
 
-//let wasm;
+async function run() {
+  //const wasm: any = await import("http://localhost:5000/pkg/phase2/phase2.js");
+
+  // @ts-ignore
+  await self.init();
+  console.log('run()');
+  let data = await fetch('./zk_transaction_1_2.params');
+  let dataAb = await data.arrayBuffer();
+  let dataU = new Uint8Array(dataAb);
+  // @ts-ignore
+  const result = self.contribute(dataU, new Uint8Array(64), reportProgress, setHash);
+  console.log('contribute done');
+};
+
+const setHash = (h: string) => {
+  console.log(`hash ${h}`);
+};
+const reportProgress = (a: number, b: number) => {
+  console.log(`progress: ${a} of ${b}`);
+  window.top.postMessage(
+      JSON.stringify({
+          error: false,
+          message: `progress: ${a} of ${b}`
+      }),
+      '*'
+  );
+};
+
+
 
 // Any other custom service worker logic can go here.
 self.addEventListener('message', async (event) => {
@@ -98,7 +128,7 @@ self.addEventListener('message', async (event) => {
     //   contribute: ((a: Uint8Array) => any);
     // }
 
-    const { contribute } = await import('phase2')
+    //const { contribute } = await import('phase2')
     //.then(
       //async ({ contribute }) => {
         //wasm.init();
@@ -107,20 +137,17 @@ self.addEventListener('message', async (event) => {
         //const instance = await WebAssembly.instantiate(module);
         //const p: any = wasm.exports;
         
-        console.log('load params');
-        let paramData: any = await fetch('/zk_transaction_1_2.params');
-        paramData =  paramData.arrayBuffer();
-        paramData = new Uint8Array(paramData);
-        console.log('Source params', paramData);
-        //console.log(`phase2  ${wasm.contribute} `);
-        const result = contribute(paramData, new Uint8Array(64), reportProgress, setHash);
-        //wasm = import('phase2');
-        console.log('WASM module loaded');
+        // console.log('load params');
+        // let paramData: any = await fetch('/zk_transaction_1_2.params');
+        // paramData =  paramData.arrayBuffer();
+        // paramData = new Uint8Array(paramData);
+        // console.log('Source params', paramData);
+        // //console.log(`phase2  ${wasm.contribute} `);
+        // const result = contribute(paramData, new Uint8Array(64), reportProgress, setHash);
+        // //wasm = import('phase2');
+        // console.log('WASM module loaded');
       //});
+      run();
   };
 
 });
-
-const reportProgress = (a: number, b: number) => {};
-
-const setHash = (h: string) => {};
