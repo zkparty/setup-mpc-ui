@@ -1,7 +1,7 @@
 import { GetParamsFile, UploadParams } from "../api/FileApi";
 import { CeremonyEvent, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
 
-import { addCeremonyEvent, addOrUpdateContribution } from "../api/FirestoreApi";
+import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant } from "../api/FirestoreApi";
 
 export enum Step {
     NOT_ACKNOWLEDGED,
@@ -99,7 +99,7 @@ export const computeStateReducer = (state: any, action: any) => {
             state.contributionState = {...state.contributionState, startTime: Date.now()};
             state.computeStatus = {...state.computeStatus, running: true, downloading: true};
             state.step = Step.RUNNING;
-            startDownload(action.contributionState.ceremony.id, state.contributionState.lastValidIndex, action.dispatch);
+            startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, action.dispatch);
             break;
         }
         case 'DOWNLOADED': {
@@ -180,8 +180,16 @@ export const computeStateReducer = (state: any, action: any) => {
             break;
         }
         case 'SET_STEP': {
-            state.step = action.data;
-            break;
+            console.debug(`step updated ${action.data}`);
+            //state.step = action.data;
+            switch (action.data) {
+                case Step.ACKNOWLEDGED: {
+                    startServiceWorker(action.dispatch);
+                    break;
+                }
+            }
+            return {...state, step: action.data}
+            //break;
         }
         case 'SET_CEREMONY': {
             state.contributionState = action.data;
@@ -192,10 +200,22 @@ export const computeStateReducer = (state: any, action: any) => {
         }
         case 'UPDATE_QUEUE': {
             state.contributionState = {...state.contributionState, ...action.data};
+            if (state.contributionState.queueIndex == state.contributionState.currentIndex) {
+                action.unsub(); // unsubscribe to the queue listener
+                // Start the computation
+                action.dispatch({
+                    type: 'START_COMPUTE',
+                    ceremonyId: state.contributionState.ceremony.id,
+                    index: state.contributionState.queueIndex,
+                    dispatch: action.dispatch,
+                  });          
+            }
             break;
         }
         case 'SET_PARTICIPANT': {
+            console.debug(`set participant ${action.data}`)
             state.participant = action.data;
+            addOrUpdateParticipant(action.data);
             break;
         }
         case 'SET_ENTROPY': {
@@ -203,6 +223,7 @@ export const computeStateReducer = (state: any, action: any) => {
             break;
         }
     }
+    console.debug(`state after reducer ${state.step}`);
     return state;
 }
 
@@ -234,6 +255,14 @@ export const startServiceWorker = (dispatch: (a: any) => void) => {
     });
 };
 
+export const loadWasm = async () => {
+    if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
+        console.debug('service worker initialised');
+    } else {
+        console.log('Do not have controller!');
+    }
+};
 
 const startDownload = (ceremonyId: string, index: number, dispatch: (a: any) => void) => {
     // DATA DOWNLOAD

@@ -21,7 +21,7 @@ import { addOrUpdateParticipant, ceremonyContributionListener,
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
 import { LinearProgress } from "@material-ui/core";
-import { newParticipant, computeStateReducer, Step, startServiceWorker, initialState } from './ComputeStateManager';
+import { newParticipant, computeStateReducer, Step, startServiceWorker, initialState, loadWasm } from './ComputeStateManager';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -58,7 +58,6 @@ const Acknowledge = ({ contribute }: { contribute: () => void}) =>
     </StyledButton>
    </div>);
 
-
 const welcomeText = (
   <Typography variant="body1" align="center">
   Welcome to zkparty. This page will allow you to participate in a ceremony. Click to your commence your contribution. 
@@ -81,16 +80,11 @@ export const ParticipantSection = () => {
   const classes = useStyles();
 
   const { step, computeStatus, messages, entropy, participant, contributionState } = state;
+  console.debug(`step is ${step}`);
 
   const getParticipant = async () => {
     console.log(`uid: ${Auth.authUser.uid}`);
     dispatch({ type: 'SET_PARTICIPANT', data: newParticipant(Auth.authUser.uid)});
-    await addOrUpdateParticipant(participant);
-  };
-
-  const loadWasm = async () => {
-    navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
-    console.debug('service worker inited');
   };
 
   const getEntropy = () => {
@@ -101,7 +95,12 @@ export const ParticipantSection = () => {
   const addMessage = (msg: string) => {
     dispatch({type: 'ADD_MESSAGE', message: msg});
   }
-
+  
+  const handleClick = () => {
+    dispatch({type: 'SET_STEP', data: Step.ACKNOWLEDGED, dispatch});
+  }
+  
+  
   const setContribution = (cs: ContributionState) => {
     // Only accept new tasks if we're waiting
     if (step !== Step.RUNNING && step !== Step.QUEUED) {
@@ -119,21 +118,12 @@ export const ParticipantSection = () => {
     dispatch({
       type: 'UPDATE_QUEUE',
       data: update,
+      dispatch,
+      unsub: ceremonyQueueListenerUnsub,
     });
-    if (contributionState) {
-      if (contributionState.queueIndex === contributionState.currentIndex) {
-        if (ceremonyQueueListenerUnsub) ceremonyQueueListenerUnsub(); // Stop listening for updates
-        dispatch({
-          type: 'START_COMPUTE',
-          ceremonyId: contributionState.ceremony.id,
-          index: contributionState.queueIndex,
-          dispatch: dispatch,
-        });
-      }
-    }
   }
   
-  const compute = async () => {
+  const logState =  () => {
     const { running,  downloaded,  computed,  uploaded } = computeStatus;
     console.log(`compute step: ${running? 'running' : '-' 
     } ${running && !downloaded  ? 'downloading' :
@@ -150,20 +140,19 @@ export const ParticipantSection = () => {
     switch (step) {
       case (Step.NOT_ACKNOWLEDGED): {
         // Display welcome text until the 'go ahead' button is clicked.
-        content = (<div>{welcomeText}<Acknowledge contribute={() => dispatch({type: 'SET_STEP', data: Step.ACKNOWLEDGED})} /></div>);
+        content = (<div>{welcomeText}<Acknowledge contribute={handleClick} /></div>);
         break;
       }
       case (Step.ACKNOWLEDGED): {
         // After 'go ahead' clicked
         // Display status messages for all remaining conditions
         // Initialise - get participant ID, load wasm module
-        startServiceWorker(dispatch);
-        const p1 = participant ? undefined : getParticipant();
-        const p2 = loadWasm();
-        Promise.all([p1, p2]).then(() => {
-          console.debug('INITIALISED');
-          dispatch({type: 'SET_STEP', data: Step.INITIALISED});
-        });
+        if (!participant) {
+          getParticipant().then(() => {
+            console.debug('INITIALISED');
+            dispatch({type: 'SET_STEP', data: Step.INITIALISED});
+          });
+        }
         content = stepText('Loading compute module...');
         break;
       }
@@ -189,15 +178,15 @@ export const ParticipantSection = () => {
       }
       case (Step.QUEUED): {
         // Waiting for a ceremony
-        if (!computeStatus.running && contributionState) {
+        if (contributionState) {
           console.debug(`contribution state: ${JSON.stringify(contributionState)}`);
-          if (contributionState.queueIndex === contributionState.currentIndex) {
-            console.log('ready to go');
-            dispatch({
-              type: 'START_COMPUTE', 
-              ceremonyId: contributionState.ceremony.id,
-              index: contributionState.queueIndex});
-          }
+          // if (contributionState.queueIndex === contributionState.currentIndex) {
+          //   console.debug('ready to go');
+          //   dispatch({
+          //     type: 'START_COMPUTE', 
+          //     ceremonyId: contributionState.ceremony.id,
+          //     index: contributionState.queueIndex});
+          // }
           content = queueProgressCard(contributionState);
         }      
         break;
@@ -206,7 +195,7 @@ export const ParticipantSection = () => {
         // We have a ceremony to contribute to. Download parameters
         // Compute
         // Upload
-        compute();
+        logState();
 
         const progressPct = state.progress.total > 0 ? 100 * state.progress.count / state.progress.total : 0;
 
