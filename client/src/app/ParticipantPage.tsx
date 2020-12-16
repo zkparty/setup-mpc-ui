@@ -88,20 +88,26 @@ const createContributionSummary = (participantId: string, status: ParticipantSta
 
 interface ComputeStatus {
   running: boolean,
+  downloading: boolean,
   downloaded: boolean,
   started: boolean,
   computed: boolean,
+  cleanup: boolean,
   newParams: Uint8Array,
   uploaded: boolean,
+  progress: { count: number, total: number},
 };
 
 const initialComputeStatus: ComputeStatus = {
   running: false,
+  downloading: false,
   downloaded: false,
   started: false,
   computed: false,
-  newParams: new Uint8Array(),
+  cleanup: false,
   uploaded: false,
+  newParams: new Uint8Array(),
+  progress: {count: 0, total: 0},
 }
 
 const newParticipant = (uid: string): Participant => {
@@ -115,11 +121,6 @@ const newParticipant = (uid: string): Participant => {
     computeProgress: 0,
   }
 }
-
-const reportProgress = async (count: number, totExponents: number) => {
-  console.log(`progress: ${count} of ${totExponents}`);
-  //await  new Promise(resolve => setTimeout(resolve, 100));
-};
 
 const startComputation = (params: Uint8Array, entropy: Buffer) => {
   //const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
@@ -163,14 +164,10 @@ export const ParticipantSection = () => {
   const contributionState = useRef<ContributionState | null>(null);
   const hash = useRef<string>('');
   const Auth = React.useContext(AuthContext);
-  const [progress, setProgress] = React.useState({count: 0, total: 0});
   const classes = useStyles();
-  //const index = 1;
 
   const addMessage = (msg: string) => {
-    const newMessages = messages;
-    newMessages.push(msg);
-    setMessages(newMessages);
+    setMessages(messages => [...messages, msg]);
   }
 
   const clearMessages = () => {
@@ -190,7 +187,7 @@ export const ParticipantSection = () => {
 
   const getEntropy = () => {
     entropy.current = new Uint8Array(64).map(() => Math.random() * 256);
-    console.log(`entropy set`);
+    console.debug(`entropy set`);
   };
 
   const setContribution = (cs: ContributionState) => {
@@ -218,7 +215,7 @@ export const ParticipantSection = () => {
         ));
         if (ceremonyQueueListenerUnsub) ceremonyQueueListenerUnsub(); // Stop listening for updates
         contrib.startTime = Date.now();
-        setComputeStatus({...computeStatus, running: true});
+        setComputeStatus(status => {return {...status, running: true}});
         setStep(Step.RUNNING);
       }
     }
@@ -226,7 +223,7 @@ export const ParticipantSection = () => {
 
   const setHash = (resultHash: string) => {
     try {
-      console.log(`setHash: ${resultHash}`);
+      console.debug(`setHash: ${resultHash}`);
       addMessage(`Hash: ${resultHash}`);
       hash.current = resultHash;
     } catch (err) { console.log(err.message); }
@@ -240,9 +237,7 @@ export const ParticipantSection = () => {
         switch (data.type) {
           case 'PROGRESS': {            
             //console.log(`message from service worker ${message}`);
-            //content = (<Typography>{message}</Typography>);
-            //addMessage(message);
-            setProgress({...data});
+            setComputeStatus(status => {return {...status, progress: {...data}}});
             break;
           }
           case 'HASH': { 
@@ -260,25 +255,28 @@ export const ParticipantSection = () => {
   };
 
   const setComplete = async (newParams: Uint8Array): Promise<void> => {
-    const ceremonyId = contributionState.current?.ceremony.id || '';
-    console.log('DoComputation finished');
-    await addCeremonyEvent(ceremonyId, createCeremonyEvent(
-      "COMPUTE_CONTRIBUTION", 
-      `Contribution for participant ${contributionState.current?.queueIndex} completed OK`,
-      contributionState.current?.queueIndex
-    ));
-    addMessage(`Computation completed.`);
-    entropy.current = new Uint8Array(); // Reset now that it has been used
-    setComputeStatus({...computeStatus, computed: true, newParams});
+    //const ceremonyId = contributionState.current?.ceremony.id || '';
+    console.log(`Computation finished ${newParams.length}`);
+    setComputeStatus( status => {
+      return {
+        ...status, 
+        computed: true, 
+        newParams, 
+        progress: {count: computeStatus.progress.total, total: computeStatus.progress.total}
+    }});
   };
   
   const compute = async () => {
-    const { running, downloaded, started, computed, uploaded, newParams } = computeStatus;
-    console.log(`compute step: ${running? 'running' : '-'} ${running && downloaded && !computed ? 'computing': running && computed && !uploaded ? 'uploaded' : 'inactive'}`);
+    const { running, downloading, downloaded, started, computed, cleanup, uploaded, newParams } = computeStatus;
+    console.log(`compute step: ${running? 'running' : '-' 
+    } ${running && !downloaded  ? 'downloading' :
+        running && downloaded && !computed ? 'computing' : 
+        running && computed && !uploaded ? 'uploading' : 
+        'inactive'}`);
     const ceremonyId = contributionState.current?.ceremony.id;
 
     if (running && contributionState.current && ceremonyId) {
-      if (!downloaded) {
+      if (!downloaded && !downloading) {
         // DATA DOWNLOAD
         GetParamsFile(ceremonyId, contributionState.current.lastValidIndex).then( (paramData) => {
           addCeremonyEvent(ceremonyId, createCeremonyEvent(
@@ -289,21 +287,30 @@ export const ParticipantSection = () => {
           console.log('Source params', paramData);
           data.current = paramData;
           addMessage(`Parameters downloaded.`);
-          setComputeStatus({...computeStatus, downloaded: true});
-        })
-      }
-      if (downloaded && !computed) {
-        if (!started) {
-          // START COMPUTE
-          console.log('running computation......');
-          if (data.current) {
-            startComputation(data.current, Buffer.from(entropy.current));
+          setComputeStatus(status => {return {...status, downloaded: true}});
+        });
+        setComputeStatus(status => {return {...status, downloading: true}});
 
-            setComputeStatus({...computeStatus, started: true});
-          }
+      }
+      if (downloaded && !computed && !started) {
+        // START COMPUTE
+        console.log('running computation......');
+        if (data.current) {
+          startComputation(data.current, Buffer.from(entropy.current));
+          setComputeStatus(status => {return {...status, started: true}});
         }
       }
-      if (computed && !uploaded) {
+      if (computed && !cleanup) {
+        await addCeremonyEvent(ceremonyId, createCeremonyEvent(
+          "COMPUTE_CONTRIBUTION", 
+          `Contribution for participant ${contributionState.current?.queueIndex} completed OK`,
+          contributionState.current?.queueIndex
+        ));
+        entropy.current = new Uint8Array(); // Reset now that it has been used
+        addMessage(`Computation completed.`);
+        setComputeStatus(status => {return {...status, cleanup: true}});
+      }
+      if (computed && cleanup && !uploaded) {
         // UPLOAD DATA
         try {
           const newIndex = contributionState.current?.queueIndex;
@@ -410,13 +417,13 @@ export const ParticipantSection = () => {
         // Upload
         compute();
 
-        const progressPct = progress.total > 0 ? 100 * progress.count / progress.total : 0;
+        const progressPct = computeStatus.progress.total > 0 ? 100 * computeStatus.progress.count / computeStatus.progress.total : 0;
 
-        content = (<><LinearProgress variant="determinate" value={progressPct} />{
+        content = (<>{
             !computeStatus.downloaded ? stepText('Downloading ...')
           : !computeStatus.computed ? stepText('Calculating ...')
           : stepText('Uploading ...') 
-        }</>);
+        }<LinearProgress variant="determinate" value={progressPct} /></>);
         break;
       }
   }};

@@ -34,8 +34,9 @@ async function run() {
 }
 
 async function compute(sourceParams: Uint8Array, entropy: Buffer) {
-  const result = contribute(sourceParams, entropy, reportProgress, setHash);
-  console.log('contribute done');
+  try {
+  const result: Uint8Array = contribute(sourceParams, entropy, reportProgress, setHash);
+  console.debug(`contribute done ${result.length}`);
   if (client)
     client.postMessage(
         JSON.stringify({
@@ -44,6 +45,14 @@ async function compute(sourceParams: Uint8Array, entropy: Buffer) {
             result: result
         }),
     );
+  } catch (err) {
+    if (client) client.postMessage(
+      JSON.stringify({
+        error: true,
+        message: err.message,
+      }),
+    );
+  }
 }
 
 const setHash = (h: string) => {
