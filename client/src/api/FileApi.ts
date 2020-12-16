@@ -8,7 +8,7 @@ const FormatParamsFileName = (index: number): string => {
     return `ph2_${padIndex}.params`;
 };
 
-export const GetParamsFile = async (ceremonyId: string, index: number): Promise<any> => {
+export const getParamsFile = async (ceremonyId: string, index: number): Promise<Uint8Array> => {
     const storage = firebase.storage();
 
     const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${FormatParamsFileName(index)}`);

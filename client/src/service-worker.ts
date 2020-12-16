@@ -35,15 +35,15 @@ async function run() {
 
 async function compute(sourceParams: Uint8Array, entropy: Buffer) {
   try {
-  const result: Uint8Array = contribute(sourceParams, entropy, reportProgress, setHash);
-  console.debug(`contribute done ${result.length}`);
-  if (client)
-    client.postMessage(
-        JSON.stringify({
-            error: false,
-            type: 'COMPLETE',
-            result: result
-        }),
+    const result: Uint8Array = contribute(sourceParams, entropy, reportProgress, setHash);
+    console.debug(`contribute done ${result.length}`);
+    if (client)
+      client.postMessage(
+          JSON.stringify({
+              error: false,
+              type: 'COMPLETE',
+              result: result
+          }),
     );
   } catch (err) {
     if (client) client.postMessage(

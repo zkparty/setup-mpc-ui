@@ -1,4 +1,4 @@
-import { GetParamsFile, UploadParams } from "../api/FileApi";
+import { getParamsFile, UploadParams } from "../api/FileApi";
 import { CeremonyEvent, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant } from "../api/FirestoreApi";
@@ -50,6 +50,7 @@ export const newParticipant = (uid: string): Participant => {
 };
 
 interface ComputeStatus {
+    ready: boolean,
     running: boolean,
     downloading: boolean,
     downloaded: boolean,
@@ -62,6 +63,7 @@ interface ComputeStatus {
   };
   
 export const initialComputeStatus: ComputeStatus = {
+    ready: false,
     running: false,
     downloading: false,
     downloaded: false,
@@ -86,64 +88,64 @@ export const initialState = {
 }
 
 export const computeStateReducer = (state: any, action: any) => {
+    let newState = {...state};
     switch (action.type) {
         case 'START_COMPUTE': {
             const msg = `It's your turn to contribute`;
-            state.messages = [...state.messages, msg];
+            newState.messages = [...state.messages, msg];
             // Create event in Firestore
             addCeremonyEvent(action.ceremonyId, createCeremonyEvent(
                 "START_CONTRIBUTION",
                 `Starting turn for index ${action.index}`,
                 action.index
             ));
-            state.contributionState = {...state.contributionState, startTime: Date.now()};
-            state.computeStatus = {...state.computeStatus, running: true, downloading: true};
-            state.step = Step.RUNNING;
+            newState.contributionState = {...state.contributionState, startTime: Date.now()};
+            newState.computeStatus = {...state.computeStatus, running: true, downloading: true};
+            //newState.step = Step.RUNNING;
             startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, action.dispatch);
-            break;
+            return newState;
         }
         case 'DOWNLOADED': {
+            console.log('Source params', action.data);
             addCeremonyEvent(action.ceremonyId, createCeremonyEvent(
                 "PARAMS_DOWNLOADED",
                 `Parameters from participant ${state.contributionState.lastValidIndex} downloaded OK`,
                 state.contributionState.queueIndex
             ));
-            console.log('Source params', action.paramData);
-            state.paramData = action.paramData;
+            newState.paramData = action.data;
             const msg = `Parameters downloaded.`;
-            state.messages = [...state.messages, msg];
-            state.computeStatus = {...state.computeStatus, downloaded: true, started: true};
-            startComputation(action.paramData, state.entropy);
+            newState.messages = [...state.messages, msg];
+            newState.computeStatus = {...state.computeStatus, downloaded: true, started: true};
+            startComputation(action.data, state.entropy);
             console.debug('running computation......');
-            break;
+            return newState;
         }
         case 'PROGRESS_UPDATE': {
-            state.progress = action.data;
-            break;
+            return {...state, progress: action.data};
         }
         case 'SET_HASH': {
             const msg = `Hash: ${action.data}`;
-            state.messages = [...state.messages, msg];
-            state.hash = action.data;
+            newState.messages = [...state.messages, msg];
+            newState.hash = action.data;
             break;
         }
         case 'COMPUTE_DONE': {
             console.log(`Computation finished ${action.newParams.length}`);
-            state.computeStatus = {
+            newState.computeStatus = {
                 ...state.computeStatus,
                 computed: true,
                 newParams: action.newParams,
             };
-            state.progress = {count: 100, total: 100};
+            newState.progress = {count: 100, total: 100};
             addCeremonyEvent(state.contributionState.ceremony.id, createCeremonyEvent(
                 "COMPUTE_CONTRIBUTION", 
                 `Contribution for participant ${state.contributionState.queueIndex} completed OK`,
                 state.contributionState.queueIndex
             ));
-            state.entropy = new Uint8Array(); // Reset now that it has been used
-            state.paramData = new Uint8Array();
+            newState.entropy = new Uint8Array(); // Reset now that it has been used
+            newState.paramData = new Uint8Array();
             const msg = `Computation completed.`;
-            state.messages = [...state.messages, msg];
+            newState.messages = [...state.messages, msg];
             startUpload(state.contributationState.ceremony.id, state.contributionState.queueIndex, action.newParams, action.dispatch);
             break;
         }
@@ -154,7 +156,7 @@ export const computeStateReducer = (state: any, action: any) => {
                 state.contributionState.queueIndex
             ));
             let msg = `Parameters uploaded.`;
-            state.messages = [...state.messages, msg];
+            newState.messages = [...state.messages, msg];
             const duration = ((Date.now()) - state.contributionState.startTime) / 1000;
             const contribution = createContributionSummary(
                  state.participant ? state.participant.uid : '??',
@@ -166,17 +168,17 @@ export const computeStateReducer = (state: any, action: any) => {
             );
             addOrUpdateContribution(state.contributionState.ceremony.id, contribution);
             msg = `Thank you for your contribution.`;
-            state.messages = [...state.messages, msg];
+            newState.messages = [...state.messages, msg];
 
             // Clean up and return to waiting
-            state.computeStatus = initialComputeStatus;
-            state.contributionState = null;
-            state.hash = '';
-            state.step = Step.WAITING;
+            newState.computeStatus = initialComputeStatus;
+            newState.contributionState = null;
+            newState.hash = '';
+            newState.step = Step.WAITING;
             break;
         }
         case 'ADD_MESSAGE': {
-            state.messages = [...state.messages, action.message];
+            newState.messages = [...state.messages, action.message];
             break;
         }
         case 'SET_STEP': {
@@ -192,39 +194,35 @@ export const computeStateReducer = (state: any, action: any) => {
             //break;
         }
         case 'SET_CEREMONY': {
-            state.contributionState = action.data;
+            newState.contributionState = action.data;
             const msg = `You are in the queue for ceremony ${action.data.ceremony.title}`;
-            state.messages = [...state.messages, msg];
-            state.step = Step.QUEUED;
-            break;
+            newState.messages = [...state.messages, msg];
+            newState.step = Step.QUEUED;
+            return newState;
         }
         case 'UPDATE_QUEUE': {
-            state.contributionState = {...state.contributionState, ...action.data};
-            if (state.contributionState.queueIndex == state.contributionState.currentIndex) {
-                action.unsub(); // unsubscribe to the queue listener
-                // Start the computation
-                action.dispatch({
-                    type: 'START_COMPUTE',
-                    ceremonyId: state.contributionState.ceremony.id,
-                    index: state.contributionState.queueIndex,
-                    dispatch: action.dispatch,
-                  });          
+            newState.contributionState = {...state.contributionState, ...action.data};
+            if (newState.contributionState.queueIndex == newState.contributionState.currentIndex) {
+                console.debug(`we are go`);
+                action.unsub(); // unsubscribe from the queue listener
+                newState.step = Step.RUNNING;
+                newState.computeStatus.ready = true;
             }
-            break;
+            return newState;
         }
         case 'SET_PARTICIPANT': {
             console.debug(`set participant ${action.data}`)
-            state.participant = action.data;
+            newState.participant = action.data;
             addOrUpdateParticipant(action.data);
-            break;
+            return newState;
         }
         case 'SET_ENTROPY': {
-            state.entropy = action.data;
+            newState.entropy = action.data;
             break;
         }
     }
-    console.debug(`state after reducer ${state.step}`);
-    return state;
+    console.debug(`state after reducer ${newState.step}`);
+    return newState;
 }
 
 export const startServiceWorker = (dispatch: (a: any) => void) => {
@@ -266,18 +264,26 @@ export const loadWasm = async () => {
 
 const startDownload = (ceremonyId: string, index: number, dispatch: (a: any) => void) => {
     // DATA DOWNLOAD
-    GetParamsFile(ceremonyId, index).then( (paramData) => {
+    console.debug(`getting data ${ceremonyId} ${index}`);
+    getParamsFile(ceremonyId, index).then( paramData => {
+        console.debug(`downloaded ${paramData?.length}`);
         dispatch({
             type: 'DOWNLOADED',
             data: paramData,
         });
-    });
+    }).catch(err => 
+        {console.error(err.message);}
+    );
 };
 
 export const startComputation = (params: Uint8Array, entropy: Buffer) => {
     //const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
-    //console.log('Updated params', newParams);
-    navigator.serviceWorker.controller?.postMessage({type: 'COMPUTE', params, entropy});
+    console.log(`params ${params.length}`);
+    navigator.serviceWorker.controller?.postMessage({
+        type: 'COMPUTE', 
+        params, 
+        entropy
+    });
 };
 
 const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispatch: (a: any) => void) => {

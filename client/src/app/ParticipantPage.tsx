@@ -95,7 +95,7 @@ export const ParticipantSection = () => {
   const addMessage = (msg: string) => {
     dispatch({type: 'ADD_MESSAGE', message: msg});
   }
-  
+
   const handleClick = () => {
     dispatch({type: 'SET_STEP', data: Step.ACKNOWLEDGED, dispatch});
   }
@@ -118,7 +118,6 @@ export const ParticipantSection = () => {
     dispatch({
       type: 'UPDATE_QUEUE',
       data: update,
-      dispatch,
       unsub: ceremonyQueueListenerUnsub,
     });
   }
@@ -196,6 +195,16 @@ export const ParticipantSection = () => {
         // Compute
         // Upload
         logState();
+
+        if (computeStatus.ready && !computeStatus.running) {
+          // Start the computation
+          dispatch({
+            type: 'START_COMPUTE',
+            ceremonyId: contributionState.ceremony.id,
+            index: contributionState.queueIndex,
+            dispatch,
+          });          
+        }
 
         const progressPct = state.progress.total > 0 ? 100 * state.progress.count / state.progress.total : 0;
 
