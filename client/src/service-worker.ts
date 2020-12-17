@@ -13,9 +13,74 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
-import * as wasm from 'phase2';
+//import init, { contribute } from "./pkg/phase2/phase2.js";
 
 declare const self: ServiceWorkerGlobalScope;
+
+self.importScripts('./pkg/phase2/phase2.js');
+
+// @ts-ignore
+const { contribute } = wasm_bindgen;
+//let sourceParams = new Uint8Array();
+let client: Client | any;
+async function run() {
+  // @ts-ignore
+  await wasm_bindgen('./pkg/phase2/phase2_bg.wasm');
+
+  // let data = await fetch('./zk_transaction_1_2.params');
+  // let data2 = await data.arrayBuffer()
+  // sourceParams = new Uint8Array(data2);
+  console.debug('wasm module loaded');
+}
+
+function compute(sourceParams: Uint8Array, entropy: Uint8Array) {
+  try {
+    console.debug(`compute starting. params: ${sourceParams.length} ${entropy.length}`);
+    const result: Uint8Array = contribute(sourceParams, entropy, reportProgress, setHash);
+    console.debug(`contribute done ${result.length}`);
+    if (client) {
+      const message = {
+          error: false,
+          type: 'COMPLETE',
+          result: result.buffer
+      };
+      client.postMessage(message, [result.buffer])
+    };
+  } catch (err) {
+    if (client) client.postMessage(
+      JSON.stringify({
+        error: true,
+        message: err.message,
+      }),
+    );
+  }
+}
+
+const setHash = (h: string) => {
+  console.debug(`hash ${h}`);
+  if (client)
+    client.postMessage(
+        JSON.stringify({
+            error: false,
+            type: 'HASH',
+            hash: h
+        }),
+    );
+};
+
+const reportProgress = (count: number, total: number) => {
+  console.debug(`sw progress: ${count} of ${total}`);
+  if (client)
+    client.postMessage(
+        JSON.stringify({
+            error: false,
+            type: 'PROGRESS',
+            count: count,
+            total: total
+        }),
+    );
+};
+
 
 clientsClaim();
 
@@ -79,7 +144,7 @@ self.addEventListener('message', (event) => {
   }
 });
 
-//let wasm;
+
 
 // Any other custom service worker logic can go here.
 self.addEventListener('message', async (event) => {
@@ -92,30 +157,18 @@ self.addEventListener('message', async (event) => {
   };
 
   if (event.data && event.data.type === 'LOAD_WASM') {
-    console.log(`LOAD_WASM in service-worker`);
+    console.log(`LOAD_WASM in service-worker ${event.source}`);
+    client = event.source;
+    run();
+  };
 
-    // interface Phase2 {
-    //   contribute: ((a: Uint8Array) => any);
-    // }
-
-    // await import('phase2').then(
-    //   async (wasm) => {
-    //     wasm.init();
-    //     //const module = await WebAssembly.compileStreaming(wasm);
-    //     //console.log('instantiate');
-    //     //const instance = await WebAssembly.instantiate(module);
-    //     //const p: any = wasm.exports;
-
-    //     console.log('load params');
-    //     let paramData: any = await fetch('/zk_transaction_1_2.params');
-    //     paramData =  paramData.arrayBuffer();
-    //     paramData = new Uint8Array(paramData);
-    //     console.log('Source params', paramData);
-    //     const result = wasm.contribute(paramData);
-    //     //wasm = import('phase2');
-    //     console.log('WASM module loaded');
-    //   });
+  if (event.data && event.data.type === 'COMPUTE') {
+    console.log(`COMPUTE in service-worker ${JSON.stringify(event.data)}`);
+    
+    const sourceParams = new Uint8Array(event.data.params);
+    const entropy = new Uint8Array(event.data.entropy);
+    console.debug(`lengths: ${sourceParams.length} ${entropy.length}`);
+    compute(sourceParams, entropy);
   };
 
 });
-

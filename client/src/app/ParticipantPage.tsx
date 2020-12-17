@@ -1,8 +1,6 @@
-import { useEffect, Fragment } from "react";
-import React, { useState, useReducer, useRef } from "react";
+import React, { useReducer } from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
-import { GetParamsFile, UploadParams } from "../api/FileApi";0
 import { AuthContext } from "../app/AuthContext";
 
 import {
@@ -11,20 +9,19 @@ import {
   textColor,
   PageContainer,
   lighterBackground,
-  SectionContainer,
-  CeremonyTitle
 } from "../styles";
-import { CeremonyEvent, ContributionState, ContributionSummary, Participant, ParticipantState } from "./../types/ceremony";
+import { ContributionState } from "./../types/ceremony";
 import Button from "@material-ui/core/Button";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import VirtualList from "./../components/MessageList";
 import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
-import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, 
-  ceremonyContributionListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirestoreApi";
+import { addOrUpdateParticipant, ceremonyContributionListener, 
+  ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirestoreApi";
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
+import { LinearProgress } from "@material-ui/core";
+import { newParticipant, computeStateReducer, Step, startServiceWorker, initialState, loadWasm } from './ComputeStateManager';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -61,89 +58,11 @@ const Acknowledge = ({ contribute }: { contribute: () => void}) =>
     </StyledButton>
    </div>);
 
-const createCeremonyEvent = (eventType: string, message: string, index: number | undefined): CeremonyEvent => {
-  return {
-    sender: "PARTICIPANT",
-    index,
-    eventType,
-    timestamp: new Date(),
-    message,
-    acknowledged: false,
-  };
-};
-
-const createContributionSummary = (participantId: string, status: ParticipantState, paramsFile: string, index: number, hash: string, duration: number): ContributionSummary => {
-  return {
-    lastSeen: new Date(),
-    hash,
-    paramsFile,
-    index,
-    participantId,
-    status,
-    timeCompleted: new Date(),
-    duration,
-  }
-};
-
-interface ComputeStatus {
-  running: boolean,
-  downloaded: boolean,
-  started: boolean,
-  computed: boolean,
-  newParams: Uint8Array,
-  uploaded: boolean,
-};
-
-const initialComputeStatus: ComputeStatus = {
-  running: false,
-  downloaded: false,
-  started: false,
-  computed: false,
-  newParams: new Uint8Array(),
-  uploaded: false,
-}
-
-const newParticipant = (uid: string): Participant => {
-  return {
-    address: '',
-    uid,
-    tier: 1,
-    online: true,
-    addedAt: new Date(),
-    state: "WAITING",
-    computeProgress: 0,
-  }
-}
-
-const reportProgress = async (count: number, totExponents: number) => {
-  console.log(`progress: ${count} of ${totExponents}`);
-  //await  new Promise(resolve => setTimeout(resolve, 100));
-};
-
-const doComputation = (wasm: any, params: Uint8Array, entropy: Buffer, setHash: (h: string) => void) => new Promise<Uint8Array>((resolve, reject) => {
-  try {
-    const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
-    console.log('Updated params', newParams);
-    resolve(newParams);
-  } catch (err) {
-    reject(err);
-  }
-});
-
 const welcomeText = (
   <Typography variant="body1" align="center">
   Welcome to zkparty. This page will allow you to participate in a ceremony. Click to your commence your contribution. 
   </Typography>);
 
-enum Step {
-  NOT_ACKNOWLEDGED,
-  ACKNOWLEDGED,
-  INITIALISED,
-  ENTROPY_COLLECTED,
-  WAITING,
-  QUEUED,
-  RUNNING,
-}
 
 const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
 
@@ -155,266 +74,152 @@ const queueProgressCard = (contrib: ContributionState) => {
   </QueueProgress>
 )};
 
-
 export const ParticipantSection = () => {
-  const [step, setStep] = React.useState(Step.NOT_ACKNOWLEDGED);
-  const [computeStatus, setComputeStatus] = React.useState<ComputeStatus>(initialComputeStatus);
-  const [messages, setMessages] = useState<string[]>([]);
-  const wasm = useRef<any | null>(null);
-  const data = useRef<Uint8Array | null>(null);
-  const entropy = useRef(new Uint8Array());
-  const participant = useRef<Participant | null>(null);
-  const contributionState = useRef<ContributionState | null>(null);
-  const hash = useRef<string>('');
+  const [state, dispatch] = useReducer(computeStateReducer, initialState);
   const Auth = React.useContext(AuthContext);
   const classes = useStyles();
-  //const index = 1;
 
-  const addMessage = (msg: string) => {
-    const newMessages = messages;
-    newMessages.push(msg);
-    setMessages(newMessages);
-  }
-
-  const clearMessages = () => {
-      setMessages([]);
-  }
-
+  const { step, computeStatus, messages, entropy, participant, contributionState } = state;
+  
   const getParticipant = async () => {
     console.log(`uid: ${Auth.authUser.uid}`);
-    participant.current = newParticipant(Auth.authUser.uid);
-    await addOrUpdateParticipant(participant.current);
-  };
-
-  const loadWasm = async () => {
-    //try {
-      //if (!loading) {
-      //  setLoading(true);
-        // ignore syntax check error. Make sure to *npm link* phase2 in ../lib/pkg
-        wasm.current = await import('phase2');
-        console.log('wasm set');
-      //}
-    //} finally {
-      //setLoading(false);
-    //}
+    dispatch({ type: 'SET_PARTICIPANT', data: newParticipant(Auth.authUser.uid)});
   };
 
   const getEntropy = () => {
-    entropy.current = new Uint8Array(64).map(() => Math.random() * 256);
-    console.log(`entropy set`);
+    dispatch({type: 'SET_ENTROPY', data: new Uint8Array(64).map(() => Math.random() * 256)});
+    console.debug(`entropy set`);
   };
 
+  const addMessage = (msg: string) => {
+    dispatch({type: 'ADD_MESSAGE', message: msg});
+  }
+
+  const handleClick = () => {
+    dispatch({type: 'SET_STEP', data: Step.ACKNOWLEDGED, dispatch});
+  }
+  
+  
   const setContribution = (cs: ContributionState) => {
     // Only accept new tasks if we're waiting
     if (step !== Step.RUNNING && step !== Step.QUEUED) {
-      contributionState.current = cs;
-      addMessage(`You are in the queue for ceremony ${cs.ceremony.title}`);
+      dispatch({
+        type: 'SET_CEREMONY',
+        data: cs,
+      });
       ceremonyQueueListener(cs.ceremony.id, updateQueue);
-      setStep(Step.QUEUED);
     } else {
       console.log(`Contribution candidate received while running another. ${step}`);
     }
   }
 
   const updateQueue = (update: any) => {
-    contributionState.current = {...contributionState.current, ...update};
-    if (contributionState.current) { // removes 'could be null' check
-      const contrib = contributionState.current;
-      if (contrib.queueIndex === contrib.currentIndex) {
-        addMessage(`It's your turn to contribute`);
-        addCeremonyEvent(contrib.ceremony.id, createCeremonyEvent(
-          "START_CONTRIBUTION",
-          `Starting turn for index ${contrib.currentIndex}`,
-          contrib.queueIndex
-        ));
-        if (ceremonyQueueListenerUnsub) ceremonyQueueListenerUnsub(); // Stop listening for updates
-        contrib.startTime = Date.now();
-        setComputeStatus({...computeStatus, running: true});
-        setStep(Step.RUNNING);
-      }
-    }
-  }
-
-  const compute = async () => {
-    const { running, downloaded, started, computed, uploaded, newParams } = computeStatus;
-    console.log(`compute step: ${running? 'running' : '-'} ${running && downloaded && !computed ? 'computing': running && computed && !uploaded ? 'uploaded' : 'inactive'}`);
-    const ceremonyId = contributionState.current?.ceremony.id;
-
-    if (running && contributionState.current && ceremonyId) {
-      if (!downloaded) {
-        GetParamsFile(ceremonyId, contributionState.current.lastValidIndex).then( (paramData) => {
-          addCeremonyEvent(ceremonyId, createCeremonyEvent(
-             "PARAMS_DOWNLOADED",
-             `Parameters from participant ${contributionState.current?.lastValidIndex} downloaded OK`,
-             contributionState.current?.queueIndex
-          ));
-          console.log('Source params', paramData);
-          data.current = paramData;
-          addMessage(`Parameters downloaded.`);
-          setComputeStatus({...computeStatus, downloaded: true});
-        })
-      }
-      if (downloaded && !computed) {
-        if (!started) {
-          console.log('running computation......');
-          if (data.current) {
-            doComputation(wasm.current, data.current, Buffer.from(entropy.current), setHash).then(async (newParams) => {
-              console.log('DoComputation finished');
-              await addCeremonyEvent(ceremonyId, createCeremonyEvent(
-                "COMPUTE_CONTRIBUTION", 
-                `Contribution for participant ${contributionState.current?.queueIndex} completed OK`,
-                contributionState.current?.queueIndex
-              ));
-              addMessage(`Computation completed.`);
-              entropy.current = new Uint8Array(); // Reset now that it has been used
-              setComputeStatus({...computeStatus, computed: true, newParams});
-          })};
-          setComputeStatus({...computeStatus, started: true});
-        }
-      }
-      if (computed && !uploaded) {
-        try {
-          const newIndex = contributionState.current?.queueIndex;
-          const paramsFile = await UploadParams(ceremonyId, newIndex, newParams);
-          // Add event to notify status and params file name
-          await addCeremonyEvent(ceremonyId, createCeremonyEvent(
-            "PARAMS_UPLOADED", 
-            `Parameters for participant ${newIndex} uploaded to ${paramsFile}`,
-            contributionState.current?.queueIndex
-          ));
-          addMessage(`Parameters uploaded.`);
-          const duration = ((Date.now()) - contributionState.current?.startTime) / 1000;
-          const contribution = createContributionSummary(
-             participant.current ? participant.current.uid : '??',
-             "COMPLETE", 
-             paramsFile, 
-             newIndex, 
-             hash.current,
-             duration
-            );
-          await addOrUpdateContribution(ceremonyId, contribution);
-          addMessage(`Thank you for your contribution.`)
-        } finally {
-          setComputeStatus({...computeStatus, running: false, uploaded: true, newParams: new Uint8Array()});
-          //setCeremonyId(null);
-          contributionState.current = null;
-          hash.current = '';
-          setStep(Step.WAITING);
-        }
-      }
-    }
-  }; 
-
-  const setHash = (resultHash: string) => {
-    try {
-      console.log(`setHash: ${resultHash}`);
-      addMessage(`Hash: ${resultHash}`);
-      hash.current = resultHash;
-    } catch (err) { console.log(err.message); }
+    dispatch({
+      type: 'UPDATE_QUEUE',
+      data: update,
+      unsub: ceremonyQueueListenerUnsub,
+    });
   }
   
+  const logState =  () => {
+    const { running,  downloaded,  computed,  uploaded } = computeStatus;
+    console.log(`compute step: ${running? 'running' : '-' 
+    } ${running && !downloaded  ? 'downloading' :
+        running && downloaded && !computed ? 'computing' : 
+        running && computed && !uploaded ? 'uploading' : 
+        'inactive'}`);
+  }; 
+
   let content = (<></>);
   if (!Auth.isLoggedIn) {
     content = (<Typography>Sorry, please login to access this page</Typography>);
   } else {
-    console.log(`step ${step.toString()}`);
-  switch (step) {
-    case (Step.NOT_ACKNOWLEDGED): {
-      // Display welcome text until the 'go ahead' button is clicked.
-      content = (<div>{welcomeText}<Acknowledge contribute={() => setStep(Step.ACKNOWLEDGED)} /></div>);
-      break;
-    }
-    case (Step.ACKNOWLEDGED): {
-      // After 'go ahead' clicked
-      // Display status messages for all remaining conditions
-      // Initialise - get participant ID, load wasm module
-      const p1 = participant.current ? undefined : getParticipant();
-      const p2 = wasm.current ? undefined : loadWasm();
-      Promise.all([p1, p2]).then(() => {
-        console.log('INITIALISED');
-        setStep(Step.INITIALISED)
-      });
-      content = stepText('Loading compute module...');
-      break;
-    }
-    case (Step.INITIALISED): {
-      // Collect entropy
-      if (entropy.current.length == 0) getEntropy();
-      content = stepText('Collecting entropy...');
-      setStep(Step.ENTROPY_COLLECTED);
-      break;
-    }
-    case (Step.ENTROPY_COLLECTED): {
-      // start looking for a ceremony to contribute to
-      if (participant.current) ceremonyContributionListener(participant.current.uid, setContribution);
-      content = stepText('Starting listener...');
-      addMessage('Initialised.');
-      setStep(Step.WAITING);
-      break;
-    }
-    case (Step.WAITING): {
-      // Waiting for a ceremony
-      if (!computeStatus.running && contributionState.current) {
-        console.log(`contribution state: ${JSON.stringify(contributionState.current)}`);
-        if (contributionState.current.queueIndex == contributionState.current.currentIndex) {
-          console.log('ready to go');
-          setComputeStatus({...initialComputeStatus, running: true });
-        }
+    console.debug(`step ${step.toString()}`);
+    switch (step) {
+      case (Step.NOT_ACKNOWLEDGED): {
+        // Display welcome text until the 'go ahead' button is clicked.
+        content = (<div>{welcomeText}<Acknowledge contribute={handleClick} /></div>);
+        break;
       }
-    
-      content = stepText('No ceremonies are ready to accept your contribution at the moment.');
-      break;
-    }
-    case (Step.QUEUED): {
-      // Waiting for a ceremony
-      if (!computeStatus.running && contributionState.current) {
-        console.log(`contribution state: ${JSON.stringify(contributionState.current)}`);
-        if (contributionState.current.queueIndex === contributionState.current.currentIndex) {
-          console.log('ready to go');
-          setComputeStatus({...initialComputeStatus, running: true });
+      case (Step.ACKNOWLEDGED): {
+        // After 'go ahead' clicked
+        // Display status messages for all remaining conditions
+        // Initialise - get participant ID, load wasm module
+        if (!participant) {
+          getParticipant().then(() => {
+            console.debug('INITIALISED');
+            dispatch({type: 'SET_STEP', data: Step.INITIALISED});
+          });
         }
-        content = queueProgressCard(contributionState.current);
+        content = stepText('Loading compute module...');
+        break;
       }
-    
-      break;
-    }
-    case (Step.RUNNING): {
-      // We have a ceremony to contribute to. Download parameters
+      case (Step.INITIALISED): {
+        // Collect entropy
+        if (entropy.length == 0) getEntropy();
+        content = stepText('Collecting entropy...');
+        dispatch({type: 'SET_STEP', data: Step.ENTROPY_COLLECTED});
+        break;
+      }
+      case (Step.ENTROPY_COLLECTED): {
+        // start looking for a ceremony to contribute to
+        if (participant) ceremonyContributionListener(participant.uid, setContribution);
+        content = stepText('Starting listener...');
+        addMessage('Initialised.');
+        dispatch({type: 'SET_STEP', data: Step.WAITING});
+        break;
+      }
+      case (Step.WAITING): {
+        // Waiting for a ceremony      
+        content = stepText('No ceremonies are ready to accept your contribution at the moment.');
+        break;
+      }
+      case (Step.QUEUED): {
+        // Waiting for a ceremony
+        if (contributionState) {
+          console.debug(`contribution state: ${JSON.stringify(contributionState)}`);
+          // if (contributionState.queueIndex === contributionState.currentIndex) {
+          //   console.debug('ready to go');
+          //   dispatch({
+          //     type: 'START_COMPUTE', 
+          //     ceremonyId: contributionState.ceremony.id,
+          //     index: contributionState.queueIndex});
+          // }
+          content = queueProgressCard(contributionState);
+        }      
+        break;
+      }
+      case (Step.RUNNING): {
+        // We have a ceremony to contribute to. Download parameters
+        // Compute
+        // Upload
+        logState();
 
-      // Compute
+        if (computeStatus.ready && !computeStatus.running) {
+          // Start the computation
+          dispatch({
+            type: 'START_COMPUTE',
+            ceremonyId: contributionState.ceremony.id,
+            index: contributionState.queueIndex,
+            dispatch,
+          });          
+        }
 
-      // Upload
-      compute();
+        const progressPct = state.progress.total > 0 ? 100 * state.progress.count / state.progress.total : 0;
 
-      content = (<><CircularProgress disableShrink />{
-           !computeStatus.downloaded ? stepText('Downloading ...') 
-         : !computeStatus.computed ? stepText('Calculating ...')
-         : stepText('Uploading ...') 
-      }</>);
-      break;
-    }
+        content = (<>{
+            !computeStatus.downloaded ? stepText('Downloading ...')
+          : !computeStatus.computed ? stepText('Calculating ...')
+          : stepText('Uploading ...') 
+        }<LinearProgress variant="determinate" value={progressPct} /></>);
+        break;
+      }
   }};
-
-  //const run = () => {
-  //  setComputeStatus({...initialComputeStatus, running: true });
-  //};
-
-  // const serviceWorker = () => { 
-  //   navigator.serviceWorker.ready.then(() => {
-  //     console.log('service worker ready');
-  //     navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
-  //     navigator.serviceWorker.addEventListener('message', event => {
-  //       console.log(`message from service worker ${event.data.type}`);
-  //     });
-  //   });
-  // };
-
-  //serviceWorker();
 
   return (
       <div className={classes.root}>
         <Paper variant="outlined" className={classes.root}>
-          {content}
+          {content}         
         </Paper>
         <Divider className={classes.divider}/>
         <Paper variant="outlined" className={classes.root}>

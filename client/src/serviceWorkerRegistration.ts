@@ -58,6 +58,8 @@ export function register(config?: Config) {
 }
 
 function registerValidSW(swUrl: string, config?: Config) {
+  //navigator.serviceWorker.register('phase2', { type: 'module' });
+
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {

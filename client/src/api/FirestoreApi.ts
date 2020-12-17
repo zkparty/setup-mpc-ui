@@ -23,6 +23,7 @@ const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
 
 const contributionConverter: firebase.firestore.FirestoreDataConverter<ContributionSummary> = {
   toFirestore: (c: ContributionSummary) => {
+    c.hash = c.hash || '#error';
     return c;
   },
   fromFirestore: (
