@@ -87,12 +87,17 @@ export const initialState = {
     hash: '',    
 }
 
+const addMessage = (state: any, message: string) => {
+    const msg = new Date().toLocaleTimeString() + ' ' + message;
+    return {...state, messages: [...state.messages, msg]};
+}
+
 export const computeStateReducer = (state: any, action: any) => {
     let newState = {...state};
     switch (action.type) {
         case 'START_COMPUTE': {
             const msg = `It's your turn to contribute`;
-            newState.messages = [...state.messages, msg];
+            newState = addMessage(state, msg);
             // Create event in Firestore
             addCeremonyEvent(action.ceremonyId, createCeremonyEvent(
                 "START_CONTRIBUTION",
@@ -114,7 +119,7 @@ export const computeStateReducer = (state: any, action: any) => {
             ));
             newState.paramData = action.data;
             const msg = `Parameters downloaded.`;
-            newState.messages = [...state.messages, msg];
+            newState = addMessage(newState, msg);
             newState.computeStatus = {...state.computeStatus, downloaded: true, started: true};
             startComputation(action.data, state.entropy);
             console.debug('running computation......');
@@ -124,10 +129,17 @@ export const computeStateReducer = (state: any, action: any) => {
             return {...state, progress: action.data};
         }
         case 'SET_HASH': {
-            const msg = `Hash: ${action.data}`;
-            newState.messages = [...state.messages, msg];
-            newState.hash = action.data;
-            break;
+            let h = '';
+            let separator = '';
+            for (let i = 0; i<action.hash.length; i+=8) {
+                const s = action.hash.slice(i, i+8);
+                h = h.concat(separator, s);
+                separator = ' ';
+            }
+            const msg = `Hash: ${h}`;
+            newState = addMessage(state, msg);
+            newState.hash = action.hash;
+            return newState;
         }
         case 'COMPUTE_DONE': {
             console.log(`Computation finished ${action.newParams.length}`);
@@ -145,9 +157,9 @@ export const computeStateReducer = (state: any, action: any) => {
             newState.entropy = new Uint8Array(); // Reset now that it has been used
             newState.paramData = new Uint8Array();
             const msg = `Computation completed.`;
-            newState.messages = [...state.messages, msg];
-            startUpload(state.contributationState.ceremony.id, state.contributionState.queueIndex, action.newParams, action.dispatch);
-            break;
+            newState = addMessage(newState, msg);
+            startUpload(state.contributionState.ceremony.id, state.contributionState.queueIndex, action.newParams, action.dispatch);
+            return newState;
         }
         case 'UPLOADED': {
             addCeremonyEvent(state.contributionState.ceremony.id, createCeremonyEvent(
@@ -156,7 +168,8 @@ export const computeStateReducer = (state: any, action: any) => {
                 state.contributionState.queueIndex
             ));
             let msg = `Parameters uploaded.`;
-            newState.messages = [...state.messages, msg];
+            newState = addMessage(state, msg);
+            //newState.messages = [...state.messages, msg];
             const duration = ((Date.now()) - state.contributionState.startTime) / 1000;
             const contribution = createContributionSummary(
                  state.participant ? state.participant.uid : '??',
@@ -168,17 +181,17 @@ export const computeStateReducer = (state: any, action: any) => {
             );
             addOrUpdateContribution(state.contributionState.ceremony.id, contribution);
             msg = `Thank you for your contribution.`;
-            newState.messages = [...state.messages, msg];
+            newState = addMessage(newState, msg);
 
             // Clean up and return to waiting
             newState.computeStatus = initialComputeStatus;
             newState.contributionState = null;
             newState.hash = '';
             newState.step = Step.WAITING;
-            break;
+            return newState;
         }
         case 'ADD_MESSAGE': {
-            newState.messages = [...state.messages, action.message];
+            newState = addMessage(state, action.message);
             break;
         }
         case 'SET_STEP': {
@@ -196,7 +209,7 @@ export const computeStateReducer = (state: any, action: any) => {
         case 'SET_CEREMONY': {
             newState.contributionState = action.data;
             const msg = `You are in the queue for ceremony ${action.data.ceremony.title}`;
-            newState.messages = [...state.messages, msg];
+            newState = addMessage(newState, msg);
             newState.step = Step.QUEUED;
             return newState;
         }
@@ -217,8 +230,7 @@ export const computeStateReducer = (state: any, action: any) => {
             return newState;
         }
         case 'SET_ENTROPY': {
-            newState.entropy = action.data;
-            break;
+            return {...state, entropy: action.data};
         }
     }
     console.debug(`state after reducer ${newState.step}`);
@@ -228,9 +240,12 @@ export const computeStateReducer = (state: any, action: any) => {
 export const startServiceWorker = (dispatch: (a: any) => void) => {
     navigator.serviceWorker.ready.then(() => {
         console.log('service worker ready');
+        loadWasm();
         navigator.serviceWorker.addEventListener('message', event => {
-        const data = JSON.parse(event.data);
-        switch (data.type) {
+          const data = (typeof event.data === 'string') ?
+            JSON.parse(event.data)
+            : event.data;
+          switch (data.type) {
             case 'PROGRESS': {
                 //console.log(`message from service worker ${message}`);
                 dispatch({
@@ -244,18 +259,19 @@ export const startServiceWorker = (dispatch: (a: any) => void) => {
                 break; 
             }
             case 'COMPLETE': { 
-                //const result: Uint8Array = data.result;
-                dispatch({type: 'COMPUTE_DONE', newParams: data.result, dispatch })
+                const result = new Uint8Array(data.result);
+                console.debug(`COMPLETE ${result.length}`);
+                dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
                 break; 
             }
-        }
+          }
         });
     });
 };
 
 export const loadWasm = async () => {
     if (navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller?.postMessage({type: 'LOAD_WASM'});
+        navigator.serviceWorker.controller.postMessage({type: 'LOAD_WASM'});
         console.debug('service worker initialised');
     } else {
         console.log('Do not have controller!');
@@ -276,14 +292,19 @@ const startDownload = (ceremonyId: string, index: number, dispatch: (a: any) => 
     );
 };
 
-export const startComputation = (params: Uint8Array, entropy: Buffer) => {
+export const startComputation = (params: Uint8Array, entropy: Uint8Array) => {
     //const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
-    console.log(`params ${params.length}`);
-    navigator.serviceWorker.controller?.postMessage({
+    console.log(`params ${params.buffer.byteLength} ${entropy.buffer.byteLength}`);
+    const message = {
         type: 'COMPUTE', 
-        params, 
-        entropy
-    });
+        params: params.buffer,
+        entropy: entropy.buffer,
+    };
+    navigator.serviceWorker.controller?.postMessage(message,
+    [
+        params.buffer,
+        entropy.buffer
+    ]);
 };
 
 const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispatch: (a: any) => void) => {

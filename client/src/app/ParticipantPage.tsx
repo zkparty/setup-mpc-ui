@@ -80,8 +80,7 @@ export const ParticipantSection = () => {
   const classes = useStyles();
 
   const { step, computeStatus, messages, entropy, participant, contributionState } = state;
-  console.debug(`step is ${step}`);
-
+  
   const getParticipant = async () => {
     console.log(`uid: ${Auth.authUser.uid}`);
     dispatch({ type: 'SET_PARTICIPANT', data: newParticipant(Auth.authUser.uid)});

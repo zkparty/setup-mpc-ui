@@ -33,18 +33,19 @@ async function run() {
   console.debug('wasm module loaded');
 }
 
-async function compute(sourceParams: Uint8Array, entropy: Buffer) {
+function compute(sourceParams: Uint8Array, entropy: Uint8Array) {
   try {
+    console.debug(`compute starting. params: ${sourceParams.length} ${entropy.length}`);
     const result: Uint8Array = contribute(sourceParams, entropy, reportProgress, setHash);
     console.debug(`contribute done ${result.length}`);
-    if (client)
-      client.postMessage(
-          JSON.stringify({
-              error: false,
-              type: 'COMPLETE',
-              result: result
-          }),
-    );
+    if (client) {
+      const message = {
+          error: false,
+          type: 'COMPLETE',
+          result: result.buffer
+      };
+      client.postMessage(message, [result.buffer])
+    };
   } catch (err) {
     if (client) client.postMessage(
       JSON.stringify({
@@ -162,9 +163,11 @@ self.addEventListener('message', async (event) => {
   };
 
   if (event.data && event.data.type === 'COMPUTE') {
-    console.log(`COMPUTE in service-worker`);
-    const sourceParams = event.data.params;
-    const entropy = event.data.entropy;
+    console.log(`COMPUTE in service-worker ${JSON.stringify(event.data)}`);
+    
+    const sourceParams = new Uint8Array(event.data.params);
+    const entropy = new Uint8Array(event.data.entropy);
+    console.debug(`lengths: ${sourceParams.length} ${entropy.length}`);
     compute(sourceParams, entropy);
   };
 
