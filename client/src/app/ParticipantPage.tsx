@@ -178,21 +178,13 @@ export const ParticipantSection = () => {
         // Waiting for a ceremony
         if (contributionState) {
           console.debug(`contribution state: ${JSON.stringify(contributionState)}`);
-          // if (contributionState.queueIndex === contributionState.currentIndex) {
-          //   console.debug('ready to go');
-          //   dispatch({
-          //     type: 'START_COMPUTE', 
-          //     ceremonyId: contributionState.ceremony.id,
-          //     index: contributionState.queueIndex});
-          // }
           content = queueProgressCard(contributionState);
         }      
         break;
       }
       case (Step.RUNNING): {
-        // We have a ceremony to contribute to. Download parameters
-        // Compute
-        // Upload
+        // We have a ceremony to contribute to. 
+        // Download/Compute/Upload
         logState();
 
         if (computeStatus.ready && !computeStatus.running) {
@@ -207,11 +199,12 @@ export const ParticipantSection = () => {
 
         const progressPct = state.progress.total > 0 ? 100 * state.progress.count / state.progress.total : 0;
 
-        content = (<>{
+        content = (<><Typography variant='h2'>{
             !computeStatus.downloaded ? stepText('Downloading ...')
           : !computeStatus.computed ? stepText('Calculating ...')
           : stepText('Uploading ...') 
-        }<LinearProgress variant="determinate" value={progressPct} /></>);
+        }</Typography>
+        <LinearProgress variant="determinate" value={progressPct} /></>);
         break;
       }
   }};
