@@ -1,5 +1,5 @@
 import { getParamsFile, UploadParams } from "../api/FileApi";
-import { CeremonyEvent, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
+import { CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant } from "../api/FirestoreApi";
 
@@ -92,6 +92,7 @@ const addMessage = (state: any, message: string) => {
     return {...state, messages: [...state.messages, msg]};
 }
 
+
 export const computeStateReducer = (state: any, action: any) => {
     let newState = {...state};
     switch (action.type) {
@@ -104,9 +105,15 @@ export const computeStateReducer = (state: any, action: any) => {
                 `Starting turn for index ${action.index}`,
                 action.index
             ));
+            const contribution: Contribution = {
+                participantId: state.participant?.uid || '??',
+                queueIndex: state.contributionState.queueIndex,
+                lastSeen: Date.now(),
+                status: "RUNNING",
+            };
+            addOrUpdateContribution(action.ceremonyId, contribution);
             newState.contributionState = {...state.contributionState, startTime: Date.now()};
             newState.computeStatus = {...state.computeStatus, running: true, downloading: true};
-            //newState.step = Step.RUNNING;
             startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, action.dispatch);
             return newState;
         }
@@ -224,7 +231,7 @@ export const computeStateReducer = (state: any, action: any) => {
             return newState;
         }
         case 'SET_PARTICIPANT': {
-            console.debug(`set participant ${action.data}`)
+            console.debug(`set participant ${action.data.uid}`)
             newState.participant = action.data;
             addOrUpdateParticipant(action.data);
             return newState;

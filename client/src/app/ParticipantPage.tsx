@@ -132,7 +132,7 @@ export const ParticipantSection = () => {
 
   let content = (<></>);
   if (!Auth.isLoggedIn) {
-    content = (<Typography>Sorry, please login to access this page</Typography>);
+    content = (<Typography variant='body1'>Sorry, please login to access this page</Typography>);
   } else {
     console.debug(`step ${step.toString()}`);
     switch (step) {
@@ -199,7 +199,7 @@ export const ParticipantSection = () => {
 
         const progressPct = state.progress.total > 0 ? 100 * state.progress.count / state.progress.total : 0;
 
-        content = (<><Typography variant='h2'>{
+        content = (<><Typography variant='h3'>{
             !computeStatus.downloaded ? stepText('Downloading ...')
           : !computeStatus.computed ? stepText('Calculating ...')
           : stepText('Uploading ...') 
