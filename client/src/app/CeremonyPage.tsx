@@ -1,5 +1,5 @@
 import { Link, RouteProps, useParams } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import * as React from "react";
 import styled from "styled-components";
 import { ReactNode } from "react";
@@ -22,6 +22,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import moment from "moment";
 import './styles.css';
 import { AuthContext } from "./AuthContext";
+import { SelectedCeremonyContext, useSelectionContext } from "./SelectionContext";
 
 const CeremonyDetailsTable = styled.table`
   text-align: right;
@@ -61,21 +62,20 @@ const CeremonyDetailsSubSection = styled.div`
   box-sizing: border-box;
 `;
 
-export const CeremonyPage = (props: {id: string, onClose: ()=> void }) => {
-  let { id } = props;
-  console.log(`have id ${id}`);
-
+export const CeremonyPage = (props: {onClose: ()=> void }) => {
   const [loaded, setLoaded] = useState<boolean>(false);
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
   const [contributions, setContributions] = useState<ContributionSummary[]>([]);
   const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
   const contributionListenerUnsub = useRef<(() => void) | null>(null);
   const loadingContributions = useRef(false);
+  const [selection, dispatch] = useSelectionContext();
 
-  console.debug('rendering');
+  let { ceremonyId } = selection;
+  console.log(`have id ${ceremonyId}`);
 
   const refreshCeremony = async () => {
-    const c = await getCeremony(id);
+    const c = ceremonyId ? await getCeremony(ceremonyId) : undefined;
     if (c !== undefined) setCeremony(c);
   };
 
@@ -106,15 +106,15 @@ export const CeremonyPage = (props: {id: string, onClose: ()=> void }) => {
   }
 
 
-  if (!ceremonyListenerUnsub.current) {
+  if (!ceremonyListenerUnsub.current && selection.selectedCeremony) {
     // Start ceremony listener
-    ceremonyUpdateListener(id, setCeremony)
+    ceremonyUpdateListener(selection.selectedCeremony, setCeremony)
         .then(unsub => ceremonyListenerUnsub.current = unsub);
   }
 
-  if (!loadingContributions.current) {
+  if (!loadingContributions.current && selection.selectedCeremony) {
     // Start contribution listener
-    contributionUpdateListener(id, updateContribution)
+    contributionUpdateListener(selection.selectedCeremony, updateContribution)
         .then(unsub => contributionListenerUnsub.current = unsub);
     loadingContributions.current = true;
   }
@@ -141,7 +141,9 @@ export const CeremonyPage = (props: {id: string, onClose: ()=> void }) => {
 
   const contribStats = contributionStats();
 
-  const handleEdit = () => {};
+  const handleEdit = () => {
+    dispatch({ type: 'EDIT_CEREMONY', selectedCeremony: ceremonyId });
+  };
 
   const handleClose = () => {
     if (ceremonyListenerUnsub.current) ceremonyListenerUnsub.current();

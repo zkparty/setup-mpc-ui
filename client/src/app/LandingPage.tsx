@@ -1,5 +1,5 @@
 import { Link, RouteProps, useHistory } from "react-router-dom";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, useReducer, Fragment } from "react";
 import * as React from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
@@ -25,24 +25,14 @@ import {
   getCeremonySummariesCached
 } from "../api/ZKPartyApi";
 import { Ceremony } from "../types/ceremony";
-import { ceremonyListener, getCeremonies } from "../api/FirestoreApi";
+import { ceremonyListener, getCeremonies, getCeremony } from "../api/FirestoreApi";
 import { AuthContext } from "./AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
 import { CeremonyPage } from "./CeremonyPage";
+import { useSelectionContext } from './SelectionContext';
 import './styles.css';
 import { withStyles } from "@material-ui/core/styles";
-
-export interface SelectedCeremonyContextInterface {
-  selectedCeremony: string,
-  setSelectedCeremony: (id: string) => void,
-};
-
-const defaultSelection: SelectedCeremonyContextInterface = {
-  selectedCeremony: "",
-  setSelectedCeremony: () => null,
-};
-export const SelectedCeremonyContext = React.createContext<SelectedCeremonyContextInterface>(defaultSelection);
 
 const StyledTabs = withStyles(theme => ({
   indicator: {
@@ -53,19 +43,22 @@ const StyledTabs = withStyles(theme => ({
 
 export const LandingPage = () => {
     const [activeTab, setActiveTab] = useState("1");
-    const [openModal, setOpenModal] = React.useState(false);
-    const [selectedCeremony, setSelectedCeremony] = React.useState("");
+    const [selection, dispatch] = useSelectionContext();
 
-    const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
+    const changeTab = (event: React.ChangeEvent<{}> | null, newValue: string) => {
       setActiveTab(newValue);
     };
 
-    const openCeremonyModal = () => {setOpenModal(true)};
+    //const openCeremonyModal = () => {setOpenModal(true)};
 
-    const closeCeremonyModal = () => {setOpenModal(false)};
+    const closeCeremonyModal = () => {dispatch({type: 'CLOSE_CEREMONY'});}
+
+    if (selection.edit) {
+      // Open tab 3 for edit or add
+      setActiveTab('3');
+    }
 
     return (
-      <SelectedCeremonyContext.Provider value={{selectedCeremony, setSelectedCeremony}}>
         <AuthContext.Consumer>
           {(Auth) => {console.debug(`landing page: ${Auth.isCoordinator}`); return (
             <Fragment>
@@ -73,7 +66,7 @@ export const LandingPage = () => {
               <PageContainer>
                 <StyledTabs 
                   value={activeTab} 
-                  onChange={handleChange}
+                  onChange={changeTab}
                   centered
                   style = {{ color: accentColor }}
                 >
@@ -82,27 +75,26 @@ export const LandingPage = () => {
                   {Auth.isCoordinator ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
                 </StyledTabs>
                 <TabPanel value={activeTab} index="1">
-                  <SummarySection key="summary" onClick={openCeremonyModal}/>
+                  <SummarySection key="summary" />
                 </TabPanel>
                 <TabPanel value={activeTab} index="2">
                   <ParticipantSection key="participants" />
                 </TabPanel>
                 <TabPanel value={activeTab} index="3">
-                  <AddCeremonyPage onSubmit={openCeremonyModal}/>
+                  <AddCeremonyPage />
                 </TabPanel>
                 <Modal
-                  open={openModal}
+                  open={selection.openModal}
                   onClose={closeCeremonyModal}
                   aria-labelledby="simple-modal-title"
                   aria-describedby="simple-modal-description"
                 >
-                  <CeremonyPage id={selectedCeremony} onClose={closeCeremonyModal} />
+                  <CeremonyPage onClose={closeCeremonyModal} />
                 </Modal>
               </PageContainer>
             </Fragment>
           )}}
         </AuthContext.Consumer>
-      </SelectedCeremonyContext.Provider>
   );
 };
 
@@ -190,7 +182,7 @@ const SummarySection = (props: any) => {
   return (
     <>
       {ceremonies.map((c, i) => (
-        <CeremonySummary key={i} ceremony={c} onClick={props.onClick} />
+        <CeremonySummary key={i} ceremony={c} />
       ))}
     </>
   );

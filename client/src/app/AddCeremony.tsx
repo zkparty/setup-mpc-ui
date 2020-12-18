@@ -18,12 +18,11 @@ import {
 } from "../styles";
 import { Ceremony, CeremonyEvent } from "../types/ceremony";
 import { addCeremony, jsonToCeremony } from "../api/ZKPartyApi";
-import { addCeremonyEvent, ceremonyEventListener } from "../api/FirestoreApi";
+import { addCeremonyEvent, ceremonyEventListener, getCeremony } from "../api/FirestoreApi";
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
-import { SelectedCeremonyContext } from "./LandingPage";
+import { useSelectionContext } from "./SelectionContext";
 import { UploadCircuitFile } from "../api/FileApi";
-
 
 const HomeLinkContainer = styled.div`
   position: absolute;
@@ -55,39 +54,28 @@ const CeremonyDetailsContainer = styled.div`
   border-radius: 4px;
 `;
 
-const StyledTextField = styled(TextField)`
-  color: "white";
-
-  & .label {
-      color: ${textColor}
-  }
-
-  & .MuiInput-root {
-    color: "white"
-  }
-
-  & .MuiInputLabel-root {
-      color: "yellow"
-  }
-
-  & .MuiInputBase-root {
-      color: "white"
-  }
-
-
-`;
-
-const AddCeremonyPage = (props: any) => {
+const AddCeremonyPage = () => {
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
+  const [selection, dispatch] = useSelectionContext();
+
+  // Edit an existing ceremony
+  if (selection.ceremonyId && !ceremony) {
+      getCeremony(selection.ceremonyId).then(
+        c => {
+          if (c) setCeremony(c);
+      });
+  }
+
+  const onSubmit = () => {
+    dispatch({
+      type: 'CLOSE_CEREMONY',      
+    });
+  }
 
   return (
-    <SelectedCeremonyContext.Consumer>{(value) => {return (
-      <CeremonyDetails ceremony={ceremony} onSubmit={props.onSubmit}></CeremonyDetails> 
-    )}}
-    </SelectedCeremonyContext.Consumer>
+      <CeremonyDetails ceremony={ceremony} onSubmit={onSubmit}></CeremonyDetails> 
   );
 };
-
 
 const CssTextField = withStyles({
     root: {

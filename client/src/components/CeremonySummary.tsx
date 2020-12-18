@@ -12,8 +12,7 @@ import {
 } from "../styles";
 import { Ceremony } from "../types/ceremony";
 import { format } from "timeago.js";
-import { SelectedCeremonyContext } from "../app/LandingPage";
-import { useContext } from "react";
+import {  useSelectionContext } from "../app/SelectionContext";
 import LinearProgress, { LinearProgressProps } from '@material-ui/core/LinearProgress';
 import { Typography, Box, makeStyles } from "@material-ui/core";
 
@@ -60,16 +59,16 @@ const Flex = styled.div`
   display: flex;
 `;
 
-const CeremonySummary = (props: { ceremony: Ceremony, onClick: () => void } & RouteProps) => {
+const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
     const c = props.ceremony;
-    const { setSelectedCeremony } = useContext(SelectedCeremonyContext);
+    const [ selection, dispatch ] = useSelectionContext();
     const classes = useStyles();
   
-    //let history = useHistory();
-  
     const onClick = () => {
-      setSelectedCeremony(c.id);
-      props.onClick();
+      dispatch({
+        type: 'DISPLAY_CEREMONY',
+        ceremonyId: c.id,
+      });
     };
 
     //console.log(`ceremony id: ${c.id}`);

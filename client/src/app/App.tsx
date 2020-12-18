@@ -3,6 +3,7 @@ import { createGlobalStyle } from "styled-components";
 import { textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
 import { AuthContext, useAuthContextValue } from "./AuthContext";
+import { SelectionContextProvider } from './SelectionContext';
 import firebase from "firebase/app";
 import firebaseConfig from "./firebaseConfig";
 import "firebase/auth";
@@ -17,10 +18,12 @@ const App = () => {
   console.log(`auth user: ${firebase.auth().currentUser?.displayName}`);
   return (
     <AuthContext.Provider value={ useAuthContextValue() }>
-      <SnackbarProvider maxSnack={4}>
-          <GlobalStyle />
-          <LandingPage />
-      </SnackbarProvider>
+      <SelectionContextProvider>
+        <SnackbarProvider maxSnack={4}>
+            <GlobalStyle />
+            <LandingPage />
+        </SnackbarProvider>
+      </SelectionContextProvider>
     </AuthContext.Provider>
   );
 };
