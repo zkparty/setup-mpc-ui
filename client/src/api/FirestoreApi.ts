@@ -136,7 +136,7 @@ export const ceremonyEventListener = async (ceremonyId: string | undefined, call
       querySnapshot.docChanges().forEach(docSnapshot => {
         var event = docSnapshot.doc.data();
         const ceremony = docSnapshot.doc.ref.parent.parent;
-        console.log(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
+        //console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
         if (ceremony?.id === ceremonyId) {
             switch (event.eventType) {
                 case 'PREPARED': {break;}
@@ -148,7 +148,7 @@ export const ceremonyEventListener = async (ceremonyId: string | undefined, call
         }
       });
     }, err => {
-      console.log(`Error while listening for ceremony events ${err}`);
+      console.warn(`Error while listening for ceremony events ${err}`);
     });
 };
 

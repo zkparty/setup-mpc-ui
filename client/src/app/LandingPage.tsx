@@ -1,12 +1,10 @@
-import { Link, RouteProps, useHistory } from "react-router-dom";
-import { useState, useEffect, useReducer, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 import * as React from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Box from "@material-ui/core/Box";
-import { ReactNode } from "react";
 import ButtonAppBar from "../components/ButtonAppBar";
 import CeremonySummary from "../components/CeremonySummary";
 import { ParticipantSection } from "./ParticipantPage";
@@ -20,10 +18,6 @@ import {
   SectionContainer,
   CeremonyTitle
 } from "../styles";
-import {
-  getCeremonySummaries,
-  getCeremonySummariesCached
-} from "../api/ZKPartyApi";
 import { Ceremony } from "../types/ceremony";
 import { ceremonyListener, getCeremonies, getCeremony } from "../api/FirestoreApi";
 import { AuthContext } from "./AuthContext";
@@ -42,21 +36,19 @@ const StyledTabs = withStyles(theme => ({
 }))(Tabs);
 
 export const LandingPage = () => {
-    const [activeTab, setActiveTab] = useState("1");
     const [selection, dispatch] = useSelectionContext();
 
     const changeTab = (event: React.ChangeEvent<{}> | null, newValue: string) => {
-      setActiveTab(newValue);
+      if (newValue === '3') {
+        dispatch({type: 'ADD_CEREMONY'});
+      } else {
+        dispatch({type: 'SET_TAB', newTab: newValue});
+      }
     };
 
     //const openCeremonyModal = () => {setOpenModal(true)};
 
     const closeCeremonyModal = () => {dispatch({type: 'CLOSE_CEREMONY'});}
-
-    if (selection.edit) {
-      // Open tab 3 for edit or add
-      setActiveTab('3');
-    }
 
     return (
         <AuthContext.Consumer>
@@ -65,7 +57,7 @@ export const LandingPage = () => {
               <ButtonAppBar />
               <PageContainer>
                 <StyledTabs 
-                  value={activeTab} 
+                  value={selection.activeTab} 
                   onChange={changeTab}
                   centered
                   style = {{ color: accentColor }}
@@ -74,13 +66,13 @@ export const LandingPage = () => {
                   <Tab label="Participate" value="2" />
                   {Auth.isCoordinator ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
                 </StyledTabs>
-                <TabPanel value={activeTab} index="1">
+                <TabPanel value={selection.activeTab} index="1">
                   <SummarySection key="summary" />
                 </TabPanel>
-                <TabPanel value={activeTab} index="2">
+                <TabPanel value={selection.activeTab} index="2">
                   <ParticipantSection key="participants" />
                 </TabPanel>
-                <TabPanel value={activeTab} index="3">
+                <TabPanel value={selection.activeTab} index="3">
                   <AddCeremonyPage />
                 </TabPanel>
                 <Modal

@@ -4,12 +4,14 @@ export interface SelectedCeremonyContextInterface {
     ceremonyId: string | null,
     edit: boolean,
     openModal: boolean,
+    activeTab: string,
   };
   
   const defaultSelection: SelectedCeremonyContextInterface = {
     ceremonyId: null,
     edit: false,
     openModal: false,
+    activeTab: '1',
   };
   export const SelectedCeremonyContext = createContext<any[]>([]);
   
@@ -27,26 +29,40 @@ export interface SelectedCeremonyContextInterface {
     return contextValue;
   }
   
-  const selectionReducer = (state: any, action: any): SelectedCeremonyContextInterface => {
-    let selection: SelectedCeremonyContextInterface = {ceremonyId: null, edit: false, openModal: false};
+  const selectionReducer = (state: SelectedCeremonyContextInterface, action: any): SelectedCeremonyContextInterface => {
+    console.debug(`selectionReducer ${action.type}`);
+    let selection = defaultSelection;
     switch (action.type) {
       case 'DISPLAY_CEREMONY': {
-        selection = {...selection, ceremonyId: action.ceremonyId, openModal: true};
-        break;
+        return { 
+            ceremonyId: action.ceremonyId, 
+            edit: false,
+            openModal: true,
+            activeTab: '1',
+        };
       }
       case 'ADD_CEREMONY': {
         selection.edit = true;
+        selection.activeTab = '3';
         break;
       }
       case 'EDIT_CEREMONY': {
-        selection = {...selection, ceremonyId: action.ceremonyId, edit: true};
-        break;
+        return {
+            ceremonyId: action.ceremonyId, 
+            edit: true, 
+            openModal: false,
+            activeTab: '3'
+        };
+      }
+      case 'SET_TAB': {
+        return {...state, activeTab: action.newTab};
       }
       case 'CLOSE_CEREMONY': {
         // default
+        return selection;
       }
     }
-    return {...state, ...selection};
+    return state;
   }
   
   

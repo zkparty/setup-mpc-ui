@@ -106,15 +106,15 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
   }
 
 
-  if (!ceremonyListenerUnsub.current && selection.selectedCeremony) {
+  if (!ceremonyListenerUnsub.current && ceremonyId) {
     // Start ceremony listener
-    ceremonyUpdateListener(selection.selectedCeremony, setCeremony)
+    ceremonyUpdateListener(ceremonyId, setCeremony)
         .then(unsub => ceremonyListenerUnsub.current = unsub);
   }
 
-  if (!loadingContributions.current && selection.selectedCeremony) {
+  if (!loadingContributions.current && ceremonyId) {
     // Start contribution listener
-    contributionUpdateListener(selection.selectedCeremony, updateContribution)
+    contributionUpdateListener(ceremonyId, updateContribution)
         .then(unsub => contributionListenerUnsub.current = unsub);
     loadingContributions.current = true;
   }
@@ -142,7 +142,7 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
   const contribStats = contributionStats();
 
   const handleEdit = () => {
-    dispatch({ type: 'EDIT_CEREMONY', selectedCeremony: ceremonyId });
+    dispatch({ type: 'EDIT_CEREMONY', ceremonyId });
   };
 
   const handleClose = () => {

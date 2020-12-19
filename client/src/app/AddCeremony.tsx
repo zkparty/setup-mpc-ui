@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, ReactNode } from "react";
 import * as React from "react";
 import styled from "styled-components";
 import TextField, { FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps } from "@material-ui/core/TextField";
@@ -58,12 +58,16 @@ const AddCeremonyPage = () => {
   const [ceremony, setCeremony] = useState<null | Ceremony>(null);
   const [selection, dispatch] = useSelectionContext();
 
+  console.debug(`AddCeremony ${selection.ceremonyId} ${JSON.stringify(ceremony)}`);
+
   // Edit an existing ceremony
   if (selection.ceremonyId && !ceremony) {
-      getCeremony(selection.ceremonyId).then(
-        c => {
-          if (c) setCeremony(c);
-      });
+    console.debug(`getting ceremony`);
+    getCeremony(selection.ceremonyId).then(
+      c => {
+        console.debug(`have ceremony`);
+        if (c) setCeremony(c);
+    });
   }
 
   const onSubmit = () => {
@@ -113,33 +117,42 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => void}) => {
   const classes = useStyles();
+  const ceremony = useRef<Ceremony | any>({});
+  const titleRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLInputElement>(null);
   const { enqueueSnackbar } = useSnackbar();
-
-  var newCeremony: Ceremony | any = {};
-  var circuitFile: File | null = null;
-  if (props.ceremony) {
-    try {
-      newCeremony = jsonToCeremony(props.ceremony);
-    } catch (err) {
-      console.log(`Cannot parse provided ceremony ${err.message}`);
-    }
-  }
 
   const statusUpdate = (event: CeremonyEvent) => {
     enqueueSnackbar(event.message);
   };
 
-  if (props.ceremony) ceremonyEventListener(props.ceremony.id, statusUpdate);
-  
+  var circuitFile: File | null = null;
+  if (!ceremony.current.id) {
+    if (props.ceremony) {
+      try {
+        ceremony.current = props.ceremony;
+        console.debug(`ceremony id ${ceremony.current.id}`);
+      } catch (err) {
+        console.log(`Cannot parse provided ceremony ${err.message}`);
+      }
+    } else {
+      console.debug(`adding ceremony`);
+    }
+  }
+
+  //TODO - return unsub + avoid subbing 2ce
+  if (ceremony.current) ceremonyEventListener(ceremony.current.id, statusUpdate); 
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       console.log(`handleChange ${e.target.id}`);
+      e.preventDefault();
 
       switch (e.target.id) {
-        case 'title': newCeremony.title = e.target.value; break;
-        case 'description': newCeremony.description = e.target.value; break;
-        case 'start-time': newCeremony.startTime = Date.parse(e.target.value); break;
-        case 'end-time': newCeremony.endTime = Date.parse(e.target.value); break;
-        case 'min-participants': newCeremony.minParticipants = parseInt(e.target.value); break;
+        //case 'title': ceremony.current.title = e.target.value; break;
+        //case 'description': ceremony.current.description = e.target.value; break;
+        case 'start-time': ceremony.current.startTime = Date.parse(e.target.value); break;
+        case 'end-time': ceremony.current.endTime = Date.parse(e.target.value); break;
+        case 'min-participants': ceremony.current.minParticipants = parseInt(e.target.value); break;
       }
   };
 
@@ -150,22 +163,25 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
 
   const validateInput = () => {
     var isValid = true;
-    if (!newCeremony.title || newCeremony.title.length == 0) {enqueueSnackbar("Must have a title"); isValid = false;}
-    if (!newCeremony.description || newCeremony.description.length == 0) {enqueueSnackbar("Must have a description"); isValid = false;};
+    ceremony.current.title = titleRef.current?.value;
+    ceremony.current.description = descRef.current?.value;
+    if (!ceremony.current.title || ceremony.current.title.length == 0) {enqueueSnackbar("Must have a title"); isValid = false;}
+    if (!ceremony.current.description || ceremony.current.description.length == 0) {enqueueSnackbar("Must have a description"); isValid = false;};
     return isValid;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: { preventDefault: () => void; }) => {
     console.log(`submit ....`);
+    event.preventDefault();
     // validate
     if (!validateInput()) return;
 
     if (circuitFile) {
         // Firebase storage ref for the new file
-        newCeremony.circuitFileName = circuitFile.name;
+        ceremony.current.circuitFileName = circuitFile.name;
     };
     // insert new DB record. Get id
-    addCeremony(newCeremony).then((id: string) => {
+    addCeremony(ceremony.current).then((id: string) => {
         console.log(`ceremony added: ${id}`);
 
         ceremonyEventListener(id, statusUpdate);
@@ -187,18 +203,33 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     });
   }
 
+  console.debug(`current title ${ceremony.current?.title}`);
+
   return (
     <CeremonyDetailsContainer>
         <form className={classes.root} noValidate autoComplete="off" >
-            <CssTextField id="title" label="Title" defaultValue={props.ceremony?.title} onChange={handleChange}/>
+            <CssTextField 
+              id="title" 
+              label="Title" 
+              type='text'
+              value={ceremony.current?.title}
+              /*onChange={handleChange}*/ 
+              inputRef={titleRef}
+            />
 
             <br />
-            <CssTextField id="description" label="Description" defaultValue={props.ceremony?.description} onChange={handleChange}/>
+            <CssTextField 
+              id="description" 
+              label="Description" 
+              value={ceremony.current?.description} 
+              /*onChange={handleChange}*/
+              inputRef={descRef}
+            />
             <br />
             <span style={{ display: "flow"}}>
                 <InputLabel variant="standard" style={{ color: accentColor }}>Circuit File:</InputLabel>
                 <FileUploader id="circuitFileName" onChange={handleFileUpload} />
-                <label>{props.ceremony?.circuitFileName}</label>
+                <label>{ceremony.current?.circuitFileName}</label>
             </span>
             <br />
             <CssTextField
@@ -208,7 +239,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
                 InputLabelProps={{
                     shrink: true,
                 }}
-                defaultValue={props.ceremony?.startTime}
+                value={ceremony.current?.startTime}
                 onChange={handleChange}
             />
             <br />
@@ -219,11 +250,16 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
                 InputLabelProps={{
                     shrink: true,
                 }}
-                defaultValue={props.ceremony?.endTime}
+                value={ceremony.current?.endTime}
                 onChange={handleChange}
             />
             <br />
-            <CssTextField id="min-participants" label="Minimum Participants" defaultValue={props.ceremony?.minParticipants} onChange={handleChange}/>
+            <CssTextField 
+              id="min-participants" 
+              label="Minimum Participants" 
+              type='number'
+              value={ceremony.current?.minParticipants} 
+              onChange={handleChange}/>
             <br />
             <Button variant="contained" color="primary" onClick={handleSubmit}>Submit</Button>
       </form>
