@@ -18,7 +18,7 @@ import {
 } from "../styles";
 import { Ceremony, CeremonyEvent } from "../types/ceremony";
 import { addCeremony, jsonToCeremony } from "../api/ZKPartyApi";
-import { addCeremonyEvent, ceremonyEventListener, getCeremony } from "../api/FirestoreApi";
+import { addCeremonyEvent, ceremonyEventListener, getCeremony, updateCeremony } from "../api/FirestoreApi";
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
 import { useSelectionContext } from "./SelectionContext";
@@ -99,6 +99,12 @@ const CssTextField = withStyles({
         "&.Mui-focused fieldset": {
           borderColor: secondAccent,
         }
+      },
+      "& .MuiFormControl-root": {
+        width: '80%',
+      },
+      "& .MuiInputBase-input": {
+        color: textColor,
       }
     }
   })(TextField);
@@ -115,11 +121,61 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const inputField = (props: StandardTextFieldProps) => {
+  //const inputRef = useRef<HTMLInputElement>(null);
+  const [value, setValue] = useState<string | null>(null);
+
+  const getValue = (): string | undefined => {
+    return value || '';
+  }
+
+  const handleChange = (event: any) => {
+    event.preventDefault();
+    setValue(event.target.value);
+  }
+
+  return ({
+    element: 
+      (<CssTextField 
+        {...props} 
+        defaultValue={null}
+        value={props.defaultValue}
+        variant='outlined'
+       /* inputRef={inputRef} */
+        onChange={handleChange}
+        style={{ width: '80%' }}
+      />),
+    value: () => getValue(),
+  });
+}
+
+const writeToDb = async (ceremony: Ceremony):Promise<string> => {
+  if (ceremony.id) {
+    await updateCeremony(ceremony);
+    return ceremony.id;
+  } else {
+    return await addCeremony(ceremony);
+  }
+}
+
+const uploadFile = async (id: string, circuitFile: File, onSubmit: () => void) => {
+  UploadCircuitFile(id, circuitFile).then((snapshot) => {
+    console.log('Uploaded file!');
+    const event: CeremonyEvent = {
+      sender: "COORDINATOR",
+      eventType: "CIRCUIT_FILE_UPLOAD",
+      timestamp: new Date(),
+      message: "",
+      acknowledged: false,
+    }
+    addCeremonyEvent(id, event);
+    onSubmit();
+  });
+}
+
 const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => void}) => {
   const classes = useStyles();
   const ceremony = useRef<Ceremony | any>({});
-  const titleRef = useRef<HTMLInputElement>(null);
-  const descRef = useRef<HTMLInputElement>(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const statusUpdate = (event: CeremonyEvent) => {
@@ -143,28 +199,73 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
   //TODO - return unsub + avoid subbing 2ce
   if (ceremony.current) ceremonyEventListener(ceremony.current.id, statusUpdate); 
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      console.log(`handleChange ${e.target.id}`);
-      e.preventDefault();
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     console.log(`handleChange ${e.target.id}`);
+  //     e.preventDefault();
 
-      switch (e.target.id) {
-        //case 'title': ceremony.current.title = e.target.value; break;
-        //case 'description': ceremony.current.description = e.target.value; break;
-        case 'start-time': ceremony.current.startTime = Date.parse(e.target.value); break;
-        case 'end-time': ceremony.current.endTime = Date.parse(e.target.value); break;
-        case 'min-participants': ceremony.current.minParticipants = parseInt(e.target.value); break;
-      }
-  };
+  //     switch (e.target.id) {
+  //       //case 'title': ceremony.current.title = e.target.value; break;
+  //       //case 'description': ceremony.current.description = e.target.value; break;
+  //       case 'start-time': ceremony.current.startTime = Date.parse(e.target.value); break;
+  //       case 'end-time': ceremony.current.endTime = Date.parse(e.target.value); break;
+  //       //case 'min-participants': ceremony.current.minParticipants = parseInt(e.target.value); break;
+  //     }
+  // };
 
   const handleFileUpload = (f: File) => {
       console.log(`handleFileUpload`);
       circuitFile = f;
   }
 
+  const title = inputField({
+      id:"title", 
+      label:"Title", 
+      type:'text',
+      multiline: true,
+      InputLabelProps: { shrink: true },
+      defaultValue: ceremony.current?.title,
+  });
+  //console.debug(`title value: ${title.value()}`);
+
+  const description = inputField({
+    id:"desc", 
+    label:"Description", 
+    type:'text',
+    multiline: true,
+    InputLabelProps: { shrink: true },
+    defaultValue: ceremony.current?.description,
+  });
+
+  const startTime = inputField({
+    id: 'start-time',
+    label: 'Start Time',
+    type: 'datetime-local',
+    InputLabelProps: { shrink: true },
+    defaultValue: ceremony.current?.startTime,
+  });
+
+  const endTime = inputField({
+    id: 'end-time',
+    label: 'End Time',
+    type: 'datetime-local',
+    InputLabelProps: { shrink: true },
+    defaultValue: ceremony.current?.endTime,
+  });
+
+  const minParticipants = inputField({
+    id:"min-participants", 
+    label:"Minimum Participants", 
+    type:'number',
+    defaultValue: ceremony.current?.minParticipants?.toString() || '0',
+  });
+
   const validateInput = () => {
     var isValid = true;
-    ceremony.current.title = titleRef.current?.value;
-    ceremony.current.description = descRef.current?.value;
+    ceremony.current.title = title.value();
+    ceremony.current.description = description.value();
+    ceremony.current.startTime = startTime.value();
+    ceremony.current.endTime = endTime.value();
+    ceremony.current.minParticipants = minParticipants.value();
     if (!ceremony.current.title || ceremony.current.title.length == 0) {enqueueSnackbar("Must have a title"); isValid = false;}
     if (!ceremony.current.description || ceremony.current.description.length == 0) {enqueueSnackbar("Must have a description"); isValid = false;};
     return isValid;
@@ -180,51 +281,24 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
         // Firebase storage ref for the new file
         ceremony.current.circuitFileName = circuitFile.name;
     };
-    // insert new DB record. Get id
-    addCeremony(ceremony.current).then((id: string) => {
-        console.log(`ceremony added: ${id}`);
-
+    // insert/update new DB record. Get id
+    writeToDb(ceremony.current).then((id: string) => {
+        console.log(`ceremony added/updated: ${id}`);
         ceremonyEventListener(id, statusUpdate);
 
         if (circuitFile) {          
-          UploadCircuitFile(id, circuitFile).then((snapshot) => {
-              console.log('Uploaded file!');
-              const event: CeremonyEvent = {
-                sender: "COORDINATOR",
-                eventType: "CIRCUIT_FILE_UPLOAD",
-                timestamp: new Date(),
-                message: "",
-                acknowledged: false,
-              }
-              addCeremonyEvent(id, event);
-              props.onSubmit();
-          });
+          uploadFile(id, circuitFile, props.onSubmit);
         }
     });
   }
 
-  console.debug(`current title ${ceremony.current?.title}`);
 
   return (
     <CeremonyDetailsContainer>
         <form className={classes.root} noValidate autoComplete="off" >
-            <CssTextField 
-              id="title" 
-              label="Title" 
-              type='text'
-              value={ceremony.current?.title}
-              /*onChange={handleChange}*/ 
-              inputRef={titleRef}
-            />
-
+            {title.element}
             <br />
-            <CssTextField 
-              id="description" 
-              label="Description" 
-              value={ceremony.current?.description} 
-              /*onChange={handleChange}*/
-              inputRef={descRef}
-            />
+            {description.element}
             <br />
             <span style={{ display: "flow"}}>
                 <InputLabel variant="standard" style={{ color: accentColor }}>Circuit File:</InputLabel>
@@ -232,34 +306,11 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
                 <label>{ceremony.current?.circuitFileName}</label>
             </span>
             <br />
-            <CssTextField
-                id="start-time"
-                label="Start time"
-                type="datetime-local"
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                value={ceremony.current?.startTime}
-                onChange={handleChange}
-            />
+            {startTime.element}
             <br />
-            <CssTextField
-                id="end-time"
-                label="End time"
-                type="datetime-local"
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                value={ceremony.current?.endTime}
-                onChange={handleChange}
-            />
+            {endTime.element}
             <br />
-            <CssTextField 
-              id="min-participants" 
-              label="Minimum Participants" 
-              type='number'
-              value={ceremony.current?.minParticipants} 
-              onChange={handleChange}/>
+            {minParticipants.element}
             <br />
             <Button variant="contained" color="primary" onClick={handleSubmit}>Submit</Button>
       </form>

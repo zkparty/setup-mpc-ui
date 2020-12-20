@@ -35,7 +35,7 @@ const contributionConverter: firebase.firestore.FirestoreDataConverter<Contribut
   }
 }
 
-export async function addCeremony(ceremony: Ceremony) {
+export async function addCeremony(ceremony: Ceremony): Promise<string> {
     const db = firebase.firestore();
     try {
       const doc = await db.collection("ceremonies")
@@ -47,6 +47,20 @@ export async function addCeremony(ceremony: Ceremony) {
     } catch (e) {
       throw new Error(`error adding ceremony data to firebase: ${e}`);
     }
+};
+
+export async function updateCeremony(ceremony: Ceremony): Promise<void> {
+  const db = firebase.firestore();
+  try {
+    await db.collection("ceremonies")
+      .withConverter(ceremonyConverter)
+      .doc(ceremony.id)
+      .update(ceremony);
+
+    console.debug(`ceremony ${ceremony.id} updated`);
+  } catch (e) {
+    throw new Error(`error updating ceremony data: ${e}`);
+  }
 };
 
 export async function getCeremony(id: string): Promise<Ceremony | undefined> {
