@@ -61,14 +61,17 @@ const AddCeremonyPage = () => {
   console.debug(`AddCeremony ${selection.ceremonyId} ${JSON.stringify(ceremony)}`);
 
   // Edit an existing ceremony
-  if (selection.ceremonyId && !ceremony) {
-    console.debug(`getting ceremony`);
-    getCeremony(selection.ceremonyId).then(
-      c => {
-        console.debug(`have ceremony`);
-        if (c) setCeremony(c);
-    });
-  }
+  useEffect(() => {
+    if (selection.ceremonyId && !ceremony) {
+      console.debug(`getting ceremony`);
+      getCeremony(selection.ceremonyId).then(
+        c => {
+          console.debug(`have ceremony`);
+          if (c) setCeremony(c);
+      });
+    }},
+    [selection.ceremonyId]
+  );
 
   const onSubmit = () => {
     dispatch({
@@ -131,7 +134,7 @@ const inputField = (props: StandardTextFieldProps & {oldValue: string}) => {
     if (!value)
       console.debug(`in effect: old value ${props.oldValue} ${value}`);
       setValue(props.oldValue);
-    }, [value, props.oldValue]
+    }, [props.oldValue]
   );
   const getValue = (): string | undefined => {
     return value || '';
