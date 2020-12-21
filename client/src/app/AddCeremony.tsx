@@ -1,4 +1,4 @@
-import { useState, useContext, useRef, ReactNode } from "react";
+import { useState, useContext, useRef, ReactNode, useEffect } from "react";
 import * as React from "react";
 import styled from "styled-components";
 import TextField, { FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps } from "@material-ui/core/TextField";
@@ -121,10 +121,18 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const inputField = (props: StandardTextFieldProps) => {
+const inputField = (props: StandardTextFieldProps & {oldValue: string}) => {
   //const inputRef = useRef<HTMLInputElement>(null);
-  const [value, setValue] = useState<string | null>(null);
+  const [value, setValue] = useState<any | null>(props.oldValue);
+  
+  console.debug(`old value ${props.oldValue} ${value}`);
 
+  useEffect(() => {
+    if (!value)
+      console.debug(`in effect: old value ${props.oldValue} ${value}`);
+      setValue(props.oldValue);
+    }, [value, props.oldValue]
+  );
   const getValue = (): string | undefined => {
     return value || '';
   }
@@ -137,9 +145,8 @@ const inputField = (props: StandardTextFieldProps) => {
   return ({
     element: 
       (<CssTextField 
-        {...props} 
-        defaultValue={null}
-        value={props.defaultValue}
+        {...props}
+        value={value}
         variant='outlined'
        /* inputRef={inputRef} */
         onChange={handleChange}
@@ -176,6 +183,7 @@ const uploadFile = async (id: string, circuitFile: File, onSubmit: () => void) =
 const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => void}) => {
   const classes = useStyles();
   const ceremony = useRef<Ceremony | any>({});
+  const unsubscribe = useRef<(()=>void) | null>(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const statusUpdate = (event: CeremonyEvent) => {
@@ -196,8 +204,12 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     }
   }
 
-  //TODO - return unsub + avoid subbing 2ce
-  if (ceremony.current) ceremonyEventListener(ceremony.current.id, statusUpdate); 
+  if (ceremony.current && !unsubscribe.current) {
+    unsubscribe.current = ()=> {}; // placeholder
+    ceremonyEventListener(ceremony.current.id, statusUpdate).then(unsub =>
+      { unsubscribe.current = unsub }
+    )
+  }
 
   // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //     console.log(`handleChange ${e.target.id}`);
@@ -223,7 +235,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
       type:'text',
       multiline: true,
       InputLabelProps: { shrink: true },
-      defaultValue: ceremony.current?.title,
+      oldValue: ceremony.current?.title,
   });
   //console.debug(`title value: ${title.value()}`);
 
@@ -233,7 +245,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     type:'text',
     multiline: true,
     InputLabelProps: { shrink: true },
-    defaultValue: ceremony.current?.description,
+    oldValue: ceremony.current?.description,
   });
 
   const startTime = inputField({
@@ -241,7 +253,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     label: 'Start Time',
     type: 'datetime-local',
     InputLabelProps: { shrink: true },
-    defaultValue: ceremony.current?.startTime,
+    oldValue: ceremony.current?.startTime,
   });
 
   const endTime = inputField({
@@ -249,14 +261,14 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     label: 'End Time',
     type: 'datetime-local',
     InputLabelProps: { shrink: true },
-    defaultValue: ceremony.current?.endTime,
+    oldValue: ceremony.current?.endTime,
   });
 
   const minParticipants = inputField({
     id:"min-participants", 
     label:"Minimum Participants", 
     type:'number',
-    defaultValue: ceremony.current?.minParticipants?.toString() || '0',
+    oldValue: ceremony.current?.minParticipants?.toString() || '0',
   });
 
   const validateInput = () => {
@@ -284,7 +296,11 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     // insert/update new DB record. Get id
     writeToDb(ceremony.current).then((id: string) => {
         console.log(`ceremony added/updated: ${id}`);
-        ceremonyEventListener(id, statusUpdate);
+        if (!unsubscribe.current) {
+          ceremonyEventListener(id, statusUpdate).then(unsub =>
+            { unsubscribe.current = unsub; }
+          );
+        }
 
         if (circuitFile) {          
           uploadFile(id, circuitFile, props.onSubmit);

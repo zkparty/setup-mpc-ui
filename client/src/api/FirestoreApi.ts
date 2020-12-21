@@ -140,12 +140,12 @@ export const addCeremonyEvent = async (ceremonyId: string, event: CeremonyEvent)
     } catch (e) { throw new Error(`Error adding event: ${e.message}`);}
 };
 
-export const ceremonyEventListener = async (ceremonyId: string | undefined, callback: (e: any) => void) => {
+export const ceremonyEventListener = async (ceremonyId: string | undefined, callback: (e: any) => void): Promise<()=>void> => {
     const db = firebase.firestore();
     const query = db.collectionGroup("events");
-    //const query = eventsCollection.where(, '==', ceremonyId);
+    //const query1 = query.where(, '==', ceremonyId);
   
-    query.onSnapshot(querySnapshot => {
+    const unsub = query.onSnapshot(querySnapshot => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
       querySnapshot.docChanges().forEach(docSnapshot => {
         var event = docSnapshot.doc.data();
@@ -164,6 +164,7 @@ export const ceremonyEventListener = async (ceremonyId: string | undefined, call
     }, err => {
       console.warn(`Error while listening for ceremony events ${err}`);
     });
+    return unsub;
 };
 
 // Listens for updates to ceremony data, to suit the front page ceremony list.
