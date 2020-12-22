@@ -240,14 +240,18 @@ export const contributionUpdateListener = async (
 
 // Listens for updates to eligible ceremonies that a participant may contribute to.
 // The first such ceremony found will be returned in the callback
-export const ceremonyContributionListener = async (participantId: string, callback: (c: ContributionState) => void) => {
+export const ceremonyContributionListener = async (participantId: string, isCoordinator: boolean, callback: (c: ContributionState) => void) => {
   console.log(`listening for contributions for ${participantId}`);
   let contributedCeremonies: string[] = [];
   const db = firebase.firestore();
   // Get running ceremonies
+  // Coordinator can contribute to ceremonies even if they're not 
+  // past start time
+  let states = [RUNNING];
+  if (isCoordinator) states.push(WAITING);
   const query = db.collection("ceremonies")
     .withConverter(ceremonyConverter)
-    .where('ceremonyState', '==', RUNNING)
+    .where('ceremonyState', 'in', states)
     .orderBy('startTime', 'asc');
 
   query.onSnapshot(querySnapshot => {

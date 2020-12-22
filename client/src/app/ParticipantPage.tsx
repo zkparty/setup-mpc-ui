@@ -99,7 +99,6 @@ export const ParticipantSection = () => {
     dispatch({type: 'SET_STEP', data: Step.ACKNOWLEDGED, dispatch});
   }
   
-  
   const setContribution = (cs: ContributionState) => {
     // Only accept new tasks if we're waiting
     if (step !== Step.RUNNING && step !== Step.QUEUED) {
@@ -163,7 +162,7 @@ export const ParticipantSection = () => {
       }
       case (Step.ENTROPY_COLLECTED): {
         // start looking for a ceremony to contribute to
-        if (participant) ceremonyContributionListener(participant.uid, setContribution);
+        if (participant) ceremonyContributionListener(participant.uid, Auth.isCoordinator, setContribution);
         content = stepText('Starting listener...');
         addMessage('Initialised.');
         dispatch({type: 'SET_STEP', data: Step.WAITING});

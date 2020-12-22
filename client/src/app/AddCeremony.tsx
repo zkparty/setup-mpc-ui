@@ -207,12 +207,19 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     }
   }
 
-  if (ceremony.current && !unsubscribe.current) {
-    unsubscribe.current = ()=> {}; // placeholder
-    ceremonyEventListener(ceremony.current.id, statusUpdate).then(unsub =>
-      { unsubscribe.current = unsub }
-    )
-  }
+  useEffect(() => {
+    if (ceremony.current && !unsubscribe.current) {
+      unsubscribe.current = ()=> {}; // placeholder
+      ceremonyEventListener(ceremony.current.id, statusUpdate).then(unsub =>
+        { 
+          unsubscribe.current = unsub;
+          return unsub;
+        }
+      )
+    }
+  
+    }, [ceremony.current?.id]
+  );
 
   // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //     console.log(`handleChange ${e.target.id}`);
@@ -256,7 +263,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     label: 'Start Time',
     type: 'datetime-local',
     InputLabelProps: { shrink: true },
-    oldValue: ceremony.current?.startTime,
+    oldValue: ceremony.current?.startTime?.toISOString(),
   });
 
   const endTime = inputField({
@@ -264,7 +271,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     label: 'End Time',
     type: 'datetime-local',
     InputLabelProps: { shrink: true },
-    oldValue: ceremony.current?.endTime,
+    oldValue: ceremony.current?.endTime?.toISOString(),
   });
 
   const minParticipants = inputField({
@@ -299,11 +306,12 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     // insert/update new DB record. Get id
     writeToDb(ceremony.current).then((id: string) => {
         console.log(`ceremony added/updated: ${id}`);
-        if (!unsubscribe.current) {
-          ceremonyEventListener(id, statusUpdate).then(unsub =>
-            { unsubscribe.current = unsub; }
-          );
-        }
+        ceremony.current.id = id; // trigger effect
+        // if (!unsubscribe.current) {
+        //   ceremonyEventListener(id, statusUpdate).then(unsub =>
+        //     { unsubscribe.current = unsub; }
+        //   );
+        // }
 
         if (circuitFile) {          
           uploadFile(id, circuitFile, props.onSubmit);
