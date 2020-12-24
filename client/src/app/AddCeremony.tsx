@@ -258,12 +258,22 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     oldValue: ceremony.current?.description,
   });
 
+  const formatDate = (d: any | null) => {
+    if (d)
+      return d.toISOString().replace('Z', '');
+    else return null;
+  }
+
+  const startTimeStr = formatDate(ceremony.current?.startTime);
+  const endTimeStr = formatDate(ceremony.current?.endTime);
+
   const startTime = inputField({
     id: 'start-time',
     label: 'Start Time',
     type: 'datetime-local',
     InputLabelProps: { shrink: true },
-    oldValue: ceremony.current?.startTime?.toISOString(),
+    oldValue: startTimeStr,
+    defaultValue: startTimeStr,
   });
 
   const endTime = inputField({
@@ -271,7 +281,8 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     label: 'End Time',
     type: 'datetime-local',
     InputLabelProps: { shrink: true },
-    oldValue: ceremony.current?.endTime?.toISOString(),
+    oldValue: endTimeStr,
+    defaultValue: endTimeStr,
   });
 
   const minParticipants = inputField({
