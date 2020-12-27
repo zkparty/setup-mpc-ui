@@ -119,6 +119,16 @@ export function getUserPrivs(userId: string): Promise<string> {
     });
 };
 
+const tryDate = (d: firebase.firestore.Timestamp | undefined, defaultResult?: Date): Date | undefined => {
+  if (!d) return defaultResult;
+  try {
+    return d.toDate();
+  } catch (e) {
+    console.warn(`error converting firebase date ${e.message}`);
+    return defaultResult;
+  }
+}
+
 export function jsonToCeremony(json: any): Ceremony {
   // throws if ceremony is malformed
 
@@ -135,13 +145,20 @@ export function jsonToCeremony(json: any): Ceremony {
   //const start: firebase.firestore.Timestamp = startTime;
   //console.log(`start time ${start ? start.toDate().toLocaleDateString() : '-'}`);
 
-  return {
-    ...rest,
-    lastParticipantsUpdate: lastParticipantsUpdate ? lastParticipantsUpdate.toDate() : undefined,
-    lastSummaryUpdate: lastSummaryUpdate ? lastSummaryUpdate.toDate(): undefined,
-    startTime: startTime ? startTime.toDate() : new Date(),
-    endTime: endTime ? endTime.toDate() : undefined,
-  };
+  try {
+    let c = 
+    {
+      ...rest,
+      lastParticipantsUpdate: tryDate(lastParticipantsUpdate),
+      lastSummaryUpdate: tryDate(lastSummaryUpdate),
+      startTime: tryDate(startTime, new Date()),
+      endTime: tryDate(endTime),
+    };
+    return c;
+  } catch (e) { 
+    console.warn(`Error converting ceremony: ${e.message}`);
+    throw e;
+  }
 }
 
 export const jsonToContribution = (json: any): Contribution => {

@@ -84,7 +84,7 @@ export const getCeremonies = async (): Promise<Ceremony[]> => {
       .withConverter(ceremonyConverter)
       .get();
 
-  const ceremonies = Promise.all(
+  const ceremonies = await Promise.all(
     ceremonySnapshot.docs.map(async doc => {
       const count = await getCeremonyCount(doc.ref);
       const c: Ceremony = {...doc.data(), ...count}

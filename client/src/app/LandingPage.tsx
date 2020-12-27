@@ -119,7 +119,7 @@ function TabPanel(props: TabPanelProps) {
 const SummarySection = (props: any) => {
   const [ceremonies, setCeremonies] = useState<Ceremony[]>([]);
   const [loaded, setLoaded] = useState(false);
-  console.debug(`render summary section ${ceremonies.length > 2 ? ceremonies[2].complete : '-'}`);
+  console.debug(`render summary section `);
 
   const findCeremonyIndex = (id: string): number => {
     return ceremonies.findIndex(val => val.id === id);
@@ -158,17 +158,20 @@ const SummarySection = (props: any) => {
   // }
 
   useEffect(() => {
-    getCeremonies()
-      .then(ceremonies => {
-        setCeremonies(ceremonies);
-        // Subscribe to ceremony updates
-        ceremonyListener(updateCeremony);
-        console.debug('getCeremonies done');
-        setLoaded(true);
-      })
-      .catch(() => {
-        setLoaded(true);
-      });
+    if (!loaded) {
+      getCeremonies()
+        .then((cerems) => {
+          setCeremonies(cerems);
+          // Subscribe to ceremony updates
+          ceremonyListener(updateCeremony);
+          console.debug('getCeremonies done');
+          setLoaded(true);
+        })
+        .catch((e) => {
+          console.warn(e.message);
+          setLoaded(true);
+        });
+      }
   }, [loaded]);
 
   return (

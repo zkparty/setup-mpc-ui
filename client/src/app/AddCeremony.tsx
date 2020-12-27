@@ -316,17 +316,18 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     };
     // insert/update new DB record. Get id
     writeToDb(ceremony.current).then((id: string) => {
-        console.log(`ceremony added/updated: ${id}`);
-        ceremony.current.id = id; // trigger effect
+        console.debug(`ceremony added/updated: ${id}`);
         // if (!unsubscribe.current) {
         //   ceremonyEventListener(id, statusUpdate).then(unsub =>
         //     { unsubscribe.current = unsub; }
         //   );
         // }
 
-        if (circuitFile) {          
+        if (circuitFile) {
+          console.debug(`upload ${circuitFile.name}`);
           uploadFile(id, circuitFile, props.onSubmit);
         }
+        ceremony.current.id = id; // trigger effect
     });
   }
 
