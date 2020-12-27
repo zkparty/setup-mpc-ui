@@ -213,25 +213,28 @@ function firebaseParticipantJsonToParticipant(json) {
 }
 
 const ceremonyEventListener = async (circuitFileUpdateHandler) => {
+  console.debug(`starting events listener...`);
   const eventsCollection = db.collectionGroup("events");
-  const query = eventsCollection.where('acknowledged', '==', false);
+  const query = eventsCollection.where('acknowledged', '==', false)
+      .where('eventType', 'in', ['CIRCUIT_FILE_UPLOAD']);
 
   query.onSnapshot(querySnapshot => {
     //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
-    querySnapshot.forEach(docSnapshot => {
-      var event = docSnapshot.data();
+    querySnapshot.docChanges().forEach(docSnapshot => {
+      var event = docSnapshot.doc.data();
       const ceremony = docSnapshot.ref.parent.parent;
-      console.log(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony.id}`);
+      console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony.id}`);
       switch (event.eventType) {
         case 'CIRCUIT_FILE_UPLOAD': {
           // Coordinator advises that r1cs file has been uploaded
           // Handle the r1cs file
+          console.debug(`Have CIRCUIT_FILE_UPLOAD event`)
           circuitFileUpdateHandler(ceremony.id); // This happens asynchronously
           docSnapshot.ref.update({acknowledged: true});
           break;
         }
-        case 'PREPARED': {}
-        case 'CREATE': {}
+        case 'PREPARED': { break; }
+        case 'CREATE': { break; }
       }
     });
   }, err => {
