@@ -213,30 +213,35 @@ function firebaseParticipantJsonToParticipant(json) {
 }
 
 const ceremonyEventListener = async (circuitFileUpdateHandler) => {
-  console.debug(`starting events listener...`);
+  console.log(`starting events listener...`);
   const eventsCollection = db.collectionGroup("events");
   const query = eventsCollection.where('acknowledged', '==', false)
       .where('eventType', 'in', ['CIRCUIT_FILE_UPLOAD']);
+  
+  //const snap = await query.get();
+  //console.debug(`snap ${snap.size}`);
 
   query.onSnapshot(querySnapshot => {
-    //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
+    console.log(`Ceremony events notified: ${JSON.stringify(querySnapshot.docChanges().length)}`);
     querySnapshot.docChanges().forEach(docSnapshot => {
-      var event = docSnapshot.doc.data();
-      const ceremony = docSnapshot.ref.parent.parent;
-      console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony.id}`);
-      switch (event.eventType) {
-        case 'CIRCUIT_FILE_UPLOAD': {
-          // Coordinator advises that r1cs file has been uploaded
-          // Handle the r1cs file
-          console.debug(`Have CIRCUIT_FILE_UPLOAD event`)
-          circuitFileUpdateHandler(ceremony.id); // This happens asynchronously
-          docSnapshot.ref.update({acknowledged: true});
-          break;
+      console.debug(`changed doc: ${docSnapshot.type}`);
+      if (docSnapshot.type === 'added') {
+        var event = docSnapshot.doc.data();
+        const ceremony = docSnapshot.doc.ref.parent.parent;
+        console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony.id}`);
+        switch (event.eventType) {
+          case 'CIRCUIT_FILE_UPLOAD': {
+            // Coordinator advises that r1cs file has been uploaded
+            // Handle the r1cs file
+            console.debug(`Have CIRCUIT_FILE_UPLOAD event`)
+            circuitFileUpdateHandler(ceremony.id); // This happens asynchronously
+            docSnapshot.doc.ref.update({acknowledged: true});
+            break;
+          }
+          case 'PREPARED': { break; }
+          case 'CREATE': { break; }
         }
-        case 'PREPARED': { break; }
-        case 'CREATE': { break; }
-      }
-    });
+    }});
   }, err => {
     console.log(`Error while listening for ceremony events ${err}`);
   });
