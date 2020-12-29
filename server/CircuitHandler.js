@@ -117,6 +117,11 @@ async function prepareCircuit(ceremonyId) {
             await snarkjs.zKey.newZKey(r1csFile, potPath, zkeyFile, consoleLogger);
             console.log(`Zkey file generated: ${zkeyFile}`);
             addStatusUpdateEvent(ceremonyId, `zKey file has been created.  ${zkeyFile}`);
+            // export bellman params file
+            const paramsFile = path.join(__dirname, 'data', 'ceremony_data', ceremonyId, 'ph2_0000.params');
+            snarkjs.zKey.exportBellman(zkeyFile, paramsFile, consoleLogger);
+            // Upload to storage
+
         });
     } else {
         console.log(`no R1CS file found for ${ceremonyId}.`);        

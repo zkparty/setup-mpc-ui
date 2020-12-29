@@ -1,5 +1,5 @@
 node_modules
 dist
 .cache
-firebase_skey.json
+firebase_skey*.json
 .env

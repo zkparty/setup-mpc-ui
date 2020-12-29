@@ -92,7 +92,6 @@ const addMessage = (state: any, message: string) => {
     return {...state, messages: [...state.messages, msg]};
 }
 
-
 export const computeStateReducer = (state: any, action: any) => {
     let newState = {...state};
     switch (action.type) {
@@ -217,7 +216,12 @@ export const computeStateReducer = (state: any, action: any) => {
             newState.contributionState = action.data;
             const msg = `You are in the queue for ceremony ${action.data.ceremony.title}`;
             newState = addMessage(newState, msg);
-            newState.step = Step.QUEUED;
+            if (newState.contributionState.queueIndex == 1) {
+                newState.step = Step.RUNNING;
+                newState.computeStatus.ready = true;
+            } else {
+                newState.step = Step.QUEUED;
+            }
             return newState;
         }
         case 'UPDATE_QUEUE': {
