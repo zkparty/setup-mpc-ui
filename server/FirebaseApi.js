@@ -225,7 +225,7 @@ const ceremonyEventListener = async (circuitFileUpdateHandler) => {
     console.log(`Ceremony events notified: ${JSON.stringify(querySnapshot.docChanges().length)}`);
     querySnapshot.docChanges().forEach(docSnapshot => {
       console.debug(`changed doc: ${docSnapshot.type}`);
-      if (docSnapshot.type === 'added') {
+      if (docSnapshot.type !== 'removed') {
         var event = docSnapshot.doc.data();
         const ceremony = docSnapshot.doc.ref.parent.parent;
         console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony.id}`);
