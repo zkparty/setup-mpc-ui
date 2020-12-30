@@ -57,6 +57,17 @@ const checkAndDownloadFromStorage = async (prefix, fileNameFilter, deriveLocalPa
     }
 };
 
+const uploadParams = async (ceremonyId, paramsFileName, paramsFile) => {
+    //const storage = firebase.storage();
+    const fileRef = await storage.bucket(`${fbSkey.project_id}.appspot.com`).upload(paramsFile,{
+        destination: `ceremony_data/${ceremonyId}/${paramsFileName}`
+    });
+    //const snapshot = await fileRef.put(paramsFile);
+    console.log(`Params uploaded to ${fileRef[0].name}.`);
+    return fileRef[0];
+};
+
+
 async function prepareCircuit(ceremonyId) {
     console.log(`prepareCircuit ${ceremonyId}`);
     const r1csFile = await checkAndDownloadFromStorage(
@@ -112,15 +123,21 @@ async function prepareCircuit(ceremonyId) {
 
             } else throw err;
 
+            // TODO catch errors
             // Have PoT & r1cs files. Now make the zkey file.
             const zkeyFile = path.join(__dirname, 'data', 'ceremony_data', ceremonyId, 'ph2_0000.zkey');
             await snarkjs.zKey.newZKey(r1csFile, potPath, zkeyFile, consoleLogger);
             console.log(`Zkey file generated: ${zkeyFile}`);
             addStatusUpdateEvent(ceremonyId, `zKey file has been created.  ${zkeyFile}`);
             // export bellman params file
-            const paramsFile = path.join(__dirname, 'data', 'ceremony_data', ceremonyId, 'ph2_0000.params');
-            snarkjs.zKey.exportBellman(zkeyFile, paramsFile, consoleLogger);
+            const paramsFileName = 'ph2_0000.params';
+            const paramsFile = path.join(__dirname, 'data', 'ceremony_data', ceremonyId, paramsFileName);
+            await snarkjs.zKey.exportBellman(zkeyFile, paramsFile, consoleLogger);
+            addStatusUpdateEvent(ceremonyId, `Params file has been created.  ${paramsFile}`);
             // Upload to storage
+            const storageFile = await uploadParams(ceremonyId, paramsFileName, paramsFile);
+            addStatusUpdateEvent(ceremonyId, `Params file has been uploaded to storage. ${storageFile}`);
+            // Set ceremony to WAITING
 
         });
     } else {

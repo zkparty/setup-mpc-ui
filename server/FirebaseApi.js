@@ -218,8 +218,8 @@ const ceremonyEventListener = async (circuitFileUpdateHandler) => {
   const query = eventsCollection.where('acknowledged', '==', false)
       .where('eventType', 'in', ['CIRCUIT_FILE_UPLOAD']);
   
-  //const snap = await query.get();
-  //console.debug(`snap ${snap.size}`);
+  const snap = await query.get();
+  console.debug(`snap ${snap.size}`);
 
   query.onSnapshot(querySnapshot => {
     console.log(`Ceremony events notified: ${JSON.stringify(querySnapshot.docChanges().length)}`);
