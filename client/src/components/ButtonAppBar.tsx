@@ -105,9 +105,11 @@ const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) |
   const [openAbout, setOpenAbout] = useState(false);
 
   const toggleAbout = () => {
-    console.debug(`toggelABout ${openAbout}`);
-    setOpenAbout(open => !open);
-  } 
+    setOpenAbout(open => {
+      if (props.handleClose) props.handleClose({}, 'backdropClick');
+      return !open;
+    });
+  }
 
   return (
     <span>

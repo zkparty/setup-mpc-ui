@@ -3,8 +3,8 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as React from 'react';
 
 function getModalStyle() {
-    const top = 100;
-    const left = 300;
+    const top = 50;
+    const left = 50;
   
     return {
       top: `${top}%`,
@@ -19,7 +19,7 @@ function getModalStyle() {
         position: 'absolute',
         width: 600,
         backgroundColor: 'black',
-        border: '2px solid #000',
+        border: '2px solid #fff',
         boxShadow: theme.shadows[5],
         padding: theme.spacing(2, 4, 3),
       },
