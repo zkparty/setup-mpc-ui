@@ -31,7 +31,7 @@ const timeLeft = (expectedTime: any) => {
         return '-';
     }
 }
- 
+
 const QueueProgress: FC<ContributionState> = (props) => {
     const classes = useStyles();
     const { ceremony, queueIndex, currentIndex, expectedStartTime, averageSecondsPerContribution} = props;

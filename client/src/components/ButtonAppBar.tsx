@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { withStyles, makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import Menu, { MenuProps } from '@material-ui/core/Menu';
@@ -19,8 +19,9 @@ import {
   textColor,
   background,
 } from "../styles";
-import { Button } from '@material-ui/core';
+import { Button, Modal } from '@material-ui/core';
 import Login from './Login';
+import About from './About';
 
 const StyledMenu = withStyles({
   paper: {
@@ -99,29 +100,39 @@ const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonEleme
   );
 };
 
-const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; }) => {
-  return (
-    <StyledMenu
-      id="customized-menu"
-      anchorEl={props.anchorEl}
-      keepMounted
-      open={Boolean(props.anchorEl)}
-      onClose={props.handleClose}
-    >
-    <StyledMenuItem>
-      <ListItemIcon>
-          <SettingsIcon fontSize="small" />
-      </ListItemIcon>
-      <ListItemText primary="Coordinator Settings" />
-      </StyledMenuItem>
-      <StyledMenuItem>
-      <ListItemIcon>
-          <InfoIcon fontSize="small" />
-      </ListItemIcon>
-      <ListItemText primary="About" />
-      </StyledMenuItem>
-    </StyledMenu>
 
+const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; }) => {
+  const [openAbout, setOpenAbout] = useState(false);
+
+  const toggleAbout = () => {
+    console.debug(`toggelABout ${openAbout}`);
+    setOpenAbout(open => !open);
+  } 
+
+  return (
+    <span>
+      <StyledMenu
+        id="customized-menu"
+        anchorEl={props.anchorEl}
+        keepMounted
+        open={Boolean(props.anchorEl)}
+        onClose={props.handleClose}
+      >
+      <StyledMenuItem>
+        <ListItemIcon>
+            <SettingsIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText primary="Coordinator Settings" />
+        </StyledMenuItem>
+        <StyledMenuItem>
+        <ListItemIcon>
+            <InfoIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText primary="About" onClick={toggleAbout}/>
+        </StyledMenuItem>
+      </StyledMenu>
+      <About open={openAbout} close={toggleAbout} />
+    </span>
   );
 };
 
@@ -149,7 +160,6 @@ export default function ButtonAppBar() {
     const [loginAnchorEl, setLoginAnchorEl] = React.useState<null | HTMLElement>(null);
     const Auth = React.useContext(AuthContext);
     const classes = useStyles();
-
 
     const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
         setMenuAnchorEl(event.currentTarget);

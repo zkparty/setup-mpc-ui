@@ -1,5 +1,4 @@
 import React, { useState, useContext } from "react";
-//import { createBrowserHistory } from "history";
 import { AuthContext } from "../app/AuthContext";
 import Button from "@material-ui/core/Button";
 import GitHubIcon from "@material-ui/icons/GitHub";
@@ -10,11 +9,8 @@ import ListItem from "@material-ui/core/ListItem";
 import { getUserPrivs } from "../api/ZKPartyApi";
 import { ListItemIcon } from "@material-ui/core";
 
-
-
 const Login = (props: { close: any }) => {
   const [error, setErrors] = useState("");
-
   const Auth = useContext(AuthContext);
 
   firebase.auth().onAuthStateChanged(user => {
@@ -80,7 +76,7 @@ const Login = (props: { close: any }) => {
     : 
       (<ListItem button={true} onClick={handleGithubLogin} style={{ color: accentColor, background: lighterBackground }}>
         <GitHubIcon />
-        Login With GitHub
+        &nbsp;Login With GitHub
       </ListItem>)      
   );
 };
