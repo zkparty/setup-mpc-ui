@@ -154,7 +154,7 @@ export const computeStateReducer = (state: any, action: any) => {
                 computed: true,
                 newParams: action.newParams,
             };
-            newState.progress = {count: 100, total: 100};
+            newState.progress = {count: 0, total: 100};
             addCeremonyEvent(state.contributionState.ceremony.id, createCeremonyEvent(
                 "COMPUTE_CONTRIBUTION", 
                 `Contribution for participant ${state.contributionState.queueIndex} completed OK`,

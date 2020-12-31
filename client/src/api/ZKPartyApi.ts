@@ -166,3 +166,32 @@ export const jsonToContribution = (json: any): Contribution => {
     ...json
   }
 }
+
+// Create a gist to record a contribution
+export const createGist = async (ceremonyId: string, ceremonyTitle: string, index: number, hash: string): string => {
+  const summary = {
+    ceremony: ceremonyTitle,
+    ceremonyId: ceremonyId,
+    time: new Date(),
+    contributionNumber: index,
+    hash: hash,
+  }
+  const gist = {
+    "description": "zkparty phase2 tusted setup MPC contribution summary",
+    "public": true,
+    "files": {
+        "contribution.txt": JSON.stringify(summary),       
+  }};
+  const res = await fetch('https://api.github.com/gists', {
+    method: 'post',
+    body: JSON.stringify(gist),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': '' // TODO - bearere auth token
+    }
+
+  });
+  // TODO handle result, get gist url and return it.
+
+  return '';
+}
