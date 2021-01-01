@@ -83,7 +83,10 @@ export const ParticipantSection = () => {
   
   const getParticipant = async () => {
     console.log(`uid: ${Auth.authUser.uid}`);
-    dispatch({ type: 'SET_PARTICIPANT', data: newParticipant(Auth.authUser.uid)});
+    dispatch({ 
+      type: 'SET_PARTICIPANT', 
+      data: newParticipant(Auth.authUser.uid), 
+      accessToken: Auth.accessToken });
   };
 
   const getEntropy = () => {

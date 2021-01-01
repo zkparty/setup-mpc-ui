@@ -49,8 +49,10 @@ const Login = (props: { close: any }) => {
         .then((result: any) => {
           console.log(result);
           //this.props.history.push('/')
+          // TODO - use reducer: dispatch LOGIN
           Auth.setAuthUser(result.user);
           Auth.setLoggedIn(true);
+          Auth.setAccessToken(result.credentials.accessToken);
           // Get user privileges
           getUserPrivs(result.user.email)
             .then((resp: string) => {

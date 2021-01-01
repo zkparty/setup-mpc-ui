@@ -1,7 +1,8 @@
 import { getParamsFile, UploadParams } from "../api/FileApi";
-import { CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
+import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant } from "../api/FirestoreApi";
+import { createGist } from "../api/ZKPartyApi";
 
 export enum Step {
     NOT_ACKNOWLEDGED,
@@ -168,30 +169,47 @@ export const computeStateReducer = (state: any, action: any) => {
             return newState;
         }
         case 'UPLOADED': {
-            addCeremonyEvent(state.contributionState.ceremony.id, createCeremonyEvent(
+            const { queueIndex, ceremony, startTime } = state.contributionState;
+            addCeremonyEvent(ceremony.id, createCeremonyEvent(
                 "PARAMS_UPLOADED", 
-                `Parameters for participant ${state.contributionState.queueIndex} uploaded to ${action.file}`,
-                state.contributionState.queueIndex
+                `Parameters for participant ${queueIndex} uploaded to ${action.file}`,
+                queueIndex
             ));
             let msg = `Parameters uploaded.`;
             newState = addMessage(state, msg);
-            //newState.messages = [...state.messages, msg];
-            const duration = ((Date.now()) - state.contributionState.startTime) / 1000;
+            const duration = ((Date.now()) - startTime) / 1000;
             const contribution = createContributionSummary(
                  state.participant ? state.participant.uid : '??',
                  "COMPLETE", 
                  action.file, 
-                 state.contributionState.queueIndex, 
+                 queueIndex, 
                  state.hash,
                  duration
             );
-            addOrUpdateContribution(state.contributionState.ceremony.id, contribution);
+            newState.contributionSummary = contribution;
+            startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
+
+            return newState;
+        }
+        case 'GIST_CREATED': {
+            const { queueIndex, ceremony } = state.contributionState;
+            addCeremonyEvent(ceremony.id, createCeremonyEvent(
+                "GIST_CREATED", 
+                `Contribution recorded at ${action.gistUrl}`,
+                queueIndex
+            ));
+            let msg = `Gist created at ${action.gistUrl}.`;
+            newState = addMessage(state, msg);
+            const contribution = newState.contributionSummary;
+            contribution.gistUrl = action.gistUrl;
+            addOrUpdateContribution(ceremony.id, contribution);
             msg = `Thank you for your contribution.`;
             newState = addMessage(newState, msg);
 
             // Clean up and return to waiting
             newState.computeStatus = initialComputeStatus;
             newState.contributionState = null;
+            newState.contributionSummary = null;
             newState.hash = '';
             newState.step = Step.WAITING;
             return newState;
@@ -237,6 +255,7 @@ export const computeStateReducer = (state: any, action: any) => {
         case 'SET_PARTICIPANT': {
             console.debug(`set participant ${action.data.uid}`)
             newState.participant = action.data;
+            newState.acccessToken = action.accessToken;
             addOrUpdateParticipant(action.data);
             return newState;
         }
@@ -324,6 +343,18 @@ const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispat
             dispatch({
                 type: 'UPLOADED',
                 file: paramsFile,
+                dispatch,
+            })
+    });
+}
+
+const startCreateGist = (ceremony: Ceremony, index: number, hash: string, accessToken: string, dispatch: (a: any) => void) => {
+    console.debug(`startCreateGist ${accessToken}`);
+    createGist(ceremony.id, ceremony.title, index, hash, accessToken).then(
+        gistUrl => {
+            dispatch({
+                type: 'GIST_CREATED',
+                gistUrl,
             })
     });
 }

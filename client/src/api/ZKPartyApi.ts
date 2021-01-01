@@ -168,7 +168,7 @@ export const jsonToContribution = (json: any): Contribution => {
 }
 
 // Create a gist to record a contribution
-export const createGist = async (ceremonyId: string, ceremonyTitle: string, index: number, hash: string): string => {
+export const createGist = async (ceremonyId: string, ceremonyTitle: string, index: number, hash: string, authToken: string): Promise<string> => {
   const summary = {
     ceremony: ceremonyTitle,
     ceremonyId: ceremonyId,
@@ -187,7 +187,7 @@ export const createGist = async (ceremonyId: string, ceremonyTitle: string, inde
     body: JSON.stringify(gist),
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': '' // TODO - bearere auth token
+      'Authorization': authToken,
     }
 
   });
