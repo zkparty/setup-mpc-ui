@@ -52,7 +52,7 @@ export const LandingPage = () => {
 
     return (
         <AuthContext.Consumer>
-          {(Auth) => {console.debug(`landing page: ${Auth.isCoordinator}`); return (
+          {(Auth) => {console.debug(`landing page: ${Auth.state.isCoordinator}`); return (
             <Fragment>
               <ButtonAppBar />
               <PageContainer>
@@ -64,7 +64,7 @@ export const LandingPage = () => {
                 >
                   <Tab label="Ceremonies" value="1" />
                   <Tab label="Participate" value="2" />
-                  {Auth.isCoordinator ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
+                  {Auth.state.isCoordinator ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
                 </StyledTabs>
                 <TabPanel value={selection.activeTab} index="1">
                   <SummarySection key="summary" />
@@ -161,7 +161,10 @@ const SummarySection = (props: any) => {
     if (!loaded) {
       getCeremonies()
         .then((cerems) => {
-          setCeremonies(cerems);
+          cerems.forEach(
+            (c: Ceremony) => updateCeremony(c)
+          );
+          //setCeremonies(cerems);
           // Subscribe to ceremony updates
           ceremonyListener(updateCeremony);
           console.debug('getCeremonies done');

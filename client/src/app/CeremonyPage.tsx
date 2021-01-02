@@ -186,7 +186,7 @@ const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
   return (
     <AuthContext.Consumer>{Auth => {
       return (<div>
-        {Auth.isCoordinator ?
+        {Auth.state.isCoordinator ?
           (<Fab 
             variant="round" 
             onClick={props.handleEdit}
