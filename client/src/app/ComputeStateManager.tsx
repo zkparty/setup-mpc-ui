@@ -61,7 +61,7 @@ interface ComputeStatus {
     newParams: Uint8Array,
     uploaded: boolean,
     progress: { count: number, total: number},
-  };
+};
   
 export const initialComputeStatus: ComputeStatus = {
     ready: false,

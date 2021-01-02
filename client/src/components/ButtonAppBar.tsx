@@ -75,7 +75,7 @@ const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonEleme
 
   return (
     <AuthContext.Consumer>
-      {(Auth) => {return (Auth.isLoggedIn && Auth.authUser) ?
+      {(Auth) => {return (Auth.state.isLoggedIn && Auth.state.authUser) ?
         (<Button
           aria-controls="github-login"
           color="inherit"
@@ -83,7 +83,7 @@ const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonEleme
           style={{ color: accentColor }}
           onClick={props.onClick}
           >
-          {Auth.authUser?.displayName || "-"}
+          {Auth.state.authUser?.displayName || "-"}
         </Button>)
       : 
         (<Button
@@ -181,7 +181,7 @@ export default function ButtonAppBar() {
 
   const handleLogout = () => {
     console.log('loggin out');
-    Auth.setLoggedIn(false);
+    Auth.dispatch({type: 'LOGOUT'});
   }
       
   return (

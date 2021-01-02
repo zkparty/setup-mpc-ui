@@ -82,11 +82,11 @@ export const ParticipantSection = () => {
   const { step, computeStatus, messages, entropy, participant, contributionState } = state;
   
   const getParticipant = async () => {
-    console.log(`uid: ${Auth.authUser.uid}`);
+    console.log(`uid: ${Auth.state.authUser.uid}`);
     dispatch({ 
       type: 'SET_PARTICIPANT', 
-      data: newParticipant(Auth.authUser.uid), 
-      accessToken: Auth.accessToken });
+      data: newParticipant(Auth.state.authUser.uid), 
+      accessToken: Auth.state.accessToken });
   };
 
   const getEntropy = () => {
@@ -133,7 +133,7 @@ export const ParticipantSection = () => {
   }; 
 
   let content = (<></>);
-  if (!Auth.isLoggedIn) {
+  if (!Auth.state.isLoggedIn) {
     content = (<Typography variant='body1'>Sorry, please login to access this page</Typography>);
   } else {
     console.debug(`step ${step.toString()}`);
@@ -165,7 +165,7 @@ export const ParticipantSection = () => {
       }
       case (Step.ENTROPY_COLLECTED): {
         // start looking for a ceremony to contribute to
-        if (participant) ceremonyContributionListener(participant.uid, Auth.isCoordinator, setContribution);
+        if (participant) ceremonyContributionListener(participant.uid, Auth.state.isCoordinator, setContribution);
         content = stepText('Starting listener...');
         addMessage('Initialised.');
         dispatch({type: 'SET_STEP', data: Step.WAITING});

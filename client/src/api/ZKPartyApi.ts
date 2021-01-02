@@ -187,7 +187,7 @@ export const createGist = async (ceremonyId: string, ceremonyTitle: string, inde
     body: JSON.stringify(gist),
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': authToken,
+      'Authorization': `bearer ${authToken}`,
     }
 
   });

@@ -16,21 +16,25 @@ const Login = (props: { close: any }) => {
   firebase.auth().onAuthStateChanged(user => {
     console.log(`auth state changed: ${user?.displayName}`);
     if (user) {
-      if (Auth.setAuthUser) Auth.setAuthUser(user);
-      if (Auth.setLoggedIn) Auth.setLoggedIn(true);
       // Get user privileges
       if (user.email) {
         getUserPrivs(user.email)
-        .then((resp: string) => {
-          console.log(`privs: ${resp}`);
-          //Auth.setCoordinator("COORDINATOR" === resp);
-          // TODO - revert to correct test. temporary for testing
-          Auth.setCoordinator(true);
-        });
+          .then((resp: string) => {
+            console.log(`privs: ${resp}`);
+            //Auth.setCoordinator("COORDINATOR" === resp);
+            // TODO - revert to correct test. temporary for testing
+            Auth.dispatch({type: 'SET_COORDINATOR'});
+          });
       }
-    } else {
-      Auth.setLoggedIn(false);
-      Auth.setAuthUser(null);
+      // Auth.dispatch({
+      //   type: 'LOGIN',
+      //   user: user,
+      //   accessToken: user.credentials.accessToken;
+      // });
+  } else {
+      Auth.dispatch(
+        {type: 'LOGOUT'}
+      );
     }
   });
   
@@ -48,16 +52,18 @@ const Login = (props: { close: any }) => {
         .signInWithPopup(provider)
         .then((result: any) => {
           console.log(result);
-          //this.props.history.push('/')
-          // TODO - use reducer: dispatch LOGIN
-          Auth.setAuthUser(result.user);
-          Auth.setLoggedIn(true);
-          Auth.setAccessToken(result.credentials.accessToken);
           // Get user privileges
           getUserPrivs(result.user.email)
             .then((resp: string) => {
               console.log(`privs: ${resp}`);
-              Auth.setCoordinator("COORDINATOR" === resp);
+              if (resp === 'COORDINATOR') {
+                Auth.dispatch({type: 'SET_COORDINATOR'})
+              }
+          });
+          Auth.dispatch({
+            type: 'LOGIN',
+            user: result.user,
+            accessToken: result.credentials.accessToken,
           });
           props.close();
         })
@@ -70,7 +76,7 @@ const Login = (props: { close: any }) => {
   };
 
   return (
-    (Auth.isLoggedIn) ? 
+    (Auth.state.isLoggedIn) ? 
       (<ListItemIcon  onClick={logOut} style={{ color: accentColor, background: lighterBackground }}>
         <ExitToAppIcon fontSize="small" />
         Log Out
