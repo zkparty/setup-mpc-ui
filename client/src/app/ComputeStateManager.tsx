@@ -93,7 +93,7 @@ const addMessage = (state: any, message: string) => {
     return {...state, messages: [...state.messages, msg]};
 }
 
-export const computeStateReducer = (state: any, action: any) => {
+export const computeStateReducer = (state: any, action: any):any => {
     let newState = {...state};
     switch (action.type) {
         case 'START_COMPUTE': {

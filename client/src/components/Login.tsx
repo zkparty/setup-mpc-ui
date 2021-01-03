@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
-import { AuthContext } from "../app/AuthContext";
-import Button from "@material-ui/core/Button";
+import { AuthDispatchContext, AuthStateContext } from "../app/AuthContext";
 import GitHubIcon from "@material-ui/icons/GitHub";
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import firebase from "firebase";
@@ -11,35 +10,11 @@ import { ListItemIcon } from "@material-ui/core";
 
 const Login = (props: { close: any }) => {
   const [error, setErrors] = useState("");
-  const Auth = useContext(AuthContext);
+  const dispatch = useContext(AuthDispatchContext);
+  const authState = useContext(AuthStateContext);
 
-  firebase.auth().onAuthStateChanged(user => {
-    console.log(`auth state changed: ${user?.displayName}`);
-    if (user) {
-      // Get user privileges
-      if (user.email) {
-        getUserPrivs(user.email)
-          .then((resp: string) => {
-            console.log(`privs: ${resp}`);
-            //Auth.setCoordinator("COORDINATOR" === resp);
-            // TODO - revert to correct test. temporary for testing
-            Auth.dispatch({type: 'SET_COORDINATOR'});
-          });
-      }
-      // Auth.dispatch({
-      //   type: 'LOGIN',
-      //   user: user,
-      //   accessToken: user.credentials.accessToken;
-      // });
-  } else {
-      Auth.dispatch(
-        {type: 'LOGOUT'}
-      );
-    }
-  });
+  if (!dispatch) return (<></>);
   
-  //const history = createBrowserHistory();
-
   const handleGithubLogin = () => {
     const provider = new firebase.auth.GithubAuthProvider();
 
@@ -57,10 +32,11 @@ const Login = (props: { close: any }) => {
             .then((resp: string) => {
               console.log(`privs: ${resp}`);
               if (resp === 'COORDINATOR') {
-                Auth.dispatch({type: 'SET_COORDINATOR'})
+                dispatch({type: 'SET_COORDINATOR'})
               }
           });
-          Auth.dispatch({
+          console.debug(`dispatch LOGIN`);
+          dispatch({
             type: 'LOGIN',
             user: result.user,
             accessToken: result.credentials.accessToken,
@@ -76,7 +52,7 @@ const Login = (props: { close: any }) => {
   };
 
   return (
-    (Auth.state.isLoggedIn) ? 
+    (authState.isLoggedIn) ? 
       (<ListItemIcon  onClick={logOut} style={{ color: accentColor, background: lighterBackground }}>
         <ExitToAppIcon fontSize="small" />
         Log Out

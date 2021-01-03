@@ -1,7 +1,7 @@
 import React, { useReducer } from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
-import { AuthContext } from "../app/AuthContext";
+import { AuthStateContext } from "../app/AuthContext";
 
 import {
   accentColor,
@@ -76,17 +76,17 @@ const queueProgressCard = (contrib: ContributionState) => {
 
 export const ParticipantSection = () => {
   const [state, dispatch] = useReducer(computeStateReducer, initialState);
-  const Auth = React.useContext(AuthContext);
+  const authState = React.useContext(AuthStateContext);
   const classes = useStyles();
 
   const { step, computeStatus, messages, entropy, participant, contributionState } = state;
   
   const getParticipant = async () => {
-    console.log(`uid: ${Auth.state.authUser.uid}`);
+    console.log(`uid: ${authState.authUser.uid}`);
     dispatch({ 
       type: 'SET_PARTICIPANT', 
-      data: newParticipant(Auth.state.authUser.uid), 
-      accessToken: Auth.state.accessToken });
+      data: newParticipant(authState.authUser.uid), 
+      accessToken: authState.accessToken });
   };
 
   const getEntropy = () => {
@@ -133,7 +133,7 @@ export const ParticipantSection = () => {
   }; 
 
   let content = (<></>);
-  if (!Auth.state.isLoggedIn) {
+  if (!authState.isLoggedIn) {
     content = (<Typography variant='body1'>Sorry, please login to access this page</Typography>);
   } else {
     console.debug(`step ${step.toString()}`);
@@ -165,7 +165,7 @@ export const ParticipantSection = () => {
       }
       case (Step.ENTROPY_COLLECTED): {
         // start looking for a ceremony to contribute to
-        if (participant) ceremonyContributionListener(participant.uid, Auth.state.isCoordinator, setContribution);
+        if (participant) ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
         content = stepText('Starting listener...');
         addMessage('Initialised.');
         dispatch({type: 'SET_STEP', data: Step.WAITING});

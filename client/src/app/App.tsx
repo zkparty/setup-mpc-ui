@@ -1,8 +1,9 @@
-import * as React from "react";
+import * as React from 'react';
+import { useReducer } from "react";
 import { createGlobalStyle } from "styled-components";
 import { textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
-import { AuthContext, useAuthContextValue } from "./AuthContext";
+import { AuthContextProvider, authStateReducer, defaultAuth } from "./AuthContext";
 import { SelectionContextProvider } from './SelectionContext';
 import firebase from "firebase/app";
 import firebaseConfig from "./firebaseConfig";
@@ -14,17 +15,18 @@ import { SnackbarProvider } from "notistack";
 firebase.initializeApp(firebaseConfig);
 
 const App = () => {
+
   console.log(`Firebase inited ${firebase.app.name}`);
   console.log(`auth user: ${firebase.auth().currentUser?.displayName}`);
   return (
-    <AuthContext.Provider value={ useAuthContextValue() }>
+    <AuthContextProvider>
       <SelectionContextProvider>
         <SnackbarProvider maxSnack={4}>
             <GlobalStyle />
             <LandingPage />
         </SnackbarProvider>
       </SelectionContextProvider>
-    </AuthContext.Provider>
+    </AuthContextProvider>
   );
 };
 

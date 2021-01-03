@@ -12,7 +12,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import InfoIcon from '@material-ui/icons/Info';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import { ZKTitle } from "./Title";
-import { AuthContext } from "../app/AuthContext";
+import { AuthStateContext, AuthDispatchContext } from "../app/AuthContext";
 import {
   accentColor,
   secondAccent,
@@ -74,8 +74,8 @@ const useStyles = makeStyles((theme: Theme) =>
 const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined; }) => {
 
   return (
-    <AuthContext.Consumer>
-      {(Auth) => {return (Auth.state.isLoggedIn && Auth.state.authUser) ?
+    <AuthStateContext.Consumer>
+      {Auth => {return (Auth.isLoggedIn && Auth.authUser) ?
         (<Button
           aria-controls="github-login"
           color="inherit"
@@ -83,7 +83,7 @@ const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonEleme
           style={{ color: accentColor }}
           onClick={props.onClick}
           >
-          {Auth.state.authUser?.displayName || "-"}
+          {Auth.authUser.displayName || "-"}
         </Button>)
       : 
         (<Button
@@ -96,7 +96,7 @@ const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonEleme
           Login
         </Button>)
       }}
-    </AuthContext.Consumer>
+    </AuthStateContext.Consumer>
   );
 };
 
@@ -155,24 +155,22 @@ const LoginMenu = (props: { anchorEl: Element | ((element: Element) => Element) 
   );
 };
 
-
-
 export default function ButtonAppBar() {
-    const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [loginAnchorEl, setLoginAnchorEl] = React.useState<null | HTMLElement>(null);
-    const Auth = React.useContext(AuthContext);
-    const classes = useStyles();
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [loginAnchorEl, setLoginAnchorEl] = React.useState<null | HTMLElement>(null);
+  const AuthDispatch = React.useContext(AuthDispatchContext);
+  const classes = useStyles();
 
-    const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-        setMenuAnchorEl(event.currentTarget);
-    };
-    
-    const handleMenuClose = () => {
-      setMenuAnchorEl(null);
-    };
-        
-    const handleLoginClick = (event: React.MouseEvent<HTMLElement>) => {
-      setLoginAnchorEl(event.currentTarget);
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+      setMenuAnchorEl(event.currentTarget);
+  };
+  
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
+      
+  const handleLoginClick = (event: React.MouseEvent<HTMLElement>) => {
+    setLoginAnchorEl(event.currentTarget);
   };
   
   const handleLoginClose = () => {
@@ -181,7 +179,7 @@ export default function ButtonAppBar() {
 
   const handleLogout = () => {
     console.log('loggin out');
-    Auth.dispatch({type: 'LOGOUT'});
+    if (AuthDispatch) AuthDispatch({type: 'LOGOUT'});
   }
       
   return (

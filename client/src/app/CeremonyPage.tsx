@@ -1,4 +1,3 @@
-import { Link, RouteProps, useParams } from "react-router-dom";
 import { useState, useEffect, useRef, useContext } from "react";
 import * as React from "react";
 import styled from "styled-components";
@@ -21,7 +20,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 import moment from "moment";
 import './styles.css';
-import { AuthContext } from "./AuthContext";
+import { AuthStateContext } from "./AuthContext";
 import { SelectedCeremonyContext, useSelectionContext } from "./SelectionContext";
 
 const CeremonyDetailsTable = styled.table`
@@ -184,9 +183,9 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
 
 const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
   return (
-    <AuthContext.Consumer>{Auth => {
+    <AuthStateContext.Consumer>{Auth => {
       return (<div>
-        {Auth.state.isCoordinator ?
+        {Auth.isCoordinator ?
           (<Fab 
             variant="round" 
             onClick={props.handleEdit}
@@ -203,7 +202,7 @@ const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
         </Fab>
       </div>
       )}}
-    </AuthContext.Consumer>
+    </AuthStateContext.Consumer>
   );
 }
 

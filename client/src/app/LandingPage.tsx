@@ -20,7 +20,7 @@ import {
 } from "../styles";
 import { Ceremony } from "../types/ceremony";
 import { ceremonyListener, getCeremonies, getCeremony } from "../api/FirestoreApi";
-import { AuthContext } from "./AuthContext";
+import { AuthStateContext } from "./AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
 import { CeremonyPage } from "./CeremonyPage";
@@ -51,8 +51,8 @@ export const LandingPage = () => {
     const closeCeremonyModal = () => {dispatch({type: 'CLOSE_CEREMONY'});}
 
     return (
-        <AuthContext.Consumer>
-          {(Auth) => {console.debug(`landing page: ${Auth.state.isCoordinator}`); return (
+        <AuthStateContext.Consumer>
+          {Auth => {console.debug(`landing page: ${Auth.isCoordinator}`); return (
             <Fragment>
               <ButtonAppBar />
               <PageContainer>
@@ -64,7 +64,7 @@ export const LandingPage = () => {
                 >
                   <Tab label="Ceremonies" value="1" />
                   <Tab label="Participate" value="2" />
-                  {Auth.state.isCoordinator ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
+                  {Auth.isCoordinator ? (<Tab label="New Ceremony" value="3" />) : (<></>) }
                 </StyledTabs>
                 <TabPanel value={selection.activeTab} index="1">
                   <SummarySection key="summary" />
@@ -86,7 +86,7 @@ export const LandingPage = () => {
               </PageContainer>
             </Fragment>
           )}}
-        </AuthContext.Consumer>
+        </AuthStateContext.Consumer>
   );
 };
 
