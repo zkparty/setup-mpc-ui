@@ -69,7 +69,7 @@ const setHash = (h: string) => {
 };
 
 const reportProgress = (count: number, total: number) => {
-  console.debug(`sw progress: ${count} of ${total}`);
+  //console.debug(`sw progress: ${count} of ${total}`);
   if (client)
     client.postMessage(
         JSON.stringify({

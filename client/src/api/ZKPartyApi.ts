@@ -177,10 +177,10 @@ export const createGist = async (ceremonyId: string, ceremonyTitle: string, inde
     hash: hash,
   }
   const gist = {
-    "description": "zkparty phase2 tusted setup MPC contribution summary",
-    "public": true,
-    "files": {
-        "contribution.txt": JSON.stringify(summary),       
+    description: "zkparty phase2 tusted setup MPC contribution summary",
+    public: true,
+    files: {
+        "contribution.txt": {content: JSON.stringify(summary, undefined, 2)},
   }};
   const res = await fetch('https://api.github.com/gists', {
     method: 'post',
@@ -193,7 +193,7 @@ export const createGist = async (ceremonyId: string, ceremonyTitle: string, inde
   })
   .catch(err => console.warn(`Error creating gist. ${err.message}`));
   // TODO handle result, get gist url and return it.
-  console.debug(`${JSON.stringify(res)}`);
-
+  console.debug(`${res ? 'ok' : 'error'}`);
+  if (res) return (await res.json()).html_url;
   return '';
 }

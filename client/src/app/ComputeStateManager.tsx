@@ -193,13 +193,17 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'GIST_CREATED': {
             const { queueIndex, ceremony } = state.contributionState;
-            addCeremonyEvent(ceremony.id, createCeremonyEvent(
-                "GIST_CREATED", 
-                `Contribution recorded at ${action.gistUrl}`,
-                queueIndex
-            ));
-            let msg = `Gist created at ${action.gistUrl}.`;
-            newState = addMessage(state, msg);
+            let msg;
+            if (action.gistUrl) {
+                addCeremonyEvent(ceremony.id, createCeremonyEvent(
+                    "GIST_CREATED", 
+                    `Contribution recorded at ${action.gistUrl}`,
+                    queueIndex
+                ));
+                msg = `Gist created at ${action.gistUrl}`;
+                newState = addMessage(state, msg);
+            }
+            
             const contribution = newState.contributionSummary;
             contribution.gistUrl = action.gistUrl;
             addOrUpdateContribution(ceremony.id, contribution);
@@ -228,7 +232,6 @@ export const computeStateReducer = (state: any, action: any):any => {
                 }
             }
             return {...state, step: action.data}
-            //break;
         }
         case 'SET_CEREMONY': {
             newState.contributionState = action.data;
@@ -348,11 +351,18 @@ const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispat
 
 const startCreateGist = (ceremony: Ceremony, index: number, hash: string, accessToken: string, dispatch: (a: any) => void) => {
     console.debug(`startCreateGist ${accessToken}`);
-    createGist(ceremony.id, ceremony.title, index, hash, accessToken).then(
-        gistUrl => {
-            dispatch({
-                type: 'GIST_CREATED',
-                gistUrl,
-            })
-    });
+    if (accessToken) {
+        createGist(ceremony.id, ceremony.title, index, hash, accessToken).then(
+            gistUrl => {
+                dispatch({
+                    type: 'GIST_CREATED',
+                    gistUrl,
+                })
+        });
+    } else {
+        dispatch({
+            type: 'GIST_CREATED',
+            gistUrl: null,
+        })
+    }
 }

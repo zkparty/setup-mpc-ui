@@ -136,7 +136,7 @@ export const ParticipantSection = () => {
   if (!authState.isLoggedIn) {
     content = (<Typography variant='body1'>Sorry, please login to access this page</Typography>);
   } else {
-    console.debug(`step ${step.toString()}`);
+    //console.debug(`step ${step.toString()}`);
     switch (step) {
       case (Step.NOT_ACKNOWLEDGED): {
         // Display welcome text until the 'go ahead' button is clicked.
@@ -187,7 +187,7 @@ export const ParticipantSection = () => {
       case (Step.RUNNING): {
         // We have a ceremony to contribute to. 
         // Download/Compute/Upload
-        logState();
+        //logState();
 
         if (computeStatus.ready && !computeStatus.running) {
           // Start the computation
