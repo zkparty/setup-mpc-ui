@@ -17,10 +17,13 @@ const Login = (props: { close: any }) => {
   
   const handleGithubLogin = () => {
     const provider = new firebase.auth.GithubAuthProvider();
+    
+    provider.addScope('read:user');
+    provider.addScope('gist');
 
     firebase
-    .auth()
-    .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+     .auth()
+     .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
       .then(() => {
         firebase
         .auth()

@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- update the version number as needed -->
-    <script defer src="/__/firebase/8.0.1/firebase-app.js"></script>
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-app.js"></script> -->
     <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/8.0.1/firebase-auth.js"></script>
+    <!-- <script defer src="/__/firebase/8.0.1/firebase-auth.js"></script>
     <script defer src="/__/firebase/8.0.1/firebase-database.js"></script>
     <script defer src="/__/firebase/8.0.1/firebase-firestore.js"></script>
     <script defer src="/__/firebase/8.0.1/firebase-functions.js"></script>
@@ -16,7 +16,7 @@
     <script defer src="/__/firebase/8.0.1/firebase-analytics.js"></script>
     <script defer src="/__/firebase/8.0.1/firebase-remote-config.js"></script>
     <script defer src="/__/firebase/8.0.1/firebase-performance.js"></script>
-
+    -->
     <!-- 
       initialize the SDK after all desired features are loaded, set useEmulator to false
       to avoid connecting the SDK to running emulators.
@@ -31,7 +31,7 @@
       #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
       #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
       #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      #load { color: rgba(8,8,8,0.4); text-align: center; font-size: 13px; }
       @media (max-width: 600px) {
         body, #message { margin-top: 0; background: white; box-shadow: none; }
         body { border-top: 16px solid #ffa100; }
@@ -41,7 +41,7 @@
   </head>
   <body>
     <div id="root"></div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    <p id="load">Firebase SDK Loading &hellip;</p>
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
@@ -62,18 +62,18 @@
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
         try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
+          //let app = firebase.app();
+          // let features = [
+          //   'auth', 
+          //   'database', 
+          //   'firestore',
+          //   'functions',
+          //   'messaging', 
+          //   'storage', 
+          //   'analytics', 
+          //   'remoteConfig',
+          //   'performance',
+          // ].filter(feature => typeof app[feature] === 'function');
           loadEl.textContent = ''; //`Firebase SDK loaded with ${features.join(', ')}`;
         } catch (e) {
           console.error(e);

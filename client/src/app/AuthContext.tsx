@@ -41,8 +41,10 @@ export const AuthContextProvider = ({ children }:any) => {
                 // TODO - revert to correct test. temporary for testing
                 dispatch({type: 'SET_COORDINATOR'});
               });
+          } else {
+            console.warn(`user email not available`);
           }
-          console.debug(`dispatch login ${JSON.stringify(user)}`);
+          //console.debug(`dispatch login ${JSON.stringify(user)}`);
           dispatch({
             type: 'LOGIN',
             user: user,
