@@ -82,7 +82,7 @@ export const ParticipantSection = () => {
   const { step, computeStatus, messages, entropy, participant, contributionState } = state;
   
   const getParticipant = async () => {
-    console.log(`uid: ${authState.authUser.uid}`);
+    console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
     dispatch({ 
       type: 'SET_PARTICIPANT', 
       data: newParticipant(authState.authUser.uid), 
@@ -181,7 +181,7 @@ export const ParticipantSection = () => {
         if (contributionState) {
           console.debug(`contribution state: ${JSON.stringify(contributionState)}`);
           content = queueProgressCard(contributionState);
-        }      
+        }
         break;
       }
       case (Step.RUNNING): {
@@ -196,7 +196,7 @@ export const ParticipantSection = () => {
             ceremonyId: contributionState.ceremony.id,
             index: contributionState.queueIndex,
             dispatch,
-          });          
+          });
         }
 
         const progressPct = state.progress.total > 0 ? 100 * state.progress.count / state.progress.total : 0;

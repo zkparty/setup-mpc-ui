@@ -216,7 +216,7 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'ADD_MESSAGE': {
             newState = addMessage(state, action.message);
-            break;
+            return newState;
         }
         case 'SET_STEP': {
             console.debug(`step updated ${action.data}`);
@@ -253,11 +253,9 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'SET_PARTICIPANT': {
-            console.debug(`set participant ${action.data.uid}`)
-            newState.participant = action.data;
-            newState.acccessToken = action.accessToken;
+            console.debug(`set participant ${action.data.uid}`);
             addOrUpdateParticipant(action.data);
-            return newState;
+            return { ...newState, participant: action.data, accessToken: action.accessToken };
         }
         case 'SET_ENTROPY': {
             return {...state, entropy: action.data};

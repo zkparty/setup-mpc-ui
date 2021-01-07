@@ -39,7 +39,7 @@ const Login = (props: { close: any }) => {
           dispatch({
             type: 'LOGIN',
             user: result.user,
-            accessToken: result.credentials.accessToken,
+            accessToken: result.credential.accessToken,
           });
           props.close();
         })

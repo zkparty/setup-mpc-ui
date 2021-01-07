@@ -190,8 +190,10 @@ export const createGist = async (ceremonyId: string, ceremonyTitle: string, inde
       'Authorization': `bearer ${authToken}`,
     }
 
-  });
+  })
+  .catch(err => console.warn(`Error creating gist. ${err.message}`));
   // TODO handle result, get gist url and return it.
+  console.debug(`${JSON.stringify(res)}`);
 
   return '';
 }
