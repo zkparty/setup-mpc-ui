@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useContext } from "react";
 import * as React from "react";
 import styled from "styled-components";
 import { ReactNode } from "react";
-import { DataGrid, ColDef, ValueGetterParams } from '@material-ui/data-grid';
+import { DataGrid, ColDef, ValueGetterParams, CellParams } from '@material-ui/data-grid';
 import {
   textColor,
   lighterBackground,
@@ -207,7 +207,7 @@ const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
 }
 
 const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, numContWaiting: number  }) => {
-  console.debug(`start ${props.ceremony.startTime}`);
+  //console.debug(`start ${props.ceremony.startTime}`);
 
   return (
     <CeremonyDetailsContainer>
@@ -257,8 +257,19 @@ const columns: ColDef[] = [
     description: 'The hash resulting from this contribution',
     sortable: false,
     width: 180,
-    //valueGetter: (params: ValueGetterParams) =>
-    //  `${params.getValue('hash')}`,
+  },
+  { field: 'gistUrl', 
+    headerName: 'Attestation',
+    description: 'Link to the attestation',
+    sortable: false,
+    width: 120,
+    renderCell: (params: CellParams) => {
+      const v = params.value?.toString();
+      return (
+        v ? 
+          <a href={v} target='_blank'>{'https://...'}</a>
+        : <></>
+      )},
   },
 ];
 
