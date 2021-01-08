@@ -3,9 +3,11 @@ export type CeremonyState =
   | "SELECTED"
   | "RUNNING"
   | "COMPLETE"
+  | "WAITING"
+  | "PAUSED"
   | "UNKNOWN";
 
-  export type ParticipantState =
+export type ParticipantState =
     | "WAITING"
     | "RUNNING"
     | "COMPLETE"

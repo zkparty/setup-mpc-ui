@@ -44,7 +44,7 @@ export interface SelectedCeremonyContextInterface {
       case 'ADD_CEREMONY': {
         selection.edit = true;
         selection.activeTab = '3';
-        break;
+        return selection;
       }
       case 'EDIT_CEREMONY': {
         return {

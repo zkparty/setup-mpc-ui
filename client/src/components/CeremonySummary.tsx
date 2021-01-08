@@ -73,6 +73,26 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
 
     //console.log(`ceremony id: ${c.id}`);
     const progress = c.complete ? Math.floor(Math.min(100, 100 * c.complete/c.minParticipants)) : 0;
+
+    let status;
+    switch (c.ceremonyState) {
+      case "WAITING":
+      case "PRESELECTION": {
+        status = 'Not accepting contributions until start date';
+        break;
+      }
+      case 'PAUSED': {
+        status = 'Not accepting contributions at present';
+        break;
+      }
+      case 'RUNNING': {
+        status = 'Accepting contributions';
+        break;
+      }
+      default: {
+        status = c.ceremonyState;
+      }
+    }
   
     return (
       <CeremonyContainer onClick={onClick}>
@@ -81,7 +101,7 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
         <br />
         <br />
         <Flex>
-          <Bold>Status:&nbsp;</Bold>{` ${c.ceremonyState}`}
+          <Bold>Status:&nbsp;</Bold>{` ${status}`}
           {(c.ceremonyState === "RUNNING" ? 
               (<div className={classes.root}>
                 <LinearProgressWithLabel value={progress} />
