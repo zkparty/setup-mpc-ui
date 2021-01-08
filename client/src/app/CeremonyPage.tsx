@@ -267,7 +267,7 @@ const columns: ColDef[] = [
       const v = params.value?.toString();
       return (
         v ? 
-          <a href={v} target='_blank'>{'https://...'}</a>
+          <a href={v} target='_blank' style={{ color: 'white' }}>{'https://...'}</a>
         : <></>
       )},
   },
