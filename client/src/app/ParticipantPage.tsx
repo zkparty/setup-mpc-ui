@@ -168,12 +168,17 @@ export const ParticipantSection = () => {
         if (participant) ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
         content = stepText('Starting listener...');
         addMessage('Initialised.');
-        dispatch({type: 'SET_STEP', data: Step.WAITING});
+        dispatch({type: 'SET_STEP', data: Step.WAITING, dispatch});
         break;
       }
       case (Step.WAITING): {
-        // Waiting for a ceremony      
-        content = stepText('No ceremonies are ready to accept your contribution at the moment.');
+        // Waiting for a ceremony
+        const { contributionCount } = state;
+        if (contributionCount) {
+          content = stepText(`You have contributed to ${contributionCount} ${contributionCount == 1 ? 'ceremony' : 'ceremonies'}. No further ceremonies are ready for your contribution at the moment.`);
+        } else {
+          content = stepText('No ceremonies are ready to accept your contribution at the moment.');
+        }
         break;
       }
       case (Step.QUEUED): {

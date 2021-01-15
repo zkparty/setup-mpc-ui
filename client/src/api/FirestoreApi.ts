@@ -469,3 +469,16 @@ export const addOrUpdateParticipant = async (participant: Participant) => {
   } catch (e) { throw new Error(`Error adding participant: ${e.message}`);}
 
 };
+
+export const countParticpantContributions = async (participant: string): Promise<number> => {
+  const db = firebase.firestore();
+  try {
+    const contribQuery = db.collectionGroup("contributions")
+      .withConverter(contributionConverter)
+      .where('participantId', '==', participant)
+      .where('status', '==', 'COMPLETE');
+    const res = await contribQuery.get();
+    console.debug(`count for ${participant}: ${res.size}`);
+    return res.size;
+  } catch (e) { throw new Error(`Error getting contribution count: ${e.message}`);}
+}

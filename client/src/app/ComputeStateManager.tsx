@@ -1,7 +1,7 @@
 import { getParamsFile, uploadParams } from "../api/FileApi";
 import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
 
-import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant } from "../api/FirestoreApi";
+import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticpantContributions } from "../api/FirestoreApi";
 import { createGist } from "../api/ZKPartyApi";
 
 export enum Step {
@@ -216,6 +216,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.contributionSummary = null;
             newState.hash = '';
             newState.step = Step.WAITING;
+            newState.contributionCount ++;
             return newState;
         }
         case 'ADD_MESSAGE': {
@@ -224,10 +225,13 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'SET_STEP': {
             console.debug(`step updated ${action.data}`);
-            //state.step = action.data;
             switch (action.data) {
                 case Step.ACKNOWLEDGED: {
                     startServiceWorker(action.dispatch);
+                    break;
+                }
+                case Step.WAITING: {
+                    getContributionCount(state.participant.uid, action.dispatch);
                     break;
                 }
             }
@@ -262,6 +266,9 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'SET_ENTROPY': {
             return {...state, entropy: action.data};
+        }
+        case 'SET_CONTRIBUTION_COUNT': {
+            return {...state, contributionCount: action.data};
         }
     }
     console.debug(`state after reducer ${newState.step}`);
@@ -366,4 +373,16 @@ const startCreateGist = (ceremony: Ceremony, index: number, hash: string, access
             gistUrl: null,
         })
     }
+}
+
+const getContributionCount = (participant: string, dispatch: React.Dispatch<any>) => {
+    console.debug(`getContCount...`);
+    countParticpantContributions(participant).then(
+        count => {
+            dispatch({
+                type: 'SET_CONTRIBUTION_COUNT',
+                data: count,
+            });
+        }
+    );
 }
