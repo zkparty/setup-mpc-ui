@@ -144,19 +144,6 @@ const SummarySection = (props: any) => {
     }
   };
 
-  // const updateCeremonyCounts = (c: any) => {
-  //   // callback for ceremony counts query
-  //   // returns {ceremonyId, complete, waiting}
-  //   console.log(`update count ${c.ceremonyId} ${c.complete}`);
-  //   let newCeremonies = ceremonies;
-  //   const i = findCeremonyIndex(c.ceremonyId);
-  //   if (i>=0) {
-  //     newCeremonies[i].waiting = c.waiting;
-  //     newCeremonies[i].complete = c.complete;
-  //   }
-  //   setCeremonies(newCeremonies);
-  // }
-
   useEffect(() => {
     if (!loaded) {
       //getCeremonies()

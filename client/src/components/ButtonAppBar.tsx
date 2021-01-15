@@ -121,13 +121,13 @@ const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) |
         onClose={props.handleClose}
       >
       <StyledMenuItem>
-        <ListItemIcon>
+        <ListItemIcon style={{ color: accentColor }} >
             <SettingsIcon fontSize="small" />
         </ListItemIcon>
-        <ListItemText primary="Coordinator Settings" />
+        <ListItemText primary="Settings" />
         </StyledMenuItem>
         <StyledMenuItem>
-        <ListItemIcon>
+        <ListItemIcon style={{ color: accentColor }} >
             <InfoIcon fontSize="small" />
         </ListItemIcon>
         <ListItemText primary="About" onClick={toggleAbout}/>
