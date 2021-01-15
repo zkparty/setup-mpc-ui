@@ -199,7 +199,7 @@ export const ParticipantSection = () => {
           });
         }
 
-        const progressPct = state.progress.total > 0 ? 100 * state.progress.count / state.progress.total : 0;
+        const progressPct = state.progress;
 
         content = (<><Typography variant='h3'>{
             !computeStatus.downloaded ? stepText('Downloading ...')

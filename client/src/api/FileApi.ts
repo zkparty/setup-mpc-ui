@@ -61,12 +61,38 @@ export const getParamsFile = async (ceremonyId: string, index: number): Promise<
     //return new Uint8Array(blob);
 };
 
-export const UploadParams = async (ceremonyId: string, index: number, params: Uint8Array): Promise<string> => {
+export const uploadParams = async (ceremonyId: string, index: number, params: Uint8Array, progressCallback: (p: number) => void): Promise<string> => {
     const storage = firebase.storage();
     const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
-    const snapshot = await fileRef.put(params);
-    console.log(`Params uploaded to ${snapshot.metadata.fullPath}. ${snapshot.totalBytes} bytes`);
-    return snapshot.metadata.fullPath;
+    const executor = (resolve: (val: string) => void, reject: (reason: any) => void) => {
+    const uploadTask = fileRef.put(params);
+
+    uploadTask.on('state_changed', (snapshot) => {
+            const progress = snapshot.bytesTransferred / snapshot.totalBytes * 100;
+            switch (snapshot.state) {
+             case firebase.storage.TaskState.RUNNING: {
+                progressCallback(progress);
+                break;
+             }
+             case firebase.storage.TaskState.ERROR: {
+                 console.error(`Error uploading parameters`);
+                 break;
+             }
+             case firebase.storage.TaskState.PAUSED: {
+                 console.log(`upload paused!`)
+                 break;
+             }
+            }
+    }, error => {
+        console.error(`Error uploading parameters: ${error.message}`);
+        reject(error.message);
+    },
+    () => {
+        // success
+        console.log(`Params uploaded to ${uploadTask.snapshot.ref.fullPath}. ${uploadTask.snapshot.totalBytes} bytes`);
+        resolve(uploadTask.snapshot.ref.fullPath);
+    })};
+    return new Promise(executor);
 };
 
 export const UploadCircuitFile = async (ceremonyId: string, circuitFile: File): Promise<firebase.storage.UploadTaskSnapshot> => {
@@ -78,5 +104,3 @@ export const UploadCircuitFile = async (ceremonyId: string, circuitFile: File): 
     const fbFileRef = ceremonyDataRef.child(circuitFile.name);
     return fbFileRef.put(circuitFile);
 };
-
-

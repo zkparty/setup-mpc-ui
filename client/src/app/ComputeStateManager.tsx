@@ -1,4 +1,4 @@
-import { getParamsFile, UploadParams } from "../api/FileApi";
+import { getParamsFile, uploadParams } from "../api/FileApi";
 import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant } from "../api/FirestoreApi";
@@ -279,9 +279,10 @@ export const startServiceWorker = (dispatch: (a: any) => void) => {
           switch (data.type) {
             case 'PROGRESS': {
                 //console.log(`message from service worker ${message}`);
+                
                 dispatch({
                     type: 'PROGRESS_UPDATE',
-                    data,
+                    data: data.total > 0 ? 100 * data.count / data.total : 0,
                 })
                 break;
             }
@@ -339,7 +340,7 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array) => {
 };
 
 const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispatch: (a: any) => void) => {
-    UploadParams(ceremonyId, index, data).then(
+    uploadParams(ceremonyId, index, data, (progress) => dispatch({type: 'PROGRESS_UPDATE', data: progress})).then(
         paramsFile => {
             dispatch({
                 type: 'UPLOADED',
