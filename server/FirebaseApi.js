@@ -89,22 +89,9 @@ async function updateFBCeremony(newCeremony) {
     {
       ...rest,
       lastSummaryUpdate: new Date(),
-      lastParticipantsUpdate: new Date()
     },
     { merge: true }
   );
-  const participantUpdatesPromises = [];
-  for (const participant of newCeremony.participants) {
-    const participantDocRef = db
-      .collection("ceremonyParticipants")
-      .doc(newCeremony.id)
-      .collection("participants")
-      .doc(participant.address.toLowerCase());
-    participantUpdatesPromises.push(
-      participantDocRef.set(participant, { merge: true })
-    );
-  }
-  await Promise.all([summaryUpdatePromise, ...participantUpdatesPromises]);
 }
 
 async function fbCeremonyExists(id) {
