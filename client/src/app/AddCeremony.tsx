@@ -127,8 +127,6 @@ const useStyles = makeStyles((theme: Theme) =>
 const inputField = (props: StandardTextFieldProps & {oldValue: string}) => {
   //const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState<any | null>(props.oldValue);
-  
-  console.debug(`old value ${props.oldValue} ${value}`);
 
   useEffect(() => {
     if (!value)
@@ -259,7 +257,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
   });
 
   const formatDate = (d: any | null) => {
-    if (d)
+    if (d && d.toISOString)
       return d.toISOString().replace('Z', '');
     else return null;
   }
@@ -294,13 +292,18 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
 
   const validateInput = () => {
     var isValid = true;
-    ceremony.current.title = title.value();
-    ceremony.current.description = description.value();
-    ceremony.current.startTime = startTime.value();
-    ceremony.current.endTime = endTime.value();
-    ceremony.current.minParticipants = minParticipants.value();
-    if (!ceremony.current.title || ceremony.current.title.length == 0) {enqueueSnackbar("Must have a title"); isValid = false;}
-    if (!ceremony.current.description || ceremony.current.description.length == 0) {enqueueSnackbar("Must have a description"); isValid = false;};
+    try {
+      ceremony.current.title = title.value();
+      ceremony.current.description = description.value();
+      ceremony.current.startTime = startTime.value();
+      ceremony.current.endTime = endTime.value();
+      ceremony.current.minParticipants = minParticipants.value();
+      if (!ceremony.current.title || ceremony.current.title.length == 0) {enqueueSnackbar("Must have a title"); isValid = false;}
+      if (!ceremony.current.description || ceremony.current.description.length == 0) {enqueueSnackbar("Must have a description"); isValid = false;};
+    } catch (err) {
+      console.log(`Error validating input: ${err.message}`);
+      isValid = false;
+    }
     return isValid;
   };
 
@@ -308,7 +311,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
     console.log(`submit ....`);
     event.preventDefault();
     // validate
-    if (!validateInput()) return;
+    if (!validateInput()) {console.log(`validation failed`); return};
 
     if (circuitFile) {
         // Firebase storage ref for the new file

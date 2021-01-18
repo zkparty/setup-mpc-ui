@@ -37,8 +37,8 @@ export interface Ceremony {
 
   // fetched from mpc server, cached by zkp server for when / if mpc server is disconnected
   ceremonyState: CeremonyState;
-  startTime: Date;
-  endTime: Date;
+  startTime: Date | string;
+  endTime: Date | string | undefined;
   completedAt?: Date;
   paused: boolean;
   selectBlock: number;

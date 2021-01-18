@@ -12,7 +12,26 @@ const WAITING = "WAITING";
 
 const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
   toFirestore: (c: Ceremony) => {
-    return c;
+    var start: firebase.firestore.Timestamp;
+    var end: firebase.firestore.Timestamp | undefined = undefined;
+    try {
+      start = (typeof c.startTime === 'string') ?
+        firebase.firestore.Timestamp.fromMillis(Date.parse(c.startTime)) : 
+        firebase.firestore.Timestamp.fromDate(c.startTime);
+      if (c.endTime) {
+        end = (typeof c.endTime === 'string') ?
+        firebase.firestore.Timestamp.fromMillis(Date.parse(c.endTime)) : 
+        firebase.firestore.Timestamp.fromDate(c.endTime);
+      }
+    } catch (err) {
+      console.error(`Unexpected error parsing dates: ${err.message}`);
+      start = firebase.firestore.Timestamp.now();
+    };
+    return {
+      ...c,
+      startTime: start,
+      endTime: end,
+    };
   },
   fromFirestore: (
     snapshot: firebase.firestore.QueryDocumentSnapshot,
