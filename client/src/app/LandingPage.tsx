@@ -146,22 +146,11 @@ const SummarySection = (props: any) => {
 
   useEffect(() => {
     if (!loaded) {
-      //getCeremonies()
-        //.then((cerems) => {
-          // cerems.forEach(
-          //   (c: Ceremony) => updateCeremony(c)
-          // );
-
-          // Subscribe to ceremony updates
-          ceremonyListener(updateCeremony);
-          console.debug('getCeremonies done');
-          setLoaded(true);
-        //})
-        //.catch((e) => {
-        //  console.warn(e.message);
-        //  setLoaded(true);
-        //});
-      }
+      // Subscribe to ceremony updates
+      ceremonyListener(updateCeremony);
+      console.debug('getCeremonies done');
+      setLoaded(true);
+    }
   }, [loaded]);
 
   return (

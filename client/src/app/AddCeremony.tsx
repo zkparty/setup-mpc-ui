@@ -235,6 +235,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
   const handleFileUpload = (f: File) => {
       console.log(`handleFileUpload`);
       circuitFile = f;
+      ceremony.current.circuitFileName = circuitFile.name;
   }
 
   const title = inputField({

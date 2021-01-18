@@ -31,6 +31,7 @@ const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
       ...c,
       startTime: start,
       endTime: end,
+      lastSummaryUpdate: firebase.firestore.Timestamp.now(),
     };
   },
   fromFirestore: (
@@ -78,6 +79,7 @@ export async function updateCeremony(ceremony: Ceremony): Promise<void> {
 
     console.debug(`ceremony ${ceremony.id} updated`);
   } catch (e) {
+    console.error(`ceremony update failed: ${e.message}`);
     throw new Error(`error updating ceremony data: ${e}`);
   }
 };

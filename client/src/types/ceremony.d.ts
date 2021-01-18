@@ -32,7 +32,6 @@ export interface Ceremony {
   github: string;
   homepage: string;
   adminAddr: string;
-  lastParticipantsUpdate: Date;
   lastSummaryUpdate: Date;
 
   // fetched from mpc server, cached by zkp server for when / if mpc server is disconnected

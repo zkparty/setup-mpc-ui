@@ -59,7 +59,7 @@ export interface SelectedCeremonyContextInterface {
       }
       case 'CLOSE_CEREMONY': {
         // default
-        return selection;
+        return {...state, ...defaultSelection};
       }
     }
     return state;
