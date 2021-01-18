@@ -22,7 +22,7 @@ import { addCeremonyEvent, ceremonyEventListener, getCeremony, updateCeremony } 
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
 import { useSelectionContext } from "./SelectionContext";
-import { UploadCircuitFile } from "../api/FileApi";
+import { uploadCircuitFile } from "../api/FileApi";
 
 const HomeLinkContainer = styled.div`
   position: absolute;
@@ -169,13 +169,13 @@ const writeToDb = async (ceremony: Ceremony):Promise<string> => {
 }
 
 const uploadFile = async (id: string, circuitFile: File, onSubmit: () => void) => {
-  UploadCircuitFile(id, circuitFile).then((snapshot) => {
-    console.log('Uploaded file!');
+  uploadCircuitFile(id, circuitFile).then((snapshot) => {
+    console.log(`Uploaded file ${snapshot.ref.fullPath}`);
     const event: CeremonyEvent = {
       sender: "COORDINATOR",
       eventType: "CIRCUIT_FILE_UPLOAD",
       timestamp: new Date(),
-      message: "",
+      message: snapshot.ref.fullPath,
       acknowledged: false,
     }
     addCeremonyEvent(id, event);
@@ -321,6 +321,8 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
         if (circuitFile) {
           console.debug(`upload ${circuitFile.name}`);
           uploadFile(id, circuitFile, props.onSubmit);
+        } else {
+          console.log(`No circuit file to upload`);
         }
         ceremony.current.id = id; // trigger effect
     });

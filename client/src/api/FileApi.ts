@@ -95,12 +95,17 @@ export const uploadParams = async (ceremonyId: string, index: number, params: Ui
     return new Promise(executor);
 };
 
-export const UploadCircuitFile = async (ceremonyId: string, circuitFile: File): Promise<firebase.storage.UploadTaskSnapshot> => {
+export const uploadCircuitFile = async (ceremonyId: string, circuitFile: File): Promise<firebase.storage.UploadTaskSnapshot> => {
     // upload circuit file
-    const storageRef = firebase.storage().ref();
-    const ceremonyDataRef = storageRef.child(`ceremony_data/${ceremonyId}`);
+    try {
+        const storageRef = firebase.storage().ref();
+        const fbFileRef = storageRef.child(`ceremony_data/${ceremonyId}/${circuitFile.name}`);
 
-    // Firebase storage ref for the new file
-    const fbFileRef = ceremonyDataRef.child(circuitFile.name);
-    return fbFileRef.put(circuitFile);
+        // Firebase storage ref for the new file
+        //const fbFileRef = ceremonyDataRef.child(circuitFile.name);
+        return fbFileRef.put(circuitFile);
+    } catch (err) {
+        console.warn(`Error uploading circuit file: ${err.message}`);
+        throw err;
+    }
 };
