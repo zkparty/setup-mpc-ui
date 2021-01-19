@@ -73,10 +73,13 @@ const AddCeremonyPage = () => {
     [selection.ceremonyId]
   );
 
-  const onSubmit = () => {
+  const onSubmit = (ceremonyId?: string) => {
+    if (!ceremonyId && ceremony) {
+      ceremonyId = ceremony.id;
+    }
     dispatch({
       type: 'DISPLAY_CEREMONY',
-      ceremonyId: selection.ceremonyId,
+      ceremonyId: ceremonyId,
     });
   }
 
@@ -168,7 +171,7 @@ const writeToDb = async (ceremony: Ceremony):Promise<string> => {
   }
 }
 
-const uploadFile = async (id: string, circuitFile: File, onSubmit: () => void) => {
+const uploadFile = async (id: string, circuitFile: File, onSubmit: (id?: string) => void) => {
   uploadCircuitFile(id, circuitFile).then((snapshot) => {
     console.log(`Uploaded file ${snapshot.ref.fullPath}`);
     const event: CeremonyEvent = {
@@ -179,11 +182,11 @@ const uploadFile = async (id: string, circuitFile: File, onSubmit: () => void) =
       acknowledged: false,
     }
     addCeremonyEvent(id, event);
-    onSubmit();
+    onSubmit(id);
   });
 }
 
-const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => void}) => {
+const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: string) => void}) => {
   const classes = useStyles();
   const ceremony = useRef<Ceremony | any>({});
   const unsubscribe = useRef<(()=>void) | null>(null);
@@ -329,6 +332,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: () => voi
           uploadFile(id, circuitFile, props.onSubmit);
         } else {
           console.log(`No circuit file to upload`);
+          props.onSubmit(id);
         }
         ceremony.current.id = id; // trigger effect
     });

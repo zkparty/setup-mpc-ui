@@ -166,7 +166,8 @@ export const addCeremonyEvent = async (ceremonyId: string, event: CeremonyEvent)
 
 export const ceremonyEventListener = async (ceremonyId: string | undefined, callback: (e: any) => void): Promise<()=>void> => {
     const db = firebase.firestore();
-    const query = db.collectionGroup("events");
+    const query = db.collectionGroup("events")
+                .where('timestamp', '>', firebase.firestore.Timestamp.now());
     //const query1 = query.where(, '==', ceremonyId);
   
     const unsub = query.onSnapshot(querySnapshot => {
