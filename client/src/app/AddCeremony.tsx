@@ -158,6 +158,7 @@ const inputField = (props: StandardTextFieldProps & {oldValue: string}) => {
 }
 
 const writeToDb = async (ceremony: Ceremony):Promise<string> => {
+  ceremony.lastSummaryUpdate = new Date();
   if (ceremony.id) {
     await updateCeremony(ceremony);
     return ceremony.id;

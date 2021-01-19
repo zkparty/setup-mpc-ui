@@ -133,7 +133,6 @@ export function jsonToCeremony(json: any): Ceremony {
   // throws if ceremony is malformed
 
   const {
-    lastParticipantsUpdate,
     lastSummaryUpdate,
     startTime,
     endTime,
@@ -149,7 +148,6 @@ export function jsonToCeremony(json: any): Ceremony {
     let c = 
     {
       ...rest,
-      lastParticipantsUpdate: tryDate(lastParticipantsUpdate),
       lastSummaryUpdate: tryDate(lastSummaryUpdate),
       startTime: tryDate(startTime, new Date()),
       endTime: tryDate(endTime),

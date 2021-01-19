@@ -171,7 +171,6 @@ async function addStatusUpdateEvent(ceremonyId, message) {
 
 function firebaseCeremonyJsonToSummary(json) {
   for (const prop of [
-    "lastParticipantsUpdate",
     "lastSummaryUpdate",
     "startTime",
     "endTime",
