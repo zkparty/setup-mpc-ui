@@ -12,8 +12,8 @@ import {
   CeremonyTitle,
   Center
 } from "../styles";
-import { Ceremony, Contribution, ContributionSummary, Participant } from "../types/ceremony";
-import { ceremonyUpdateListener, contributionUpdateListener, getCeremony } from "../api/FirestoreApi";
+import { Ceremony, CeremonyEvent, Contribution, ContributionSummary, Participant } from "../types/ceremony";
+import { ceremonyEventListener, ceremonyUpdateListener, contributionUpdateListener, getCeremony } from "../api/FirestoreApi";
 import { createStyles, makeStyles, Theme, Typography, withStyles, Container } from "@material-ui/core";
 import Fab from '@material-ui/core/Fab';
 import EditIcon from '@material-ui/icons/Edit';
@@ -22,6 +22,8 @@ import moment from "moment";
 import './styles.css';
 import { AuthStateContext } from "./AuthContext";
 import { SelectedCeremonyContext, useSelectionContext } from "./SelectionContext";
+import { useSnackbar } from "notistack";
+import { ceremonyStatus } from "../utils/utils";
 
 const CeremonyDetailsTable = styled.table`
   text-align: right;
@@ -67,11 +69,17 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
   const [contributions, setContributions] = useState<ContributionSummary[]>([]);
   const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
   const contributionListenerUnsub = useRef<(() => void) | null>(null);
+  const eventsListenerUnsub = useRef<(() => void) | null>(null);
   const loadingContributions = useRef(false);
   const [selection, dispatch] = useSelectionContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   let { ceremonyId } = selection;
   console.log(`have id ${ceremonyId}`);
+
+  const statusUpdate = (event: CeremonyEvent) => {
+    enqueueSnackbar(event.message);
+  };
 
   const refreshCeremony = async () => {
     const c = ceremonyId ? await getCeremony(ceremonyId) : undefined;
@@ -104,6 +112,11 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
       .then(() => setLoaded(true));
   }
 
+  if (!eventsListenerUnsub.current && ceremonyId) {
+    // Start ceremony listener
+    ceremonyEventListener(ceremonyId, statusUpdate)
+        .then(unsub => eventsListenerUnsub.current = unsub);
+  }
 
   if (!ceremonyListenerUnsub.current && ceremonyId) {
     // Start ceremony listener
@@ -209,6 +222,8 @@ const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
 const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, numContWaiting: number  }) => {
   //console.debug(`start ${props.ceremony.startTime}`);
 
+  const status = ceremonyStatus(props.ceremony);
+
   return (
     <CeremonyDetailsContainer>
       <CeremonyTitle>{props.ceremony.title}</CeremonyTitle>
@@ -218,7 +233,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, 
             <tbody>
               <tr>
                 <td className='title'>Status</td>
-                <td className='content'>{props.ceremony.ceremonyState}</td>
+                <td className='content'>{status}</td>
               </tr>
               <tr>
                 <td className='title'>Start Time</td>
@@ -235,6 +250,14 @@ const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, 
               <tr>
                 <td className='title'>Contributions</td>
                 <td className='content'>{props.numContCompleted} completed, {props.numContWaiting} waiting</td>
+              </tr>
+              <tr>
+                <td className='title'>Circuit File</td>
+                <td className='content'>{props.ceremony.circuitFileName}</td>
+              </tr>
+              <tr>
+                <td className='title'>Number of Constraints</td>
+                <td className='content'>{props.ceremony.numConstraints}</td>
               </tr>
             </tbody>
           </CeremonyDetailsTable>

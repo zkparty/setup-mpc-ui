@@ -15,6 +15,7 @@ import { format } from "timeago.js";
 import {  useSelectionContext } from "../app/SelectionContext";
 import LinearProgress, { LinearProgressProps } from '@material-ui/core/LinearProgress';
 import { Typography, Box, makeStyles } from "@material-ui/core";
+import { ceremonyStatus } from '../utils/utils';
 
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
   return (
@@ -74,25 +75,7 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
     //console.log(`ceremony id: ${c.id}`);
     const progress = c.complete ? Math.floor(Math.min(100, 100 * c.complete/c.minParticipants)) : 0;
 
-    let status;
-    switch (c.ceremonyState) {
-      case "WAITING":
-      case "PRESELECTION": {
-        status = 'Not accepting contributions until start date';
-        break;
-      }
-      case 'PAUSED': {
-        status = 'Not accepting contributions at present';
-        break;
-      }
-      case 'RUNNING': {
-        status = 'Accepting contributions';
-        break;
-      }
-      default: {
-        status = c.ceremonyState;
-      }
-    }
+    const status = ceremonyStatus(c);
   
     return (
       <CeremonyContainer onClick={onClick}>

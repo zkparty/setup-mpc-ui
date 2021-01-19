@@ -1,4 +1,3 @@
-import { timeStamp } from "console";
 import { Ceremony, Contribution } from "../types/ceremony";
 import { addCeremony as addCeremonyToDB } from "./FirestoreApi";
 import firebase from 'firebase/app';

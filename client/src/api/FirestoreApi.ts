@@ -11,26 +11,29 @@ const RUNNING = "RUNNING";
 const WAITING = "WAITING";
 
 const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
-  toFirestore: (c: Ceremony) => {
-    var start: firebase.firestore.Timestamp;
-    var end: firebase.firestore.Timestamp | undefined = undefined;
+  toFirestore: (c: Partial<Ceremony>) => {
+    var ceremonyData: any = c;
+
     try {
-      start = (typeof c.startTime === 'string') ?
-        firebase.firestore.Timestamp.fromMillis(Date.parse(c.startTime)) : 
-        firebase.firestore.Timestamp.fromDate(c.startTime);
+      if (c.startTime) {
+        var start: firebase.firestore.Timestamp = 
+         (typeof c.startTime === 'string') ?
+          firebase.firestore.Timestamp.fromMillis(Date.parse(c.startTime)) : 
+          firebase.firestore.Timestamp.fromDate(c.startTime);
+        ceremonyData = {...ceremonyData, startTime: start};
+      }
       if (c.endTime) {
-        end = (typeof c.endTime === 'string') ?
-        firebase.firestore.Timestamp.fromMillis(Date.parse(c.endTime)) : 
-        firebase.firestore.Timestamp.fromDate(c.endTime);
+        var end: firebase.firestore.Timestamp = 
+         (typeof c.endTime === 'string') ?
+          firebase.firestore.Timestamp.fromMillis(Date.parse(c.endTime)) : 
+          firebase.firestore.Timestamp.fromDate(c.endTime);
+        ceremonyData = {...ceremonyData, endTime: end};
       }
     } catch (err) {
-      console.error(`Unexpected error parsing dates: ${err.message}`);
-      start = firebase.firestore.Timestamp.now();
+      console.error(`Unexpected error parsing dates: ${err.message}`);     
     };
     return {
-      ...c,
-      startTime: start,
-      endTime: end,
+      ...ceremonyData,
       lastSummaryUpdate: firebase.firestore.Timestamp.now(),
     };
   },
@@ -75,7 +78,7 @@ export async function updateCeremony(ceremony: Ceremony): Promise<void> {
     await db.collection("ceremonies")
       .withConverter(ceremonyConverter)
       .doc(ceremony.id)
-      .update(ceremony);
+      .set(ceremony, { merge: true });
 
     console.debug(`ceremony ${ceremony.id} updated`);
   } catch (e) {

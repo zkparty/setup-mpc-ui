@@ -136,7 +136,7 @@ async function prepareCircuit(ceremonyId) {
             addStatusUpdateEvent(ceremonyId, `Params file has been created.  ${paramsFile}`);
             // Upload to storage
             const storageFile = await uploadParams(ceremonyId, paramsFileName, paramsFile);
-            addStatusUpdateEvent(ceremonyId, `Params file has been uploaded to storage. ${storageFile}`);
+            addStatusUpdateEvent(ceremonyId, `Params file has been uploaded to storage. ${storageFile.path}`);
             // Set ceremony to WAITING
             updateFBCeremony({id: ceremonyId, ceremonyState: 'WAITING'});
         });

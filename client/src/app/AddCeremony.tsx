@@ -75,7 +75,8 @@ const AddCeremonyPage = () => {
 
   const onSubmit = () => {
     dispatch({
-      type: 'CLOSE_CEREMONY',      
+      type: 'DISPLAY_CEREMONY',
+      ceremonyId: selection.ceremonyId,
     });
   }
 
