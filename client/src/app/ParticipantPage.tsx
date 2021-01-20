@@ -210,12 +210,16 @@ export const ParticipantSection = () => {
 
         const progressPct = state.progress;
 
-        content = (<><Typography variant='h3'>{
-            !computeStatus.downloaded ? stepText('Downloading ...')
-          : !computeStatus.computed ? stepText('Calculating ...')
-          : stepText('Uploading ...') 
-        }</Typography>
-        <LinearProgress variant="determinate" value={progressPct} /></>);
+        content = (<>
+          <Typography variant='h6'>Ceremony: {contributionState.ceremony.title}</Typography>
+          <Typography variant='h3' style={{ paddingTop: '20px' }}>{
+              !computeStatus.downloaded ? stepText('Downloading ...')
+            : !computeStatus.computed ? stepText('Calculating ...')
+            : stepText('Uploading ...') 
+          }</Typography>
+          <LinearProgress variant="determinate" value={progressPct} style={{ paddingTop: '20px' }} />
+          <Typography variant='body2' style={{ paddingTop: '40px' }}>Warning: Don't close this page or return to the 'Ceremonies' tab, or your contribution will be interrupted.</Typography>
+        </>);
         break;
       }
   }};
