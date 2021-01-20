@@ -218,7 +218,7 @@ export const ParticipantSection = () => {
             : stepText('Uploading ...') 
           }</Typography>
           <LinearProgress variant="determinate" value={progressPct} style={{ paddingTop: '20px' }} />
-          <Typography variant='body2' style={{ paddingTop: '40px' }}>Warning: Don't close this page or return to the 'Ceremonies' tab, or your contribution will be interrupted.</Typography>
+          <Typography variant='body2' style={{ paddingTop: '40px' }}>Warning: Closing this page or returning to the 'Ceremonies' tab will interrupt your contribution.</Typography>
         </>);
         break;
       }
