@@ -138,7 +138,7 @@ async function prepareCircuit(ceremonyId) {
             const storageFile = await uploadParams(ceremonyId, paramsFileName, paramsFile);
             addStatusUpdateEvent(ceremonyId, `Params file has been uploaded to storage. ${storageFile.path}`);
             // Set ceremony to WAITING
-            updateFBCeremony({id: ceremonyId, ceremonyState: 'WAITING'});
+            updateFBCeremony({id: ceremonyId, ceremonyState: 'PRESELECTION'});
         });
     } else {
         console.log(`no R1CS file found for ${ceremonyId}.`);        

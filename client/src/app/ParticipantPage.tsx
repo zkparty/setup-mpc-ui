@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useRef } from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
 import { AuthStateContext } from "../app/AuthContext";
@@ -77,7 +77,9 @@ const queueProgressCard = (contrib: ContributionState) => {
 export const ParticipantSection = () => {
   const [state, dispatch] = useReducer(computeStateReducer, initialState);
   const authState = React.useContext(AuthStateContext);
+  const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
   const classes = useStyles();
+
 
   const { step, computeStatus, messages, entropy, participant, contributionState } = state;
   
@@ -103,6 +105,8 @@ export const ParticipantSection = () => {
   }
   
   const setContribution = (cs: ContributionState) => {
+    if (ceremonyListenerUnsub.current) ceremonyListenerUnsub.current();
+
     // Only accept new tasks if we're waiting
     if (step !== Step.RUNNING && step !== Step.QUEUED) {
       dispatch({
@@ -165,7 +169,7 @@ export const ParticipantSection = () => {
       }
       case (Step.ENTROPY_COLLECTED): {
         // start looking for a ceremony to contribute to
-        if (participant) ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
+        if (participant) ceremonyListenerUnsub.current = ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
         content = stepText('Starting listener...');
         addMessage('Initialised.');
         dispatch({type: 'SET_STEP', data: Step.WAITING, dispatch});

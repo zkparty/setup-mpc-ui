@@ -9,6 +9,7 @@ const COMPLETE = "COMPLETE";
 const INVALIDATED = "INVALIDATED";
 const RUNNING = "RUNNING";
 const WAITING = "WAITING";
+const PRESELECTION = "PRESELECTION";
 
 const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
   toFirestore: (c: Partial<Ceremony>) => {
@@ -265,7 +266,7 @@ export const contributionUpdateListener = async (
 
 // Listens for updates to eligible ceremonies that a participant may contribute to.
 // The first such ceremony found will be returned in the callback
-export const ceremonyContributionListener = async (participantId: string, isCoordinator: boolean, callback: (c: ContributionState) => void) => {
+export const ceremonyContributionListener = (participantId: string, isCoordinator: boolean, callback: (c: ContributionState) => void): () => void => {
   console.log(`listening for contributions for ${participantId}`);
   let contributedCeremonies: string[] = [];
   const db = firebase.firestore();
@@ -273,56 +274,63 @@ export const ceremonyContributionListener = async (participantId: string, isCoor
   // Coordinator can contribute to ceremonies even if they're not 
   // past start time
   let states = [RUNNING];
-  if (isCoordinator) states.push(WAITING);
+  if (isCoordinator) states.push(PRESELECTION, WAITING);
   const query = db.collection("ceremonies")
     .withConverter(ceremonyConverter)
     .where('ceremonyState', 'in', states)
     .orderBy('startTime', 'asc');
 
-  query.onSnapshot(querySnapshot => {
-    //TODO docChanges()
-    querySnapshot.docs.every(async ceremonySnapshot => {
+  let found = false;
+  const unsub = query.onSnapshot(querySnapshot => {
+    querySnapshot.forEach(async ceremonySnapshot => {
       // First check cached ceremonies. These are ceremonies that this participant 
       // has already contributed to, so they aren't eligible for selection.
-      if (!contributedCeremonies.includes(ceremonySnapshot.id)) {
-        var ceremony = ceremonySnapshot.data();
-        const ceremonyId = ceremonySnapshot.id;
-        // Get any contributions for this participant
-        const participantQuery = ceremonySnapshot.ref.collection('contributions')
-          .withConverter(contributionConverter)
-          .where('participantId', '==', participantId)
-          .where('status', "!=", WAITING);
-        const contSnapshot = await participantQuery.get();
-        if (!contSnapshot.empty) {
-          // Add to cache
-          contributedCeremonies.push(ceremonyId);
-          return true;
-        } else {
-          console.log(`found ceremony ${ceremonyId} to contribute to`);
-          // We have a ceremony to contribute to
-          let contribution: Contribution = {
-            participantId,
-            status: WAITING,
-            lastSeen: new Date(),
-            timeAdded: new Date(),            
+      if (!found) {
+        console.debug(`ceremony listener forEach ${ceremonySnapshot.id}`);
+        if (!contributedCeremonies.includes(ceremonySnapshot.id)) {
+          var ceremony = ceremonySnapshot.data();
+          const ceremonyId = ceremonySnapshot.id;
+          // Get any contributions for this participant
+          const participantQuery = ceremonySnapshot.ref.collection('contributions')
+            .withConverter(contributionConverter)
+            .where('participantId', '==', participantId)
+            .where('status', "!=", WAITING);
+          const contSnapshot = await participantQuery.get();
+          if (!contSnapshot.empty) {
+            // Add to cache
+            contributedCeremonies.push(ceremonyId);
+            //return true;
+          } else if (!found) {
+            console.log(`found ceremony ${ceremonyId} to contribute to`);
+            found = true;
+            // We have a ceremony to contribute to
+            let contribution: Contribution = {
+              participantId,
+              status: WAITING,
+              lastSeen: new Date(),
+              timeAdded: new Date(),            
+            }
+            // Allocate a position in the queue
+            contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
+            // Save the contribution record
+            addOrUpdateContribution(ceremonyId, contribution);
+
+            const cs = await getContributionState(
+              ceremony,
+              contribution
+            );
+
+            callback(cs);
           }
-          // Allocate a position in the queue
-          contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
-          // Save the contribution record
-          addOrUpdateContribution(ceremonyId, contribution);
-
-          const cs = await getContributionState(
-            ceremony,
-            contribution);
-
-          callback(cs);
-          return false; // exits the every() loop
-        }
-      };
+        };
+      }
     });
-  }, err => {
-    console.log(`Error while listening for ceremony changes ${err}`);
-  });
+    }, err => {
+      console.log(`Error while listening for ceremony changes ${err.message}`);
+    }
+  );
+
+  return unsub;
 };
 
 export const getNextQueueIndex = async (ceremonyId: string, participantId: string): Promise<number> => {
@@ -430,7 +438,7 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
                 .withConverter(contributionConverter)
                 .where("status", "in", [COMPLETE, INVALIDATED]);
 
-  ceremonyQueueListenerUnsub = query.onSnapshot(querySnapshot => {0
+  ceremonyQueueListenerUnsub = query.onSnapshot(querySnapshot => {
     //console.debug(`queue listener doc: ${querySnapshot.size}`);
     let found = false;
     querySnapshot.docChanges().forEach(async docData => {
@@ -495,7 +503,7 @@ export const addOrUpdateParticipant = async (participant: Participant) => {
 
 };
 
-export const countParticpantContributions = async (participant: string): Promise<number> => {
+export const countParticipantContributions = async (participant: string): Promise<number> => {
   const db = firebase.firestore();
   try {
     const contribQuery = db.collectionGroup("contributions")
