@@ -22,3 +22,7 @@ Firebase provides these service:
 * Functions - periodically invoked operations
 * Hosting - host for the client app
 
+
+Copyright ©️ 2021 Stonebell Consulting Pty Ltd
+
+License
