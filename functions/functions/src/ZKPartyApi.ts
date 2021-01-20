@@ -5,7 +5,6 @@ export function jsonToCeremony(json: any): Ceremony {
   // throws if ceremony is malformed
 
   const {
-    lastParticipantsUpdate,
     lastSummaryUpdate,
     startTime,
     endTime,
@@ -19,7 +18,6 @@ export function jsonToCeremony(json: any): Ceremony {
 
   return {
     ...rest,
-    lastParticipantsUpdate: lastParticipantsUpdate ? lastParticipantsUpdate.toDate() : undefined,
     lastSummaryUpdate: lastSummaryUpdate ? lastSummaryUpdate.toDate(): undefined,
     startTime: startTime ? startTime.toDate() : new Date(),
     endTime: endTime ? endTime.toDate() : undefined,

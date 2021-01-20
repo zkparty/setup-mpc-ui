@@ -1,10 +1,13 @@
 import * as functions from 'firebase-functions';
+import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 
-import firebase from 'firebase/app';
+//import firebase from 'firebase/app';
 import "firebase/firestore";
 import firebaseConfig from './firebaseConfig';
 
-firebase.initializeApp(firebaseConfig);
+const fbAdmin =require('firebase-admin');
+
+fbAdmin.initializeApp(firebaseConfig);
 
 
 // export const ContributionWatchdog = functions.firestore
@@ -32,13 +35,14 @@ firebase.initializeApp(firebaseConfig);
 // a new contributor to start.
 export const TimeoutWatchdog = functions.pubsub.schedule('every 10 minutes').onRun(async (context) => {
   //functions.logger.debug(`pubsub check ${context.eventType}`);
-  const db = firebase.firestore();
+  const db = fbAdmin.firestore();
+  
   const snap = await db
     .collectionGroup("contributions")
     .where('status', '==', 'RUNNING')
     .get();
 
-    snap.forEach(async contrib => {
+  snap.forEach(async (contrib: DocumentSnapshot) => {
       functions.logger.debug(`contribution ${contrib.id} is running`);
       const ceremony = contrib.ref.parent ? contrib.ref.parent.parent : undefined;
       functions.logger.debug(`ceremony id ${ceremony?.id}`);
@@ -59,7 +63,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 10 minutes').onR
         //TODO - base this on calculated contribution duration
         if (age > 300) {
           functions.logger.info(`expired contribution ${contrib.id}`);
-          await contrib.ref.update({'status': 'INVALIDATED'});
+          await contrib.ref.set({'status': 'INVALIDATED'}, { merge: true });
           // add event
           await ceremony.collection('events')
             .add({
@@ -67,7 +71,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 10 minutes').onR
               index: contrib.get('queueIndex'),
               sender: 'WATCHDOG',
               message: `No activity detected for ${age} seconds`,
-              timestamp: firebase.firestore.Timestamp.now(),
+              timestamp: fbAdmin.firestore.Timestamp.now(),
             });
         }
       }
@@ -77,23 +81,23 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 10 minutes').onR
 // Look for ceremonies that have been prepared and have a start time prior to 
 // now, but aren't yet RUNNING. This will kick them off.
 export const CeremonyStarter = functions.pubsub.schedule('every 30 minutes').onRun(async (context) => {
-  const db = firebase.firestore();
+  const db = fbAdmin.firestore();
   const snap = await db
     .collection("ceremonies")
     .where('ceremonyState', '==', 'PRESELECTION')
-    .where('startTime', '<=', firebase.firestore.Timestamp.now())
+    .where('startTime', '<=', fbAdmin.firestore.Timestamp.now())
     .get();
 
-  snap.forEach(async ceremony => {
+  snap.forEach(async (ceremony: DocumentSnapshot) => {
       functions.logger.debug(`ceremony ${ceremony.id} is ready to start`);
-      await ceremony.ref.update({'ceremonyState': 'RUNNING'});
+      await ceremony.ref.set({'ceremonyState': 'RUNNING'}, { merge: true });
       // add event
       await ceremony.ref.collection('events')
         .add({
             eventType: 'SET_RUNNING',
             sender: 'WATCHDOG',
             message: `Ceremony started`,
-            timestamp: firebase.firestore.Timestamp.now(),
+            timestamp: fbAdmin.firestore.Timestamp.now(),
           });
   });
 });
