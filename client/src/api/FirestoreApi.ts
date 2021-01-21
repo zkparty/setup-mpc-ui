@@ -509,9 +509,28 @@ export const countParticipantContributions = async (participant: string): Promis
     const contribQuery = db.collectionGroup("contributions")
       .withConverter(contributionConverter)
       .where('participantId', '==', participant)
-      .where('status', '==', 'COMPLETE');
+      .where('status', '==', COMPLETE);
     const res = await contribQuery.get();
     console.debug(`count for ${participant}: ${res.size}`);
     return res.size;
   } catch (e) { throw new Error(`Error getting contribution count: ${e.message}`);}
+}
+
+export const resetContributions = async (participant: string): Promise<void> => {
+  console.debug(`resetting contribs for ${participant}`);
+  let count = 0;
+  const db = firebase.firestore();
+  try {
+    const contribSnapshot = await db.collectionGroup("contributions")
+      .withConverter(contributionConverter)
+      .where('participantId', '==', participant)
+      .get();
+    
+    contribSnapshot.forEach(async doc => {
+      doc.ref.set({participantId: `RESET_${participant.substr(0,5)}...`}, {merge: true});
+      count ++;
+    });
+    console.log(`Reset ${count} contributions`);
+  } catch (e) { throw new Error(`Error resetting contribution: ${e.message}`);}
+
 }

@@ -278,6 +278,8 @@ export const computeStateReducer = (state: any, action: any):any => {
 export const startServiceWorker = (dispatch: (a: any) => void) => {
     navigator.serviceWorker.ready.then(() => {
         console.log('service worker ready');
+        navigator.serviceWorker.controller?.postMessage({type: 'SKIP_WAITING'});
+        
         loadWasm();
         navigator.serviceWorker.addEventListener('message', event => {
           const data = (typeof event.data === 'string') ?

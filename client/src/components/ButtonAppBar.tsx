@@ -22,6 +22,7 @@ import {
 import { Button, Modal } from '@material-ui/core';
 import Login from './Login';
 import About from './About';
+import Options from './Options';
 
 const StyledMenu = withStyles({
   paper: {
@@ -103,6 +104,14 @@ const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonEleme
 
 const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; }) => {
   const [openAbout, setOpenAbout] = useState(false);
+  const [openOptions, setOpenOptions] = useState(false);
+
+  const toggleOptions = () => {
+    setOpenOptions(open => {
+      if (props.handleClose) props.handleClose({}, 'backdropClick');
+      return !open;
+    });
+  }
 
   const toggleAbout = () => {
     setOpenAbout(open => {
@@ -124,7 +133,7 @@ const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) |
         <ListItemIcon style={{ color: accentColor }} >
             <SettingsIcon fontSize="small" />
         </ListItemIcon>
-        <ListItemText primary="Settings" />
+        <ListItemText primary="Options" onClick={toggleOptions} />
         </StyledMenuItem>
         <StyledMenuItem>
         <ListItemIcon style={{ color: accentColor }} >
@@ -133,6 +142,7 @@ const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) |
         <ListItemText primary="About" onClick={toggleAbout}/>
         </StyledMenuItem>
       </StyledMenu>
+      <Options open={openOptions} close={toggleOptions} />
       <About open={openAbout} close={toggleAbout} />
     </span>
   );
