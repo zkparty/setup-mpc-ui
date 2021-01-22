@@ -162,7 +162,10 @@ export const addCeremonyEvent = async (ceremonyId: string, event: CeremonyEvent)
         
         await doc.set(event);
         console.log(`added event ${doc.id}`);
-    } catch (e) { throw new Error(`Error adding event: ${e.message}`);}
+    } catch (e) { 
+      console.warn(`Error adding event: ${e.message}`);
+      //throw new Error(`Error adding event: ${e.message}`);
+    }
 };
 
 export const ceremonyEventListener = async (ceremonyId: string | undefined, callback: (e: any) => void): Promise<()=>void> => {
@@ -496,10 +499,13 @@ export const addOrUpdateParticipant = async (participant: Participant) => {
     participant.online = true;
     participant.lastUpdate = new Date();
     const doc = await db
-        .doc(`participants/${participant.uid}`);    
+        .doc(`participants/${participant.uid}`);
     await doc.set(participant);
     console.log(`updated participant ${doc.id}`);
-  } catch (e) { throw new Error(`Error adding participant: ${e.message}`);}
+  } catch (e) {
+     console.warn(`Error trying to update participant ${e.message}`);
+     //throw new Error(`Error adding participant: ${e.message}`);
+  }
 
 };
 

@@ -5,8 +5,8 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import firebase from "firebase";
 import { accentColor, lighterBackground } from "../styles";
 import ListItem from "@material-ui/core/ListItem";
-import { getUserPrivs } from "../api/ZKPartyApi";
 import { ListItemIcon } from "@material-ui/core";
+import { getUserStatus } from "../api/FirestoreApi";
 
 const Login = (props: { close: any }) => {
   const [error, setErrors] = useState("");
@@ -31,7 +31,7 @@ const Login = (props: { close: any }) => {
         .then((result: any) => {
           console.log(result);
           // Get user privileges
-          getUserPrivs(result.user.email)
+          getUserStatus(result.user.email)
             .then((resp: string) => {
               console.log(`privs: ${resp}`);
               if (resp === 'COORDINATOR') {

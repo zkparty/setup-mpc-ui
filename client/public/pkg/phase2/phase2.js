@@ -95,6 +95,8 @@ __exports.contribute = function(params, entropy, report_progress, set_hash) {
         var v2 = getArrayU8FromWasm0(r0, r1).slice();
         wasm.__wbindgen_free(r0, r1 * 1);
         return v2;
+    } catch (err) {
+        console.error(`Error caught in contribute. ${err.message}`);
     } finally {
         heap[stack_pointer++] = undefined;
         heap[stack_pointer++] = undefined;

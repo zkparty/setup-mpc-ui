@@ -16,7 +16,7 @@ import VirtualList from "./../components/MessageList";
 import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
-import { addOrUpdateParticipant, ceremonyContributionListener, 
+import { ceremonyContributionListener, 
   ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirestoreApi";
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";

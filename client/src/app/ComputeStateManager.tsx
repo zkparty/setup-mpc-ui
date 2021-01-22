@@ -118,7 +118,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'DOWNLOADED': {
-            console.log('Source params', action.data);
+            //console.log('Source params', action.data);
             addCeremonyEvent(action.ceremonyId, createCeremonyEvent(
                 "PARAMS_DOWNLOADED",
                 `Parameters from participant ${state.contributionState.lastValidIndex} downloaded OK`,
@@ -304,6 +304,9 @@ export const startServiceWorker = (dispatch: (a: any) => void) => {
                 console.debug(`COMPLETE ${result.length}`);
                 dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
                 break; 
+            }
+            case 'ERROR': {
+                console.log(`Error while computing. ${JSON.stringify(data)}`);
             }
           }
         });

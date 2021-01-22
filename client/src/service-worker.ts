@@ -44,12 +44,14 @@ function compute(sourceParams: Uint8Array, entropy: Uint8Array) {
           type: 'COMPLETE',
           result: result.buffer
       };
-      client.postMessage(message, [result.buffer])
+      client.postMessage(message, [result.buffer]);
     };
   } catch (err) {
+    console.log(`Error in compute: ${err.message}`);
     if (client) client.postMessage(
       JSON.stringify({
         error: true,
+        type: 'ERROR',
         message: err.message,
       }),
     );
@@ -168,7 +170,11 @@ self.addEventListener('message', async (event) => {
     const sourceParams = new Uint8Array(event.data.params);
     const entropy = new Uint8Array(event.data.entropy);
     console.debug(`lengths: ${sourceParams.length} ${entropy.length}`);
-    compute(sourceParams, entropy);
+    try {
+      compute(sourceParams, entropy);
+    } catch (err) {
+      console.error(`Error in compute(): ${err.message}`);
+    }
   };
 
 });
