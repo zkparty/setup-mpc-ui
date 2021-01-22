@@ -532,5 +532,31 @@ export const resetContributions = async (participant: string): Promise<void> => 
     });
     console.log(`Reset ${count} contributions`);
   } catch (e) { throw new Error(`Error resetting contribution: ${e.message}`);}
-
 }
+
+export const getUserStatus = async (userId: string): Promise<string> => {
+  // userId will contain user Id (e.g. github email) // TODO: , or a signature)
+  // If userId is an entry in the coordinators collection, they have coord privs.
+  console.log(userId);
+  var status = 'USER';
+  console.debug(`status for ${userId}`);
+
+  const db = firebase.firestore();
+  try {
+    const userSnapshot = await db.doc(`coordinators/${userId}`)
+      .get();
+    
+    if (userSnapshot.exists) {
+      status = 'COORDINATOR'
+    }
+  } catch (err) {
+    console.warn(`Error getting user status: ${err.message}`);
+  }
+
+  // if (status === 'USER' && userId.signature) {
+  //   // ecrecover signature. Compare to configured admin address
+  //   const adminAddress = process.env.ADMIN_ADDRESS;
+
+  // };
+  return status;
+};

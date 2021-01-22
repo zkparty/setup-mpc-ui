@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Dispatch, useEffect, useReducer, useState } from "react";
 import firebase from "firebase";
-import { getUserPrivs } from "../api/ZKPartyApi";
+import { getUserStatus } from "../api/FirestoreApi";
 
 export interface AuthContextInterface {
   isLoggedIn: boolean,
@@ -34,7 +34,7 @@ export const AuthContextProvider = ({ children }:any) => {
         if (user) {
           // Get user privileges
           if (user.email) {
-            getUserPrivs(user.email)
+            getUserStatus(user.email)
               .then((resp: string) => {
                 console.log(`privs: ${resp}`);
                 //Auth.setCoordinator("COORDINATOR" === resp);
