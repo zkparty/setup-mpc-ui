@@ -130,6 +130,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.computeStatus = {...state.computeStatus, downloaded: true, started: true};
             startComputation(action.data, state.entropy);
             console.debug('running computation......');
+            newState.progress={ data: 0 };
             return newState;
         }
         case 'PROGRESS_UPDATE': {
@@ -253,7 +254,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.contributionState = {...state.contributionState, ...action.data};
             if (newState.contributionState.queueIndex == newState.contributionState.currentIndex) {
                 console.debug(`we are go`);
-                action.unsub(); // unsubscribe from the queue listener
+                //action.unsub(); // unsubscribe from the queue listener
                 newState.step = Step.RUNNING;
                 newState.computeStatus.ready = true;
             }

@@ -47,7 +47,7 @@ function compute(sourceParams: Uint8Array, entropy: Uint8Array) {
       client.postMessage(message, [result.buffer]);
     };
   } catch (err) {
-    console.log(`Error in compute: ${err.message}`);
+    console.log(`Error in compute: ${JSON.stringify(err)}`);
     if (client) client.postMessage(
       JSON.stringify({
         error: true,

@@ -13,6 +13,8 @@ import "firebase/storage";
 import { SnackbarProvider } from "notistack";
 
 firebase.initializeApp(firebaseConfig);
+firebase.firestore().settings({ experimentalForceLongPolling: true });
+
 
 const App = () => {
 
