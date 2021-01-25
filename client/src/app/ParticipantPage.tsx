@@ -21,7 +21,7 @@ import { ceremonyContributionListener,
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
 import { LinearProgress } from "@material-ui/core";
-import { newParticipant, computeStateReducer, Step, startServiceWorker, initialState, loadWasm } from './ComputeStateManager';
+import { newParticipant, computeStateReducer, Step, initialState } from './ComputeStateManager';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

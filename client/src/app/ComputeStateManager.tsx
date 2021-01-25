@@ -3,6 +3,7 @@ import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionS
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
 import { createGist } from "../api/ZKPartyApi";
+//import { Worker, MessageChannel } from 'worker_threads';
 
 export enum Step {
     NOT_ACKNOWLEDGED,
@@ -228,7 +229,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             console.debug(`step updated ${action.data}`);
             switch (action.data) {
                 case Step.ACKNOWLEDGED: {
-                    startServiceWorker(action.dispatch);
+                    startWorkerThread(action.dispatch);
                     break;
                 }
                 case Step.WAITING: {
@@ -276,52 +277,69 @@ export const computeStateReducer = (state: any, action: any):any => {
     return newState;
 }
 
-export const startServiceWorker = (dispatch: (a: any) => void) => {
-    navigator.serviceWorker.ready.then(() => {
-        console.log('service worker ready');
-        navigator.serviceWorker.controller?.postMessage({type: 'SKIP_WAITING'});
+let worker: Worker | null = null;
+
+export const startWorkerThread = (dispatch: (a: any) => void) => {
+    if (worker) return;
+
+    worker = new window.Worker('./worker.js');
+    console.debug('worker thread started');
+    //worker.onmessage = (e) => ('online', loadWasm);
+    worker.onmessage = (event) => {
+        //console.log('message from worker:', event);
+        const data = (typeof event.data === 'string') ?
+        JSON.parse(event.data)
+        : event.data;
+      switch (data.type) {
+        case 'ONLINE': {
+            worker?.postMessage({type: 'LOAD_WASM'});
+            break;
+        }
+        case 'PROGRESS': {
+            //console.log(`message from service worker ${message}`);
+            
+            dispatch({
+                type: 'PROGRESS_UPDATE',
+                data: data.total > 0 ? 100 * data.count / data.total : 0,
+            })
+            break;
+        }
+        case 'HASH': { 
+            dispatch({type: 'SET_HASH', hash: data.hash});
+            break; 
+        }
+        case 'COMPLETE': { 
+            const result = new Uint8Array(data.result);
+            console.debug(`COMPLETE ${result.length}`);
+            dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
+            break; 
+        }
+        case 'ERROR': {
+            console.log(`Error while computing. ${JSON.stringify(data)}`);
+        }
+      }
+    };
+    // navigator.serviceWorker.ready.then(() => {
+    // //    navigator.serviceWorker.controller?.postMessage({type: 'SKIP_WAITING'});
         
-        loadWasm();
-        navigator.serviceWorker.addEventListener('message', event => {
-          const data = (typeof event.data === 'string') ?
-            JSON.parse(event.data)
-            : event.data;
-          switch (data.type) {
-            case 'PROGRESS': {
-                //console.log(`message from service worker ${message}`);
-                
-                dispatch({
-                    type: 'PROGRESS_UPDATE',
-                    data: data.total > 0 ? 100 * data.count / data.total : 0,
-                })
-                break;
-            }
-            case 'HASH': { 
-                dispatch({type: 'SET_HASH', hash: data.hash});
-                break; 
-            }
-            case 'COMPLETE': { 
-                const result = new Uint8Array(data.result);
-                console.debug(`COMPLETE ${result.length}`);
-                dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
-                break; 
-            }
-            case 'ERROR': {
-                console.log(`Error while computing. ${JSON.stringify(data)}`);
-            }
-          }
-        });
-    });
+    // //    loadWasm();
+    //     navigator.serviceWorker.addEventListener('message', event => {
+    //     });
+    // });
 };
 
-export const loadWasm = async () => {
-    if (navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({type: 'LOAD_WASM'});
-        console.debug('service worker initialised');
-    } else {
-        console.log('Do not have controller!');
-    }
-};
+// export const loadWasm = async () => {
+//     if (worker) {
+//         worker.postMessage({type: 'LOAD_WASM'});
+//     }
+
+//     //if (navigator.serviceWorker.controller) {
+//     //    navigator.serviceWorker.controller.postMessage({type: 'LOAD_WASM'});
+//     //    console.debug('service worker initialised');
+//     //} else {
+//     //    console.log('Do not have controller!');
+//     //}
+// };
 
 const startDownload = (ceremonyId: string, index: number, dispatch: (a: any) => void) => {
     // DATA DOWNLOAD
@@ -345,7 +363,7 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array) => {
         params: params.buffer,
         entropy: entropy.buffer,
     };
-    navigator.serviceWorker.controller?.postMessage(message,
+    worker?.postMessage(message,
     [
         params.buffer,
         entropy.buffer
