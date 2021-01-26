@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { AuthDispatchContext, AuthStateContext } from "../app/AuthContext";
+import { AuthDispatchContext, AuthStateContext } from "../state/AuthContext";
 import GitHubIcon from "@material-ui/icons/GitHub";
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import firebase from "firebase";

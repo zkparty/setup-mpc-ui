@@ -12,7 +12,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import InfoIcon from '@material-ui/icons/Info';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import { ZKTitle } from "./Title";
-import { AuthStateContext, AuthDispatchContext } from "../app/AuthContext";
+import { AuthStateContext, AuthDispatchContext } from "../state/AuthContext";
 import {
   accentColor,
   secondAccent,

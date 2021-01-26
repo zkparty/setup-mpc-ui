@@ -21,7 +21,7 @@ import { addCeremony, jsonToCeremony } from "../api/ZKPartyApi";
 import { addCeremonyEvent, ceremonyEventListener, getCeremony, updateCeremony } from "../api/FirestoreApi";
 import FileUploader from "../components/FileUploader";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
-import { useSelectionContext } from "./SelectionContext";
+import { useSelectionContext } from "../state/SelectionContext";
 import { uploadCircuitFile } from "../api/FileApi";
 
 const HomeLinkContainer = styled.div`

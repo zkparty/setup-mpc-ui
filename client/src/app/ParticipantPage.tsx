@@ -1,7 +1,7 @@
-import React, { useReducer, useRef } from "react";
+import React, { useContext, useReducer, useRef } from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
-import { AuthStateContext } from "../app/AuthContext";
+import { AuthStateContext } from "../state/AuthContext";
 
 import {
   accentColor,
@@ -21,7 +21,7 @@ import { ceremonyContributionListener,
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
 import { LinearProgress } from "@material-ui/core";
-import { newParticipant, computeStateReducer, Step, initialState } from './ComputeStateManager';
+import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -75,33 +75,33 @@ const queueProgressCard = (contrib: ContributionState) => {
 )};
 
 export const ParticipantSection = () => {
-  const [state, dispatch] = useReducer(computeStateReducer, initialState);
-  const authState = React.useContext(AuthStateContext);
+  const state = useContext(ComputeStateContext);
+  const dispatch = useContext(ComputeDispatchContext);
+  const authState = useContext(AuthStateContext);
   const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
   const classes = useStyles();
-
 
   const { step, computeStatus, messages, entropy, participant, contributionState } = state;
   
   const getParticipant = async () => {
     console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
-    dispatch({ 
+    if (dispatch) dispatch({ 
       type: 'SET_PARTICIPANT', 
       data: newParticipant(authState.authUser.uid), 
       accessToken: authState.accessToken });
   };
 
   const getEntropy = () => {
-    dispatch({type: 'SET_ENTROPY', data: new Uint8Array(64).map(() => Math.random() * 256)});
+    if (dispatch) dispatch({type: 'SET_ENTROPY', data: new Uint8Array(64).map(() => Math.random() * 256)});
     console.debug(`entropy set`);
   };
 
   const addMessage = (msg: string) => {
-    dispatch({type: 'ADD_MESSAGE', message: msg});
+    if (dispatch) dispatch({type: 'ADD_MESSAGE', message: msg});
   }
 
   const handleClick = () => {
-    dispatch({type: 'SET_STEP', data: Step.ACKNOWLEDGED, dispatch});
+    if (dispatch) dispatch({type: 'SET_STEP', data: Step.ACKNOWLEDGED});
   }
   
   const setContribution = (cs: ContributionState) => {
@@ -109,7 +109,7 @@ export const ParticipantSection = () => {
 
     // Only accept new tasks if we're waiting
     if (step !== Step.RUNNING && step !== Step.QUEUED) {
-      dispatch({
+      if (dispatch) dispatch({
         type: 'SET_CEREMONY',
         data: cs,
       });
@@ -120,7 +120,7 @@ export const ParticipantSection = () => {
   }
 
   const updateQueue = (update: any) => {
-    dispatch({
+    if (dispatch) dispatch({
       type: 'UPDATE_QUEUE',
       data: update,
       unsub: ceremonyQueueListenerUnsub,
@@ -151,7 +151,7 @@ export const ParticipantSection = () => {
         // After 'go ahead' clicked
         // Display status messages for all remaining conditions
         // Initialise - get participant ID, load wasm module
-        if (!participant) {
+        if (!participant && dispatch) {
           getParticipant().then(() => {
             console.debug('INITIALISED');
             dispatch({type: 'SET_STEP', data: Step.INITIALISED});
@@ -164,7 +164,7 @@ export const ParticipantSection = () => {
         // Collect entropy
         if (entropy.length == 0) getEntropy();
         content = stepText('Collecting entropy...');
-        dispatch({type: 'SET_STEP', data: Step.ENTROPY_COLLECTED});
+        if (dispatch) dispatch({type: 'SET_STEP', data: Step.ENTROPY_COLLECTED});
         break;
       }
       case (Step.ENTROPY_COLLECTED): {
@@ -172,7 +172,7 @@ export const ParticipantSection = () => {
         if (participant) ceremonyListenerUnsub.current = ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
         content = stepText('Starting listener...');
         addMessage('Initialised.');
-        dispatch({type: 'SET_STEP', data: Step.WAITING, dispatch});
+        if (dispatch) dispatch({type: 'SET_STEP', data: Step.WAITING});
         break;
       }
       case (Step.WAITING): {
@@ -198,20 +198,19 @@ export const ParticipantSection = () => {
         // Download/Compute/Upload
         //logState();
 
-        if (computeStatus.ready && !computeStatus.running) {
+        if (computeStatus.ready && !computeStatus.running && dispatch) {
           // Start the computation
           dispatch({
             type: 'START_COMPUTE',
-            ceremonyId: contributionState.ceremony.id,
-            index: contributionState.queueIndex,
-            dispatch,
+            ceremonyId: contributionState?.ceremony.id,
+            index: contributionState?.queueIndex,
           });
         }
 
         const progressPct = state.progress;
 
         content = (<>
-          <Typography variant='h6'>Ceremony: {contributionState.ceremony.title}</Typography>
+          <Typography variant='h6'>Ceremony: {contributionState?.ceremony.title}</Typography>
           <Typography variant='h3' style={{ paddingTop: '20px' }}>{
               !computeStatus.downloaded ? stepText('Downloading ...')
             : !computeStatus.computed ? stepText('Calculating ...')

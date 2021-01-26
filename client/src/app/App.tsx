@@ -3,14 +3,15 @@ import { useReducer } from "react";
 import { createGlobalStyle } from "styled-components";
 import { textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
-import { AuthContextProvider, authStateReducer, defaultAuth } from "./AuthContext";
-import { SelectionContextProvider } from './SelectionContext';
+import { AuthContextProvider, authStateReducer, defaultAuth } from "../state/AuthContext";
+import { SelectionContextProvider } from '../state/SelectionContext';
 import firebase from "firebase/app";
 import firebaseConfig from "./firebaseConfig";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
 import { SnackbarProvider } from "notistack";
+import { ComputeContextProvider } from '../state/ComputeStateManager';
 
 firebase.initializeApp(firebaseConfig);
 firebase.firestore().settings({ experimentalForceLongPolling: true });
@@ -23,10 +24,12 @@ const App = () => {
   return (
     <AuthContextProvider>
       <SelectionContextProvider>
-        <SnackbarProvider maxSnack={4}>
-            <GlobalStyle />
-            <LandingPage />
-        </SnackbarProvider>
+        <ComputeContextProvider>
+          <SnackbarProvider maxSnack={4}>
+              <GlobalStyle />
+              <LandingPage />
+          </SnackbarProvider>
+        </ComputeContextProvider>
       </SelectionContextProvider>
     </AuthContextProvider>
   );

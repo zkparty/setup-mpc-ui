@@ -2,7 +2,7 @@ import { Button, Modal, Typography } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as React from 'react';
 import { resetContributions } from '../api/FirestoreApi';
-import { AuthStateContext } from '../app/AuthContext';
+import { AuthStateContext } from '../state/AuthContext';
 import { accentColor } from '../styles';
 
 require('dotenv').config();

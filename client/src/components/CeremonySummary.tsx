@@ -12,7 +12,7 @@ import {
 } from "../styles";
 import { Ceremony } from "../types/ceremony";
 import { format } from "timeago.js";
-import {  useSelectionContext } from "../app/SelectionContext";
+import {  useSelectionContext } from "../state/SelectionContext";
 import LinearProgress, { LinearProgressProps } from '@material-ui/core/LinearProgress';
 import { Typography, Box, makeStyles } from "@material-ui/core";
 import { ceremonyStatus } from '../utils/utils';

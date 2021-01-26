@@ -1,9 +1,9 @@
-import { getParamsFile, uploadParams } from "../api/FileApi";
+import * as React from 'react';
 import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
-import { createGist } from "../api/ZKPartyApi";
-//import { Worker, MessageChannel } from 'worker_threads';
+import { createContext, Dispatch, useContext, useReducer } from "react";
+import { startWorkerThread, startDownload, startComputation, startUpload, startCreateGist } from './Compute';
 
 export enum Step {
     NOT_ACKNOWLEDGED,
@@ -77,22 +77,51 @@ export const initialComputeStatus: ComputeStatus = {
     progress: {count: 0, total: 0},
 };
 
-export const initialState = {
+interface ComputeContextInterface {
+    computeStatus: ComputeStatus,
+    messages: string [],
+    contributionState?: ContributionState,
+    step: Step,
+    participant?: Participant,
+    paramData?: Uint8Array,
+    entropy: Uint8Array,
+    progress: number, // { count: number, total: number},
+    hash: string,
+    contributionCount: number,
+};
+
+export const initialState: ComputeContextInterface = {
     computeStatus: initialComputeStatus,
     messages: [],
-    contributionState: null,
+    contributionState: undefined,
     step: Step.NOT_ACKNOWLEDGED,
     participant: undefined,
     paramData: new Uint8Array(0),
     entropy: new Uint8Array(0),
-    progress: {count: 0, total: 0},
-    hash: '',    
+    progress: 0, //{count: 0, total: 0},
+    hash: '',
+    contributionCount: 0,
 }
 
 const addMessage = (state: any, message: string) => {
     const msg = new Date().toLocaleTimeString() + ' ' + message;
     return {...state, messages: [...state.messages, msg]};
 }
+
+export const ComputeStateContext = createContext<ComputeContextInterface>(initialState);
+export const ComputeDispatchContext = createContext<Dispatch<any> | undefined>(undefined);
+
+export const ComputeContextProvider = ({ children }:any) => {
+    const [state, dispatch] = useReducer(computeStateReducer, initialState);
+
+    return (
+        <ComputeStateContext.Provider value={ state }>
+          <ComputeDispatchContext.Provider value={ dispatch }>
+            {children}
+          </ComputeDispatchContext.Provider>
+        </ComputeStateContext.Provider>
+      )    
+};
 
 export const computeStateReducer = (state: any, action: any):any => {
     let newState = {...state};
@@ -115,7 +144,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             addOrUpdateContribution(action.ceremonyId, contribution);
             newState.contributionState = {...state.contributionState, startTime: Date.now()};
             newState.computeStatus = {...state.computeStatus, running: true, downloading: true};
-            startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, action.dispatch);
+            startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex);
             return newState;
         }
         case 'DOWNLOADED': {
@@ -167,7 +196,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.paramData = new Uint8Array();
             const msg = `Computation completed.`;
             newState = addMessage(newState, msg);
-            startUpload(state.contributionState.ceremony.id, state.contributionState.queueIndex, action.newParams, action.dispatch);
+            startUpload(state.contributionState.ceremony.id, state.contributionState.queueIndex, action.newParams);
             return newState;
         }
         case 'UPLOADED': {
@@ -189,7 +218,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                  duration
             );
             newState.contributionSummary = contribution;
-            startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
+            startCreateGist(ceremony, queueIndex, state.hash, state.accessToken);
 
             return newState;
         }
@@ -229,11 +258,11 @@ export const computeStateReducer = (state: any, action: any):any => {
             console.debug(`step updated ${action.data}`);
             switch (action.data) {
                 case Step.ACKNOWLEDGED: {
-                    startWorkerThread(action.dispatch);
+                    startWorkerThread();
                     break;
                 }
                 case Step.WAITING: {
-                    getContributionCount(state.participant.uid, action.dispatch);
+                    getContributionCount(state.participant.uid);
                     break;
                 }
             }
@@ -277,129 +306,13 @@ export const computeStateReducer = (state: any, action: any):any => {
     return newState;
 }
 
-let worker: Worker | null = null;
 
-export const startWorkerThread = (dispatch: (a: any) => void) => {
-    if (worker) return;
-
-    worker = new window.Worker('./worker.js');
-    console.debug('worker thread started');
-    //worker.onmessage = (e) => ('online', loadWasm);
-    worker.onmessage = (event) => {
-        //console.log('message from worker:', event);
-        const data = (typeof event.data === 'string') ?
-        JSON.parse(event.data)
-        : event.data;
-      switch (data.type) {
-        case 'ONLINE': {
-            worker?.postMessage({type: 'LOAD_WASM'});
-            break;
-        }
-        case 'PROGRESS': {
-            //console.log(`message from service worker ${message}`);
-            
-            dispatch({
-                type: 'PROGRESS_UPDATE',
-                data: data.total > 0 ? 100 * data.count / data.total : 0,
-            })
-            break;
-        }
-        case 'HASH': { 
-            dispatch({type: 'SET_HASH', hash: data.hash});
-            break; 
-        }
-        case 'COMPLETE': { 
-            const result = new Uint8Array(data.result);
-            console.debug(`COMPLETE ${result.length}`);
-            dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
-            break; 
-        }
-        case 'ERROR': {
-            console.log(`Error while computing. ${JSON.stringify(data)}`);
-        }
-      }
-    };
-    // navigator.serviceWorker.ready.then(() => {
-    // //    navigator.serviceWorker.controller?.postMessage({type: 'SKIP_WAITING'});
-        
-    // //    loadWasm();
-    //     navigator.serviceWorker.addEventListener('message', event => {
-    //     });
-    // });
-};
-
-// export const loadWasm = async () => {
-//     if (worker) {
-//         worker.postMessage({type: 'LOAD_WASM'});
-//     }
-
-//     //if (navigator.serviceWorker.controller) {
-//     //    navigator.serviceWorker.controller.postMessage({type: 'LOAD_WASM'});
-//     //    console.debug('service worker initialised');
-//     //} else {
-//     //    console.log('Do not have controller!');
-//     //}
-// };
-
-const startDownload = (ceremonyId: string, index: number, dispatch: (a: any) => void) => {
-    // DATA DOWNLOAD
-    console.debug(`getting data ${ceremonyId} ${index}`);
-    getParamsFile(ceremonyId, index).then( paramData => {
-        console.debug(`downloaded ${paramData?.length}`);
-        dispatch({
-            type: 'DOWNLOADED',
-            data: paramData,
-        });
-    }).catch(err => 
-        {console.error(err.message);}
-    );
-};
-
-export const startComputation = (params: Uint8Array, entropy: Uint8Array) => {
-    //const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
-    console.log(`params ${params.buffer.byteLength} ${entropy.buffer.byteLength}`);
-    const message = {
-        type: 'COMPUTE', 
-        params: params.buffer,
-        entropy: entropy.buffer,
-    };
-    worker?.postMessage(message,
-    [
-        params.buffer,
-        entropy.buffer
-    ]);
-};
-
-const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispatch: (a: any) => void) => {
-    uploadParams(ceremonyId, index, data, (progress) => dispatch({type: 'PROGRESS_UPDATE', data: progress})).then(
-        paramsFile => {
-            dispatch({
-                type: 'UPLOADED',
-                file: paramsFile,
-                dispatch,
-            })
-    });
-}
-
-const startCreateGist = (ceremony: Ceremony, index: number, hash: string, accessToken: string, dispatch: (a: any) => void) => {
-    console.debug(`startCreateGist ${accessToken}`);
-    if (accessToken) {
-        createGist(ceremony.id, ceremony.title, index, hash, accessToken).then(
-            gistUrl => {
-                dispatch({
-                    type: 'GIST_CREATED',
-                    gistUrl,
-                })
-        });
-    } else {
-        dispatch({
-            type: 'GIST_CREATED',
-            gistUrl: null,
-        })
+const getContributionCount = (participant: string) => {
+    const dispatch = useContext(ComputeDispatchContext);
+    if (!dispatch) {
+        console.error('Expected dispatch but it is not defined');
+        return;
     }
-}
-
-const getContributionCount = (participant: string, dispatch: React.Dispatch<any>) => {
     console.debug(`getContCount...`);
     countParticipantContributions(participant).then(
         count => {
