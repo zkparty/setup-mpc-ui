@@ -20,11 +20,11 @@ import {
 } from "../styles";
 import { Ceremony } from "../types/ceremony";
 import { ceremonyListener, getCeremonies, getCeremony } from "../api/FirestoreApi";
-import { AuthStateContext } from "./AuthContext";
+import { AuthStateContext } from "../state/AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
 import { CeremonyPage } from "./CeremonyPage";
-import { useSelectionContext } from './SelectionContext';
+import { useSelectionContext } from '../state/SelectionContext';
 import './styles.css';
 import { withStyles } from "@material-ui/core/styles";
 

@@ -88,6 +88,7 @@ interface ComputeContextInterface {
     progress: number, // { count: number, total: number},
     hash: string,
     contributionCount: number,
+    worker?: Worker,
 };
 
 export const initialState: ComputeContextInterface = {
@@ -95,7 +96,6 @@ export const initialState: ComputeContextInterface = {
     messages: [],
     contributionState: undefined,
     step: Step.NOT_ACKNOWLEDGED,
-    participant: undefined,
     paramData: new Uint8Array(0),
     entropy: new Uint8Array(0),
     progress: 0, //{count: 0, total: 0},
@@ -113,6 +113,8 @@ export const ComputeDispatchContext = createContext<Dispatch<any> | undefined>(u
 
 export const ComputeContextProvider = ({ children }:any) => {
     const [state, dispatch] = useReducer(computeStateReducer, initialState);
+
+    //console.debug(`ComputeContextProvider ${!!dispatch}`);
 
     return (
         <ComputeStateContext.Provider value={ state }>
@@ -144,7 +146,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             addOrUpdateContribution(action.ceremonyId, contribution);
             newState.contributionState = {...state.contributionState, startTime: Date.now()};
             newState.computeStatus = {...state.computeStatus, running: true, downloading: true};
-            startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex);
+            startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, action.dispatch);
             return newState;
         }
         case 'DOWNLOADED': {
@@ -158,7 +160,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             const msg = `Parameters downloaded.`;
             newState = addMessage(newState, msg);
             newState.computeStatus = {...state.computeStatus, downloaded: true, started: true};
-            startComputation(action.data, state.entropy);
+            if (state.worker) startComputation(action.data, state.entropy, state.worker);
             console.debug('running computation......');
             newState.progress={ data: 0 };
             return newState;
@@ -196,7 +198,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.paramData = new Uint8Array();
             const msg = `Computation completed.`;
             newState = addMessage(newState, msg);
-            startUpload(state.contributionState.ceremony.id, state.contributionState.queueIndex, action.newParams);
+            startUpload(state.contributionState.ceremony.id, state.contributionState.queueIndex, action.newParams, action.dispatch);
             return newState;
         }
         case 'UPLOADED': {
@@ -218,7 +220,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                  duration
             );
             newState.contributionSummary = contribution;
-            startCreateGist(ceremony, queueIndex, state.hash, state.accessToken);
+            startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
 
             return newState;
         }
@@ -254,18 +256,15 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState = addMessage(state, action.message);
             return newState;
         }
+        case 'ACKNOWLEDGE': {
+            //startWorkerThread();
+            return {...state, step: Step.ACKNOWLEDGED};
+        }
+        case 'WAIT': {
+            return { ...state, step: Step.WAITING };
+        }
         case 'SET_STEP': {
             console.debug(`step updated ${action.data}`);
-            switch (action.data) {
-                case Step.ACKNOWLEDGED: {
-                    startWorkerThread();
-                    break;
-                }
-                case Step.WAITING: {
-                    getContributionCount(state.participant.uid);
-                    break;
-                }
-            }
             return {...state, step: action.data}
         }
         case 'SET_CEREMONY': {
@@ -301,25 +300,11 @@ export const computeStateReducer = (state: any, action: any):any => {
         case 'SET_CONTRIBUTION_COUNT': {
             return {...state, contributionCount: action.data};
         }
+        case 'SET_WORKER': {
+            return { ...state, worker: action.data };
+        }
     }
     console.debug(`state after reducer ${newState.step}`);
     return newState;
 }
 
-
-const getContributionCount = (participant: string) => {
-    const dispatch = useContext(ComputeDispatchContext);
-    if (!dispatch) {
-        console.error('Expected dispatch but it is not defined');
-        return;
-    }
-    console.debug(`getContCount...`);
-    countParticipantContributions(participant).then(
-        count => {
-            dispatch({
-                type: 'SET_CONTRIBUTION_COUNT',
-                data: count,
-            });
-        }
-    );
-}

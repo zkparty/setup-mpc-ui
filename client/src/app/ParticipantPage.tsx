@@ -1,4 +1,4 @@
-import React, { useContext, useReducer, useRef } from "react";
+import React, { Dispatch, useContext, useReducer, useRef } from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
 import { AuthStateContext } from "../state/AuthContext";
@@ -17,11 +17,12 @@ import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import { ceremonyContributionListener, 
-  ceremonyQueueListener, ceremonyQueueListenerUnsub } from "../api/FirestoreApi";
+  ceremonyQueueListener, ceremonyQueueListenerUnsub, countParticipantContributions } from "../api/FirestoreApi";
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
 import { LinearProgress } from "@material-ui/core";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
+import { startWorkerThread } from "../state/Compute";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -82,6 +83,7 @@ export const ParticipantSection = () => {
   const classes = useStyles();
 
   const { step, computeStatus, messages, entropy, participant, contributionState } = state;
+
   
   const getParticipant = async () => {
     console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
@@ -101,7 +103,7 @@ export const ParticipantSection = () => {
   }
 
   const handleClick = () => {
-    if (dispatch) dispatch({type: 'SET_STEP', data: Step.ACKNOWLEDGED});
+    if (dispatch) dispatch({type: 'ACKNOWLEDGE' });
   }
   
   const setContribution = (cs: ContributionState) => {
@@ -156,6 +158,7 @@ export const ParticipantSection = () => {
             console.debug('INITIALISED');
             dispatch({type: 'SET_STEP', data: Step.INITIALISED});
           });
+          if (!state.worker) startWorkerThread(dispatch);
         }
         content = stepText('Loading compute module...');
         break;
@@ -169,10 +172,13 @@ export const ParticipantSection = () => {
       }
       case (Step.ENTROPY_COLLECTED): {
         // start looking for a ceremony to contribute to
-        if (participant) ceremonyListenerUnsub.current = ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
+        if (participant) {
+          ceremonyListenerUnsub.current = ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
+          if (dispatch) getContributionCount(participant.uid, dispatch);
+        }
         content = stepText('Starting listener...');
         addMessage('Initialised.');
-        if (dispatch) dispatch({type: 'SET_STEP', data: Step.WAITING});
+        if (dispatch) dispatch({ type: 'WAIT' });
         break;
       }
       case (Step.WAITING): {
@@ -204,6 +210,7 @@ export const ParticipantSection = () => {
             type: 'START_COMPUTE',
             ceremonyId: contributionState?.ceremony.id,
             index: contributionState?.queueIndex,
+            dispatch,
           });
         }
 
@@ -217,7 +224,7 @@ export const ParticipantSection = () => {
             : stepText('Uploading ...') 
           }</Typography>
           <LinearProgress variant="determinate" value={progressPct} style={{ paddingTop: '20px' }} />
-          <Typography variant='body2' style={{ paddingTop: '40px' }}>Warning: Closing this page or returning to the 'Ceremonies' tab will interrupt your contribution.</Typography>
+          <Typography variant='body2' style={{ paddingTop: '40px' }}>Warning: Closing this page will interrupt your contribution.</Typography>
         </>);
         break;
       }
@@ -235,3 +242,16 @@ export const ParticipantSection = () => {
       </div>
   );
 };
+
+
+const getContributionCount = (participant: string, dispatch: Dispatch<any>) => {
+  console.debug(`getContCount...`);
+  countParticipantContributions(participant).then(
+      count => {
+          dispatch({
+              type: 'SET_CONTRIBUTION_COUNT',
+              data: count,
+          });
+      }
+  );
+}

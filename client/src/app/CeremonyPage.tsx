@@ -20,8 +20,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 import moment from "moment";
 import './styles.css';
-import { AuthStateContext } from "./AuthContext";
-import { SelectedCeremonyContext, useSelectionContext } from "./SelectionContext";
+import { AuthStateContext } from "../state/AuthContext";
+import { SelectedCeremonyContext, useSelectionContext } from "../state/SelectionContext";
 import { useSnackbar } from "notistack";
 import { ceremonyStatus } from "../utils/utils";
 

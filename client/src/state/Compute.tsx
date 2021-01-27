@@ -1,20 +1,19 @@
 import * as React from 'react';
 import { getParamsFile, uploadParams } from "../api/FileApi";
-import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
+import { Ceremony } from "../types/ceremony";
 
-import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
 import { createGist } from "../api/ZKPartyApi";
-import { createContext, Dispatch, useContext, useReducer } from "react";
+import { Dispatch, useContext } from "react";
 import { ComputeDispatchContext } from './ComputeStateManager';
 
-let worker: Worker | null = null;
+//let worker: Worker | null = null;
 
-export const startWorkerThread = () => {
-    const dispatch = useContext(ComputeDispatchContext);
+export const startWorkerThread = (dispatch: React.Dispatch<any>) => {
+    //const dispatch = useContext(ComputeDispatchContext);
 
-    if (worker || !dispatch) return;
+    if (!dispatch) return;
 
-    worker = new window.Worker('./worker.js');
+    const worker = new window.Worker('./worker.js');
     console.debug('worker thread started');
     //worker.onmessage = (e) => ('online', loadWasm);
     worker.onmessage = (event) => {
@@ -24,7 +23,7 @@ export const startWorkerThread = () => {
         : event.data;
       switch (data.type) {
         case 'ONLINE': {
-            worker?.postMessage({type: 'LOAD_WASM'});
+            worker.postMessage({type: 'LOAD_WASM'});
             break;
         }
         case 'PROGRESS': {
@@ -51,13 +50,8 @@ export const startWorkerThread = () => {
         }
       }
     };
-    // navigator.serviceWorker.ready.then(() => {
-    // //    navigator.serviceWorker.controller?.postMessage({type: 'SKIP_WAITING'});
-        
-    // //    loadWasm();
-    //     navigator.serviceWorker.addEventListener('message', event => {
-    //     });
-    // });
+
+    dispatch({ type: 'SET_WORKER', data: worker });
 };
 
 // export const loadWasm = async () => {
@@ -73,12 +67,8 @@ export const startWorkerThread = () => {
 //     //}
 // };
 
-export const startDownload = (ceremonyId: string, index: number) => {
-    const dispatch = useContext(ComputeDispatchContext);
-    if (!dispatch) {
-        console.error('Expected dispatch but it is not defined');
-        return;
-    }
+export const startDownload = (ceremonyId: string, index: number, dispatch: Dispatch<any>) => {
+    //const dispatch = useContext(ComputeDispatchContext);
 
     // DATA DOWNLOAD
     console.debug(`getting data ${ceremonyId} ${index}`);
@@ -93,7 +83,7 @@ export const startDownload = (ceremonyId: string, index: number) => {
     );
 };
 
-export const startComputation = (params: Uint8Array, entropy: Uint8Array) => {
+export const startComputation = (params: Uint8Array, entropy: Uint8Array, worker: Worker) => {
     //const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
     console.log(`params ${params.buffer.byteLength} ${entropy.buffer.byteLength}`);
     const message = {
@@ -101,19 +91,14 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array) => {
         params: params.buffer,
         entropy: entropy.buffer,
     };
-    worker?.postMessage(message,
+    worker.postMessage(message,
     [
         params.buffer,
         entropy.buffer
     ]);
 };
 
-export const startUpload = (ceremonyId: string, index: number, data: Uint8Array) => {
-    const dispatch = useContext(ComputeDispatchContext);
-    if (!dispatch) {
-        console.error('Expected dispatch but it is not defined');
-        return;
-    }
+export const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispatch: Dispatch<any>) => {
     uploadParams(
         ceremonyId, 
         index, 
@@ -124,16 +109,12 @@ export const startUpload = (ceremonyId: string, index: number, data: Uint8Array)
             dispatch({
                 type: 'UPLOADED',
                 file: paramsFile,
+                dispatch,
             })
     });
 }
 
-export const startCreateGist = (ceremony: Ceremony, index: number, hash: string, accessToken: string) => {
-    const dispatch = useContext(ComputeDispatchContext);
-    if (!dispatch) {
-        console.error('Expected dispatch but it is not defined');
-        return;
-    }
+export const startCreateGist = (ceremony: Ceremony, index: number, hash: string, accessToken: string, dispatch: Dispatch<any>) => {
     console.debug(`startCreateGist ${accessToken}`);
     if (accessToken) {
         createGist(ceremony.id, ceremony.title, index, hash, accessToken).then(

@@ -1,8 +1,10 @@
 import { Button, Modal, Typography } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as React from 'react';
+import { Dispatch, useContext } from 'react';
 import { resetContributions } from '../api/FirestoreApi';
 import { AuthStateContext } from '../state/AuthContext';
+import { ComputeDispatchContext, Step } from '../state/ComputeStateManager';
 import { accentColor } from '../styles';
 
 require('dotenv').config();
@@ -33,20 +35,24 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const resetContribs = (participantId: string, onClose: () => void) => {
+const resetContribs = (participantId: string, onClose: () => void, dispatch?: Dispatch<any> ) => {
     resetContributions(participantId);
+    if (dispatch) dispatch({ type: 'SET_STEP', data: Step.NOT_ACKNOWLEDGED });
     onClose();
 };
 
 export default function Options(props: any) {
     const classes = useStyles();
+    const dispatch = useContext(ComputeDispatchContext);
 
     const resetButton = (participantId: string): any => {
         let button;
         if (allowReset && participantId) {
             button = (<Button 
                 variant='outlined'
-                onClick={() => resetContribs(participantId, props.close)}
+                onClick={() => {
+                    resetContribs(participantId, props.close, dispatch )
+                }}
                 style={{ color: accentColor }}
             >
                     Reset Contributions
