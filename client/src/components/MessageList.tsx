@@ -38,14 +38,14 @@ function renderRow(props: ListChildComponentProps) {
 export default function VirtualizedList(props: {messages: string[]}) {
   //const classes = useStyles();
   const {messages} = props;
-  const listRef = React.createRef<VariableSizeList>();
+  const listRef = React.useRef<VariableSizeList>(null);
 
   const rowHeight = (index: number) => {
     let lines = Math.floor(messages[index].length / 80) + 1;
     return (lines * 30);
   }
 
-  if (listRef.current) listRef.current.scrollToItem(messages.length, 'end');
+  if (listRef.current && messages && messages.length > 5) listRef.current.scrollToItem(messages.length - 1, 'end');
   
   return (
     <div>

@@ -133,7 +133,7 @@ const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) |
         <ListItemIcon style={{ color: accentColor }} >
             <SettingsIcon fontSize="small" />
         </ListItemIcon>
-        <ListItemText primary="Options" onClick={toggleOptions} />
+        <ListItemText primary="Options" onClick={toggleOptions} style={{ color: accentColor }} />
         </StyledMenuItem>
         <StyledMenuItem>
         <ListItemIcon style={{ color: accentColor }} >

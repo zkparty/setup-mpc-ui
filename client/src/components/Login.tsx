@@ -63,7 +63,7 @@ const Login = (props: { close: any }) => {
     : 
       (<ListItem button={true} onClick={handleGithubLogin} style={{ color: accentColor, background: lighterBackground }}>
         <GitHubIcon />
-        &nbsp;Login With GitHub
+        &nbsp;Login with GitHub
       </ListItem>)      
   );
 };

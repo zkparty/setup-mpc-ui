@@ -225,23 +225,25 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'GIST_CREATED': {
-            const { queueIndex, ceremony } = state.contributionState;
-            let msg;
-            if (action.gistUrl) {
-                addCeremonyEvent(ceremony.id, createCeremonyEvent(
-                    "GIST_CREATED", 
-                    `Contribution recorded at ${action.gistUrl}`,
-                    queueIndex
-                ));
-                msg = `Gist created at ${action.gistUrl}`;
-                newState = addMessage(state, msg);
+            if (state.contribution) {
+                const { queueIndex, ceremony } = state.contributionState;
+                let msg;
+                if (action.gistUrl) {
+                    addCeremonyEvent(ceremony.id, createCeremonyEvent(
+                        "GIST_CREATED", 
+                        `Contribution recorded at ${action.gistUrl}`,
+                        queueIndex
+                    ));
+                    msg = `Gist created at ${action.gistUrl}`;
+                    newState = addMessage(state, msg);
+                }
+                
+                const contribution = newState.contributionSummary;
+                contribution.gistUrl = action.gistUrl;
+                addOrUpdateContribution(ceremony.id, contribution);
+                msg = `Thank you for your contribution.`;
+                newState = addMessage(newState, msg);
             }
-            
-            const contribution = newState.contributionSummary;
-            contribution.gistUrl = action.gistUrl;
-            addOrUpdateContribution(ceremony.id, contribution);
-            msg = `Thank you for your contribution.`;
-            newState = addMessage(newState, msg);
 
             // Clean up and return to waiting
             newState.computeStatus = initialComputeStatus;
