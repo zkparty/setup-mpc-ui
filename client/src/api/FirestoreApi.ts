@@ -241,7 +241,7 @@ export const contributionUpdateListener = async (
       oldIndex?: number
       ) => void,
     ): Promise<()=>void> => {
-  console.log(`contributionUpdateListener ${id}`);
+  console.debug(`contributionUpdateListener ${id}`);
   const db = firebase.firestore();
   const query = db.collection("ceremonies")
                 .doc(id)
@@ -251,13 +251,13 @@ export const contributionUpdateListener = async (
   
   // First time, get all docs
   const querySnapshot = await query.get();
-  console.log(`query snapshot ${querySnapshot.size}`);
+  console.debug(`query snapshot ${querySnapshot.size}`);
   querySnapshot.docs.forEach(doc => 
     callback(doc.data(), 'added')
   );
 
   return query.onSnapshot(querySnapshot => {
-    console.log(`contribData snapshot ${querySnapshot.size}`);
+    console.debug(`contribData snapshot ${querySnapshot.size}`);
     querySnapshot.docChanges().forEach(contrib => {
       callback(contrib.doc.data(), contrib.type, contrib.oldIndex);
     });
@@ -270,7 +270,7 @@ export const contributionUpdateListener = async (
 // Listens for updates to eligible ceremonies that a participant may contribute to.
 // The first such ceremony found will be returned in the callback
 export const ceremonyContributionListener = (participantId: string, isCoordinator: boolean, callback: (c: ContributionState) => void): () => void => {
-  console.log(`listening for contributions for ${participantId}`);
+  console.debug(`listening for contributions for ${participantId}`);
   let contributedCeremonies: string[] = [];
   const db = firebase.firestore();
   // Get running ceremonies
@@ -304,7 +304,7 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
             contributedCeremonies.push(ceremonyId);
             //return true;
           } else if (!found) {
-            console.log(`found ceremony ${ceremonyId} to contribute to`);
+            console.debug(`found ceremony ${ceremonyId} to contribute to`);
             found = true;
             // We have a ceremony to contribute to
             let contribution: Contribution = {
@@ -393,12 +393,14 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   let numContribs = 0;
 
   const db = firebase.firestore();
-  const query = db.collection("ceremonies")
-    .doc(ceremonyId)
+  const ceremony = db.collection("ceremonies")
+    .doc(ceremonyId);
+  const query = ceremony
     .collection('contributions')
     .withConverter(contributionConverter)
     .orderBy('queueIndex', 'asc');
   
+  const ceremonySnap = await ceremony.get();
   const snapshot = await query.get();
   snapshot.forEach( docSnapshot => {
     const cont = docSnapshot.data();
@@ -420,7 +422,7 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   contributionStats.averageSecondsPerContribution = 
       (numContribs > 0) ? 
         Math.floor(totalSecs / numContribs) 
-      : 90; // TODO: calc sensible default based on circuit size
+      : ceremonySnap.get('numConstraints') * 5 / 1000; // calc sensible default based on circuit size
 
   return contributionStats;
 };

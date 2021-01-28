@@ -38,15 +38,24 @@ function renderRow(props: ListChildComponentProps) {
 export default function VirtualizedList(props: {messages: string[]}) {
   //const classes = useStyles();
   const {messages} = props;
+  const listRef = React.createRef<VariableSizeList>();
 
   const rowHeight = (index: number) => {
     let lines = Math.floor(messages[index].length / 80) + 1;
-    return (lines * 25);
+    return (lines * 30);
   }
+
+  if (listRef.current) listRef.current.scrollToItem(messages.length);
   
   return (
     <div>
-      <VariableSizeList height={200} width={600} itemSize={rowHeight} itemCount={messages.length} itemData={messages}>
+      <VariableSizeList 
+        height={200} width={600} 
+        itemSize={rowHeight} 
+        itemCount={messages.length} 
+        itemData={messages}
+        ref={listRef}
+      >
         {renderRow}
       </VariableSizeList>
     </div>
