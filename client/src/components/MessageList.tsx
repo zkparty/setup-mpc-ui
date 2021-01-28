@@ -45,7 +45,7 @@ export default function VirtualizedList(props: {messages: string[]}) {
     return (lines * 30);
   }
 
-  if (listRef.current) listRef.current.scrollToItem(messages.length);
+  if (listRef.current) listRef.current.scrollToItem(messages.length, 'end');
   
   return (
     <div>
