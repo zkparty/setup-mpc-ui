@@ -88,7 +88,7 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
 
   const updateContribution = (doc: ContributionSummary, changeType: string, oldIndex?: number) => {
     // A contribution has been updated
-    console.debug(`contribution update: ${doc.queueIndex} ${changeType} ${oldIndex}`);
+    //console.debug(`contribution update: ${doc.queueIndex} ${changeType} ${oldIndex}`);
     let newContributions = contributions;
     switch (changeType) {
       case 'added': {

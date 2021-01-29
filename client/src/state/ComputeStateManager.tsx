@@ -225,9 +225,9 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'GIST_CREATED': {
-            if (state.contribution) {
+            let msg;
+            if (state.contributionState) {
                 const { queueIndex, ceremony } = state.contributionState;
-                let msg;
                 if (action.gistUrl) {
                     addCeremonyEvent(ceremony.id, createCeremonyEvent(
                         "GIST_CREATED", 
@@ -237,12 +237,13 @@ export const computeStateReducer = (state: any, action: any):any => {
                     msg = `Gist created at ${action.gistUrl}`;
                     newState = addMessage(state, msg);
                 }
-                
                 const contribution = newState.contributionSummary;
                 contribution.gistUrl = action.gistUrl;
                 addOrUpdateContribution(ceremony.id, contribution);
                 msg = `Thank you for your contribution.`;
                 newState = addMessage(newState, msg);
+            } else {
+                console.warn(`Duplicate call to GIST_CREATED`);
             }
 
             // Clean up and return to waiting
