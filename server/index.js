@@ -12,7 +12,7 @@ const {
   addCeremony,
   getUserStatus,
 } = require("./ZKPartyServer");
-const { prepareCircuit } = require("./CircuitHandler");
+const { prepareCircuit, verifyContribution } = require("./CircuitHandler");
 const { ceremonyEventListener } = require("./FirebaseApi");
 
 require("dotenv").config();
@@ -107,4 +107,4 @@ app.get("/api/prepare-ceremony/:id", async (req, res) => {
 
 app.listen(port, () => console.log(`App listening on port ${port}!`));
 
-ceremonyEventListener(prepareCircuit);
+ceremonyEventListener(prepareCircuit, verifyContribution);

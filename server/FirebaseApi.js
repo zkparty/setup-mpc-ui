@@ -1,5 +1,4 @@
 const admin = require("firebase-admin");
-//const { prepareCircuit } = require("./CircuitHandler");
 const serviceAccount = require("./firebase_skey.json");
 
 admin.initializeApp({
@@ -39,19 +38,8 @@ async function getFBCeremony(id) {
   }
   console.log(`getFBCeremony ${doc.exists}`);
   const missingParticipants = firebaseCeremonyJsonToSummary(doc.data());
-  const participants = [];
-  const participantsSnapshot = await db
-    .collection("ceremonyParticipants")
-    .doc(id)
-    .collection("participants")
-    .orderBy("position")
-    .get();
-  participantsSnapshot.forEach(doc => {
-    participants.push(firebaseParticipantJsonToParticipant(doc.data()));
-  });
   const ceremony = {
     ...missingParticipants,
-    participants
   };
   return ceremony;
 }
@@ -104,22 +92,6 @@ async function addFBCeremony(summaryData) {
     const doc = await db.collection("ceremonies").add(summaryData);
 
     console.log(`new ceremony added with id ${doc.id}`)
-    // await docRef.set({
-    //   ...summaryData,
-    //   lastSummaryUpdate: new Date(),
-    //   lastParticipantsUpdate: new Date()
-    // });
-    // const ceremonyParticipantsDocRef = db
-    //   .collection("ceremonyParticipants")
-    //   .doc(summaryData.id);
-    // await ceremonyParticipantsDocRef.set({
-    //   id: summaryData.id
-    // });
-    // const participantPromises = [];
-    // for (const participant of participants) {
-    //   participantPromises.push(addParticipant(summaryData.id, participant));
-    // }
-    // await Promise.all(participantPromises);
     return doc.id;
   } catch (e) {
     throw new Error(`error adding ceremony data to firebase: ${e}`);
@@ -198,39 +170,51 @@ function firebaseParticipantJsonToParticipant(json) {
   return json;
 }
 
-const ceremonyEventListener = async (circuitFileUpdateHandler) => {
+const ceremonyEventListener = async (circuitFileUpdateHandler, verifyContribution) => {
   console.log(`starting events listener...`);
-  const eventsCollection = db.collectionGroup("events");
-  const query = eventsCollection.where('acknowledged', '==', false)
-      .where('eventType', 'in', ['CIRCUIT_FILE_UPLOAD']);
-  
-  const snap = await query.get();
-  console.debug(`snap ${snap.size}`);
+  try {
+    const eventsCollection = db.collectionGroup("events");
+    const query = eventsCollection.where('acknowledged', '==', false)
+        .where('eventType', 'in', ['CIRCUIT_FILE_UPLOAD', 'PARAMS_UPLOADED']);
+    
+    const snap = await query.get();
+    console.debug(`snap ${snap.size}`);
 
-  query.onSnapshot(querySnapshot => {
-    console.log(`Ceremony events notified: ${JSON.stringify(querySnapshot.docChanges().length)}`);
-    querySnapshot.docChanges().forEach(docSnapshot => {
-      console.debug(`changed doc: ${docSnapshot.type}`);
-      if (docSnapshot.type !== 'removed') {
-        var event = docSnapshot.doc.data();
-        const ceremony = docSnapshot.doc.ref.parent.parent;
-        console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony.id}`);
-        switch (event.eventType) {
-          case 'CIRCUIT_FILE_UPLOAD': {
-            // Coordinator advises that r1cs file has been uploaded
-            // Handle the r1cs file
-            console.debug(`Have CIRCUIT_FILE_UPLOAD event`)
-            circuitFileUpdateHandler(ceremony.id); // This happens asynchronously
-            docSnapshot.doc.ref.update({acknowledged: true});
-            break;
+    query.onSnapshot(querySnapshot => {
+      console.log(`Ceremony events notified: ${JSON.stringify(querySnapshot.docChanges().length)}`);
+      querySnapshot.docChanges().forEach(docSnapshot => {
+        console.debug(`changed doc: ${docSnapshot.type}`);
+        if (docSnapshot.type !== 'removed') {
+          var event = docSnapshot.doc.data();
+          const ceremony = docSnapshot.doc.ref.parent.parent;
+          console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony.id}`);
+          switch (event.eventType) {
+            case 'CIRCUIT_FILE_UPLOAD': {
+              // Coordinator advises that r1cs file has been uploaded
+              // Handle the r1cs file
+              console.debug(`Have CIRCUIT_FILE_UPLOAD event`)
+              circuitFileUpdateHandler(ceremony.id); // This happens asynchronously
+              docSnapshot.doc.ref.update({acknowledged: true});
+              break;
+            }
+            case 'PARAMS_UPLOADED': {
+              // Participant advises that contrib file has been uploaded
+              // DO the steps to verify it
+              console.debug(`Have PARAMS_UPLOADED event`)
+              verifyContribution(ceremony.id, event.index);
+              docSnapshot.doc.ref.update({acknowledged: true});
+              break;
+            }
+            case 'PREPARED': { break; }
+            case 'CREATE': { break; }
           }
-          case 'PREPARED': { break; }
-          case 'CREATE': { break; }
-        }
-    }});
-  }, err => {
-    console.log(`Error while listening for ceremony events ${err}`);
-  });
+      }});
+    }, err => {
+      console.log(`Error while listening for ceremony events ${err}`);
+    });
+  } catch (err) {
+    console.error(`Error caught in ceremonyEventListener ${err.message}`);
+  }
 };
 
 module.exports = {
