@@ -8,6 +8,70 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
+const ceremonyConverter = {
+  toFirestore: (c) => {
+    var ceremonyData = c;
+
+    try {
+      if (c.startTime) {
+        var start = 
+         (typeof c.startTime === 'string') ?
+          firebase.firestore.Timestamp.fromMillis(Date.parse(c.startTime)) : 
+          firebase.firestore.Timestamp.fromDate(c.startTime);
+        ceremonyData = {...ceremonyData, startTime: start};
+      }
+      if (c.endTime) {
+        var end = 
+         (typeof c.endTime === 'string') ?
+          firebase.firestore.Timestamp.fromMillis(Date.parse(c.endTime)) : 
+          firebase.firestore.Timestamp.fromDate(c.endTime);
+        ceremonyData = {...ceremonyData, endTime: end};
+      }
+    } catch (err) {
+      console.error(`Unexpected error parsing dates: ${err.message}`);     
+    };
+    return {
+      ...ceremonyData,
+      lastSummaryUpdate: firebase.firestore.Timestamp.now(),
+    };
+  },
+  fromFirestore: (
+    snapshot,
+    options) => {
+    return jsonToCeremony({id: snapshot.id, ...snapshot.data(options)});
+  }
+}
+
+function jsonToCeremony(json) {
+  // throws if ceremony is malformed
+
+  const {
+    lastSummaryUpdate,
+    startTime,
+    endTime,
+    completedAt,
+    participants,
+    ...rest
+  } = json;
+
+  //const start: firebase.firestore.Timestamp = startTime;
+  //console.log(`start time ${start ? start.toDate().toLocaleDateString() : '-'}`);
+
+  try {
+    let c = 
+    {
+      ...rest,
+      lastSummaryUpdate: tryDate(lastSummaryUpdate),
+      startTime: tryDate(startTime, new Date()),
+      endTime: tryDate(endTime),
+    };
+    return c;
+  } catch (e) { 
+    console.warn(`Error converting ceremony: ${e.message}`);
+    throw e;
+  }
+}
+
 async function getFBSummaries() {
   const ceremonySummariesSnapshot = await db.collection("ceremonies").get();
   const fbSummaries = [];
@@ -20,12 +84,13 @@ async function getFBSummaries() {
 async function getFBSummary(id) {
   const doc = await db
     .collection("ceremonies")
+    .withConverter(ceremonyConverter)
     .doc(id)
     .get();
   if (!doc.exists) {
     throw new Error("ceremony not found");
   }
-  return firebaseCeremonyJsonToSummary({id: doc.id, ...doc.data()});
+  return {id: doc.id, ...doc.data()};
 }
 
 async function getFBCeremony(id) {
@@ -37,11 +102,7 @@ async function getFBCeremony(id) {
     throw new Error("ceremony not found");
   }
   console.log(`getFBCeremony ${doc.exists}`);
-  const missingParticipants = firebaseCeremonyJsonToSummary(doc.data());
-  const ceremony = {
-    ...missingParticipants,
-  };
-  return ceremony;
+  return doc.data();
 }
 
 async function updateFBSummary(newCeremonySummary) {
@@ -91,7 +152,7 @@ async function addFBCeremony(summaryData) {
   try {
     const doc = await db.collection("ceremonies").add(summaryData);
 
-    console.log(`new ceremony added with id ${doc.id}`)
+    console.log(`new ceremony added with id ${doc.id}`);
     return doc.id;
   } catch (e) {
     throw new Error(`error adding ceremony data to firebase: ${e}`);

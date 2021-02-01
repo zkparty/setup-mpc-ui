@@ -36,7 +36,7 @@ const checkAndDownloadFromStorage = async (prefix, fileNameFilter, deriveLocalPa
         prefix: prefix, 
         delimiter: '/'
     });
-    //console.log('Files:');
+    console.log(`Files: ${prefix}` );
     const matchFiles = files.filter(file => fileNameFilter(file.name));
     if (matchFiles.length > 0) {
         console.log(`found matching file ${matchFiles[0].name}`);
@@ -51,7 +51,7 @@ const checkAndDownloadFromStorage = async (prefix, fileNameFilter, deriveLocalPa
         });
         console.log(`Downloaded ${destFile}`);
         return destFile;
-} else {
+    } else {
         console.log(`no matching file found.`);
         return false;
     }
@@ -134,6 +134,7 @@ async function prepareCircuit(ceremonyId) {
 async function verifyContribution(ceremonyId, index) {
     console.debug(`Verify contrib ${ceremonyId} index ${index}`);
     const ceremony = await getFBCeremony(ceremonyId);
+
     // Download params
     const paramsFile = await downloadParams( ceremonyId, index );
     if (paramsFile) {
@@ -223,9 +224,13 @@ const localFilePath = (filename) => {
 }
 
 async function downloadParams(ceremonyId, index) {
+    console.debug(`downloadParams ${index}`);
+    const p = paramsFileNameFromIndex(index);
+    console.log(`file is ${p}`);
+
     return checkAndDownloadFromStorage(
-        `ceremony_data/${ceremonyId}`,
-        filename => filename.endsWith(paramsFileNameFromIndex(index)),
+        `ceremony_data/${ceremonyId}/`,
+        filename => filename.endsWith(p),
         filename => localFilePath(filename)
     );
 };

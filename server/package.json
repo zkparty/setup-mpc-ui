@@ -16,7 +16,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "firebase": "^8.0.2",
-    "firebase-admin": "^8.9.1",
+    "firebase-admin": "^8.13.0",
     "js-logger": "^1.6.1",
     "moment": "^2.24.0",
     "morgan": "^1.9.1",
