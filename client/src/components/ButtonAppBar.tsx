@@ -51,7 +51,7 @@ const StyledMenuItem = withStyles((theme) => ({
     '&:focus': {
       backgroundColor: "unset",
       '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-        color: textColor,
+        color: accentColor,
       },
     },
   },

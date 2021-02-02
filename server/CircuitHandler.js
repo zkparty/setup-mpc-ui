@@ -192,7 +192,7 @@ async function verifyContribution(ceremonyId, index) {
                     ok = false;
                 }
             });
-            fs.close();
+            
             if (ok) {
                 console.log(`Verification log written to ${verifFile}`);
                 // Add event

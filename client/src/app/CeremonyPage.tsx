@@ -20,6 +20,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 import moment from "moment";
 import './styles.css';
+import ViewLog from '../components/ViewLog';
 import { AuthStateContext } from "../state/AuthContext";
 import { SelectedCeremonyContext, useSelectionContext } from "../state/SelectionContext";
 import { useSnackbar } from "notistack";
@@ -73,6 +74,8 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
   const loadingContributions = useRef(false);
   const [selection, dispatch] = useSelectionContext();
   const { enqueueSnackbar } = useSnackbar();
+  const viewLogContent = useRef('');
+  const [viewLogOpen, setOpenViewLog] = useState(false);
 
   let { ceremonyId } = selection;
   console.log(`have id ${ceremonyId}`);
@@ -163,24 +166,40 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
     props.onClose();
   };
 
+  const closeViewLog = () => {
+    setOpenViewLog(false);
+  }
+
+  const openViewLog = (content: string) => {
+    console.debug('verify view clicked');
+    viewLogContent.current = content;
+    setOpenViewLog(true);
+  }
+
   return (
     <>
       {ceremony ? (
         <PageContainer >
-          <br />
-          <div style={{ width: '80%', display: 'flex' }}>
-            <div style={{ marginLeft: 'auto' }}>
-              <CeremonyDetails 
-                ceremony={ceremony} 
-                numContCompleted={contribStats.completed} 
-                numContWaiting={contribStats.waiting} />
+          <div>
+            <br />
+            <div style={{ width: '80%', display: 'flex' }}>
+              <div style={{ marginLeft: 'auto' }}>
+                <CeremonyDetails 
+                  ceremony={ceremony} 
+                  numContCompleted={contribStats.completed} 
+                  numContWaiting={contribStats.waiting} />
+              </div>
+              <div style={{ float: 'right', marginLeft: 'auto' }}>
+                <Actions handleEdit={handleEdit} handleClose={handleClose} />
+              </div>
             </div>
-            <div style={{ float: 'right', marginLeft: 'auto' }}>
-              <Actions handleEdit={handleEdit} handleClose={handleClose} />
-            </div>
+            <br />
+            <ContributionsGrid contributions={gridRows} openViewer={openViewLog} />
+            <ViewLog open={viewLogOpen} 
+              close={closeViewLog} 
+              content={viewLogContent.current} 
+            />
           </div>
-          <br />
-          <ContributionsGrid contributions={gridRows} />
         </PageContainer>
       ) : (
         <PageContainer>
@@ -270,40 +289,64 @@ const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, 
   );
 };
 
-const columns: ColDef[] = [
-  { field: 'queueIndex', headerName: '#', description: 'Queue position', type: 'number', width: 50, sortable: true },
-  { field: 'timestamp', headerName: 'Time', width: 180, sortable: true },
-  { field: 'status', headerName: 'Status', width: 120, sortable: false },
-  { field: 'duration', headerName: 'Duration', type: 'string', width: 90, sortable: false },
-  { field: 'hash', 
-    headerName: 'Hash',
-    description: 'The hash resulting from this contribution',
-    sortable: false,
-    width: 180,
-  },
-  { field: 'gistUrl', 
-    headerName: 'Attestation',
-    description: 'Link to the attestation',
-    sortable: false,
-    width: 120,
-    renderCell: (params: CellParams) => {
-      const v = params.value?.toString();
-      return (
-        v ? 
-          <a href={v} target='_blank' style={{ color: 'white' }}>{'https://...'}</a>
-        : <></>
-      )},
-  },
-];
+const getColumns = (openViewer: (s: string)=>void): ColDef[] => {
+//  const cols = 
+  return (
+  [
+    { field: 'queueIndex', headerName: '#', description: 'Queue position', type: 'number', width: 50, sortable: true },
+    { field: 'timestamp', headerName: 'Time', width: 180, sortable: true },
+    { field: 'status', headerName: 'Status', width: 120, sortable: false },
+    { field: 'duration', headerName: 'Duration', type: 'string', width: 90, sortable: false },
+    { field: 'hash', 
+      headerName: 'Hash',
+      description: 'The hash resulting from this contribution',
+      sortable: false,
+      width: 180,
+    },
+    { field: 'gistUrl', 
+      headerName: 'Attestation',
+      description: 'Link to the attestation',
+      sortable: false,
+      width: 120,
+      renderCell: (params: CellParams) => {
+        const v = params.value?.toString();
+        return (
+          v ? 
+            <a href={v} target='_blank' style={{ color: 'white' }}>{'https://...'}</a>
+          : <></>
+        )},
+    },
+    { field: 'verification', 
+      headerName: 'Verification',
+      description: 'The verification log',
+      sortable: false,
+      width: 80,
+      renderCell: (params: CellParams) => {
+        const v = params.value;
+        return (
+          v ? 
+            <button 
+              onClick={() => {
+                openViewer(v?.toString())
+              }}
+              style={{ backgroundColor: lighterBackground, color: textColor, borderStyle: 'none' }}
+            >view</button>
+          : <></>
+        )},
+    },
+  ]
+  );
+};
 
-const ContributionsGrid = (props: {contributions: any[]}) => {
+const ContributionsGrid = (props: { contributions: any[], openViewer: (s: string)=> void }): JSX.Element => {
   //const classes = useStyles();
+  const cols: ColDef[] = getColumns(props.openViewer);
   return (
     <div style={{ height: 450, width: 800 }}>
       <Typography variant="h5" style={{ color: accentColor, background: lighterBackground }}>Contributions</Typography>
       <DataGrid 
         rows={props.contributions} 
-        columns={columns} 
+        columns={cols} 
         pageSize={8}
         rowHeight={40}
         sortingMode='server'
