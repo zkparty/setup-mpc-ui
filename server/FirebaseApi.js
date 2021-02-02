@@ -261,7 +261,7 @@ const ceremonyEventListener = async (circuitFileUpdateHandler, verifyContributio
             case 'PARAMS_UPLOADED': {
               // Participant advises that contrib file has been uploaded
               // DO the steps to verify it
-              console.debug(`Have PARAMS_UPLOADED event`)
+              console.debug(`Have PARAMS_UPLOADED event`);
               verifyContribution(ceremony.id, event.index);
               docSnapshot.doc.ref.update({acknowledged: true});
               break;

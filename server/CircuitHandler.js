@@ -108,7 +108,7 @@ async function prepareCircuit(ceremonyId) {
 
             // Have PoT & r1cs files. Now make the zkey file.
             const initZkey = zkeyFileNameFromIndex(0);
-            const zkeyFile = path.join(__dirname, 'data', 'ceremony_data', ceremonyId, initZkey);
+            const zkeyFile = localFilePath( initZkey, true, ceremonyId);
             await snarkjs.zKey.newZKey(r1csFile, potPath, zkeyFile, consoleLogger);
             console.log(`Zkey file generated: ${zkeyFile}`);
             addStatusUpdateEvent(ceremonyId, `zKey file has been created.  ${zkeyFile}`);
@@ -139,17 +139,18 @@ async function verifyContribution(ceremonyId, index) {
     const paramsFile = await downloadParams( ceremonyId, index );
     if (paramsFile) {
         // Convert to zkey
-        const oldZkey = localFilePath(paramsFileNameFromIndex(index-1));
-        const newZkeyFile = zkeyFileNameFromIndex(index);
-        await snarkjs.zKey.importBellman(oldZkey, paramsFile, newZkeyFile, consoleLogger);
+        const oldZkey = localFilePath(zkeyFileNameFromIndex(index-1), true, ceremonyId);
+        const newZkeyFile = localFilePath(zkeyFileNameFromIndex(index), true, ceremonyId);
+        await snarkjs.zKey.importBellman(oldZkey, paramsFile, newZkeyFile, `Contributor ${index}`, consoleLogger);
         console.log(`New zkey file created: ${newZkeyFile}`);
 
         // Verify
-        const initFile = localFilePath(paramsFileNameFromIndex(0));
-        const powers = ceremony.get('powersNeeded');
-        const potFile = getPoTPath(powers);
+        const initFile = localFilePath(zkeyFileNameFromIndex(0), true, ceremonyId);
+        const powers = ceremony.powersNeeded;
+        const potFile = await getPoTPath(powers);
+        console.debug(`Init file ${initFile}\nPoT ${potFile}`);
         logCatcher = [];
-        const verified = await snarkjs.verifyFromInit(initFile, potFile, newZkeyFile, catchLogger);
+        const verified = await snarkjs.zKey.verifyFromInit(initFile, potFile, newZkeyFile, catchLogger);
         console.log(`Contribution ${index} was${verified ? '' : ' not'} verified`);
 
         if (!verified) {
@@ -158,7 +159,7 @@ async function verifyContribution(ceremonyId, index) {
         }
 
         // Save verification log
-        const ceremonyName = ceremony.get('title');
+        const ceremonyName = ceremony.title;
         let verificationLog = `Verification transcript for ${ceremonyName} phase 2 contribution #${index}\n`;
         logCatcher.forEach(m => {
             verificationLog += m + '\n';
@@ -167,7 +168,7 @@ async function verifyContribution(ceremonyId, index) {
         // TODO
 
         // Save to local file
-        const verifFile = localFilePath(`ceremony_data/${ceremonyId}/verification_${index}.txt`);
+        const verifFile = localFilePath(`verification_${index}.txt`, true, ceremonyId);
         let ok = true;
         fs.writeFile(verifFile, verificationLog, err => {
             console.err(`Error writing verification record: ${err.message}`);
@@ -191,23 +192,25 @@ const getPoTPath = async (powers) => {
     console.debug(`PoT file: ${potFile}`);
     const potPath = localFilePath(`ptau/${potFile}`);
     // See if we have the file locally
-    fs.stat(potPath, async (err, stat) => {
-        if (err == null) {
-            console.log('Already have PoT file');
-        } else if (err.code === 'ENOENT') {
-            // Look for it on storage, then download it.
-            const potFileLocal = await checkAndDownloadFromStorage(
-                'ptau/',
-                filename => filename.endsWith(potFile),
-                () => potPath
-            );
-            // TODO - put these status messages in a status field on the FB ceremony doc
-            if (!potFileLocal) throw `Couldn't find or download download PoT file`;
-            addStatusUpdateEvent(ceremonyId, `Powers-of-tau file is available: ${potFileLocal}`);
+    return new Promise((resolve, reject) => {
+        fs.stat(potPath, async (err, stat) => {
+            if (err == null) {
+                console.log('Already have PoT file');
+                resolve(potPath);
+            } else if (err.code === 'ENOENT') {
+                // Look for it on storage, then download it.
+                const potFileLocal = await checkAndDownloadFromStorage(
+                    'ptau/',
+                    filename => filename.endsWith(potFile),
+                    () => potPath
+                );
+                // TODO - put these status messages in a status field on the FB ceremony doc
+                if (!potFileLocal) reject(`Couldn't find or download download PoT file`);
+                addStatusUpdateEvent(ceremonyId, `Powers-of-tau file is available: ${potFileLocal}`);
+                resolve(potFileLocal);
+            } else reject(err.message);
 
-        } else throw err;
-
-        return potPath;
+        })
     });
 };
 
@@ -219,8 +222,12 @@ const zkeyFileNameFromIndex = (index) => {
     return `ph2_${('0000' + index).slice(-4)}.zkey`;
 }
 
-const localFilePath = (filename) => {
-    return path.join(__dirname, 'data', filename);
+const localFilePath = (filename, includePrefix=false, ceremonyId='') => {
+    let fullPath = path.join(__dirname, 'data');
+    if (includePrefix) {
+        fullPath = path.join(fullPath, 'ceremony_data', ceremonyId);
+    }
+    return path.join(fullPath, filename);
 }
 
 async function downloadParams(ceremonyId, index) {
