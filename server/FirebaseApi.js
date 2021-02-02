@@ -199,7 +199,48 @@ async function addStatusUpdateEvent(ceremonyId, message) {
   } catch (e) {
     throw new Error(`error adding ceremony event to firebase: ${e}`);
   }
+}
 
+async function addContributionEvent(ceremonyId, index, eventType, message) {
+  try {
+    const event = {
+      timestamp: new Date(),
+      acknowledged: false,
+      eventType,
+      index,
+      sender: 'SERVER',
+      message,
+    }
+    const doc = await db
+      .collection("ceremonies")
+      .doc(ceremonyId)
+      .collection('events')
+      .add(event);
+    console.debug(`Event added for contrib ${ceremonyId}/${index}. Id: ${doc.id}`);
+  } catch (e) {
+    throw new Error(`error adding ceremony event to firebase: ${e}`);
+  }
+}
+
+async function addVerificationToContribution(ceremonyId, index, verification) {
+  try {
+    const doc = await db
+      .collection('ceremonies')
+      .doc(ceremonyId)
+      .collection('contributions')
+      .where('queueIndex', '==', index)
+      .get()
+    
+    if (!doc.empty) {
+      doc.docs[0].ref.set(
+        { verification },
+        { merge: true }
+      );
+      console.log(`Contribution updated with verification`);
+    }
+  } catch (err) {
+    console.error(`Error updating contribution. ${err.message}`);
+  } 
 }
 
 function firebaseCeremonyJsonToSummary(json) {
@@ -289,4 +330,6 @@ module.exports = {
   addCeremonyEvent,
   ceremonyEventListener,
   addStatusUpdateEvent,
+  addContributionEvent,
+  addVerificationToContribution,
 };

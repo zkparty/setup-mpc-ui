@@ -7,7 +7,9 @@ const firebase = require("firebase");
 const {Storage} = require("@google-cloud/storage");
 const Logger = require("js-logger");
 const fbSkey = require("./firebase_skey.json");
-const { updateFBCeremony, addStatusUpdateEvent, getFBCeremony } = require("./FirebaseApi");
+const { updateFBCeremony, addStatusUpdateEvent, 
+    getFBCeremony, addContributionEvent, 
+    addVerificationToContribution } = require("./FirebaseApi");
 
 const mkdirAsync = util.promisify(fs.mkdir);
 
@@ -133,55 +135,83 @@ async function prepareCircuit(ceremonyId) {
 
 async function verifyContribution(ceremonyId, index) {
     console.debug(`Verify contrib ${ceremonyId} index ${index}`);
-    const ceremony = await getFBCeremony(ceremonyId);
+    try {
+        const ceremony = await getFBCeremony(ceremonyId);
 
-    // Download params
-    const paramsFile = await downloadParams( ceremonyId, index );
-    if (paramsFile) {
-        // Convert to zkey
-        const oldZkey = localFilePath(zkeyFileNameFromIndex(index-1), true, ceremonyId);
-        const newZkeyFile = localFilePath(zkeyFileNameFromIndex(index), true, ceremonyId);
-        await snarkjs.zKey.importBellman(oldZkey, paramsFile, newZkeyFile, `Contributor ${index}`, consoleLogger);
-        console.log(`New zkey file created: ${newZkeyFile}`);
-
-        // Verify
-        const initFile = localFilePath(zkeyFileNameFromIndex(0), true, ceremonyId);
-        const powers = ceremony.powersNeeded;
-        const potFile = await getPoTPath(powers);
-        console.debug(`Init file ${initFile}\nPoT ${potFile}`);
-        logCatcher = [];
-        const verified = await snarkjs.zKey.verifyFromInit(initFile, potFile, newZkeyFile, catchLogger);
-        console.log(`Contribution ${index} was${verified ? '' : ' not'} verified`);
-
-        if (!verified) {
-            // Invalidate the contribution.
-
-        }
-
-        // Save verification log
-        const ceremonyName = ceremony.title;
-        let verificationLog = `Verification transcript for ${ceremonyName} phase 2 contribution #${index}\n`;
-        logCatcher.forEach(m => {
-            verificationLog += m + '\n';
-        });
-        // Save to firestore contribution record
-        // TODO
-
-        // Save to local file
-        const verifFile = localFilePath(`verification_${index}.txt`, true, ceremonyId);
-        let ok = true;
-        fs.writeFile(verifFile, verificationLog, err => {
-            console.err(`Error writing verification record: ${err.message}`);
-            ok = false;
-        });
-        if (ok) {
-            console.log(`Verification log written to ${verifFile}`);
-            // Add event
-            addStatusUpdateEvent(
+        // Download params
+        const paramsFile = await downloadParams( ceremonyId, index );
+        if (paramsFile) {
+            // Convert to zkey
+            const oldZkey = localFilePath(zkeyFileNameFromIndex(index-1), true, ceremonyId);
+            const newZkeyFile = localFilePath(zkeyFileNameFromIndex(index), true, ceremonyId);
+            await snarkjs.zKey.importBellman(oldZkey, paramsFile, newZkeyFile, `Contributor ${index}`, consoleLogger);
+            console.log(`New zkey file created: ${newZkeyFile}`);
+            addContributionEvent(
                 ceremonyId, 
-                `Contribution verified. Log saved to ${verifFile}`
-            );            
+                index,
+                'CONVERT',
+                `Contribution converted to zkey file. ${newZkeyFile}`
+            );
+
+            // Verify
+            const initFile = localFilePath(zkeyFileNameFromIndex(0), true, ceremonyId);
+            const powers = ceremony.powersNeeded;
+            const potFile = await getPoTPath(powers);
+            console.debug(`Init file ${initFile}\nPoT ${potFile}`);
+            logCatcher = [];
+            const verified = await snarkjs.zKey.verifyFromInit(initFile, potFile, newZkeyFile, catchLogger);
+            console.log(`Contribution ${index} was${verified ? '' : ' not'} verified`);
+
+            if (!verified) {
+                // Invalidate the contribution.
+
+                // Add event to notify failure
+                addContributionEvent(
+                    ceremonyId, 
+                    index,
+                    'VERIFY_FAILED',
+                    `Contribution failed to be verified.`
+                );
+            }
+
+            // Save verification log
+            const ceremonyName = ceremony.title;
+            let verificationLog = `Verification transcript for ${ceremonyName} phase 2 contribution #${index}\n`;
+            logCatcher.forEach(m => {
+                verificationLog += m + '\n';
+            });
+            // Save to firestore contribution record
+            await addVerificationToContribution(ceremonyId, index, verificationLog);
+
+            // Save to local file
+            const verifFile = localFilePath(`verification_${index}.txt`, true, ceremonyId);
+            let ok = true;
+            fs.writeFile(verifFile, verificationLog, err => {
+                if (err) {
+                    console.err(`Error writing verification record: ${err.message}`);
+                    ok = false;
+                }
+            });
+            fs.close();
+            if (ok) {
+                console.log(`Verification log written to ${verifFile}`);
+                // Add event
+                addContributionEvent(
+                    ceremonyId, 
+                    index,
+                    'VERIFIED',
+                    `Contribution verified. Log saved to ${verifFile}`
+                );            
+            }
         }
+    } catch (err) {
+        addContributionEvent(
+            ceremonyId, 
+            index,
+            'VERIFY_FAILED',
+            `Error caught while verifying. ${err.message}`
+        );
+
     }
 };
 
