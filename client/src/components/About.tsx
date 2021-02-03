@@ -40,6 +40,7 @@ export default function About(props: any) {
         <ContentModal
             open={props.open}
             close={props.close}
+            title='About the Phase 2 MPC'
             body={body}
         />
     );

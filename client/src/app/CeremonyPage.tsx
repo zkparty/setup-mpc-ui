@@ -75,6 +75,7 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
   const [selection, dispatch] = useSelectionContext();
   const { enqueueSnackbar } = useSnackbar();
   const viewLogContent = useRef('');
+  const viewLogIndex = useRef('');
   const [viewLogOpen, setOpenViewLog] = useState(false);
 
   let { ceremonyId } = selection;
@@ -170,9 +171,10 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
     setOpenViewLog(false);
   }
 
-  const openViewLog = (content: string) => {
-    console.debug('verify view clicked');
+  const openViewLog = (content: string, index: any) => {
+    console.debug(`verify view clicked ${index}`);
     viewLogContent.current = content;
+    viewLogIndex.current = index;
     setOpenViewLog(true);
   }
 
@@ -198,6 +200,7 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
             <ViewLog open={viewLogOpen} 
               close={closeViewLog} 
               content={viewLogContent.current} 
+              title={`Verification transcript for contributor #${viewLogIndex.current}`}
             />
           </div>
         </PageContainer>
@@ -289,7 +292,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, 
   );
 };
 
-const getColumns = (openViewer: (s: string)=>void): ColDef[] => {
+const getColumns = (openViewer: (s: string, n: any)=>void): ColDef[] => {
 //  const cols = 
   return (
   [
@@ -301,13 +304,13 @@ const getColumns = (openViewer: (s: string)=>void): ColDef[] => {
       headerName: 'Hash',
       description: 'The hash resulting from this contribution',
       sortable: false,
-      width: 180,
+      width: 120,
     },
     { field: 'gistUrl', 
       headerName: 'Attestation',
       description: 'Link to the attestation',
       sortable: false,
-      width: 120,
+      width: 80,
       renderCell: (params: CellParams) => {
         const v = params.value?.toString();
         return (
@@ -327,7 +330,7 @@ const getColumns = (openViewer: (s: string)=>void): ColDef[] => {
           v ? 
             <button 
               onClick={() => {
-                openViewer(v?.toString())
+                openViewer(v?.toString(), params.getValue('queueIndex'))
               }}
               style={{ backgroundColor: lighterBackground, color: textColor, borderStyle: 'none' }}
             >view</button>
@@ -338,7 +341,7 @@ const getColumns = (openViewer: (s: string)=>void): ColDef[] => {
   );
 };
 
-const ContributionsGrid = (props: { contributions: any[], openViewer: (s: string)=> void }): JSX.Element => {
+const ContributionsGrid = (props: { contributions: any[], openViewer: (s: string, i:any)=> void }): JSX.Element => {
   //const classes = useStyles();
   const cols: ColDef[] = getColumns(props.openViewer);
   return (

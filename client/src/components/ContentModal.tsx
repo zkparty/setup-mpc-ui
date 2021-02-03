@@ -1,15 +1,15 @@
-import { Modal } from '@material-ui/core';
+import { Dialog, DialogContent, DialogProps, DialogTitle } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as React from 'react';
 
 function getModalStyle() {
-    const top = 50;
-    const left = 50;
+    const top = 10;
+    const left = 30;
   
     return {
       top: `${top}%`,
       left: `${left}%`,
-      transform: `translate(-${top}%, -${left}%)`,
+      transform: `translate(-20%, -5%)`,
     };
   }
   
@@ -17,7 +17,7 @@ function getModalStyle() {
     createStyles({
       paper: {
         position: 'absolute',
-        width: 600,
+        //width: 600,
         backgroundColor: 'black',
         border: '2px solid #fff',
         boxShadow: theme.shadows[5],
@@ -26,21 +26,26 @@ function getModalStyle() {
     }),
   );
 
-export default function ContentModal(props: {open: boolean, close: ()=>void, body:JSX.Element}) {
+export default function ContentModal(props: 
+  {open: boolean, close: ()=>void, title?: string, body:JSX.Element}) {
     const classes = useStyles();
 
     return (
-        <Modal
+        <Dialog
             open={props.open}
             onClose={props.close}
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-            style={{ overflow: 'scroll' }}
+            aria-labelledby="scroll-dialog-title"
+            aria-describedby="scroll-dialog-description"
+            maxWidth='lg'
+            scroll='body'
+            style={getModalStyle()} 
+            className={classes.paper}
         >
-          <div style={getModalStyle()} className={classes.paper}>
-          {props.body}
-          </div>
-        </Modal>
+          <DialogTitle id='scroll-dialog-title'>{props.title}</DialogTitle>
+          <DialogContent dividers={true}  >
+            {props.body}
+          </DialogContent>
+        </Dialog>
     );
 }
   
