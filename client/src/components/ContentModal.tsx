@@ -35,6 +35,7 @@ export default function ContentModal(props: {open: boolean, close: ()=>void, bod
             onClose={props.close}
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
+            style={{ overflow: 'scroll' }}
         >
           <div style={getModalStyle()} className={classes.paper}>
           {props.body}

@@ -312,7 +312,7 @@ const getColumns = (openViewer: (s: string)=>void): ColDef[] => {
         const v = params.value?.toString();
         return (
           v ? 
-            <a href={v} target='_blank' style={{ color: 'white' }}>{'https://...'}</a>
+            <a href={v} target='_blank' style={{ color: textColor }}>link</a>
           : <></>
         )},
     },
