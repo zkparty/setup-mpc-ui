@@ -125,7 +125,8 @@ export interface Contribution {
   timeAdded?: timestamp;
   status: ParticipantState;
   index?: number;
-  verification?: string,
+  priorIndex?: number;
+  verification?: string;
 }
 
 export interface ContributionSummary extends Contribution {

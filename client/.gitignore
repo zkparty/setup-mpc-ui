@@ -5,5 +5,5 @@ dist
 *.cache
 build
 firebaseConfig.*
-.env
+.env*
 */**/*.params

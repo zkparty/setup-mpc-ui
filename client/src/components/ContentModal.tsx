@@ -42,7 +42,7 @@ export default function ContentModal(props:
             className={classes.paper}
         >
           <DialogTitle id='scroll-dialog-title'>{props.title}</DialogTitle>
-          <DialogContent dividers={true}  >
+          <DialogContent dividers={true} >
             {props.body}
           </DialogContent>
         </Dialog>

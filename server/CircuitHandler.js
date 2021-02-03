@@ -9,7 +9,8 @@ const Logger = require("js-logger");
 const fbSkey = require("./firebase_skey.json");
 const { updateFBCeremony, addStatusUpdateEvent, 
     getFBCeremony, addContributionEvent, 
-    addVerificationToContribution } = require("./FirebaseApi");
+    addVerificationToContribution,
+    getContribution } = require("./FirebaseApi");
 
 const mkdirAsync = util.promisify(fs.mkdir);
 
@@ -137,12 +138,14 @@ async function verifyContribution(ceremonyId, index) {
     console.debug(`Verify contrib ${ceremonyId} index ${index}`);
     try {
         const ceremony = await getFBCeremony(ceremonyId);
+        const contrib = await getContribution(ceremonyId, index);
 
         // Download params
         const paramsFile = await downloadParams( ceremonyId, index );
         if (paramsFile) {
             // Convert to zkey
-            const oldZkey = localFilePath(zkeyFileNameFromIndex(index-1), true, ceremonyId);
+            const priorIndex = contrib.priorIndex ? contrib.priorIndex : index-1;
+            const oldZkey = localFilePath(zkeyFileNameFromIndex(priorIndex), true, ceremonyId);
             const newZkeyFile = localFilePath(zkeyFileNameFromIndex(index), true, ceremonyId);
             await snarkjs.zKey.importBellman(oldZkey, paramsFile, newZkeyFile, `Contributor ${index}`, consoleLogger);
             console.log(`New zkey file created: ${newZkeyFile}`);

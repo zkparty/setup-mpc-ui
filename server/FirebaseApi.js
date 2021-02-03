@@ -159,6 +159,20 @@ async function addFBCeremony(summaryData) {
   }
 }
 
+const getContribution = async (ceremonyId, index) => {
+  try {
+    const query = await db.collection('ceremonies')
+      .doc(ceremonyId)
+      .collection('contributions')
+      .where('queueIndex', '==', index)
+      .get();
+    
+    return query.empty ? {} : query.docs[0].data();
+  } catch (e) {
+    throw new Error(`error getting contrib: ${e}`);
+  }
+}
+
 async function addParticipant(ceremonyId, participant) {
   participant.messages = [];
   const participantRef = db
@@ -327,6 +341,7 @@ module.exports = {
   updateFBCeremony,
   fbCeremonyExists,
   addFBCeremony,
+  getContribution,
   addCeremonyEvent,
   ceremonyEventListener,
   addStatusUpdateEvent,

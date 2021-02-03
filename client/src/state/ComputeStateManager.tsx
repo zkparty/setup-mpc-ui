@@ -140,6 +140,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             const contribution: Contribution = {
                 participantId: state.participant?.uid || '??',
                 queueIndex: state.contributionState.queueIndex,
+                priorIndex: state.contributionState.lastValidIndex,
                 lastSeen: Date.now(),
                 status: "RUNNING",
             };
@@ -210,7 +211,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             ));
             let msg = `Parameters uploaded.`;
             newState = addMessage(state, msg);
-            const duration = ((Date.now()) - startTime) / 1000;
+            const duration = (Date.now() - startTime) / 1000;
             const contribution = createContributionSummary(
                  state.participant ? state.participant.uid : '??',
                  "COMPLETE", 
