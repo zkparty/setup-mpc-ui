@@ -57,6 +57,7 @@ export interface Participant {
   address: string;
   uid: string; // Firebase.auth uid. Also firestore document id.
   state: ParticipantState; // is participant queued, currently computing, done, or invalidated?
+  authId: string, // ID on the authorising platform, e.g. email for GitHub
   //runningState: ParticipantRunningState; // if the participant is computing, are they computing offline? (or maybe they are queued or invalidated)
   //position: number;
   //priority: number;
@@ -119,7 +120,8 @@ export interface Message {
 //}
 
 export interface Contribution {
-  participantId: string;
+  participantId: string; // Firebase ID
+  participantAuthId?: string; // Authorising platform ID
   queueIndex?: number;
   lastSeen?: timestamp;
   timeAdded?: timestamp;

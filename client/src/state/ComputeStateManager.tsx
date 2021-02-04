@@ -39,10 +39,11 @@ export const createContributionSummary = (participantId: string, status: Partici
     }
 };
 
-export const newParticipant = (uid: string): Participant => {
+export const newParticipant = (uid: string, authId: string): Participant => {
     return {
       address: '',
       uid,
+      authId,
       tier: 1,
       online: true,
       addedAt: new Date(),
@@ -139,6 +140,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             ));
             const contribution: Contribution = {
                 participantId: state.participant?.uid || '??',
+                participantAuthId: state.participant?.authId,
                 queueIndex: state.contributionState.queueIndex,
                 priorIndex: state.contributionState.lastValidIndex,
                 lastSeen: Date.now(),

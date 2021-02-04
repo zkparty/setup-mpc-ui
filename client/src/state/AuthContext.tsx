@@ -74,7 +74,7 @@ export const authStateReducer = (state: any, action: any):any => {
     case 'LOGIN': {
       console.debug(`LOGIN token ${action.accessToken}`);
       if (action.accessToken !== undefined) newState = {...newState, accessToken: action.accessToken};
-      return {...newState, isLoggedIn: true, authUser: action.user, loaded: true };
+      return {...newState, isLoggedIn: true, authUser: {...state.authUser, ...action.user}, loaded: true };
     }
     case 'LOGOUT': {
       return {...newState, isLoggedIn: false, authUser: null, isCoordinator: false, accessToken: null, loaded: true};

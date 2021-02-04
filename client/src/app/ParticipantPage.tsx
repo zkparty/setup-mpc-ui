@@ -84,12 +84,11 @@ export const ParticipantSection = () => {
 
   const { step, computeStatus, messages, entropy, participant, contributionState } = state;
 
-  
   const getParticipant = async () => {
     console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
     if (dispatch) dispatch({ 
       type: 'SET_PARTICIPANT', 
-      data: newParticipant(authState.authUser.uid), 
+      data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username), 
       accessToken: authState.accessToken });
   };
 
