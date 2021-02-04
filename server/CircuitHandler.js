@@ -179,7 +179,7 @@ async function verifyContribution(ceremonyId, index) {
 
             // Save verification log
             const ceremonyName = ceremony.title;
-            let verificationLog = `Verification transcript for ${ceremonyName} phase 2 contribution #${index}\n`;
+            let verificationLog = `Verification transcript for ${ceremonyName} phase 2 contribution.\nContributor number ${index}\n`;
             logCatcher.forEach(m => {
                 verificationLog += m + '\n';
             });

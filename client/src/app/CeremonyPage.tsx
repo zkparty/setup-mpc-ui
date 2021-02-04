@@ -200,7 +200,7 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
             <ViewLog open={viewLogOpen} 
               close={closeViewLog} 
               content={viewLogContent.current} 
-              title={`Verification transcript for contributor #${viewLogIndex.current}`}
+              title={`Verification transcript for contributor number ${viewLogIndex.current}`}
             />
           </div>
         </PageContainer>
