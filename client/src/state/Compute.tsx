@@ -76,6 +76,7 @@ export const startDownload = (ceremonyId: string, index: number, dispatch: Dispa
         console.debug(`downloaded ${paramData?.length}`);
         dispatch({
             type: 'DOWNLOADED',
+            ceremonyId,
             data: paramData,
         });
     }).catch(err => 

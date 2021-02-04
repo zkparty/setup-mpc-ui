@@ -10,6 +10,8 @@ const INVALIDATED = "INVALIDATED";
 const RUNNING = "RUNNING";
 const WAITING = "WAITING";
 const PRESELECTION = "PRESELECTION";
+const VERIFIED = "VERIFIED";
+const VERIFY_FAILED = "VERIFY_FAILED";
 
 const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
   toFirestore: (c: Partial<Ceremony>) => {
@@ -251,13 +253,13 @@ export const contributionUpdateListener = async (
   
   // First time, get all docs
   const querySnapshot = await query.get();
-  console.debug(`query snapshot ${querySnapshot.size}`);
+  //console.debug(`query snapshot ${querySnapshot.size}`);
   querySnapshot.docs.forEach(doc => 
     callback(doc.data(), 'added')
   );
 
   return query.onSnapshot(querySnapshot => {
-    console.debug(`contribData snapshot ${querySnapshot.size}`);
+    //console.debug(`contribData snapshot ${querySnapshot.size}`);
     querySnapshot.docChanges().forEach(contrib => {
       callback(contrib.doc.data(), contrib.type, contrib.oldIndex);
     });
@@ -289,7 +291,7 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
       // First check cached ceremonies. These are ceremonies that this participant 
       // has already contributed to, so they aren't eligible for selection.
       if (!found) {
-        console.debug(`ceremony listener forEach ${ceremonySnapshot.id}`);
+        //console.debug(`ceremony listener forEach ${ceremonySnapshot.id}`);
         if (!contributedCeremonies.includes(ceremonySnapshot.id)) {
           var ceremony = ceremonySnapshot.data();
           const ceremonyId = ceremonySnapshot.id;
@@ -299,9 +301,11 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
             .where('participantId', '==', participantId)
             .where('status', "!=", WAITING);
           const contSnapshot = await participantQuery.get();
+          //console.debug(`participant query ${ceremonyId} contribs: ${contSnapshot.size}`);          
           if (!contSnapshot.empty) {
             // Add to cache
             contributedCeremonies.push(ceremonyId);
+            //console.debug(`index ${contSnapshot.docs[0].id} ${contSnapshot.docs[0].get('queueIndex')} ${ceremonyId}`);
             //return true;
           } else if (!found) {
             console.debug(`found ceremony ${ceremonyId} to contribute to`);
@@ -439,24 +443,23 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
   // Get running ceremonies
   const query = db.collection("ceremonies")
                 .doc(ceremonyId)
-                .collection("contributions")
-                .withConverter(contributionConverter)
-                .where("status", "in", [COMPLETE, INVALIDATED]);
+                .collection("events")
+                .where("eventType", "in", [VERIFIED, VERIFY_FAILED, INVALIDATED]);
 
   ceremonyQueueListenerUnsub = query.onSnapshot(querySnapshot => {
     //console.debug(`queue listener doc: ${querySnapshot.size}`);
     let found = false;
     querySnapshot.docChanges().forEach(async docData => {
       const cont = docData.doc.data();
-      console.debug(`queue listener doc change index: ${cont.queueIndex}`);
+      //console.debug(`queue listener doc change index: ${cont.queueIndex}`);
 
-      if (cont.queueIndex && cont.queueIndex > lastQueueIndex) {
-        lastQueueIndex = cont.queueIndex;
+      if (cont.index && cont.index > lastQueueIndex) {
+        lastQueueIndex = cont.index;
         found = true;
       } 
     });
     if (found) {
-      console.debug(`new queue index ${lastQueueIndex+1}`);
+      //console.debug(`new queue index ${lastQueueIndex+1}`);
       let cs = {
         currentIndex: lastQueueIndex + 1,
       }
@@ -500,13 +503,13 @@ export const addOrUpdateParticipant = async (participant: Participant) => {
   try {
     participant.online = true;
     participant.lastUpdate = new Date();
+    participant.authId = participant.authId || 'anonymous';
     const doc = await db
         .doc(`participants/${participant.uid}`);
     await doc.set(participant);
     console.log(`updated participant ${doc.id}`);
   } catch (e) {
      console.warn(`Error trying to update participant ${e.message}`);
-     //throw new Error(`Error adding participant: ${e.message}`);
   }
 
 };

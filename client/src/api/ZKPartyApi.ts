@@ -143,8 +143,13 @@ export function jsonToCeremony(json: any): Ceremony {
 }
 
 export const jsonToContribution = (json: any): Contribution => {
-  return {
-    ...json
+  try {
+    return {
+      ...json
+    }
+  } catch (err) {
+    console.error(`Error converting contrib: ${err.message}`);
+    throw err;
   }
 }
 
