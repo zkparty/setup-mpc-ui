@@ -144,7 +144,7 @@ async function verifyContribution(ceremonyId, index) {
         const paramsFile = await downloadParams( ceremonyId, index );
         if (paramsFile) {
             // Convert to zkey
-            const priorIndex = contrib.priorIndex ? contrib.priorIndex : index-1;
+            const priorIndex = contrib.priorIndex !== undefined ? contrib.priorIndex : index-1;
             const oldZkey = localFilePath(zkeyFileNameFromIndex(priorIndex), true, ceremonyId);
             const newZkeyFile = localFilePath(zkeyFileNameFromIndex(index), true, ceremonyId);
             await snarkjs.zKey.importBellman(oldZkey, paramsFile, newZkeyFile, `${contrib.participantAuthId || 'anonymous'} (${index})`, consoleLogger);
