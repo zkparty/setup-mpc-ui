@@ -1,0 +1,21 @@
+{
+  "name": "phase2mpc-cli",
+  "version": "1.0.0",
+  "description": "Trusted Setup Phase 2 MPC - CLI version",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "zkSNARKS",
+    "trusted",
+    "setup",
+    "mpc"
+  ],
+  "author": "G Lamperd",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "firebase": "^8.2.6"
+  }
+}

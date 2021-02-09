@@ -64,7 +64,7 @@ An additional server is required, aside from Firebase. It will provide storage f
 
 The server performs outgoing web calls only. It does not need a static IP address nor a dedicated URL. The process can run on a desktop or on a cloud server, but a fast upload connection is an advantage, and the process must be running continually as long as ceremonies are expected to be taking contributions. 
 
-## instructions
+## instructions TODO - rewite this
 
 First, clone the Setup repository and get the phase2 submodule:
 
