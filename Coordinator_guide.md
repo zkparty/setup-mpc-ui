@@ -38,21 +38,33 @@ The ceremony server saves all contributions and participant signatures on the co
 
 ## Firebase setup
 
+Google Firebase provides much of the infrastructure for the suite. Administrators will need some familiarity with Firebase. Help is available at https://firebase.google.com/
+
 ### Firebase account
+Your Firebase account will require the 'Blaze' tier at a minimum. Some charges may accrue, but they are likely to be trivial.
 
 ### User authentication
+Participants authenticate via GitHub OAuth. Once authenticated, a participant gains access to the Firestore database, sufficient to record their contribution. Elevated privileges are required to set up ceremonies and to access stored data. Firebase administrators have unlimited access.
 
 ### Hosting
+Firebase Hosting provides the server for the UI client.
 
 ### Firestore database
+Firestore records ceremony setup and state, including contribution metadata. A Coordinators collection (table) is used by the administrator to grant Coordinator privileges.
 
 ### Storage
+Firebase Storage holds files containing each participant's contribution. Files are retrieved via a web URL, or downloaded using the admin interface. It is to here that user contributions will be uploaded, and from where the subsequent participant will download the file. These files are working storage only. The data is transferred to the server (see below) for verification, and it is there that the complete set of verified contributions will be stored.
 
 ### Functions
+Firebase Functions are used to run housekeeping operations. Specifically, a function will run periodically to watch for ceremonies that are ready to run and have just passed their nominated start time, effectively kicking off the ceremony to public contributors. Another function watches for contributions that appear to be stuck, either because they have started running the contribution but haven't completed, or because their turn in the queue has arrived but they have not acknowledged.
 
 ## Server setup
 
+An additional server is required, aside from Firebase. It will provide storage for each ceremony's circuit and contribution files and for the Phase 1 files from which cermonies are built. This server will also run back-end processes such as preparing ceremonies and verifying contributions. 
 
+The server performs outgoing web calls only. It does not need a static IP address nor a dedicated URL. The process can run on a desktop or on a cloud server, but a fast upload connection is an advantage, and the process must be running continually as long as ceremonies are expected to be taking contributions. 
+
+## instructions
 
 First, clone the Setup repository and get the phase2 submodule:
 
