@@ -5,7 +5,7 @@ import "firebase/firestore";
 import "firebase/storage";
 import * as chalk from 'chalk';
 import axios from 'axios';
-import { getCeremonies} from './api/FirestoreApi';
+import { getEligibleCeremonies} from './api/FirestoreApi';
 
 firebase.initializeApp(firebaseConfig);
 firebase.firestore().settings({ experimentalForceLongPolling: true });
@@ -13,32 +13,34 @@ firebase.firestore().settings({ experimentalForceLongPolling: true });
 require('dotenv').config();
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-console.log(`GH client id: ${GITHUB_CLIENT_ID}`);
 
 const App = async () => {
-    Login();
+    console.log(chalk`{bold Welcome to the }{green.bold ZKPARTY} Phase 2 MPC {italic Command-Line} version`);
 
-    console.log(chalk.magenta.underline('Ceremonies'));
+    const user = await login();
 
-    //const ceremonies = await getCeremonies();
-
-    //ceremonies.forEach(c => {
-    //    console.log(chalk.green(c.title));
-    //});
-
+    getEligibleCeremonies(user.uid).then(
+        ceremonies => {
+            console.debug(`ceremonies: ${ceremonies.length}`);
+            console.log(chalk.greenBright.underline('Ceremonies'));
+            ceremonies.forEach(c => {
+            console.log(chalk.green(c.title));
+            });
+        });
 }
 
-const Login = async () => {
-    console.log('post...');
+const login = async (): Promise<firebase.User> => {
+    //console.log('post...');
     const res = await axios.post(`https://github.com/login/device/code?client_id=${GITHUB_CLIENT_ID}&scope=read:user,gist`);
 
-    console.log(`Login response: ${res.data} status: ${res.status}`);
+    //console.log(`Login response: ${res.data} status: ${res.status}`);
 
     if (res.status>= 200 && res.status < 300) {
         const resData = parseResponse(res.data);
-        console.log(chalk.bold(`Your user code is ${resData['user_code']}. Visit ${resData['verification_uri']} ` +
+        const verificationUrl = decodeURIComponent(resData['verification_uri']);
+        console.log(chalk`\nYour user code is {green.bold ${resData['user_code']}}. Visit {green ${verificationUrl}} ` +
             `in your browser or on another device. Enter the user code to authenticate this session.` +
-            ` The code will expire in ${Math.round(resData['expires_in']/60)} minutes`));
+            ` The code will expire in ${Math.round(resData['expires_in']/60)} minutes\n`);
         
         const auth = await waitForAuth(resData['device_code'], resData['interval'])
             .catch(err => { 
@@ -49,20 +51,21 @@ const Login = async () => {
         var credential = firebase.auth.GithubAuthProvider.credential(auth.access_token);
 
         // Sign in with the credential from the user.
-        firebase.auth()
+        const result = await firebase.auth()
             .signInWithCredential(credential)
-            .then((result) => {
-                // Signed in 
-                console.log(chalk.green.bold(`You're signed in as ${result.additionalUserInfo?.username}`));
-            })
             .catch((error) => {
                 // Handle Errors here.
-                const errorCode = error.code;
+                //const errorCode = error.code;
                 const errorMessage = error.message;
                 // The email of the user's account used.
-                const email = error.email;
+                //const email = error.email;
                 throw new Error(`Firebase auth request failed: ${errorMessage}`);
             });
+
+        
+        // Signed in 
+        console.log(chalk.green.bold(`You're signed in as ${result.additionalUserInfo?.username} ${result.user.uid}`));
+        return result.user;
     } else {
         throw new Error(`GitHub auth request failed with response code ${res.status}`);
     }
@@ -101,7 +104,7 @@ const waitForAuth = async (deviceId: string, duration: number): Promise<any> => 
                     `&device_code=${deviceId}` +
                     `&grant_type=urn:ietf:params:oauth:grant-type:device_code`);
                 
-                console.debug(`poll ${res.status} ${res.data}`);
+                //console.debug(`poll ${res.status} ${res.data}`);
                 const resp = parseResponse(res.data);
                 const errorCode = resp['error'];
                 if (errorCode) {

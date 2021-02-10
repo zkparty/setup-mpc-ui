@@ -271,73 +271,49 @@ export const contributionUpdateListener = async (
 
 // Listens for updates to eligible ceremonies that a participant may contribute to.
 // The first such ceremony found will be returned in the callback
-export const ceremonyContributionListener = (participantId: string, isCoordinator: boolean, callback: (c: ContributionState) => void): () => void => {
-  console.debug(`listening for contributions for ${participantId}`);
-  let contributedCeremonies: string[] = [];
+export const getEligibleCeremonies = async (participantId: string): Promise<Ceremony[]> => {
+  console.debug(`finding contributions for ${participantId}`);
+  let eligibleCeremonies: Ceremony[] = [];
+
   const db = firebase.firestore();
-  // Get running ceremonies
-  // Coordinator can contribute to ceremonies even if they're not 
-  // past start time
-  let states = [RUNNING];
-  if (isCoordinator) states.push(PRESELECTION, WAITING);
-  const query = db.collection("ceremonies")
-    .withConverter(ceremonyConverter)
-    .where('ceremonyState', 'in', states)
-    .orderBy('startTime', 'asc');
 
-  let found = false;
-  const unsub = query.onSnapshot(querySnapshot => {
-    querySnapshot.forEach(async ceremonySnapshot => {
-      // First check cached ceremonies. These are ceremonies that this participant 
-      // has already contributed to, so they aren't eligible for selection.
-      if (!found) {
-        //console.debug(`ceremony listener forEach ${ceremonySnapshot.id}`);
-        if (!contributedCeremonies.includes(ceremonySnapshot.id)) {
-          var ceremony = ceremonySnapshot.data();
-          const ceremonyId = ceremonySnapshot.id;
-          // Get any contributions for this participant
-          const participantQuery = ceremonySnapshot.ref.collection('contributions')
-            .withConverter(contributionConverter)
-            .where('participantId', '==', participantId)
-            .where('status', "!=", WAITING);
-          const contSnapshot = await participantQuery.get();
-          //console.debug(`participant query ${ceremonyId} contribs: ${contSnapshot.size}`);          
-          if (!contSnapshot.empty) {
-            // Add to cache
-            contributedCeremonies.push(ceremonyId);
-            //console.debug(`index ${contSnapshot.docs[0].id} ${contSnapshot.docs[0].get('queueIndex')} ${ceremonyId}`);
-            //return true;
-          } else if (!found) {
-            console.debug(`found ceremony ${ceremonyId} to contribute to`);
-            found = true;
-            // We have a ceremony to contribute to
-            let contribution: Contribution = {
-              participantId,
-              status: WAITING,
-              lastSeen: new Date(),
-              timeAdded: new Date(),            
-            }
-            // Allocate a position in the queue
-            contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
-            // Save the contribution record
-            addOrUpdateContribution(ceremonyId, contribution);
+  try {
+    // Get running ceremonies
+    // Coordinator can contribute to ceremonies even if they're not 
+    // past start time
+    let states = [RUNNING];
+    const query = await db.collection("ceremonies")
+      .withConverter(ceremonyConverter)
+      .where('ceremonyState', 'in', states)
+      .orderBy('startTime', 'asc')
+      .get();
 
-            const cs = await getContributionState(
-              ceremony,
-              contribution
-            );
+    console.debug(`query ${query.size}`);
+    const checkCeremony = async (ceremonySnapshot:firebase.firestore.QueryDocumentSnapshot<Ceremony>) => {
+        // First check cached ceremonies. These are ceremonies that this participant 
+        // has already contributed to, so they aren't eligible for selection.
+        var ceremony = ceremonySnapshot.data();
+        const ceremonyId = ceremonySnapshot.id;
+        // Get any contributions for this participant
+        const participantQuery = ceremonySnapshot.ref.collection('contributions')
+          .withConverter(contributionConverter)
+          .where('participantId', '==', participantId)
+          .where('status', "!=", WAITING);
+        const contSnapshot = await participantQuery.get();
+        //console.debug(`participant query ${ceremonyId} contribs: ${contSnapshot.size}`);
+        if (contSnapshot.empty) {
+          console.debug(`found ceremony ${ceremonyId} to contribute to`);
+          eligibleCeremonies.push(ceremony);
+        }
+    };
+    let promises:Promise<any>[] = [];
+    query.forEach(ceremonySnap => promises.push(checkCeremony(ceremonySnap)));
+    await Promise.all(promises);
 
-            callback(cs);
-          }
-        };
-      }
-    });
-    }, err => {
-      console.log(`Error while listening for ceremony changes ${err.message}`);
-    }
-  );
-
-  return unsub;
+    return eligibleCeremonies;
+  } catch (err) {
+    console.error(`Error getting ceremonies: ${err.message}`);
+  }
 };
 
 export const getNextQueueIndex = async (ceremonyId: string, participantId: string): Promise<number> => {
