@@ -4,7 +4,9 @@
   "description": "Trusted Setup Phase 2 MPC - CLI version",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node dist/index"
   },
   "keywords": [
     "zkSNARKS",
@@ -12,10 +14,13 @@
     "setup",
     "mpc"
   ],
-  "author": "G Lamperd",
+  "author": "Geoff Lamperd",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "chalk": "^4.1.0",
+    "cli-progress": "^3.9.0",
+    "dotenv": "^8.2.0",
     "firebase": "^8.2.6"
   }
 }
