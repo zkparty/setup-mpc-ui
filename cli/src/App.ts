@@ -5,124 +5,72 @@ import "firebase/firestore";
 import "firebase/storage";
 import * as chalk from 'chalk';
 import axios from 'axios';
+import login from './Login';
 import { getEligibleCeremonies} from './api/FirestoreApi';
 
 firebase.initializeApp(firebaseConfig);
 firebase.firestore().settings({ experimentalForceLongPolling: true });
 
-require('dotenv').config();
-
-const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+//require('dotenv').config();
 
 const App = async () => {
     console.log(chalk`{bold Welcome to the }{green.bold ZKPARTY} Phase 2 MPC {italic Command-Line} version`);
 
+    const readline = require('readline');
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      prompt: chalk.green('ZKParty> ')
+    });
+    
+    rl.prompt();
+    rl.on('line', (line) => {
+        switch (line.trim()) {
+          case 'login':
+            console.log('login!');
+            doCommand(rl);
+            break;
+          default:
+            console.log(`Unrecognized command '${line.trim()}'`);
+            break;
+        }
+        rl.prompt();
+      }).on('close', () => {
+        console.log('Have a great day!');
+        process.exit(0);
+      });
+
+}
+
+const doCommand = async (rl) => {
     const user = await login();
 
     getEligibleCeremonies(user.uid).then(
         ceremonies => {
             console.debug(`ceremonies: ${ceremonies.length}`);
             console.log(chalk.greenBright.underline('Ceremonies'));
+            let i = 1;
             ceremonies.forEach(c => {
-            console.log(chalk.green(c.title));
-            });
-        });
-}
-
-const login = async (): Promise<firebase.User> => {
-    //console.log('post...');
-    const res = await axios.post(`https://github.com/login/device/code?client_id=${GITHUB_CLIENT_ID}&scope=read:user,gist`);
-
-    //console.log(`Login response: ${res.data} status: ${res.status}`);
-
-    if (res.status>= 200 && res.status < 300) {
-        const resData = parseResponse(res.data);
-        const verificationUrl = decodeURIComponent(resData['verification_uri']);
-        console.log(chalk`\nYour user code is {green.bold ${resData['user_code']}}. Visit {green ${verificationUrl}} ` +
-            `in your browser or on another device. Enter the user code to authenticate this session.` +
-            ` The code will expire in ${Math.round(resData['expires_in']/60)} minutes\n`);
-        
-        const auth = await waitForAuth(resData['device_code'], resData['interval'])
-            .catch(err => { 
-                console.error(chalk.red(`Error waiting for authentication: ${err}`));
-            });
-        console.log(chalk.green(`Authentication successful! ${auth.access_token}`));
-
-        var credential = firebase.auth.GithubAuthProvider.credential(auth.access_token);
-
-        // Sign in with the credential from the user.
-        const result = await firebase.auth()
-            .signInWithCredential(credential)
-            .catch((error) => {
-                // Handle Errors here.
-                //const errorCode = error.code;
-                const errorMessage = error.message;
-                // The email of the user's account used.
-                //const email = error.email;
-                throw new Error(`Firebase auth request failed: ${errorMessage}`);
+                console.log(chalk.green(`${i++}. ${c.title}`));
             });
 
-        
-        // Signed in 
-        console.log(chalk.green.bold(`You're signed in as ${result.additionalUserInfo?.username} ${result.user.uid}`));
-        return result.user;
-    } else {
-        throw new Error(`GitHub auth request failed with response code ${res.status}`);
-    }
-}
-
-const parseResponse = (data: string):any => {
-    const resData: string[] = data.split('&');
-    const resp = {};
-    resData.forEach(element => {
-        const entry = element.split('=');
-        resp[entry[0]] = entry[1];
-    });
-    return resp;
-}
-
-const waitForAuth = async (deviceId: string, duration: number): Promise<any> => {
-    console.debug(`waitforAuth ${deviceId} ${duration}`);
-    return new Promise((resolve, reject) => {
-        let intervalTimer;
-
-        const finish = (resp: any, rejekt?: boolean) => {
-            clearInterval(intervalTimer);
-            if (rejekt) reject(resp)
-            else resolve(resp);
-        };
-
-        const restart = (interval: number) => {
-            clearInterval(intervalTimer);
-            start(interval);
-        }
-
-        const start = (interval: number) => {
-            intervalTimer = setInterval(async () => {
-                const res = await axios.post(`https://github.com/login/oauth/access_token` +
-                    `?client_id=${GITHUB_CLIENT_ID}` +
-                    `&device_code=${deviceId}` +
-                    `&grant_type=urn:ietf:params:oauth:grant-type:device_code`);
-                
-                //console.debug(`poll ${res.status} ${res.data}`);
-                const resp = parseResponse(res.data);
-                const errorCode = resp['error'];
-                if (errorCode) {
-                    switch (errorCode) {
-                        case 'authorization_pending': break;
-                        case 'slow_down': restart(resp['interval']); break;
-                        case 'expired_token': 
-                        case 'access_denied': finish(errorCode, true); break;
-                        default: console.warn(`Error waiting for auth: ${errorCode}`);
+            rl.question('Select> ', (sel) => {
+                try {
+                    const c = parseInt(sel);
+                    if ((c > 0) && (c <= ceremonies.length)) {
+                        console.log(`Joining ${ceremonies[c-1].title} ...`);
+                    } else {
+                        console.log('Invalid choice');
                     }
-                } else {
-                    finish(resp);
+                } catch (err) {
+                    console.log(`Error: ${err.message}`);
                 }
-            }, interval * 1000);
-        }
+            })
+        
+        });
 
-        start(duration);
-    });
+    
+    //rl.close();
 
 }
 
