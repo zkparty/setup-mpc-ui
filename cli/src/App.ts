@@ -45,6 +45,24 @@ const Login = async () => {
                 console.error(chalk.red(`Error waiting for authentication: ${err}`));
             });
         console.log(chalk.green(`Authentication successful! ${auth.access_token}`));
+
+        var credential = firebase.auth.GithubAuthProvider.credential(auth.access_token);
+
+        // Sign in with the credential from the user.
+        firebase.auth()
+            .signInWithCredential(credential)
+            .then((result) => {
+                // Signed in 
+                console.log(chalk.green.bold(`You're signed in as ${result.additionalUserInfo?.username}`));
+            })
+            .catch((error) => {
+                // Handle Errors here.
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // The email of the user's account used.
+                const email = error.email;
+                throw new Error(`Firebase auth request failed: ${errorMessage}`);
+            });
     } else {
         throw new Error(`GitHub auth request failed with response code ${res.status}`);
     }
