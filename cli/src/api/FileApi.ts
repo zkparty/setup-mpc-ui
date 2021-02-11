@@ -1,6 +1,12 @@
 import firebase from 'firebase/app';
 import "firebase/storage";
 import { resolve } from 'path';
+import {createWriteStream} from 'fs';
+import {pipeline} from 'stream';
+import {promisify} from 'util';
+import fetch from 'node-fetch';
+
+const streamPipeline = promisify(pipeline);
 
 const formatParamsFileName = (index: number): string => {
     var tmp = "000" + index.toString();
@@ -8,7 +14,7 @@ const formatParamsFileName = (index: number): string => {
     return `ph2_${padIndex}.params`;
 };
 
-export const getParamsFile = async (ceremonyId: string, index: number): Promise<Uint8Array> => {
+export const getParamsFile = async (ceremonyId: string, index: number, destPath: string): Promise<void> => {
     const storage = firebase.storage();
 
     const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
@@ -19,12 +25,19 @@ export const getParamsFile = async (ceremonyId: string, index: number): Promise<
     });
     
     const url = await fileRef.getDownloadURL();
-    console.log(`Fetching ${url}  ${metadata.size} `);
+    console.log(`Fetching ${url}  ${metadata.size} bytes`);
+    
+    const res = await fetch(url);
+    //const response = await fetch('https://assets-cdn.github.com/images/modules/logos_page/Octocat.png');
+    
+    if (!res.ok) throw new Error(`unexpected response ${res.statusText}`);
+    
+    await streamPipeline(res.body, createWriteStream(destPath));
+    
+    return;
 
-    const paramsFile = await fetch(url, {mode: 'cors'});
-
-    //let paramData = await paramsFile.arrayBuffer();
-    return new Uint8Array(await paramsFile.arrayBuffer());
+    //const paramsFile = await fetch(url);
+    //const fileStream = fs.createWriteStream(destPath);
 
     // Using streamed read:
     //const buffer = await new Response(await paramsFile.blob()).arrayBuffer();

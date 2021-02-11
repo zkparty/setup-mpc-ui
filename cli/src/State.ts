@@ -4,6 +4,7 @@ const state = {
     listed: false,
     joined: false,
     haveEntropy: false,
+    autoRun: false,
     waiting: false,
     downloaded: false,
     computed: false,
@@ -11,6 +12,7 @@ const state = {
     user: null,
     ceremonyList: [],
     selectedCeremony: -1,
+    contributionState: null,
     entropy: null,
     oldFile: null,
     newFile: null,
@@ -22,10 +24,13 @@ export enum StateChange {
     LISTED,
     JOINED,
     WAIT,
+    WAIT_DONE,
+    AUTO_RUN,
     SET_ENTROPY,
     DOWNLOADED, 
     COMPUTED,
     UPLOADED,
+    UPDATE_CONTRIBUTION_STATUS,
 };
 
 export const setState = (newState: StateChange, data?: any) => {
@@ -42,11 +47,19 @@ export const setState = (newState: StateChange, data?: any) => {
             if (data && data.length>0) state.listed = true;
         }
         case StateChange.JOINED: {
-            state.selectedCeremony = data;
+            state.selectedCeremony = data?.index;
+            state.contributionState = data?.contribState;
             state.joined = !!data;
+            state.waiting = true;
         }
         case StateChange.WAIT: {
             state.waiting = true;
+        }
+        case StateChange.WAIT_DONE: {
+            state.waiting = false;
+        }
+        case StateChange.AUTO_RUN: {
+            state.autoRun = true;
         }
         case StateChange.SET_ENTROPY: {
             state.entropy = data;
@@ -64,6 +77,9 @@ export const setState = (newState: StateChange, data?: any) => {
         }
         case StateChange.UPLOADED: {
             state.uploaded = true;
+        }
+        case StateChange.UPDATE_CONTRIBUTION_STATUS: {
+            state.contributionState = { ...state.contributionState, ...data };
         }
         default: {
             console.error(`Invalid state change ${newState}`);

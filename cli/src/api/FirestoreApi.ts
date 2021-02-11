@@ -100,7 +100,7 @@ export async function getCeremony(id: string): Promise<Ceremony | undefined> {
   if (doc === undefined) {
     throw new Error("ceremony not found");
   }
-  console.log(`getCeremony ${doc.exists}`);
+  //console.log(`getCeremony ${doc.exists}`);
   return doc.data();
 }
 
@@ -269,8 +269,7 @@ export const contributionUpdateListener = async (
 };
 
 
-// Listens for updates to eligible ceremonies that a participant may contribute to.
-// The first such ceremony found will be returned in the callback
+// Gets eligible ceremonies that a participant may contribute to.
 export const getEligibleCeremonies = async (participantId: string): Promise<Ceremony[]> => {
   console.debug(`finding contributions for ${participantId}`);
   let eligibleCeremonies: Ceremony[] = [];
@@ -315,6 +314,26 @@ export const getEligibleCeremonies = async (participantId: string): Promise<Cere
     console.error(`Error getting ceremonies: ${err.message}`);
   }
 };
+
+export const joinCeremony = async (ceremonyId: string, participantId: string): Promise<ContributionState> => {
+  let contribution: Contribution = {
+    participantId,
+    status: WAITING,
+    lastSeen: new Date(),
+    timeAdded: new Date(),            
+  }
+  const ceremony = await getCeremony(ceremonyId);
+
+  // Allocate a position in the queue
+  contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
+  // Save the contribution record
+  addOrUpdateContribution(ceremonyId, contribution);
+
+  return getContributionState(
+    ceremony,
+    contribution
+  );
+}
 
 export const getNextQueueIndex = async (ceremonyId: string, participantId: string): Promise<number> => {
   const db = firebase.firestore();

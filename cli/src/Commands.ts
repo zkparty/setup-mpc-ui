@@ -1,7 +1,13 @@
 import * as chalk from 'chalk';
 import login from './Login';
 import { getState, setState, StateChange } from './State';
-import { getCeremonies, getEligibleCeremonies} from './api/FirestoreApi';
+import { addCeremonyEvent, addOrUpdateContribution, ceremonyQueueListener,
+    ceremonyQueueListenerUnsub, getCeremonies, getEligibleCeremonies,
+    joinCeremony as joinCeremonyApi } from './api/FirestoreApi';
+import { getParamsFile } from './api/FileApi';
+import * as path from 'path';
+
+import { CeremonyEvent, Contribution, ContributionState } from './types/ceremony';
 
 const commandHandler = () => {
     const readline = require('readline');
@@ -13,7 +19,16 @@ const commandHandler = () => {
 
     rl.prompt();
     rl.on('line', (line) => {
-        const command = line.trim();
+        parseCommand(line.trim(), rl);
+        rl.prompt();
+    }).on('close', () => {
+        console.log('Bye');
+        process.exit(0);
+    });
+};
+
+const parseCommand = async (command: string, rl) => {
+    if (command && command.length > 0) {
         const cmdList = allowedCommands();
         switch (command) {
             case 'help':
@@ -28,56 +43,51 @@ const commandHandler = () => {
                     const cmdArgs = command.split(' ');
                     switch (cmdArgs[0]) {
                         case 'login': 
-                            login();
+                            await login();
                             break;
                         case 'logout':
                             setState(StateChange.LOGOUT);
                             break;
                         case 'list':
-                            listCeremonies();
+                            await listCeremonies();
                             break;
                         case 'join':
                             if (cmdArgs.length > 1)
-                                joinCeremony(cmdArgs[1])
+                                await joinCeremony(cmdArgs[1])
                             else {
                                 console.log(`Please nominate a ceremony number to join`);
                             }
                             break;
                         case 'entropy':
-                            getEntropy(rl, cmdArgs.length > 1 ? cmdArgs[1]: null);
+                            await getEntropy(rl, cmdArgs.length > 1 ? cmdArgs[1]: null);
                             break;
                         case 'download':
-                            download();
+                            await download();
                             break;
                         case 'run':
-                            runCeremony();
+                            setState(StateChange.AUTO_RUN);;
                             break;
                         case 'compute':
-                            compute();
+                            await compute();
                             break;
                         case 'upload':
-                            upload();
+                            await upload();
                             break;
                         case 'verify':
-                            verify();
+                            await verify();
                             break;
                         case 'attest':
-                            attest();
+                            await attest();
                             break;
                         default: 
                             console.log(`Unrecognized command '${command}'`);
                     }
-                } else {
+                } else {                    
                     console.log(`Command not available`);
                 }
-                break;
         }
-        rl.prompt();
-    }).on('close', () => {
-        console.log('Bye');
-        process.exit(0);
-    });
-};
+    }
+}
 
 const commandIsAllowed = (cmd: string, cmdList: string[]): boolean => {
     return cmdList.some(v => cmd.startsWith(v));
@@ -89,10 +99,15 @@ const allowedCommands = (): string[] => {
     let cmds = ['quit', 'help', '?', 'list'];
     cmds.push( state.loggedIn ? 'logout' : 'login');
     if (state.listed) cmds.push('join');
-    if (state.joined && !state.computed) cmds.push('entropy', 'run');
-    if (state.joined && !state.waiting && !state.computed) cmds.push('download');
-    if (state.downloaded && state.haveEntropy && !state.computed) cmds.push('compute');
-    if (state.computed) cmds.push('upload');
+    if (state.joined && !state.computed) {
+        cmds.push('entropy');
+        if (state.haveEntropy && !state.autoRun) cmds.push('run');
+    }
+    if (!state.autoRun) {
+        if (state.joined && !state.waiting && !state.computed) cmds.push('download');
+        if (state.downloaded && state.haveEntropy && !state.computed) cmds.push('compute');
+        if (state.computed) cmds.push('upload');
+    }
     if (state.uploaded) cmds.push('verify', 'attest');
     return cmds;
 }
@@ -121,8 +136,14 @@ const joinCeremony = async (arg: string) => {
     try {
         const c = parseInt(arg);
         if ((c > 0) && (c <= state.ceremonyList.length)) {
-            console.log(`Joining ${state.ceremonyList[c-1].title} ...`);
-            setState(StateChange.JOINED, c-1);
+            const ceremony = state.ceremonyList[c-1];
+            console.log(`Joining ${ceremony.title} ...`);
+            // Add contribution to DB (WAITING)
+            const contribState = joinCeremonyApi(ceremony.id, state.user.uid);
+            // Start queue listener
+            ceremonyQueueListener(ceremony.id, updateQueue);
+            // Set local state
+            setState(StateChange.JOINED, {index: c-1, contribState});
         } else {
             console.log('Invalid argument');
         }
@@ -131,31 +152,107 @@ const joinCeremony = async (arg: string) => {
     }
 };
 
-const getEntropy = (rl, arg?: string) => {
+const updateQueue = (cs: ContributionState) => {
+    const state = getState();
+    const myIndex = state.contributionState.queueIndex;
+    // Check the new index - is it out turn?
+    if (myIndex == cs.currentIndex) {
+        // Yes
+        console.log(`It is your turn to contribute`);
+        // Unsubscribe to contribution updates
+        if (ceremonyQueueListenerUnsub) ceremonyQueueListenerUnsub();
+        // Cancel waiting state
+        setState(StateChange.WAIT_DONE);
+        // Are we running on auto? If so, start the process
+        if (state.autoRun) {
+            runCeremony();
+        }
+    } else {
+        console.log(`Participant ${cs.currentIndex} is starting their turn`);
+    }
+}
+
+const getEntropy = async (rl, arg?: string) => {
     if (arg && arg.length > 1) {
         setState(StateChange.SET_ENTROPY, arg);
         return;
     }
     // Collect entropy
-    rl.question(
-        'Entropy an entropy string', (ent: string) => {
-            if (ent && ent.length>0) {
-                setState(StateChange.SET_ENTROPY, ent);
+    await new Promise(resolve => {
+        rl.question(
+            'Enter a random string to be used as your entropy:', (ent: string) => {
+                if (ent && ent.length>0) {
+                    setState(StateChange.SET_ENTROPY, ent);
+                    resolve(ent);
+                }
             }
-        }
-    );
+        );
+    });
 };
 
-const download = () => {};
+const runCeremony = async () => {
+    // Called when waiting is finished (notified via queue update)
+    // download
+    await download();
+    // compute
+    await compute();
+    // upload
+    await upload();
+};
 
-const compute = () => {};
+const download = async () => {
+    const state = getState();
+    const ceremony = state.ceremonyList[state.selectedCeremony].id;
+    console.log(`Downloading prior contributor's data...`);
+    addCeremonyEvent(ceremony, createCeremonyEvent(
+        "START_CONTRIBUTION",
+        `Starting turn for index ${state.contributionState.currentIndex}`,
+        state.contributionState.currentIndex
+    ));
+    const contribution: Contribution = {
+        participantId: state.user.uid || '??',
+        participantAuthId: state.user?.authId,
+        queueIndex: state.contributionState.queueIndex,
+        priorIndex: state.contributionState.lastValidIndex,
+        lastSeen: new Date(),
+        status: "RUNNING",
+    };
+    addOrUpdateContribution(ceremony.id, contribution);
 
-const runCeremony = () => {};
+    setState(StateChange.UPDATE_CONTRIBUTION_STATUS, {
+        startTime: new Date()
+    });
 
-const upload = () => {};
+    const oldFilePath = path.join(__dirname, 'data', `ph2_${state.contributionState.lastValidIndex}.params`);
+    const file = await getParamsFile(ceremony.id, state.contributionState.lastValidIndex, oldFilePath)
+        .catch(err => { console.error(chalk.red(`Error downloading file: ${err.message}`)) });
 
-const verify = () => {};
+    setState(StateChange.DOWNLOADED, oldFilePath);
+};
 
-const attest = () => {};
+export const createCeremonyEvent = (eventType: string, message: string, index: number | undefined): CeremonyEvent => {
+    return {
+        sender: "PARTICIPANT",
+        index,
+        eventType,
+        timestamp: new Date(),
+        message,
+        acknowledged: false,
+    };
+};
+
+const compute = async () => {
+    const state = getState();
+};
+
+const upload = async () => {
+    const state = getState();
+};
+
+const verify = async () => {
+    const state = getState();
+};
+
+const attest = async () => {};
 
 export default commandHandler;
