@@ -4,6 +4,7 @@ import "firebase/firestore";
 import "firebase/storage";
 import * as chalk from 'chalk';
 import axios from 'axios';
+import { setState, StateChange } from './State';
 
 require('dotenv').config();
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
@@ -45,6 +46,7 @@ const login = async (): Promise<firebase.User> => {
         
         // Signed in 
         console.log(chalk.green.bold(`You're signed in as ${result.additionalUserInfo?.username} ${result.user.uid}`));
+        setState(StateChange.LOGIN, result.user);
         return result.user;
     } else {
         throw new Error(`GitHub auth request failed with response code ${res.status}`);
