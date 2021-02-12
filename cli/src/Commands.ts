@@ -139,7 +139,7 @@ const joinCeremony = async (arg: string) => {
             const ceremony = state.ceremonyList[c-1];
             console.log(`Joining ${ceremony.title} ...`);
             // Add contribution to DB (WAITING)
-            const contribState = joinCeremonyApi(ceremony.id, state.user.uid);
+            const contribState = await joinCeremonyApi(ceremony.id, state.user.uid);
             // Start queue listener
             ceremonyQueueListener(ceremony.id, updateQueue);
             // Set local state
@@ -155,10 +155,11 @@ const joinCeremony = async (arg: string) => {
 const updateQueue = (cs: ContributionState) => {
     const state = getState();
     const myIndex = state.contributionState.queueIndex;
+    console.debug(`my index is ${myIndex}`);
     // Check the new index - is it out turn?
     if (myIndex == cs.currentIndex) {
         // Yes
-        console.log(`It is your turn to contribute`);
+        console.log(chalk.greenBright(`It is your turn to contribute`));
         // Unsubscribe to contribution updates
         if (ceremonyQueueListenerUnsub) ceremonyQueueListenerUnsub();
         // Cancel waiting state
@@ -180,9 +181,10 @@ const getEntropy = async (rl, arg?: string) => {
     // Collect entropy
     await new Promise(resolve => {
         rl.question(
-            'Enter a random string to be used as your entropy:', (ent: string) => {
+            'Enter random text to be used as your entropy:', (ent: string) => {
                 if (ent && ent.length>0) {
                     setState(StateChange.SET_ENTROPY, ent);
+                    console.log('Entropy saved');
                     resolve(ent);
                 }
             }
@@ -224,7 +226,7 @@ const download = async () => {
     });
 
     const oldFilePath = path.join(__dirname, 'data', `ph2_${state.contributionState.lastValidIndex}.params`);
-    const file = await getParamsFile(ceremony.id, state.contributionState.lastValidIndex, oldFilePath)
+    await getParamsFile(ceremony.id, state.contributionState.lastValidIndex, oldFilePath)
         .catch(err => { console.error(chalk.red(`Error downloading file: ${err.message}`)) });
 
     setState(StateChange.DOWNLOADED, oldFilePath);
