@@ -1,5 +1,5 @@
 import firebase from 'firebase/app';
-//const {Storage} = require("@google-cloud/storage");
+const {Storage} = require("@google-cloud/storage");
 import "firebase/storage";
 import { resolve } from 'path';
 import {createWriteStream} from 'fs';
@@ -16,26 +16,53 @@ const formatParamsFileName = (index: number): string => {
 };
 
 export const getParamsFile = async (ceremonyId: string, index: number, destPath: string): Promise<void> => {
+    
+    const projectId = 'trustedsetup-a86f4';
     const storage = firebase.storage();
+    let ref = storage.ref();
+    console.debug(`ref ${ref.name}`)
+    const f = formatParamsFileName(index);
+    ref = ref.child('ceremony_data').child(ceremonyId).child(f);
+    console.debug(`ref ${ref.name}`)
+    //const storage = new Storage({projectId });
 
-    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
-    console.debug('get metadata')
-    // const metadata = await fileRef.getMetadata()
-    //     .catch((err: any) => { 
-    //         console.log(`Expected params file doesn't exist? ${err.message}`); 
-    //         throw err;
+    // const [files] = await storage.bucket(`${projectId}.appspot.com`).getFiles({
+    //     prefix: `/ceremony_data/${ceremonyId}/`, 
+    //     delimiter: '/'
     // });
-    // console.log(`${metadata.size} bytes`);
+    // console.log(`Files: ` );
+    // const matchFiles = files.filter(file => file.name.endsWith(f));
+    // if (matchFiles.length > 0) {
+    //     console.log(`found matching file ${matchFiles[0].name}`);
+    //     const file = await matchFiles[0].download({
+    //         destination: destPath,
+    //     });
+    //     console.log(`Downloaded!`);
+    // } else {
+    //     console.log(`no matching file found.`);
+    // };
+
+    const fileRef = ref; //storage.ref(`/ceremony_data/${ceremonyId}/${f}`);
+    console.debug('get metadata')
+    fileRef.getMetadata().then((metadata) => {
+        console.log(`${metadata.size} bytes`);
+        })
+        .catch((err: any) => { 
+            console.log(`Expected params file doesn't exist? ${err.message}`); 
+            throw err;
+    });
     
-    const url = await fileRef.getDownloadURL();
-    console.log(`Fetching ${url}`);
+    fileRef.getDownloadURL().then(async url => {
+        console.log(`Fetching ${url}`);
+        const res = await fetch(url);
+        //const response = await fetch('https://assets-cdn.github.com/images/modules/logos_page/Octocat.png');
+        
+        if (!res.ok) throw new Error(`unexpected response ${res.statusText}`);
+        
+        await streamPipeline(res.body, createWriteStream(destPath));
+    })
+
     
-    const res = await fetch(url);
-    //const response = await fetch('https://assets-cdn.github.com/images/modules/logos_page/Octocat.png');
-    
-    if (!res.ok) throw new Error(`unexpected response ${res.statusText}`);
-    
-    await streamPipeline(res.body, createWriteStream(destPath));
     
     return;
 
