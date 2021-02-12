@@ -5,12 +5,41 @@ import "firebase/storage";
 import * as chalk from 'chalk';
 import axios from 'axios';
 import { setState, StateChange } from './State';
+import * as fs from 'fs';
 
 require('dotenv').config();
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 
 const login = async (): Promise<firebase.User> => {
 
+    // Get creds from previously saved data if any
+    let credential: firebase.auth.OAuthCredential | undefined = await getCreds();
+
+    if (!credential) {
+        credential = await authenticate();
+    }
+
+    if (credential) {
+        // Sign in with the credential from the user.
+        const result = await firebase.auth()
+            .signInWithCredential(credential)
+            .catch((error) => {
+                // Handle Errors here.
+                //const errorCode = error.code;
+                const errorMessage = error.message;
+                // The email of the user's account used.
+                //const email = error.email;
+                throw new Error(`Firebase auth request failed: ${errorMessage}`);
+            });
+        
+        // Signed in 
+        console.log(chalk.green.bold(`You're signed in as ${result.additionalUserInfo?.username} ${result.user.uid}`));
+        setState(StateChange.LOGIN, result.user);
+        return result.user;
+    }
+}
+
+const authenticate = async () => {
     console.log(`login...${GITHUB_CLIENT_ID}`);
     const res = await axios.post(`https://github.com/login/device/code?client_id=${GITHUB_CLIENT_ID}&scope=read:user,gist`);
 
@@ -30,27 +59,38 @@ const login = async (): Promise<firebase.User> => {
         console.log(chalk.green(`Authentication successful! ${auth.access_token}`));
 
         var credential = firebase.auth.GithubAuthProvider.credential(auth.access_token);
-
-        // Sign in with the credential from the user.
-        const result = await firebase.auth()
-            .signInWithCredential(credential)
-            .catch((error) => {
-                // Handle Errors here.
-                //const errorCode = error.code;
-                const errorMessage = error.message;
-                // The email of the user's account used.
-                //const email = error.email;
-                throw new Error(`Firebase auth request failed: ${errorMessage}`);
-            });
-
+        console.debug(credential.toJSON())
+        saveCreds(JSON.stringify(credential.toJSON()));
         
-        // Signed in 
-        console.log(chalk.green.bold(`You're signed in as ${result.additionalUserInfo?.username} ${result.user.uid}`));
-        setState(StateChange.LOGIN, result.user);
-        return result.user;
+        return credential;
     } else {
         throw new Error(`GitHub auth request failed with response code ${res.status}`);
     }
+}
+
+const saveCreds = async (cred: string) => {
+    fs.writeFile('.data', cred,
+        function(err) {
+            if (err) throw err;
+            // if no error
+            console.log("Creds written to file successfully.")
+        });
+}
+
+const getCreds = async (): Promise<firebase.auth.OAuthCredential> => {
+    return new Promise((resolve, reject) => {
+        fs.readFile('.data', (err, data) => {
+            if (err) {
+                if (err.code === 'ENOENT') {
+                    resolve(null);
+                }
+                reject(err)
+            }
+            else {
+                //const cred = data.toJSON();
+                resolve(firebase.auth.AuthCredential.fromJSON(data.toString()));
+            }
+    })});
 }
 
 const parseResponse = (data: string):any => {

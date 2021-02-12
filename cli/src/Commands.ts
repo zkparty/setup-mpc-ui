@@ -204,29 +204,29 @@ const runCeremony = async () => {
 
 const download = async () => {
     const state = getState();
-    const ceremony = state.ceremonyList[state.selectedCeremony].id;
+    const ceremonyId = state.ceremonyList[state.selectedCeremony].id;
     console.log(`Downloading prior contributor's data...`);
-    addCeremonyEvent(ceremony, createCeremonyEvent(
+    addCeremonyEvent(ceremonyId, createCeremonyEvent(
         "START_CONTRIBUTION",
         `Starting turn for index ${state.contributionState.currentIndex}`,
         state.contributionState.currentIndex
     ));
     const contribution: Contribution = {
         participantId: state.user.uid || '??',
-        participantAuthId: state.user?.authId,
+        participantAuthId: state.user?.authId || 'anonymous',
         queueIndex: state.contributionState.queueIndex,
         priorIndex: state.contributionState.lastValidIndex,
         lastSeen: new Date(),
         status: "RUNNING",
     };
-    addOrUpdateContribution(ceremony.id, contribution);
+    addOrUpdateContribution(ceremonyId, contribution);
 
     setState(StateChange.UPDATE_CONTRIBUTION_STATUS, {
         startTime: new Date()
     });
 
     const oldFilePath = path.join(__dirname, 'data', `ph2_${state.contributionState.lastValidIndex}.params`);
-    await getParamsFile(ceremony.id, state.contributionState.lastValidIndex, oldFilePath)
+    await getParamsFile(ceremonyId, state.contributionState.lastValidIndex, oldFilePath)
         .catch(err => { console.error(chalk.red(`Error downloading file: ${err.message}`)) });
 
     setState(StateChange.DOWNLOADED, oldFilePath);

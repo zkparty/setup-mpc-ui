@@ -1,4 +1,5 @@
 import firebase from 'firebase/app';
+//const {Storage} = require("@google-cloud/storage");
 import "firebase/storage";
 import { resolve } from 'path';
 import {createWriteStream} from 'fs';
@@ -18,14 +19,16 @@ export const getParamsFile = async (ceremonyId: string, index: number, destPath:
     const storage = firebase.storage();
 
     const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
-    const metadata = await fileRef.getMetadata()
-        .catch((err: any) => { 
-            console.log(`Expected params file doesn't exist? ${err.message}`); 
-            throw err;
-    });
+    console.debug('get metadata')
+    // const metadata = await fileRef.getMetadata()
+    //     .catch((err: any) => { 
+    //         console.log(`Expected params file doesn't exist? ${err.message}`); 
+    //         throw err;
+    // });
+    // console.log(`${metadata.size} bytes`);
     
     const url = await fileRef.getDownloadURL();
-    console.log(`Fetching ${url}  ${metadata.size} bytes`);
+    console.log(`Fetching ${url}`);
     
     const res = await fetch(url);
     //const response = await fetch('https://assets-cdn.github.com/images/modules/logos_page/Octocat.png');
