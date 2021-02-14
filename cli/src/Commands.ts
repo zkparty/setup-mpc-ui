@@ -4,10 +4,13 @@ import { getState, setState, StateChange } from './State';
 import { addCeremonyEvent, addOrUpdateContribution, ceremonyQueueListener,
     ceremonyQueueListenerUnsub, getCeremonies, getEligibleCeremonies,
     joinCeremony as joinCeremonyApi } from './api/FirestoreApi';
-import { getParamsFile } from './api/FileApi';
+import { getParamsFile, uploadParams } from './api/FileApi';
 import * as path from 'path';
+import Logger from 'js-logger';
 
 import { CeremonyEvent, Contribution, ContributionState } from './types/ceremony';
+
+const snarkjs = require('snarkjs');
 
 const commandHandler = () => {
     const readline = require('readline');
@@ -225,9 +228,14 @@ const download = async () => {
         startTime: new Date()
     });
 
-    const oldFilePath = path.join(__dirname, 'data', `ph2_${state.contributionState.lastValidIndex}.params`);
+    const oldFilePath = path.join(__dirname, '..', '..', 'data', `ph2_${state.contributionState.lastValidIndex}.params`);
     await getParamsFile(ceremonyId, state.contributionState.lastValidIndex, oldFilePath)
-        .catch(err => { console.error(chalk.red(`Error downloading file: ${err.message}`)) });
+        .catch(err => { 
+            console.error(chalk.red(`Error downloading file: ${err.message}`));
+            return; // TODO - INVALIDATE
+        });
+    
+    console.log(chalk.greenBright(`Params file downloaded ${oldFilePath}`));
 
     setState(StateChange.DOWNLOADED, oldFilePath);
 };
@@ -245,10 +253,51 @@ export const createCeremonyEvent = (eventType: string, message: string, index: n
 
 const compute = async () => {
     const state = getState();
+    const ceremonyId = state.ceremonyList[state.selectedCeremony].id;
+    // 
+    const oldFilePath = state.oldFile;
+    const consoleLogger = Logger.get('console');
+    // convert to zkey
+    const dataPath = path.join(__dirname, '..', '..', 'data'); 
+    const oldZkey = path.join(dataPath, 'old.zkey');
+    await snarkjs.zKey.importBellman(oldFilePath, oldZkey, consoleLogger);
+
+    // newFilePath
+    const newZkey = path.join(dataPath, `ph2_${state.contributionState.queueIndex}.zkey`);
+
+    // call snarkjs to contribute 
+    const username = `${state.user.username || 'anonymous'}`;
+    let entropy = state.entropy;
+    await snarkjs.zKey.contribute(oldZkey, newZkey, username, entropy, consoleLogger);
+    entropy = null;
+
+    // convert to params
+    const newParams = path.join(dataPath, 'new.params');
+    await snarkjs.zKey.exportBellman(newZkey, newParams, consoleLogger);
+    addCeremonyEvent(ceremonyId, createCeremonyEvent(
+        "COMPUTED_DONE",
+        `Contribution computation finished`,
+        state.contributionState.currentIndex
+    ));
+    
+    setState(StateChange.COMPUTED, newParams);
 };
 
 const upload = async () => {
     const state = getState();
+    const ceremonyId = state.ceremonyList[state.selectedCeremony].id;
+    console.log(`Downloading prior contributor's data...`);
+    addCeremonyEvent(ceremonyId, createCeremonyEvent(
+        "START_UPLOAD",
+        `Starting upload`,
+        state.contributionState.currentIndex
+    ));
+
+    await uploadParams(ceremonyId, state.contributionState.currentIndex, state.newFile, updateProgress);
+};
+
+const updateProgress = (progress: number) => {
+    
 };
 
 const verify = async () => {

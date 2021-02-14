@@ -23,7 +23,9 @@
     "cli-progress": "^3.9.0",
     "dotenv": "^8.2.0",
     "firebase": "^8.2.6",
+    "js-logger": "^1.6.1",
     "node-fetch": "^2.6.1",
+    "snarkjs": "^0.3.59",
     "xmlhttprequest": "^1.8.0"
   }
 }

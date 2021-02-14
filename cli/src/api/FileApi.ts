@@ -2,7 +2,7 @@ import firebase from 'firebase/app';
 const {Storage} = require("@google-cloud/storage");
 import "firebase/storage";
 import { resolve } from 'path';
-import {createWriteStream} from 'fs';
+import { createWriteStream, createReadStream } from 'fs';
 import {pipeline} from 'stream';
 import {promisify} from 'util';
 import fetch from 'node-fetch';
@@ -44,26 +44,25 @@ export const getParamsFile = async (ceremonyId: string, index: number, destPath:
 
     const fileRef = ref; //storage.ref(`/ceremony_data/${ceremonyId}/${f}`);
     console.debug('get metadata')
-    fileRef.getMetadata().then((metadata) => {
-        console.log(`${metadata.size} bytes`);
-        })
-        .catch((err: any) => { 
-            console.log(`Expected params file doesn't exist? ${err.message}`); 
-            throw err;
-    });
+    // fileRef.getMetadata().then((metadata) => {
+    //     console.log(`${metadata.size} bytes`);
+    //     })
+    //     .catch((err: any) => { 
+    //         console.log(`Expected params file doesn't exist? ${err.message}`); 
+    //         throw err;
+    // });
     
-    fileRef.getDownloadURL().then(async url => {
-        console.log(`Fetching ${url}`);
-        const res = await fetch(url);
-        //const response = await fetch('https://assets-cdn.github.com/images/modules/logos_page/Octocat.png');
-        
-        if (!res.ok) throw new Error(`unexpected response ${res.statusText}`);
-        
-        await streamPipeline(res.body, createWriteStream(destPath));
-    })
+    //fileRef.getDownloadURL()
+    const url = `https://firebasestorage.googleapis.com/v0/b/trustedsetup-a86f4.appspot.com/o/ceremony_data%2F${ceremonyId}%2F${f}?alt=media`;
+    
+    console.log(`Fetching ${url}`);
+    const res = await fetch(url);
+    //const response = await fetch('https://assets-cdn.github.com/images/modules/logos_page/Octocat.png');
+    
+    if (!res.ok) throw new Error(`unexpected response ${res.statusText}`);
+    
+    await streamPipeline(res.body, createWriteStream(destPath));
 
-    
-    
     return;
 
     //const paramsFile = await fetch(url);
@@ -104,37 +103,61 @@ export const getParamsFile = async (ceremonyId: string, index: number, destPath:
     //return new Uint8Array(blob);
 };
 
-export const uploadParams = async (ceremonyId: string, index: number, params: Uint8Array, progressCallback: (p: number) => void): Promise<string> => {
+export const uploadParams = async (ceremonyId: string, index: number, params: string, progressCallback: (p: number) => void): Promise<string> => {
     const storage = firebase.storage();
-    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
-    const executor = (resolve: (val: string) => void, reject: (reason: any) => void) => {
-        const uploadTask = fileRef.put(params);
+    //const fileRef = await storage.bucket(`${fbSkey.project_id}.appspot.com`).upload(paramsFile,{
+    //    destination: `ceremony_data/${ceremonyId}/${paramsFileName}`
+    //});
 
-        uploadTask.on('state_changed', (snapshot) => {
-                const progress = snapshot.bytesTransferred / snapshot.totalBytes * 100;
-                switch (snapshot.state) {
-                case firebase.storage.TaskState.RUNNING: {
-                    progressCallback(progress);
-                    break;
-                }
-                case firebase.storage.TaskState.ERROR: {
-                    console.error(`Error uploading parameters`);
-                    break;
-                }
-                case firebase.storage.TaskState.PAUSED: {
-                    console.log(`upload paused!`)
-                    break;
-                }
-                }
-        }, error => {
-            console.error(`Error uploading parameters: ${error.message}`);
-            reject(error.message);
-        },
-        () => {
-            // success
-            console.log(`Params uploaded to ${uploadTask.snapshot.ref.fullPath}. ${uploadTask.snapshot.totalBytes} bytes`);
-            resolve(uploadTask.snapshot.ref.fullPath);
-    })};
+    console.debug(`upload starting`)
+    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
+    console.debug(`have file ref`)
+    
+    const executor = (resolve: (val: string) => void, reject: (reason: any) => void) => {
+        const stream = createReadStream(params);
+        let arr = new Uint8Array();
+        stream.on('data', chunk => {
+            if (chunk instanceof Buffer) {
+                let tmp = new Uint8Array(arr.length + chunk.byteLength);
+                tmp.set(arr);
+                tmp.set(Array.from(chunk), arr.length);
+                arr = tmp;
+            }
+        });
+        stream.on('error', (err) => {
+            console.error(`Error uploading file: ${err.message}`);
+        });
+        stream.on('close', () => {
+            console.debug(`stream close`)
+
+            const uploadTask = fileRef.put(arr);
+
+            uploadTask.on('state_changed', (snapshot) => {
+                    const progress = snapshot.bytesTransferred / snapshot.totalBytes * 100;
+                    switch (snapshot.state) {
+                    case firebase.storage.TaskState.RUNNING: {
+                        progressCallback(progress);
+                        break;
+                    }
+                    case firebase.storage.TaskState.ERROR: {
+                        console.error(`Error uploading parameters`);
+                        break;
+                    }
+                    case firebase.storage.TaskState.PAUSED: {
+                        console.log(`upload paused!`)
+                        break;
+                    }
+                    }
+            }, error => {
+                console.error(`Error uploading parameters: ${error.message}`);
+                reject(error.message);
+            },
+            () => {
+                // success
+                console.log(`Params uploaded to ${uploadTask.snapshot.ref.fullPath}. ${uploadTask.snapshot.totalBytes} bytes`);
+                resolve(uploadTask.snapshot.ref.fullPath);
+        })});
+    };
     return new Promise(executor);
 };
 
