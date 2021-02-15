@@ -6,9 +6,15 @@ import { addCeremonyEvent, addOrUpdateContribution, ceremonyQueueListener,
     joinCeremony as joinCeremonyApi } from './api/FirestoreApi';
 import { getParamsFile, uploadParams } from './api/FileApi';
 import * as path from 'path';
-import Logger from 'js-logger';
 
 import { CeremonyEvent, Contribution, ContributionState } from './types/ceremony';
+
+const Logger = require('js-logger');
+Logger.useDefaults();
+// const consoleHandler = Logger.createDefaultHandler();
+// Logger.setHandler((m, c) => {
+//     consoleHandler(m,c);
+// });
 
 const snarkjs = require('snarkjs');
 
@@ -21,8 +27,8 @@ const commandHandler = () => {
     });
 
     rl.prompt();
-    rl.on('line', (line) => {
-        parseCommand(line.trim(), rl);
+    rl.on('line', async (line) => {
+        await parseCommand(line.trim(), rl);
         rl.prompt();
     }).on('close', () => {
         console.log('Bye');
@@ -259,45 +265,56 @@ const compute = async () => {
     const consoleLogger = Logger.get('console');
     // convert to zkey
     const dataPath = path.join(__dirname, '..', '..', 'data'); 
+    const priorZkey = path.join(dataPath, 'ph2_0055.zkey');
     const oldZkey = path.join(dataPath, 'old.zkey');
-    await snarkjs.zKey.importBellman(oldFilePath, oldZkey, consoleLogger);
+    const username = `${state.user.username || 'anonymous'}`;
+    console.debug(`import params...`);
+    await snarkjs.zKey.importBellman(priorZkey, oldFilePath, oldZkey, username, consoleLogger);
+    console.log(`Convert to zkey done`);
 
     // newFilePath
     const newZkey = path.join(dataPath, `ph2_${state.contributionState.queueIndex}.zkey`);
 
     // call snarkjs to contribute 
-    const username = `${state.user.username || 'anonymous'}`;
     let entropy = state.entropy;
     await snarkjs.zKey.contribute(oldZkey, newZkey, username, entropy, consoleLogger);
     entropy = null;
+    console.log(`Contribute done`);
 
     // convert to params
     const newParams = path.join(dataPath, 'new.params');
     await snarkjs.zKey.exportBellman(newZkey, newParams, consoleLogger);
     addCeremonyEvent(ceremonyId, createCeremonyEvent(
-        "COMPUTED_DONE",
+        "COMPUTE_DONE",
         `Contribution computation finished`,
         state.contributionState.currentIndex
     ));
     
     setState(StateChange.COMPUTED, newParams);
+    console.log('Compute done');
 };
 
 const upload = async () => {
     const state = getState();
     const ceremonyId = state.ceremonyList[state.selectedCeremony].id;
-    console.log(`Downloading prior contributor's data...`);
+    console.log(`Uploading data...`);
     addCeremonyEvent(ceremonyId, createCeremonyEvent(
         "START_UPLOAD",
-        `Starting upload`,
+        `Starting upload (CLI)`,
         state.contributionState.currentIndex
     ));
 
     await uploadParams(ceremonyId, state.contributionState.currentIndex, state.newFile, updateProgress);
+    console.debug(`upload done`);
+    addCeremonyEvent(ceremonyId, createCeremonyEvent(
+        "START_UPLOAD",
+        `Starting upload (CLI)`,
+        state.contributionState.currentIndex
+    ));
 };
 
 const updateProgress = (progress: number) => {
-    
+    console.debug(`Progress: ${progress}`);
 };
 
 const verify = async () => {

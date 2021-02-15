@@ -112,7 +112,46 @@ export const uploadParams = async (ceremonyId: string, index: number, params: st
     console.debug(`upload starting`)
     const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
     console.debug(`have file ref`)
-    
+
+    const upload = (arr: Uint8Array, resolve: any, reject: any) => {
+        try {
+            const uploadTask = fileRef.put(arr);
+            uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, (snapshot) => {
+                snapshot.ref.getDownloadURL().then(
+                    url => {console.debug(`snapshot url: ${url}`)}
+                );
+                const progress = snapshot.bytesTransferred / snapshot.totalBytes * 100;
+                switch (snapshot.state) {
+                    case firebase.storage.TaskState.RUNNING: {
+                        progressCallback(progress);
+                        break;
+                    }
+                    case firebase.storage.TaskState.ERROR: {
+                        console.error(`Error uploading parameters`);
+                        break;
+                    }
+                    case firebase.storage.TaskState.PAUSED: {
+                        console.log(`upload paused!`)
+                        break;
+                    }
+                    default: {
+                        console.debug(`upload snapshot state: ${snapshot.state}`);
+                    }
+                }
+        }, error => {
+            console.error(`Error uploading parameters: ${error.message}`);
+            reject(error.message);
+        },
+        () => {
+            // success
+            console.log(`Params uploaded to ${uploadTask.snapshot.ref.fullPath}. ${uploadTask.snapshot.totalBytes} bytes`);
+            resolve(uploadTask.snapshot.ref.fullPath);
+        });
+        } catch (err) {
+            console.error(err.message);
+        }
+    };
+
     const executor = (resolve: (val: string) => void, reject: (reason: any) => void) => {
         const stream = createReadStream(params);
         let arr = new Uint8Array();
@@ -128,35 +167,10 @@ export const uploadParams = async (ceremonyId: string, index: number, params: st
             console.error(`Error uploading file: ${err.message}`);
         });
         stream.on('close', () => {
-            console.debug(`stream close`)
+            console.debug(`stream close ${arr.byteLength}`);
 
-            const uploadTask = fileRef.put(arr);
-
-            uploadTask.on('state_changed', (snapshot) => {
-                    const progress = snapshot.bytesTransferred / snapshot.totalBytes * 100;
-                    switch (snapshot.state) {
-                    case firebase.storage.TaskState.RUNNING: {
-                        progressCallback(progress);
-                        break;
-                    }
-                    case firebase.storage.TaskState.ERROR: {
-                        console.error(`Error uploading parameters`);
-                        break;
-                    }
-                    case firebase.storage.TaskState.PAUSED: {
-                        console.log(`upload paused!`)
-                        break;
-                    }
-                    }
-            }, error => {
-                console.error(`Error uploading parameters: ${error.message}`);
-                reject(error.message);
-            },
-            () => {
-                // success
-                console.log(`Params uploaded to ${uploadTask.snapshot.ref.fullPath}. ${uploadTask.snapshot.totalBytes} bytes`);
-                resolve(uploadTask.snapshot.ref.fullPath);
-        })});
+            upload(arr, resolve, reject);
+        });
     };
     return new Promise(executor);
 };
