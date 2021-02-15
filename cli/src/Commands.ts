@@ -7,7 +7,7 @@ import { addCeremonyEvent, addOrUpdateContribution, ceremonyQueueListener,
 import { getParamsFile, uploadParams } from './api/FileApi';
 import * as path from 'path';
 
-import { CeremonyEvent, Contribution, ContributionState } from './types/ceremony';
+import { CeremonyEvent, Contribution, ContributionState, ContributionSummary, ParticipantState } from './types/ceremony';
 
 const Logger = require('js-logger');
 Logger.useDefaults();
@@ -139,7 +139,7 @@ const listCeremonies = async () => {
     });
 
 
-    uploadParams('4KJfxE9WKYAruT64zvlI', 67, path.join(__dirname, '..', '..', 'data', 'new.params'));
+    //uploadParams('4KJfxE9WKYAruT64zvlI', 67, path.join(__dirname, '..', '..', 'data', 'new.params'));
 };
 
 
@@ -244,6 +244,7 @@ const download = async () => {
             return; // TODO - INVALIDATE
         });
     
+    // Download prior .zkey
     console.log(chalk.greenBright(`Params file downloaded ${oldFilePath}`));
 
     setState(StateChange.DOWNLOADED, oldFilePath);
@@ -268,7 +269,8 @@ const compute = async () => {
     const consoleLogger = Logger.get('console');
     // convert to zkey
     const dataPath = path.join(__dirname, '..', '..', 'data'); 
-    const priorZkey = path.join(dataPath, 'ph2_0055.zkey');
+    //TODO - download this?
+    const priorZkey = path.join(dataPath, 'prior.zkey');
     const oldZkey = path.join(dataPath, 'old.zkey');
     const username = `${state.user.username || 'anonymous'}`;
     console.debug(`import params...`);
@@ -283,6 +285,8 @@ const compute = async () => {
     await snarkjs.zKey.contribute(oldZkey, newZkey, username, entropy, consoleLogger);
     entropy = null;
     console.log(`Contribute done`);
+    // Parse logs to get hash
+    const hash = '';
 
     // convert to params
     const newParams = path.join(dataPath, 'new.params');
@@ -293,7 +297,7 @@ const compute = async () => {
         state.contributionState.currentIndex
     ));
     
-    setState(StateChange.COMPUTED, newParams);
+    setState(StateChange.COMPUTED, {file: newParams, hash});
     console.log('Compute done');
 };
 
@@ -307,13 +311,26 @@ const upload = async () => {
         state.contributionState.currentIndex
     ));
 
-    await uploadParams(ceremonyId, state.contributionState.currentIndex, state.newFile);
+    const file = await uploadParams(ceremonyId, state.contributionState.currentIndex, state.newFile);
     console.debug(`upload done`);
     addCeremonyEvent(ceremonyId, createCeremonyEvent(
-        "START_UPLOAD",
-        `Starting upload (CLI)`,
+        "PARAMS_UPLOADED",
+        `Parameters for participant ${state.contributionState.currentIndex} uploaded to ${file} (CLI)`,
         state.contributionState.currentIndex
     ));
+
+    console.log(`Parameters uploaded.`);
+    const duration = (Date.now() - state.startTime) / 1000;
+    const contribution = createContributionSummary(
+         state.user ? state.user.uid : '??',
+         "COMPLETE", 
+         file, 
+         state.contributionState.currentIndex, 
+         state.hash,
+         duration
+    );
+
+    setState(StateChange.UPLOADED);
 };
 
 const updateProgress = (progress: number) => {
@@ -325,5 +342,19 @@ const verify = async () => {
 };
 
 const attest = async () => {};
+
+export const createContributionSummary = (participantId: string, status: ParticipantState, paramsFile: string, index: number, hash: string, duration: number): ContributionSummary => {
+    return {
+      lastSeen: new Date(),
+      hash,
+      paramsFile,
+      index,
+      participantId,
+      status,
+      timeCompleted: new Date(),
+      duration,
+    }
+};
+
 
 export default commandHandler;

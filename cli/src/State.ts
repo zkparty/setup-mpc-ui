@@ -12,10 +12,12 @@ const state = {
     user: null,
     ceremonyList: [],
     selectedCeremony: -1,
+    startTime: null,
     contributionState: null,
     entropy: null,
     oldFile: null,
     newFile: null,
+    hash: null,
 };
 
 export enum StateChange {
@@ -77,10 +79,12 @@ export const setState = (newState: StateChange, data?: any) => {
             state.oldFile = data;
             state.downloaded = !!data;
             state.waiting = false;
+            state.startTime = new Date();
             break;
         }
         case StateChange.COMPUTED: {
-            state.newFile = data;
+            state.newFile = data.file;
+            state.hash = data.hash;
             state.computed = !!data;
             state.entropy = null;
             break;
