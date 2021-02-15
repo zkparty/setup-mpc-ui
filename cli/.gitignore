@@ -9,3 +9,5 @@ firebaseConfig.*
 .data
 data/**/*
 data
+trustedsetup*.json
+firebase_skey*

@@ -137,6 +137,9 @@ const listCeremonies = async () => {
     ceremonies.forEach(c => {
         console.log(chalk.green(`${i++}. ${c.title}`));
     });
+
+
+    uploadParams('4KJfxE9WKYAruT64zvlI', 67, path.join(__dirname, '..', '..', 'data', 'new.params'));
 };
 
 
@@ -304,7 +307,7 @@ const upload = async () => {
         state.contributionState.currentIndex
     ));
 
-    await uploadParams(ceremonyId, state.contributionState.currentIndex, state.newFile, updateProgress);
+    await uploadParams(ceremonyId, state.contributionState.currentIndex, state.newFile);
     console.debug(`upload done`);
     addCeremonyEvent(ceremonyId, createCeremonyEvent(
         "START_UPLOAD",

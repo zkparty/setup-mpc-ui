@@ -7,6 +7,7 @@ import {pipeline} from 'stream';
 import {promisify} from 'util';
 import fetch from 'node-fetch';
 
+
 const streamPipeline = promisify(pipeline);
 
 const formatParamsFileName = (index: number): string => {
@@ -103,7 +104,7 @@ export const getParamsFile = async (ceremonyId: string, index: number, destPath:
     //return new Uint8Array(blob);
 };
 
-export const uploadParams = async (ceremonyId: string, index: number, params: string, progressCallback: (p: number) => void): Promise<string> => {
+export const uploadParamsFB = async (ceremonyId: string, index: number, params: string, progressCallback: (p: number) => void): Promise<string> => {
     const storage = firebase.storage();
     //const fileRef = await storage.bucket(`${fbSkey.project_id}.appspot.com`).upload(paramsFile,{
     //    destination: `ceremony_data/${ceremonyId}/${paramsFileName}`
@@ -174,6 +175,29 @@ export const uploadParams = async (ceremonyId: string, index: number, params: st
     };
     return new Promise(executor);
 };
+
+export const uploadParams = async (ceremonyId: string, index: number, paramsFile: string): Promise<string> => {
+    console.debug(`Starting upload...`);
+    var fbSkey = require("./../../../firebase_skey.json");
+    //TODO - uses service account. Better to use firebase auth token or default auth
+    // Cloud Key Management Svcs?
+    const storageGC = new Storage({keyFilename: `${process.cwd()}/firebase_skey.json`, projectId: fbSkey.project_id });
+    //const storageGC = new Storage();
+
+    const paramsFileName = formatParamsFileName(index);
+    try {
+        const fileRef = await storageGC.bucket(`${fbSkey.project_id}.appspot.com`).upload(paramsFile,{
+            destination: `ceremony_data/${ceremonyId}/${paramsFileName}`
+        })
+        //const snapshot = await fileRef.put(paramsFile);
+        console.log(`Params uploaded to ${fileRef[0].name}.`);
+        return fileRef[0].name;
+    } catch(err) {
+        console.error(`Upload failed: ${err.message}`);
+        return null;
+    };
+};
+
 
 export const uploadCircuitFile = async (ceremonyId: string, circuitFile: File): Promise<firebase.storage.UploadTaskSnapshot> => {
     // upload circuit file

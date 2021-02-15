@@ -9,7 +9,8 @@
   },
   "include": [
     "./src/**/*.ts",
-    "./*.ts"
+    "./*.ts",
+    "./src/**/*.json"
   ],
   "exclude": [
     "node_modules"
