@@ -166,9 +166,8 @@ async function verifyContribution(ceremonyId, index) {
                     'CONVERT',
                     `Contribution converted to zkey file. ${newZkeyFile}`
                 );
+                uploadParams(ceremonyId, newZkeyFileName, newZkeyFile);
             }
-
-            uploadParams(ceremonyId, newZkeyFileName, newZkeyFile);
         }
 
         if (newZkeyFile) {
