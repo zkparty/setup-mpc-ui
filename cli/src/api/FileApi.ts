@@ -13,7 +13,7 @@ const streamPipeline = promisify(pipeline);
 const formatParamsFileName = (index: number): string => {
     var tmp = "000" + index.toString();
     var padIndex = tmp.substr(tmp.length-4);
-    return `ph2_${padIndex}.params`;
+    return `ph2_${padIndex}.zkey`;
 };
 
 export const getParamsFile = async (ceremonyId: string, index: number, destPath: string): Promise<void> => {

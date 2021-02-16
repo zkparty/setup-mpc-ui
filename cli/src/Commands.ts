@@ -246,7 +246,7 @@ const download = async () => {
         startTime: new Date()
     });
 
-    const oldFilePath = path.join(__dirname, '..', '..', 'data', `ph2_${state.contributionState.lastValidIndex}.params`);
+    const oldFilePath = path.join(__dirname, '..', '..', 'data', `ph2_${state.contributionState.lastValidIndex}.zkey`);
     await getParamsFile(ceremonyId, state.contributionState.lastValidIndex, oldFilePath)
         .catch(err => { 
             console.error(chalk.red(`Error downloading file: ${err.message}`));
@@ -254,7 +254,7 @@ const download = async () => {
         });
     
     // Download prior .zkey
-    console.log(chalk.greenBright(`Params file downloaded ${oldFilePath}`));
+    console.log(chalk.greenBright(`ZKey file downloaded ${oldFilePath}`));
 
     setState(StateChange.DOWNLOADED, oldFilePath);
 };
@@ -274,17 +274,17 @@ const compute = async () => {
     const state = getState();
     const ceremonyId = state.ceremonyList[state.selectedCeremony].id;
     // 
-    const oldFilePath = state.oldFile;
+    const oldZkey = state.oldFile;
     const consoleLogger = Logger.get('console');
     // convert to zkey
     const dataPath = path.join(__dirname, '..', '..', 'data'); 
     //TODO - download this?
-    const priorZkey = path.join(dataPath, 'prior.zkey');
-    const oldZkey = path.join(dataPath, 'old.zkey');
+    //const priorZkey = path.join(dataPath, 'prior.zkey');
+    //const oldZkey = path.join(dataPath, 'old.zkey');
     const username = `${state.user.username || 'anonymous'}`;
-    console.debug(`import params...`);
-    await snarkjs.zKey.importBellman(priorZkey, oldFilePath, oldZkey, username, consoleLogger);
-    console.log(`Convert to zkey done`);
+    //console.debug(`import params...`);
+    //await snarkjs.zKey.importBellman(priorZkey, oldFilePath, oldZkey, username, consoleLogger);
+    //console.log(`Convert to zkey done`);
 
     // newFilePath
     const newZkey = path.join(dataPath, `ph2_${state.contributionState.queueIndex}.zkey`);
@@ -300,15 +300,15 @@ const compute = async () => {
     console.debug(`Hash: ${hash}`)
 
     // convert to params
-    const newParams = path.join(dataPath, 'new.params');
-    await snarkjs.zKey.exportBellman(newZkey, newParams, consoleLogger);
+    //const newParams = path.join(dataPath, 'new.params');
+    //await snarkjs.zKey.exportBellman(newZkey, newParams, consoleLogger);
     addCeremonyEvent(ceremonyId, createCeremonyEvent(
         "COMPUTE_DONE",
         `Contribution computation finished`,
-        state.contributionState.currentIndex
+        state.contributionState.queueIndex
     ));
     
-    setState(StateChange.COMPUTED, {file: newParams, hash});
+    setState(StateChange.COMPUTED, {file: newZkey, hash});
     console.log(chalk.whiteBright('Compute done'));
 };
 
@@ -336,7 +336,7 @@ const upload = async () => {
     addCeremonyEvent(ceremonyId, createCeremonyEvent(
         "START_UPLOAD",
         `Starting upload (CLI)`,
-        state.contributionState.queueIndex
+        index
     ));
 
     const file = await uploadParams(ceremonyId, index, state.newFile);
@@ -347,7 +347,7 @@ const upload = async () => {
         index
     ));
 
-    console.log(`Parameters uploaded.`);
+    console.log(chalk.green(`Parameters uploaded.`));
     const duration = (Date.now() - state.startTime) / 1000;
     const contribution = createContributionSummary(
          state.user ? state.user.uid : '??',
