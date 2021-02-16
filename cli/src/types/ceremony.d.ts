@@ -129,6 +129,7 @@ export interface Contribution {
   index?: number;
   priorIndex?: number;
   verification?: string;
+  mode?: string;
 }
 
 export interface ContributionSummary extends Contribution {

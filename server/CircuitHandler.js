@@ -141,21 +141,33 @@ async function verifyContribution(ceremonyId, index) {
         const contrib = await getContribution(ceremonyId, index);
 
         // Download params
-        const paramsFile = await downloadParams( ceremonyId, index );
-        if (paramsFile) {
-            // Convert to zkey
-            const priorIndex = contrib.priorIndex !== undefined ? contrib.priorIndex : index-1;
-            const oldZkey = localFilePath(zkeyFileNameFromIndex(priorIndex), true, ceremonyId);
-            const newZkeyFile = localFilePath(zkeyFileNameFromIndex(index), true, ceremonyId);
-            await snarkjs.zKey.importBellman(oldZkey, paramsFile, newZkeyFile, `${contrib.participantAuthId || 'anonymous'} (${index})`, consoleLogger);
-            console.log(`New zkey file created: ${newZkeyFile}`);
-            addContributionEvent(
-                ceremonyId, 
-                index,
-                'CONVERT',
-                `Contribution converted to zkey file. ${newZkeyFile}`
-            );
-
+        let paramsFile, newZkeyFile;
+        if (contrib.mode && contrib.mode === 'CLI') {
+            newZkeyFile = await downloadZkey( ceremonyId, index );
+            const paramsFileName = paramsFileNameFromIndex(index);
+            paramsFile = localFilePath(paramsFileName, true, ceremonyId);
+            // export bellman(zkey, params, logger)
+            await snarkjs.zKey.exportBellman(newZkeyFile, paramsFile, consoleLogger);
+            // upload params
+            uploadParams(ceremonyId, paramsFileName, paramsFile);
+        } else {
+            paramsFile = await downloadParams( ceremonyId, index );
+            if (paramsFile) {
+                // Convert to zkey
+                const priorIndex = contrib.priorIndex !== undefined ? contrib.priorIndex : index-1;
+                const oldZkey = localFilePath(zkeyFileNameFromIndex(priorIndex), true, ceremonyId);
+                newZkeyFile = localFilePath(zkeyFileNameFromIndex(index), true, ceremonyId);
+                await snarkjs.zKey.importBellman(oldZkey, paramsFile, newZkeyFile, `${contrib.participantAuthId || 'anonymous'} (${index})`, consoleLogger);
+                console.log(`New zkey file created: ${newZkeyFile}`);
+                addContributionEvent(
+                    ceremonyId, 
+                    index,
+                    'CONVERT',
+                    `Contribution converted to zkey file. ${newZkeyFile}`
+                );
+            }
+        }
+        if (newZkeyFile) {
             // Verify
             const initFile = localFilePath(zkeyFileNameFromIndex(0), true, ceremonyId);
             const powers = ceremony.powersNeeded;
@@ -264,9 +276,9 @@ const localFilePath = (filename, includePrefix=false, ceremonyId='') => {
     return path.join(fullPath, filename);
 }
 
-async function downloadParams(ceremonyId, index) {
-    console.debug(`downloadParams ${index}`);
-    const p = paramsFileNameFromIndex(index);
+async function downloadFile(ceremonyId, index, isParams) {
+    console.debug(`downloadFIle ${index}`);
+    const p = isParams ? paramsFileNameFromIndex(index) : zkeyFileNameFromIndex(index);
     console.log(`file is ${p}`);
 
     return checkAndDownloadFromStorage(
@@ -274,6 +286,14 @@ async function downloadParams(ceremonyId, index) {
         filename => filename.endsWith(p),
         filename => localFilePath(filename)
     );
+};
+
+async function downloadParams(ceremonyId, index) {
+    return downloadFile(ceremonyId, index, true);
+};
+
+async function downloadZkey(ceremonyId, index) {
+    return downloadFile(ceremonyId, index, false);
 };
 
 module.exports = {

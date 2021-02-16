@@ -233,11 +233,12 @@ const download = async () => {
     ));
     const contribution: Contribution = {
         participantId: state.user.uid || '??',
-        participantAuthId: state.user?.authId || 'anonymous',
+        participantAuthId: state.user?.username || 'anonymous',
         queueIndex: state.contributionState.queueIndex,
         priorIndex: state.contributionState.lastValidIndex,
         lastSeen: new Date(),
         status: "RUNNING",
+        mode: 'CLI',
     };
     addOrUpdateContribution(ceremonyId, contribution);
 
@@ -308,22 +309,19 @@ const compute = async () => {
     ));
     
     setState(StateChange.COMPUTED, {file: newParams, hash});
-    console.log('Compute done');
+    console.log(chalk.whiteBright('Compute done'));
 };
 
 const parseHash = (logs: string[]): string => {
-    let trigger = false;
+    let found = false;
     let hash = '';
     let count = 0;
-    logCatcher.forEach(m => {
-        if (!trigger) {
-            trigger = m.match(/Contribution Hash:/);
-        } else {
-            if (count++ <= 4) {
-                hash += m;
-            } else {
-                trigger = false;
-                count = 0;
+    logs.forEach(m => {
+        if (!found) {
+            const match = m.match(/Contribution Hash:/);
+            if (match) {
+                hash = m;
+                found = true;
             }
         }  
     });
@@ -359,8 +357,10 @@ const upload = async () => {
          state.hash,
          duration
     );
+    addOrUpdateContribution(ceremonyId, contribution);
 
     setState(StateChange.UPLOADED);
+    console.log('Thank you for your contribution');
 };
 
 const updateProgress = (progress: number) => {
