@@ -10,11 +10,19 @@ import * as path from 'path';
 import { CeremonyEvent, Contribution, ContributionState, ContributionSummary, ParticipantState } from './types/ceremony';
 
 const Logger = require('js-logger');
+const consoleHandler = Logger.createDefaultHandler();
+var logCatcher = [];
+const captureHandler = (messages, context) => {
+    if (context.level === Logger.INFO) {
+        logCatcher.push(messages[0]);
+    }
+};
 Logger.useDefaults();
-// const consoleHandler = Logger.createDefaultHandler();
-// Logger.setHandler((m, c) => {
-//     consoleHandler(m,c);
-// });
+
+Logger.setHandler((m, c) => {
+    consoleHandler(m, c);
+    captureHandler(m, c);
+});
 
 const snarkjs = require('snarkjs');
 
@@ -282,11 +290,13 @@ const compute = async () => {
 
     // call snarkjs to contribute 
     let entropy = state.entropy;
-    await snarkjs.zKey.contribute(oldZkey, newZkey, username, entropy, consoleLogger);
+    logCatcher = [];
+    await snarkjs.zKey.contribute(oldZkey, newZkey, username, entropy, Logger);
     entropy = null;
     console.log(`Contribute done`);
     // Parse logs to get hash
-    const hash = '';
+    const hash = parseHash(logCatcher);
+    console.debug(`Hash: ${hash}`)
 
     // convert to params
     const newParams = path.join(dataPath, 'new.params');
@@ -301,22 +311,42 @@ const compute = async () => {
     console.log('Compute done');
 };
 
+const parseHash = (logs: string[]): string => {
+    let trigger = false;
+    let hash = '';
+    let count = 0;
+    logCatcher.forEach(m => {
+        if (!trigger) {
+            trigger = m.match(/Contribution Hash:/);
+        } else {
+            if (count++ <= 4) {
+                hash += m;
+            } else {
+                trigger = false;
+                count = 0;
+            }
+        }  
+    });
+    return hash;
+};
+
 const upload = async () => {
     const state = getState();
+    const index = state.contributionState.queueIndex;
     const ceremonyId = state.ceremonyList[state.selectedCeremony].id;
     console.log(`Uploading data...`);
     addCeremonyEvent(ceremonyId, createCeremonyEvent(
         "START_UPLOAD",
         `Starting upload (CLI)`,
-        state.contributionState.currentIndex
+        state.contributionState.queueIndex
     ));
 
-    const file = await uploadParams(ceremonyId, state.contributionState.currentIndex, state.newFile);
+    const file = await uploadParams(ceremonyId, index, state.newFile);
     console.debug(`upload done`);
     addCeremonyEvent(ceremonyId, createCeremonyEvent(
         "PARAMS_UPLOADED",
-        `Parameters for participant ${state.contributionState.currentIndex} uploaded to ${file} (CLI)`,
-        state.contributionState.currentIndex
+        `Parameters for participant ${index} uploaded to ${file} (CLI)`,
+        index
     ));
 
     console.log(`Parameters uploaded.`);
@@ -325,7 +355,7 @@ const upload = async () => {
          state.user ? state.user.uid : '??',
          "COMPLETE", 
          file, 
-         state.contributionState.currentIndex, 
+         index, 
          state.hash,
          duration
     );
