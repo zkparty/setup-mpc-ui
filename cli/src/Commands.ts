@@ -3,7 +3,8 @@ import login from './Login';
 import { getState, setState, StateChange } from './State';
 import { addCeremonyEvent, addOrUpdateContribution, ceremonyQueueListener,
     ceremonyQueueListenerUnsub, getCeremonies, getContribution, getEligibleCeremonies,
-    joinCeremony as joinCeremonyApi } from './api/FirestoreApi';
+    joinCeremony as joinCeremonyApi, 
+    updateContribution} from './api/FirestoreApi';
 import { getParamsFile, uploadParams } from './api/FileApi';
 import * as path from 'path';
 
@@ -83,7 +84,8 @@ const parseCommand = async (command: string, rl) => {
                             await download();
                             break;
                         case 'run':
-                            setState(StateChange.AUTO_RUN);;
+                            setState(StateChange.AUTO_RUN);
+                            await runCeremony();
                             break;
                         case 'compute':
                             await compute();
@@ -214,6 +216,7 @@ const getEntropy = async (rl, arg?: string) => {
 };
 
 const runCeremony = async () => {
+    console.log(`Running...`);
     // Called when waiting is finished (notified via queue update)
     // download
     await download();
@@ -297,10 +300,10 @@ const compute = async () => {
     logCatcher = [];
     await snarkjs.zKey.contribute(oldZkey, newZkey, username, entropy, Logger);
     entropy = null;
-    console.log(`Contribute done`);
+    //console.log(chalk.green(`Contribute done`));
     // Parse logs to get hash
     const hash = parseHash(logCatcher);
-    console.debug(`Hash: ${hash}`)
+    console.log(chalk.green(`Hash: ${hash}`));
 
     // convert to params
     //const newParams = path.join(dataPath, 'new.params');
@@ -360,7 +363,7 @@ const upload = async () => {
          state.hash,
          duration
     );
-    addOrUpdateContribution(ceremonyId, contribution);
+    updateContribution(ceremonyId, index, contribution);
 
     setState(StateChange.UPLOADED);
     console.log('Thank you for your contribution');
@@ -392,9 +395,10 @@ const attest = async () => {
     const url = await createGist(ceremonyId, ceremony.title, index, state.hash, state.user.accessToken);
     if (url && url.length>0) {
         console.log(`Gist created at ${url}`);
-        const contribution = state.contributionState;
-        contribution.gistUrl = url;
-        addOrUpdateContribution(ceremony.id, contribution);
+        const contribution: Partial<Contribution> = {
+            gistUrl: url,
+        }
+        updateContribution(ceremony.id, index, contribution);
     }
 };
 

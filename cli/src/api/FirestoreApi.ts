@@ -463,7 +463,7 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
   });
 };
 
-export const addOrUpdateContribution = async (ceremonyId: string, contribution: Contribution) => {
+export const addOrUpdateContribution = async (ceremonyId: string, contribution: Partial<Contribution>) => {
   const db = firebase.firestore();
   try {
     // Existing contributor - update the record
@@ -482,7 +482,7 @@ export const addOrUpdateContribution = async (ceremonyId: string, contribution: 
           .withConverter(contributionConverter)
           .doc();
       
-      await doc.set(contribution);
+      await doc.set(contribution, { merge: true });
       console.log(`added contribution summary ${doc.id}`);
     } else {
       // Update existing contributor
@@ -492,6 +492,30 @@ export const addOrUpdateContribution = async (ceremonyId: string, contribution: 
   } catch (e) { throw new Error(`Error adding/updating contribution summary: ${e.message}`);}
 
 };
+
+export const updateContribution = async (ceremonyId: string, index: number, contribution: Partial<Contribution>) => {
+  const db = firebase.firestore();
+  try {
+    // Existing contributor - update the record
+    const contribQuery = await db.collection("ceremonies")
+      .doc(ceremonyId)
+      .collection('contributions')
+      .withConverter(contributionConverter)
+      .where('queueIndex', '==', index)
+      .limit(1)
+      .get();
+
+    if (contribQuery.empty) {
+      console.warn(`Contrib ${index} not found when expected`);
+    } else {
+      // Update existing contributor
+      const doc = contribQuery.docs[0].ref;
+      await doc.update(contribution);
+    }
+  } catch (e) { throw new Error(`Error updating contribution summary: ${e.message}`);}
+
+};
+
 
 export const addOrUpdateParticipant = async (participant: Participant) => {
   const db = firebase.firestore();

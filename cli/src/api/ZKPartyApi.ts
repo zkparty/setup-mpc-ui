@@ -134,7 +134,7 @@ export function jsonToCeremony(json: any): Ceremony {
       ...rest,
       lastSummaryUpdate: tryDate(lastSummaryUpdate),
       startTime: tryDate(startTime, new Date()),
-      endTime: tryDate(endTime),
+      endTime: tryDate(endTime, new Date()),
     };
     return c;
   } catch (e) { 

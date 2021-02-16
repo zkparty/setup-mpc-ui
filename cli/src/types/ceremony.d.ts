@@ -130,6 +130,7 @@ export interface Contribution {
   priorIndex?: number;
   verification?: string;
   mode?: string;
+  gistUrl?: string;
 }
 
 export interface ContributionSummary extends Contribution {

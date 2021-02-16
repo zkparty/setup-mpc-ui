@@ -91,6 +91,7 @@ export const setState = (newState: StateChange, data?: any) => {
         }
         case StateChange.UPLOADED: {
             state.uploaded = true;
+            state.contributionState.endTime = Date.now();
             break;
         }
         case StateChange.UPDATE_CONTRIBUTION_STATUS: {
