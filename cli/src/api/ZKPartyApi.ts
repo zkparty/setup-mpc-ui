@@ -1,6 +1,7 @@
 import { Ceremony, Contribution } from "../types/ceremony";
 import { addCeremony as addCeremonyToDB } from "./FirestoreApi";
 import firebase from 'firebase/app';
+import fetch from 'node-fetch';
 
 require('dotenv').config();
 const url = process.env.API_URL ? process.env.API_URL : "http://localhost:80";
@@ -166,7 +167,7 @@ export const createGist = async (ceremonyId: string, ceremonyTitle: string, inde
     description: "zkparty phase2 tusted setup MPC contribution summary",
     public: true,
     files: {
-        "contribution.txt": {content: JSON.stringify(summary, undefined, 2)},
+        'contribution.txt': {content: JSON.stringify(summary, undefined, 2)},
   }};
   const res = await fetch('https://api.github.com/gists', {
     method: 'post',
@@ -175,7 +176,6 @@ export const createGist = async (ceremonyId: string, ceremonyTitle: string, inde
       'Content-Type': 'application/json',
       'Authorization': `bearer ${authToken}`,
     }
-
   })
   .catch(err => console.warn(`Error creating gist. ${err.message}`));
   // TODO handle result, get gist url and return it.

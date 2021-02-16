@@ -566,3 +566,17 @@ export const getUserStatus = async (userId: string): Promise<string> => {
   // };
   return status;
 };
+
+export const getContribution = async (ceremonyId: string, index: number): Promise<ContributionSummary> => {
+  const db = firebase.firestore();
+  try {
+    const contribSnapshot = await db.collection(`ceremonies/${ceremonyId}/contributions`)
+      .withConverter(contributionConverter)
+      .where('queueIndex', '==', index)
+      .get();
+    
+    if (contribSnapshot.empty) return null;
+    return contribSnapshot.docs[0].data();
+  } catch (e) { throw new Error(`Error resetting contribution: ${e.message}`);}
+ 
+}

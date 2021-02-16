@@ -2,12 +2,13 @@ import * as chalk from 'chalk';
 import login from './Login';
 import { getState, setState, StateChange } from './State';
 import { addCeremonyEvent, addOrUpdateContribution, ceremonyQueueListener,
-    ceremonyQueueListenerUnsub, getCeremonies, getEligibleCeremonies,
+    ceremonyQueueListenerUnsub, getCeremonies, getContribution, getEligibleCeremonies,
     joinCeremony as joinCeremonyApi } from './api/FirestoreApi';
 import { getParamsFile, uploadParams } from './api/FileApi';
 import * as path from 'path';
 
 import { CeremonyEvent, Contribution, ContributionState, ContributionSummary, ParticipantState } from './types/ceremony';
+import { createGist } from './api/ZKPartyApi';
 
 const Logger = require('js-logger');
 const consoleHandler = Logger.createDefaultHandler();
@@ -123,7 +124,7 @@ const allowedCommands = (): string[] => {
     if (!state.autoRun) {
         if (state.joined && !state.waiting && !state.computed) cmds.push('download');
         if (state.downloaded && state.haveEntropy && !state.computed) cmds.push('compute');
-        if (state.computed) cmds.push('upload');
+        if (state.computed && !state.uploaded) cmds.push('upload');
     }
     if (state.uploaded) cmds.push('verify', 'attest');
     return cmds;
@@ -220,6 +221,8 @@ const runCeremony = async () => {
     await compute();
     // upload
     await upload();
+
+    await attest();
 };
 
 const download = async () => {
@@ -281,7 +284,7 @@ const compute = async () => {
     //TODO - download this?
     //const priorZkey = path.join(dataPath, 'prior.zkey');
     //const oldZkey = path.join(dataPath, 'old.zkey');
-    const username = `${state.user.username || 'anonymous'}`;
+    const username = `${state.user.username || 'anonymous'} (${state.contributionState.queueIndex})`;
     //console.debug(`import params...`);
     //await snarkjs.zKey.importBellman(priorZkey, oldFilePath, oldZkey, username, consoleLogger);
     //console.log(`Convert to zkey done`);
@@ -369,9 +372,31 @@ const updateProgress = (progress: number) => {
 
 const verify = async () => {
     const state = getState();
+    const index = state.contributionState.queueIndex;
+    const ceremonyId = state.ceremonyList[state.selectedCeremony].id;
+
+    const contrib = await getContribution(ceremonyId, index);
+    if (contrib && contrib.verification) {
+        console.log(chalk.white(`${contrib.verification}`));
+    } else {
+        console.log('Verification is not yet available. Try again soon.');
+    }
 };
 
-const attest = async () => {};
+const attest = async () => {
+    const state = getState();
+    const index = state.contributionState.queueIndex;
+    const ceremony = state.ceremonyList[state.selectedCeremony];
+    const ceremonyId = ceremony.id;
+
+    const url = await createGist(ceremonyId, ceremony.title, index, state.hash, state.user.accessToken);
+    if (url && url.length>0) {
+        console.log(`Gist created at ${url}`);
+        const contribution = state.contributionState;
+        contribution.gistUrl = url;
+        addOrUpdateContribution(ceremony.id, contribution);
+    }
+};
 
 export const createContributionSummary = (participantId: string, status: ParticipantState, paramsFile: string, index: number, hash: string, duration: number): ContributionSummary => {
     return {
