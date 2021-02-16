@@ -156,7 +156,8 @@ async function verifyContribution(ceremonyId, index) {
                 // Convert to zkey
                 const priorIndex = contrib.priorIndex !== undefined ? contrib.priorIndex : index-1;
                 const oldZkey = localFilePath(zkeyFileNameFromIndex(priorIndex), true, ceremonyId);
-                newZkeyFile = localFilePath(zkeyFileNameFromIndex(index), true, ceremonyId);
+                const newZkeyFileName = zkeyFileNameFromIndex(index);
+                newZkeyFile = localFilePath(newZkeyFileName, true, ceremonyId);
                 await snarkjs.zKey.importBellman(oldZkey, paramsFile, newZkeyFile, `${contrib.participantAuthId || 'anonymous'} (${index})`, consoleLogger);
                 console.log(`New zkey file created: ${newZkeyFile}`);
                 addContributionEvent(
@@ -166,7 +167,10 @@ async function verifyContribution(ceremonyId, index) {
                     `Contribution converted to zkey file. ${newZkeyFile}`
                 );
             }
+
+            uploadParams(ceremonyId, newZkeyFileName, newZkeyFile);
         }
+
         if (newZkeyFile) {
             // Verify
             const initFile = localFilePath(zkeyFileNameFromIndex(0), true, ceremonyId);
