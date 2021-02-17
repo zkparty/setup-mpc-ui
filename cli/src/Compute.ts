@@ -268,7 +268,7 @@ const updateProgress = (progress: number) => {
 
 export const verify = async () => {
     const state = getState();
-    if (state.selectedCeremony > 0) {
+    if (state.selectedCeremony >= 0) {
         const index = state.contributionState.queueIndex;
         const ceremonyId = state.ceremonyList[state.selectedCeremony].id;
 
@@ -278,6 +278,8 @@ export const verify = async () => {
         } else {
             console.log('Verification is not yet available. Try again soon.');
         }
+    } else {
+        console.log('No ceremony selected');
     }
 };
 

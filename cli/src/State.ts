@@ -1,4 +1,5 @@
 
+// Properties reset by list
 const defaultState = {
     joined: false,
     haveEntropy: false,
