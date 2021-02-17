@@ -1,7 +1,5 @@
 
-const state = {
-    loggedIn: false,
-    listed: false,
+const defaultState = {
     joined: false,
     haveEntropy: false,
     autoRun: false,
@@ -9,7 +7,6 @@ const state = {
     downloaded: false,
     computed: false,
     uploaded: false,
-    user: null,
     ceremonyList: [],
     selectedCeremony: -1,
     startTime: null,
@@ -18,6 +15,13 @@ const state = {
     oldFile: null,
     newFile: null,
     hash: null,
+}
+
+let state = {
+    loggedIn: false,
+    listed: false,
+    user: null,
+    ...defaultState,
 };
 
 export enum StateChange {
@@ -47,6 +51,7 @@ export const setState = (newState: StateChange, data?: any) => {
             break;
         }
         case StateChange.LISTED: {
+            state = {...state, ...defaultState}; // Resets contribution
             state.ceremonyList = data;
             if (data && data.length>0) state.listed = true;
             break;
