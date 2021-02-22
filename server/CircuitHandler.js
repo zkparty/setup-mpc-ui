@@ -29,7 +29,7 @@ Logger.setHandler((m, c) => {
 const catchLogger = Logger.get("catcher");
 const consoleLogger = Logger.get("console");
 
-const logLocked = false;
+let logLocked = false;
 const getLogLock = async () => {
     const p = new Promise((resolve, reject) => {
         let timer;
