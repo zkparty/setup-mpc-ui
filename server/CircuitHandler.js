@@ -29,6 +29,26 @@ Logger.setHandler((m, c) => {
 const catchLogger = Logger.get("catcher");
 const consoleLogger = Logger.get("console");
 
+const logLocked = false;
+const getLogLock = async () => {
+    const p = new Promise((resolve, reject) => {
+        let timer;
+        const check = () => {
+            if (!logLocked) {
+                logLocked = true;
+                clearInterval(timer);
+                resolve(true);
+            }
+        }
+
+        timer = setInterval(check, 1000);
+    })
+}
+
+const clearLogLock = () => {
+    logLocked = false;
+}
+
 const storage = new Storage({keyFilename: `${process.cwd()}/firebase_skey.json`, projectId: fbSkey.project_id });
 
 const POT_FILE_PATTERN='pot%EXP%_final.ptau';
@@ -82,6 +102,7 @@ async function prepareCircuit(ceremonyId) {
     if (r1csFile) {
         console.log(`Downloaded ${r1csFile}`);
         // Get circuit info
+        await getLogLock();
         logCatcher = [];
         // TODO - make snarkjs return a JSON object
         await snarkjs.r1cs.info(r1csFile, catchLogger);
@@ -91,6 +112,7 @@ async function prepareCircuit(ceremonyId) {
             const result = m.match(/Constraints: ([0-9]+)/);
             if (result && result.length > 1) numConstraints = result[1];
         });
+        clearLogLock();
         console.log(`#Constraints: ${numConstraints}`);
         const powers = Math.ceil(Math.log2(numConstraints));
         console.log(`Powers needed: ${powers}`);
@@ -176,6 +198,7 @@ async function verifyContribution(ceremonyId, index) {
             const initFile = localFilePath(zkeyFileNameFromIndex(0), true, ceremonyId);
             const powers = ceremony.powersNeeded;
             const potFile = await getPoTPath(powers);
+            await getLogLock();
             console.debug(`Init file ${initFile}\nPoT ${potFile}`);
             logCatcher = [];
             const verified = await snarkjs.zKey.verifyFromInit(initFile, potFile, newZkeyFile, catchLogger);
@@ -199,6 +222,7 @@ async function verifyContribution(ceremonyId, index) {
             logCatcher.forEach(m => {
                 verificationLog += m + '\n';
             });
+            clearLogLock();
             // Save to firestore contribution record
             await addVerificationToContribution(ceremonyId, index, verificationLog);
 
