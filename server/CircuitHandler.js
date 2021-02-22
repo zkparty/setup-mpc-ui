@@ -67,6 +67,7 @@ const uploadParams = async (ceremonyId, paramsFileName, paramsFile) => {
     });
     //const snapshot = await fileRef.put(paramsFile);
     console.log(`Params uploaded to ${fileRef[0].name}.`);
+    console.log(`Time: ${(new Date()).toISOString()}`);
     return fileRef[0];
 };
 

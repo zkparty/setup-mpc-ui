@@ -1,9 +1,12 @@
 const admin = require("firebase-admin");
 const serviceAccount = require("./firebase_skey.json");
 
+// TODO - put in .env
+const DB_URL = "https://trustedsetup-a86f4.firebaseio.com";
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://trustedsetup-a86f4.firebaseio.com"
+  databaseURL: DB_URL
 });
 
 const db = admin.firestore();
@@ -298,6 +301,7 @@ const ceremonyEventListener = async (circuitFileUpdateHandler, verifyContributio
 
     query.onSnapshot(querySnapshot => {
       console.log(`Ceremony events notified: ${JSON.stringify(querySnapshot.docChanges().length)}`);
+      console.log(`Time: ${(new Date()).toISOString()}`);
       querySnapshot.docChanges().forEach(docSnapshot => {
         console.debug(`changed doc: ${docSnapshot.type}`);
         if (docSnapshot.type !== 'removed') {
