@@ -38,11 +38,14 @@ const getLogLock = async () => {
                 logLocked = true;
                 clearInterval(timer);
                 resolve(true);
+            } else {
+                console.debug('waiting for log ...');
             }
         }
 
         timer = setInterval(check, 1000);
-    })
+    });
+    return p;
 }
 
 const clearLogLock = () => {
