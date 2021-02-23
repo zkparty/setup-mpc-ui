@@ -33,7 +33,7 @@ const login = async (): Promise<firebase.User> => {
             });
         
         // Signed in 
-        console.log(chalk.green.bold(`You're signed in as ${result.additionalUserInfo?.username} ${result.user.uid}`));
+        console.log(chalk.green.bold(`You're signed in as ${result.additionalUserInfo?.username}`));
         setState(StateChange.LOGIN, {...result.user, ...result.additionalUserInfo, ...result.credential });
         return result.user;
     }

@@ -1,21 +1,25 @@
 
 // Properties reset by list
-const defaultState = {
-    joined: false,
+const defaultCeremony = {
     haveEntropy: false,
     autoRun: false,
     waiting: false,
     downloaded: false,
     computed: false,
     uploaded: false,
-    ceremonyList: [],
-    selectedCeremony: -1,
     startTime: null,
     contributionState: null,
     entropy: null,
     oldFile: null,
     newFile: null,
     hash: null,
+}
+
+const defaultState = {
+    joined: false,
+    ceremonyList: [],
+    selectedCeremony: -1,
+    ...defaultCeremony,
 }
 
 let state = {
@@ -58,6 +62,7 @@ export const setState = (newState: StateChange, data?: any) => {
             break;
         }
         case StateChange.JOINED: {
+            state = {...state, ...defaultCeremony};
             state.selectedCeremony = data?.index;
             state.contributionState = data?.contribState;
             state.joined = !!data;
@@ -98,6 +103,7 @@ export const setState = (newState: StateChange, data?: any) => {
         case StateChange.UPLOADED: {
             state.uploaded = true;
             state.contributionState.endTime = Date.now();
+            state.autoRun = false;
             break;
         }
         case StateChange.UPDATE_CONTRIBUTION_STATUS: {
