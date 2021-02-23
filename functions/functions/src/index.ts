@@ -68,6 +68,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRu
     functions.logger.debug(`age ${age} s, status ${status}`);
 
     let expire = false;
+    let expectedDur = 600; // seconds
     if (status === 'WAITING') {
       // Expire 3 minutes after due time.
       if (age > 180) {
@@ -77,14 +78,13 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRu
     } else if (status === 'RUNNING') {
       // Expire after 10 minutes or calculated expected duration, whichever is greater
       const numConstraints: number | undefined = ceremony.get('numConstraints');
-      let expectedDur = 600; // seconds
       if (numConstraints) {
         expectedDur = numConstraints * 10 / 1000;
         expectedDur = Math.max(expectedDur, 600);
       }
       expire = (age > expectedDur);
       if (expire) {
-        functions.logger.info(`expired running contribution ${contrib.id}. Expected duration is ${expectedDur}`);
+        functions.logger.info(`Expired running contribution ${contrib.id}. Expected duration is ${expectedDur}`);
       }
     }
     if (expire) {
@@ -96,7 +96,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRu
           eventType: 'INVALIDATED',
           index: contrib.get('queueIndex'),
           sender: 'WATCHDOG',
-          message: `No activity detected for ${age} seconds for ${status} contribution`,
+          message: `No activity detected for ${Math.floor(age)} seconds for ${status} contribution. Max ${Math.floor(expectedDur)} secs.`,
           timestamp: fbAdmin.firestore.Timestamp.now(),
         });
     }

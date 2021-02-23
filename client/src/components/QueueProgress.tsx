@@ -53,7 +53,7 @@ const QueueProgress: FC<ContributionState> = (props) => {
                     Your contribution will be requested {expectedTimeLeft}
                 </Typography>
                 <Typography align="center">
-                    The computation is estimated to take {averageSecondsPerContribution} seconds
+                    The computation is estimated to take {moment.duration(averageSecondsPerContribution, 'seconds').humanize()}
                 </Typography>
             </CardContent>
             <Divider variant="middle" />
