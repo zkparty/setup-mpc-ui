@@ -1,0 +1,3 @@
+[submodule "phase2mpc-cli"]
+	path = phase2mpc-cli
+	url = https://github.com/glamperd/phase2mpc-cli.git
