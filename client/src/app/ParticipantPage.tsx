@@ -140,14 +140,15 @@ export const ParticipantSection = () => {
   
   const tweetText = (siteSettings: any, contribs: any[]): string => {
     //const siteSettings = await getSiteSettings();
-    const header = siteSettings.tweetHeader;
-    const footer = siteSettings.tweetFooter;
+    const EOL = '\n';
+    const header = encodeURIComponent(siteSettings.tweetHeader + EOL);
+    const footer = encodeURIComponent(siteSettings.tweetFooter);
 
     let contribsList = '';
     contribs.map(c => {
-      contribsList += `${c.ceremony.title} ${c.queueIndex} ${c.hash}\n`;
+      contribsList += encodeURIComponent(`Circuit: ${c.ceremony.title}${EOL} Contributor # ${c.queueIndex}${EOL} Hash: ${c.hash}${EOL}`);
     });
-    return `https://twitter.com/compose/tweet?text=${header}\n${contribsList}\n${footer}`;
+    return `https://twitter.com/intent/tweet?text=${header}${contribsList}${footer}`;
   }
 
   let content = (<></>);
@@ -205,13 +206,17 @@ export const ParticipantSection = () => {
         }
         if (userContributions && siteSettings) {
           tweet = (
-            <a href={tweetText(siteSettings, userContributions)} target='_blank' >
-                <TwitterIcon fontSize='large' />
-            </a>);
+            <div>
+              Tweet your attestation
+              <a href={tweetText(siteSettings, userContributions)} target='_blank' >
+                  <TwitterIcon fontSize='large' />
+              </a>
+            </div>);
         }
         content = (
-            <div>
+            <div style={{ textAlign: 'center' }} >
               {text}
+              {tweet}
             </div>
           );
         break;

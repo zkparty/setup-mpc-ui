@@ -533,7 +533,7 @@ export const getParticipantContributions = async (participant: string): Promise<
       const ceremony = await cref
         .withConverter(ceremonyConverter)
         .get();
-      return {ceremony, ...cs.data()};
+      return {ceremony: ceremony.data(), ...cs.data()};
     }
   });
   return Promise.all(p);
