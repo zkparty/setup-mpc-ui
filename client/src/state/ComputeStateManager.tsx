@@ -4,6 +4,7 @@ import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionS
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
 import { createContext, Dispatch, useContext, useReducer } from "react";
 import { startWorkerThread, startDownload, startComputation, startUpload, startCreateGist } from './Compute';
+import { database } from 'firebase-admin';
 
 export enum Step {
     NOT_ACKNOWLEDGED,
@@ -89,7 +90,9 @@ interface ComputeContextInterface {
     progress: number, // { count: number, total: number},
     hash: string,
     contributionCount: number,
+    userContributions?: any[],
     worker?: Worker,
+    siteSettings?: any,
 };
 
 export const initialState: ComputeContextInterface = {
@@ -101,7 +104,7 @@ export const initialState: ComputeContextInterface = {
     entropy: new Uint8Array(0),
     progress: 0, //{count: 0, total: 0},
     hash: '',
-    contributionCount: 0,
+    contributionCount: 0,    
 }
 
 const addMessage = (state: any, message: string) => {
@@ -303,8 +306,11 @@ export const computeStateReducer = (state: any, action: any):any => {
         case 'SET_ENTROPY': {
             return {...state, entropy: action.data};
         }
-        case 'SET_CONTRIBUTION_COUNT': {
-            return {...state, contributionCount: action.data};
+        case 'SET_CONTRIBUTIONS': {
+            return {...state, contributionCount: action.data.count, userContributions: action.data.contributions};
+        }
+        case 'SET_SETTINGS': {
+            return {...state, siteSettings: action.data};
         }
         case 'SET_WORKER': {
             return { ...state, worker: action.data };

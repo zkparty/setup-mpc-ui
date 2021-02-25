@@ -514,17 +514,35 @@ export const addOrUpdateParticipant = async (participant: Participant) => {
 
 };
 
-export const countParticipantContributions = async (participant: string): Promise<number> => {
+const  getParticipantContributionsSnapshot = async (participant: string): Promise<firebase.firestore.QuerySnapshot<ContributionSummary>> => {
   const db = firebase.firestore();
   try {
     const contribQuery = db.collectionGroup("contributions")
       .withConverter(contributionConverter)
       .where('participantId', '==', participant)
       .where('status', '==', COMPLETE);
-    const res = await contribQuery.get();
-    console.debug(`count for ${participant}: ${res.size}`);
-    return res.size;
-  } catch (e) { throw new Error(`Error getting contribution count: ${e.message}`);}
+    return contribQuery.get();
+  } catch (e) { throw new Error(`Error getting contributions: ${e.message}`);}
+}
+
+export const getParticipantContributions = async (participant: string): Promise<any[]> => {
+  const snap = await getParticipantContributionsSnapshot(participant);
+  const p = snap.docs.map(async (cs) => { 
+    const cref = cs.ref.parent.parent;
+    if (cref) {
+      const ceremony = await cref
+        .withConverter(ceremonyConverter)
+        .get();
+      return {ceremony, ...cs.data()};
+    }
+  });
+  return Promise.all(p);
+}
+
+export const countParticipantContributions = async (participant: string): Promise<number> => {
+  const snap = await getParticipantContributionsSnapshot(participant);
+  console.debug(`count for ${participant}: ${snap.size}`);
+  return snap.size;
 }
 
 export const resetContributions = async (participant: string): Promise<void> => {
@@ -571,3 +589,15 @@ export const getUserStatus = async (userId: string): Promise<string> => {
   // };
   return status;
 };
+
+export const getSiteSettings = async (): Promise<any> => {
+  const db = firebase.firestore();
+  try {
+    const snapshot = await db.doc(`settings/site`)
+      .get();
+    
+    return snapshot.data();
+  } catch (err) {
+    console.warn(`Error getting site settings: ${err.message}`);
+  }
+}

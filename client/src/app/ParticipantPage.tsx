@@ -17,12 +17,13 @@ import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import { ceremonyContributionListener, 
-  ceremonyQueueListener, ceremonyQueueListenerUnsub, countParticipantContributions } from "../api/FirestoreApi";
+  ceremonyQueueListener, ceremonyQueueListenerUnsub, contributionUpdateListener, countParticipantContributions, getParticipantContributions, getSiteSettings } from "../api/FirestoreApi";
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
-import { LinearProgress } from "@material-ui/core";
+import { IconButton, LinearProgress, Link } from "@material-ui/core";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
 import { startWorkerThread } from "../state/Compute";
+import TwitterIcon from '@material-ui/icons/Twitter';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -136,6 +137,18 @@ export const ParticipantSection = () => {
         running && computed && !uploaded ? 'uploading' : 
         'inactive'}`);
   }; 
+  
+  const tweetText = (siteSettings: any, contribs: any[]): string => {
+    //const siteSettings = await getSiteSettings();
+    const header = siteSettings.tweetHeader;
+    const footer = siteSettings.tweetFooter;
+
+    let contribsList = '';
+    contribs.map(c => {
+      contribsList += `${c.ceremony.title} ${c.queueIndex} ${c.hash}\n`;
+    });
+    return `https://twitter.com/compose/tweet?text=${header}\n${contribsList}\n${footer}`;
+  }
 
   let content = (<></>);
   if (!authState.isLoggedIn) {
@@ -182,12 +195,25 @@ export const ParticipantSection = () => {
       }
       case (Step.WAITING): {
         // Waiting for a ceremony
-        const { contributionCount } = state;
+        const { contributionCount, userContributions, siteSettings } = state;
+        let text=(<></>);
+        let tweet = (<></>);
         if (contributionCount) {
-          content = stepText(`You have contributed to ${contributionCount} ${contributionCount == 1 ? 'ceremony' : 'ceremonies'}. No further ceremonies are ready for your contribution at the moment.`);
+          text = stepText(`You have contributed to ${contributionCount} ${contributionCount == 1 ? 'ceremony' : 'ceremonies'}. No further ceremonies are ready for your contribution at the moment.`);
         } else {
           content = stepText('No ceremonies are ready to accept your contribution at the moment.');
         }
+        if (userContributions && siteSettings) {
+          tweet = (
+            <a href={tweetText(siteSettings, userContributions)} target='_blank' >
+                <TwitterIcon fontSize='large' />
+            </a>);
+        }
+        content = (
+            <div>
+              {text}
+            </div>
+          );
         break;
       }
       case (Step.QUEUED): {
@@ -242,15 +268,21 @@ export const ParticipantSection = () => {
   );
 };
 
-
 const getContributionCount = (participant: string, dispatch: Dispatch<any>) => {
   console.debug(`getContCount...`);
-  countParticipantContributions(participant).then(
-      count => {
-          dispatch({
-              type: 'SET_CONTRIBUTION_COUNT',
-              data: count,
-          });
-      }
+  getSiteSettings().then(
+    settings => {
+      dispatch({
+          type: 'SET_SETTINGS',
+          data: settings,
+      });
+  });
+  getParticipantContributions(participant).then(
+    contribs => {
+        dispatch({
+            type: 'SET_CONTRIBUTIONS',
+            data: {contributions: contribs, count: contribs.length},
+        });
+    }
   );
 }
