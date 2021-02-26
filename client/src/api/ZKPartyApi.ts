@@ -189,13 +189,16 @@ const addGist = async (summary: string, description: string, authToken: string):
 }
 
 export const createSummaryGist = async (settings: any, userContributions: any[], username: string, authToken: string): Promise<string> => {
-  const template = settings.gistTemplate;
+  const EOL = '\n';
+  const template = settings.gistTemplate.replaceAll('{EOL}', EOL);
   let body = '';
   userContributions.map(c => {
     body += 
-    `Circuit: ${c.ceremony.title} Contributor #: ${c.queueIndex}
-        Hash: ${c.hash}
-    `;
+    `Circuit: ${c.ceremony.title} 
+          Contributor # ${c.queueIndex}
+          Hash: ${c.hash}
+
+`;
   });
   const ts = new Date().toUTCString();
 

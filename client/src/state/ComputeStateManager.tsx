@@ -180,15 +180,22 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'SET_HASH': {
             let h = '';
+            let oldHash = action.hash.replace('0x', '');
             let separator = '';
-            for (let i = 0; i<action.hash.length; i+=8) {
-                const s = action.hash.slice(i, i+8);
+            let j = 0;
+            for (let i = 0; i<oldHash.length; i+=8) {
+                const s = oldHash.slice(i, i+8);
                 h = h.concat(separator, s);
+                if (j++ >= 4) {
+                    h = h.concat('\n');
+                    j = 0;
+                }
                 separator = ' ';
+                
             }
             const msg = `Hash: ${h}`;
             newState = addMessage(state, msg);
-            newState.hash = action.hash;
+            newState.hash = h;
             return newState;
         }
         case 'COMPUTE_DONE': {
