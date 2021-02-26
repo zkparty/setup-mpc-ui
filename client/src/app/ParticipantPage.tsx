@@ -156,7 +156,7 @@ export const ParticipantSection = () => {
   const tweetText = (siteSettings: any, url: string): string => {
     //const siteSettings = await getSiteSettings();
     const EOL = '\n';
-    const body = encodeURIComponent(siteSettings.tweetTemplate.replace('{URL}', url));
+    const body = encodeURIComponent(siteSettings.tweetTemplate.replace('{URL}', url).replaceAll('{EOL}', EOL));
 
     return `https://twitter.com/intent/tweet?text=${body}`;
   }

@@ -329,21 +329,20 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
 
   let promises: Promise<boolean>[] = [];
   const unsub = query.onSnapshot(querySnapshot => {
-    querySnapshot.forEach(ceremonySnapshot => {
-      const p = checkCeremony(ceremonySnapshot);
-      promises.push(p);
-    });
+      querySnapshot.forEach(ceremonySnapshot => {
+        const p = checkCeremony(ceremonySnapshot);
+        promises.push(p);
+      });
+      Promise.all(promises).then(res => {
+        if (!found) {
+          // Indicate end of run
+          callback(false);
+        }
+      });
     }, err => {
       console.log(`Error while listening for ceremony changes ${err.message}`);
     }
   );
-
-  Promise.all(promises).then(res => {
-    if (!found) {
-      // Indicate end of run
-      callback(false);
-    }
-  });
 
   return unsub;
 };

@@ -170,7 +170,7 @@ const addGist = async (summary: string, description: string, authToken: string):
     description,
     public: true,
     files: {
-        "contribution.txt": {content: summary},
+        "attestation.txt": {content: summary},
   }};
   const res = await fetch('https://api.github.com/gists', {
     method: 'post',
@@ -192,13 +192,16 @@ export const createSummaryGist = async (settings: any, userContributions: any[],
   const template = settings.gistTemplate;
   let body = '';
   userContributions.map(c => {
-    body += `Circuit: ${c.ceremony.title} Contributor #: ${c.queueIndex} Hash: ${c.hash}\n`;
+    body += 
+    `Circuit: ${c.ceremony.title} Contributor #: ${c.queueIndex}
+        Hash: ${c.hash}
+    `;
   });
   const ts = new Date().toUTCString();
 
   const content = template
     .replace('{BODY}', body)
-    .replace('{TIMESTAMP}, ts')
+    .replace('{TIMESTAMP}', ts)
     .replace('{USERID}', username);
 
   const description = settings.gistSummaryDescription;
