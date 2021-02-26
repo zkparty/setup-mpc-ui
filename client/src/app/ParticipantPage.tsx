@@ -17,13 +17,14 @@ import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import { ceremonyContributionListener, 
-  ceremonyQueueListener, ceremonyQueueListenerUnsub, contributionUpdateListener, countParticipantContributions, getParticipantContributions, getSiteSettings } from "../api/FirestoreApi";
+  ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings } from "../api/FirestoreApi";
 import QueueProgress from './../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
 import { IconButton, LinearProgress, Link } from "@material-ui/core";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
 import { startWorkerThread } from "../state/Compute";
 import TwitterIcon from '@material-ui/icons/Twitter';
+import { createSummaryGist } from "../api/ZKPartyApi";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -106,18 +107,32 @@ export const ParticipantSection = () => {
     if (dispatch) dispatch({type: 'ACKNOWLEDGE' });
   }
   
-  const setContribution = (cs: ContributionState) => {
+  const setContribution = (cs: ContributionState | boolean) => {
     if (ceremonyListenerUnsub.current) ceremonyListenerUnsub.current();
 
-    // Only accept new tasks if we're waiting
-    if (step !== Step.RUNNING && step !== Step.QUEUED) {
-      if (dispatch) dispatch({
-        type: 'SET_CEREMONY',
-        data: cs,
-      });
-      ceremonyQueueListener(cs.ceremony.id, updateQueue);
-    } else {
-      console.log(`Contribution candidate received while running another. ${step}`);
+    if (!cs) {
+      // Query is telling us that all circuits have been run. 
+      // Add a gist
+      const { userContributions, siteSettings, participant, accessToken } = state;
+      if (userContributions && participant && participant.authId && accessToken) {
+        createSummaryGist(siteSettings, userContributions, participant.authId, accessToken).then(
+          url => {
+            if (dispatch) dispatch({ type: 'SUMMARY_GIST_CREATED', data: url });
+        })
+      }
+      if (dispatch) dispatch({ type: 'END_OF_SERIES' });
+    } else if (cs instanceof Object) {
+      // New circuit to contribute to
+      // Only accept new tasks if we're waiting
+      if (step !== Step.RUNNING && step !== Step.QUEUED) {
+        if (dispatch) dispatch({
+          type: 'SET_CEREMONY',
+          data: cs,
+        });
+        ceremonyQueueListener(cs.ceremony.id, updateQueue);
+      } else {
+        console.log(`Contribution candidate received while running another. ${step}`);
+      }
     }
   }
 
@@ -138,22 +153,17 @@ export const ParticipantSection = () => {
         'inactive'}`);
   }; 
   
-  const tweetText = (siteSettings: any, contribs: any[]): string => {
+  const tweetText = (siteSettings: any, url: string): string => {
     //const siteSettings = await getSiteSettings();
     const EOL = '\n';
-    const header = encodeURIComponent(siteSettings.tweetHeader + EOL);
-    const footer = encodeURIComponent(siteSettings.tweetFooter);
+    const body = encodeURIComponent(siteSettings.tweetTemplate.replace('{URL}', url));
 
-    let contribsList = '';
-    contribs.map(c => {
-      contribsList += encodeURIComponent(`Circuit: ${c.ceremony.title}${EOL} Contributor # ${c.queueIndex}${EOL} Hash: ${c.hash}${EOL}`);
-    });
-    return `https://twitter.com/intent/tweet?text=${header}${contribsList}${footer}`;
+    return `https://twitter.com/intent/tweet?text=${body}`;
   }
 
   let content = (<></>);
   if (!authState.isLoggedIn) {
-    content = (<Typography variant='body1'>Sorry, please login to access this page</Typography>);
+    content = (<Typography variant='body1'>Please login to access this page</Typography>);
   } else {
     //console.debug(`step ${step.toString()}`);
     switch (step) {
@@ -166,13 +176,21 @@ export const ParticipantSection = () => {
         // After 'go ahead' clicked
         // Display status messages for all remaining conditions
         // Initialise - get participant ID, load wasm module
-        if (!participant && dispatch) {
-          getParticipant().then(() => {
-            console.debug('INITIALISED');
-            dispatch({type: 'SET_STEP', data: Step.INITIALISED});
+        if (dispatch) {
+          getSiteSettings().then(
+            settings => {
+              dispatch({ type: 'SET_SETTINGS', data: settings });
           });
-          if (!state.worker) startWorkerThread(dispatch);
+        
+          if (!participant) {
+            getParticipant().then(() => {
+              console.debug('INITIALISED');
+              dispatch({type: 'SET_STEP', data: Step.INITIALISED});
+            });
+            if (!state.worker) startWorkerThread(dispatch);
+          }
         }
+
         content = stepText('Loading compute module...');
         break;
       }
@@ -187,7 +205,6 @@ export const ParticipantSection = () => {
         // start looking for a ceremony to contribute to
         if (participant) {
           ceremonyListenerUnsub.current = ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
-          if (dispatch) getContributionCount(participant.uid, dispatch);
         }
         content = stepText('Starting listener...');
         addMessage('Initialised.');
@@ -196,7 +213,7 @@ export const ParticipantSection = () => {
       }
       case (Step.WAITING): {
         // Waiting for a ceremony
-        const { contributionCount, userContributions, siteSettings } = state;
+        const { contributionCount, siteSettings, summaryGistUrl } = state;
         let text=(<></>);
         let tweet = (<></>);
         if (contributionCount) {
@@ -204,11 +221,11 @@ export const ParticipantSection = () => {
         } else {
           content = stepText('No ceremonies are ready to accept your contribution at the moment.');
         }
-        if (userContributions && siteSettings) {
+        if (summaryGistUrl && siteSettings) {
           tweet = (
             <div>
               Tweet your attestation
-              <a href={tweetText(siteSettings, userContributions)} target='_blank' >
+              <a href={tweetText(siteSettings, summaryGistUrl)} target='_blank' >
                   <TwitterIcon fontSize='large' />
               </a>
             </div>);
@@ -273,21 +290,3 @@ export const ParticipantSection = () => {
   );
 };
 
-const getContributionCount = (participant: string, dispatch: Dispatch<any>) => {
-  console.debug(`getContCount...`);
-  getSiteSettings().then(
-    settings => {
-      dispatch({
-          type: 'SET_SETTINGS',
-          data: settings,
-      });
-  });
-  getParticipantContributions(participant).then(
-    contribs => {
-        dispatch({
-            type: 'SET_CONTRIBUTIONS',
-            data: {contributions: contribs, count: contribs.length},
-        });
-    }
-  );
-}

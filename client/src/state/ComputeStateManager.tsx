@@ -3,7 +3,7 @@ import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionS
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
 import { createContext, Dispatch, useContext, useReducer } from "react";
-import { startWorkerThread, startDownload, startComputation, startUpload, startCreateGist } from './Compute';
+import { startWorkerThread, startDownload, startComputation, startUpload, endOfCircuit } from './Compute';
 import { database } from 'firebase-admin';
 
 export enum Step {
@@ -85,6 +85,7 @@ interface ComputeContextInterface {
     contributionState?: ContributionState,
     step: Step,
     participant?: Participant,
+    accessToken?: string,
     paramData?: Uint8Array,
     entropy: Uint8Array,
     progress: number, // { count: number, total: number},
@@ -93,6 +94,8 @@ interface ComputeContextInterface {
     userContributions?: any[],
     worker?: Worker,
     siteSettings?: any,
+    seriesIsComplete: boolean,
+    summaryGistUrl?: string,
 };
 
 export const initialState: ComputeContextInterface = {
@@ -104,7 +107,8 @@ export const initialState: ComputeContextInterface = {
     entropy: new Uint8Array(0),
     progress: 0, //{count: 0, total: 0},
     hash: '',
-    contributionCount: 0,    
+    contributionCount: 0,
+    seriesIsComplete: false,
 }
 
 const addMessage = (state: any, message: string) => {
@@ -226,11 +230,12 @@ export const computeStateReducer = (state: any, action: any):any => {
                  duration
             );
             newState.contributionSummary = contribution;
-            startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
+            endOfCircuit(ceremony, queueIndex, state.hash, state.accessToken, state.participant.uid, action.dispatch);
 
             return newState;
         }
         case 'GIST_CREATED': {
+            // End-of-circuit actions completed
             let msg;
             if (state.contributionState) {
                 const { queueIndex, ceremony } = state.contributionState;
@@ -314,6 +319,12 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'SET_WORKER': {
             return { ...state, worker: action.data };
+        }
+        case 'END_OF_SERIES': {
+            return { ...state, seriesIsComplete: true}
+        }
+        case 'SUMMARY_GIST_CREATED': {
+            return { ...state, summaryGistUrl: action.data }
         }
     }
     console.debug(`state after reducer ${newState.step}`);

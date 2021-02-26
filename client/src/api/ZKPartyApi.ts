@@ -1,4 +1,4 @@
-import { Ceremony, Contribution } from "../types/ceremony";
+import { Ceremony, Contribution, ContributionSummary } from "../types/ceremony";
 import { addCeremony as addCeremonyToDB } from "./FirestoreApi";
 import firebase from 'firebase/app';
 
@@ -162,11 +162,15 @@ export const createGist = async (ceremonyId: string, ceremonyTitle: string, inde
     contributionNumber: index,
     hash: hash,
   }
+  return addGist(JSON.stringify(summary, undefined, 2), 'zkparty phase2 tusted setup MPC contribution summary', authToken);
+}
+
+const addGist = async (summary: string, description: string, authToken: string): Promise<string> => {
   const gist = {
-    description: "zkparty phase2 tusted setup MPC contribution summary",
+    description,
     public: true,
     files: {
-        "contribution.txt": {content: JSON.stringify(summary, undefined, 2)},
+        "contribution.txt": {content: summary},
   }};
   const res = await fetch('https://api.github.com/gists', {
     method: 'post',
@@ -182,4 +186,22 @@ export const createGist = async (ceremonyId: string, ceremonyTitle: string, inde
   console.debug(`${res ? 'ok' : 'error'}`);
   if (res) return (await res.json()).html_url;
   return '';
+}
+
+export const createSummaryGist = async (settings: any, userContributions: any[], username: string, authToken: string): Promise<string> => {
+  const template = settings.gistTemplate;
+  let body = '';
+  userContributions.map(c => {
+    body += `Circuit: ${c.ceremony.title} Contributor #: ${c.queueIndex} Hash: ${c.hash}\n`;
+  });
+  const ts = new Date().toUTCString();
+
+  const content = template
+    .replace('{BODY}', body)
+    .replace('{TIMESTAMP}, ts')
+    .replace('{USERID}', username);
+
+  const description = settings.gistSummaryDescription;
+
+  return addGist(content, description, authToken);
 }
