@@ -82,6 +82,7 @@ export const ParticipantSection = () => {
   const dispatch = useContext(ComputeDispatchContext);
   const authState = useContext(AuthStateContext);
   const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
+  const summaryStarted = useRef<boolean>(false);
   const classes = useStyles();
 
   const { step, computeStatus, messages, entropy, participant, contributionState } = state;
@@ -112,14 +113,6 @@ export const ParticipantSection = () => {
 
     if (!cs) {
       // Query is telling us that all circuits have been run. 
-      // Add a gist
-      const { userContributions, siteSettings, participant, accessToken } = state;
-      if (userContributions && participant && participant.authId && accessToken) {
-        createSummaryGist(siteSettings, userContributions, participant.authId, accessToken).then(
-          url => {
-            if (dispatch) dispatch({ type: 'SUMMARY_GIST_CREATED', data: url });
-        })
-      }
       if (dispatch) dispatch({ type: 'END_OF_SERIES' });
     } else if (cs instanceof Object) {
       // New circuit to contribute to
@@ -159,6 +152,19 @@ export const ParticipantSection = () => {
     const body = encodeURIComponent(siteSettings.tweetTemplate.replace('{URL}', url).replaceAll('{EOL}', EOL));
 
     return `https://twitter.com/intent/tweet?text=${body}`;
+  }
+
+  // Handle end of series
+  if (state.seriesIsComplete && state.userContributions && state.userContributions.length>0 && !state.summaryGistUrl && !summaryStarted.current) {
+      summaryStarted.current = true;
+      // Add a gist
+      const { userContributions, siteSettings, participant, accessToken } = state;
+      if (participant && participant.authId && accessToken) {
+        createSummaryGist(siteSettings, userContributions, participant.authId, accessToken).then(
+          url => {
+            if (dispatch) dispatch({ type: 'SUMMARY_GIST_CREATED', data: url });
+        })
+      }
   }
 
   let content = (<></>);

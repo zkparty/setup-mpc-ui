@@ -3,7 +3,7 @@ import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionS
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
 import { createContext, Dispatch, useContext, useReducer } from "react";
-import { startWorkerThread, startDownload, startComputation, startUpload, endOfCircuit } from './Compute';
+import { startWorkerThread, startDownload, startComputation, startUpload, endOfCircuit, startCreateGist } from './Compute';
 import { database } from 'firebase-admin';
 
 export enum Step {
@@ -186,7 +186,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             for (let i = 0; i<oldHash.length; i+=8) {
                 const s = oldHash.slice(i, i+8);
                 h = h.concat(separator, s);
-                if (j++ >= 4) {
+                if (j++ >= 3) {
                     h = h.concat('\n');
                     j = 0;
                 }
@@ -237,7 +237,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                  duration
             );
             newState.contributionSummary = contribution;
-            endOfCircuit(ceremony, queueIndex, state.hash, state.accessToken, state.participant.uid, action.dispatch);
+            startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
 
             return newState;
         }
@@ -257,20 +257,25 @@ export const computeStateReducer = (state: any, action: any):any => {
                 }
                 const contribution = newState.contributionSummary;
                 contribution.gistUrl = action.gistUrl;
-                addOrUpdateContribution(ceremony.id, contribution);
+                addOrUpdateContribution(ceremony.id, contribution).then( () => {
+                    endOfCircuit(state.participant.uid, action.dispatch);
+                });
                 msg = `Thank you for your contribution.`;
                 newState = addMessage(newState, msg);
             } else {
                 console.warn(`Duplicate call to GIST_CREATED`);
             }
 
+            return newState;
+        }
+        case 'END_OF_CIRCUIT': {
+            // End-of-circuit actions completed
             // Clean up and return to waiting
             newState.computeStatus = initialComputeStatus;
             newState.contributionState = null;
             newState.contributionSummary = null;
             newState.hash = '';
             newState.step = Step.INITIALISED;
-            newState.contributionCount ++;
             return newState;
         }
         case 'ADD_MESSAGE': {

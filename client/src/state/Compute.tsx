@@ -116,25 +116,37 @@ export const startUpload = (ceremonyId: string, index: number, data: Uint8Array,
     });
 }
 
-export const endOfCircuit = (ceremony: Ceremony, index: number, hash: string, accessToken: string, participantId: string, dispatch: Dispatch<any>) => {
+export const startCreateGist = (ceremony: Ceremony, index: number, hash: string, accessToken: string, dispatch: Dispatch<any>) => {
     console.debug(`startCreateGist ${accessToken}`);
-    if (dispatch) getContributions(participantId, dispatch);
     if (accessToken) {
         createGist(ceremony.id, ceremony.title, index, hash, accessToken).then(
             gistUrl => {
                 dispatch({
                     type: 'GIST_CREATED',
                     gistUrl,
+                    dispatch,
                 })
         });
     } else {
         dispatch({
             type: 'GIST_CREATED',
             gistUrl: null,
+            dispatch,
         })
     }
 }
 
+// All processing for the circuit has completed. 
+export const endOfCircuit = ( participantId: string, dispatch: Dispatch<any>) => {
+    console.debug(`endOfCircuit`);
+    if (dispatch) {
+        getContributions(participantId, dispatch);
+        dispatch({
+            type: 'END_OF_CIRCUIT',
+            dispatch,
+        })
+    }
+}
 
 const getContributions = (participantId: string, dispatch: Dispatch<any>) => {
     console.debug(`getContCount...`);
@@ -146,4 +158,10 @@ const getContributions = (participantId: string, dispatch: Dispatch<any>) => {
             });
         }
     );
+    // Clear it first to avoid early summary 
+    dispatch({
+        type: 'SET_CONTRIBUTIONS',
+        data: {contributions: [], count: null},
+    });
+
 }
