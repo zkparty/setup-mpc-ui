@@ -221,25 +221,29 @@ export const ParticipantSection = () => {
         // Waiting for a ceremony
         const { contributionCount, siteSettings, summaryGistUrl } = state;
         let text=(<></>);
-        let tweet = (<></>);
         if (contributionCount) {
           text = stepText(`You have contributed to ${contributionCount} ${contributionCount == 1 ? 'ceremony' : 'ceremonies'}. No further ceremonies are ready for your contribution at the moment.`);
         } else {
-          content = stepText('No ceremonies are ready to accept your contribution at the moment.');
+          text = stepText('No ceremonies are ready to accept your contribution at the moment.');
         }
         if (summaryGistUrl && siteSettings) {
-          tweet = (
+          text = (
             <div>
+              {text}
+              <p></p>
+              Your contributions have been recorded 
+              <a href={summaryGistUrl} target='_blank'>here</a>
+              <p></p>
               Tweet your attestation
               <a href={tweetText(siteSettings, summaryGistUrl)} target='_blank' >
                   <TwitterIcon fontSize='large' />
               </a>
-            </div>);
+            </div>
+          );
         }
         content = (
             <div style={{ textAlign: 'center' }} >
               {text}
-              {tweet}
             </div>
           );
         break;

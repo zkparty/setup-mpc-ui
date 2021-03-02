@@ -262,8 +262,6 @@ export const computeStateReducer = (state: any, action: any):any => {
                 });
                 msg = `Thank you for your contribution.`;
                 newState = addMessage(newState, msg);
-            } else {
-                console.warn(`Duplicate call to GIST_CREATED`);
             }
 
             return newState;
