@@ -231,13 +231,15 @@ export const ParticipantSection = () => {
             <div>
               {text}
               <p></p>
-              Your contributions have been recorded 
-              <a href={summaryGistUrl} target='_blank'>here</a>
+              {`Your contributions have been recorded `}
+              <a href={summaryGistUrl} target='_blank' style={{ color: textColor }}>here</a>
               <p></p>
-              Tweet your attestation
-              <a href={tweetText(siteSettings, summaryGistUrl)} target='_blank' >
-                  <TwitterIcon fontSize='large' />
-              </a>
+              <div style = {{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                Tweet your attestation
+                <a href={tweetText(siteSettings, summaryGistUrl)} target='_blank' style={{ color:  '#1DA1F2' }}>
+                    <TwitterIcon fontSize='large' />
+                </a>
+              </div>
             </div>
           );
         }
