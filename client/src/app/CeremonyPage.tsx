@@ -13,7 +13,7 @@ import {
   Center
 } from "../styles";
 import { Ceremony, CeremonyEvent, Contribution, ContributionSummary, Participant } from "../types/ceremony";
-import { ceremonyEventListener, ceremonyUpdateListener, contributionUpdateListener, getCeremony } from "../api/FirestoreApi";
+import { ceremonyEventListener, ceremonyUpdateListener, contributionUpdateListener, getCeremony, getContributionState } from "../api/FirestoreApi";
 import { createStyles, makeStyles, Theme, Typography, withStyles, Container } from "@material-ui/core";
 import Fab from '@material-ui/core/Fab';
 import EditIcon from '@material-ui/icons/Edit';
@@ -144,11 +144,18 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
     }
   });
 
-  const contributionStats = (): {completed: number, waiting: number} => {
-    let result = {completed: 0, waiting: 0};
+  const contributionStats = (): {completed: number, waiting: number, lastVerified: number, transcript: string} => {
+    let result = {completed: 0, waiting: 0, lastVerified: -1, transcript: ''};
     contributions.forEach(c => {
       switch (c.status) {
-        case 'COMPLETE': result.completed++; break;
+        case 'COMPLETE': {
+          result.completed++;
+          if (c.verification && c.queueIndex && c.queueIndex > result.lastVerified) {
+            result.lastVerified = c.queueIndex;
+            result.transcript = c.verification;
+          }
+          break;
+        }
         case 'WAITING': result.waiting++; break;
       }
     });
@@ -189,7 +196,10 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
                 <CeremonyDetails 
                   ceremony={ceremony} 
                   numContCompleted={contribStats.completed} 
-                  numContWaiting={contribStats.waiting} />
+                  numContWaiting={contribStats.waiting}
+                  transcript={contribStats.transcript}
+                  lastVerified={contribStats.lastVerified}
+                  openViewLog={openViewLog} />
               </div>
               <div style={{ float: 'right', marginLeft: 'auto' }}>
                 <Actions handleEdit={handleEdit} handleClose={handleClose} />
@@ -241,7 +251,13 @@ const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
   );
 }
 
-const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, numContWaiting: number  }) => {
+const CeremonyDetails = (props: { 
+    ceremony: Ceremony, 
+    numContCompleted: number, 
+    numContWaiting: number, 
+    openViewLog: (c: string, i: any)=>void,
+    lastVerified: number,
+    transcript: string }) => {
   //console.debug(`start ${props.ceremony.startTime}`);
 
   const status = ceremonyStatus(props.ceremony);
@@ -280,6 +296,14 @@ const CeremonyDetails = (props: { ceremony: Ceremony, numContCompleted: number, 
               <tr>
                 <td className='title'>Number of Constraints</td>
                 <td className='content'>{props.ceremony.numConstraints}</td>
+              </tr>
+              <tr>
+                <td className='title'>Verification Log</td>
+                <td className='content'>
+                  <button 
+                    onClick={() => {props.openViewLog(props.transcript, props.lastVerified)}}
+                      style={{ backgroundColor: lighterBackground, color: textColor, borderStyle: 'none' }}
+                  >view</button></td>
               </tr>
             </tbody>
           </CeremonyDetailsTable>
