@@ -298,12 +298,13 @@ const CeremonyDetails = (props: {
                 <td className='content'>{props.ceremony.numConstraints}</td>
               </tr>
               <tr>
-                <td className='title'>Verification Log</td>
+                <td className='title'>Verification Transcript</td>
                 <td className='content'>
                   <button 
                     onClick={() => {props.openViewLog(props.transcript, props.lastVerified)}}
-                      style={{ backgroundColor: lighterBackground, color: textColor, borderStyle: 'none' }}
-                  >view</button></td>
+                    style={{ backgroundColor: lighterBackground, color: textColor, borderStyle: 'solid' }}
+                  >view</button>
+                </td>
               </tr>
             </tbody>
           </CeremonyDetailsTable>

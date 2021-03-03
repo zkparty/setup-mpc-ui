@@ -10,7 +10,7 @@ const fbAdmin =require('firebase-admin');
 fbAdmin.initializeApp(firebaseConfig);
 
 // This watchdog will look for RUNNING and WAITING contributions, then 
-// check for the most recent activity (using events) for the ceremony.
+// check for the most recent activity (using events) for the circuit.
 // Inactive contributions will be marked INVALIDATED, which will allow
 // a new contributor to start.
 export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRun(async (context) => {

@@ -33,6 +33,7 @@ export const createContributionSummary = (participantId: string, status: Partici
       hash,
       paramsFile,
       index,
+      queueIndex: index,
       participantId,
       status,
       timeCompleted: new Date(),

@@ -286,17 +286,27 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
 
   let found = false;
 
+  const setContribution = async (ceremony: Ceremony, contrib: Contribution): Promise<void> => {
+    // Save the contribution record
+    await addOrUpdateContribution(ceremony.id, contrib);
+
+    const cs = await getContributionState(
+      ceremony,
+      contrib
+    );
+
+    callback(cs);
+  }
+
   const checkCeremony = async (ceremonySnapshot: firebase.firestore.QueryDocumentSnapshot<Ceremony>): Promise<boolean> => {
-    // First check cached ceremonies. These are ceremonies that this participant 
-    // has already contributed to, so they aren't eligible for selection.
     //console.debug(`ceremony listener forEach ${ceremonySnapshot.id}`);
     var ceremony = ceremonySnapshot.data();
     const ceremonyId = ceremonySnapshot.id;
     // Get any contributions for this participant
     const participantQuery = ceremonySnapshot.ref.collection('contributions')
       .withConverter(contributionConverter)
-      .where('participantId', '==', participantId)
-      .where('status', "!=", WAITING);
+      .where('participantId', '==', participantId);
+      //.where('status', "!=", WAITING);
     const contSnapshot = await participantQuery.get();
     //console.debug(`participant query ${ceremonyId} contribs: ${contSnapshot.size}`);          
     if (contSnapshot.empty) {
@@ -312,15 +322,16 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
         }
         // Allocate a position in the queue
         contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
-        // Save the contribution record
-        addOrUpdateContribution(ceremonyId, contribution);
 
-        const cs = await getContributionState(
-          ceremony,
-          contribution
-        );
-
-        callback(cs);
+        await setContribution(ceremony, contribution);
+        return true;
+      }
+    } else {
+      const contrib = contSnapshot.docs[0].data();
+      if (contrib.status === WAITING && !found) {
+        // Re-use this
+        contrib.lastSeen = new Date();
+        await setContribution(ceremony, contrib);
         return true;
       }
     };
@@ -328,6 +339,8 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
   };
 
   let promises: Promise<boolean>[] = [];
+  // TODO - Review the need for onSnapshot. a get() would probably do the job. 
+  // sub/unsub is overkill
   const unsub = query.onSnapshot(querySnapshot => {
       querySnapshot.forEach(ceremonySnapshot => {
         const p = checkCeremony(ceremonySnapshot);
@@ -361,8 +374,8 @@ export const getNextQueueIndex = async (ceremonyId: string, participantId: strin
   } else {
     const cont = snapshot.docs[0].data();
     // If the last entry is for this participant, reuse it.
-    // TODO - should reuse earlier entries if they are still pending
-    if (cont.participantId == participantId && cont.queueIndex) {
+    // TODO - should reuse earlier entries if they are still waiting
+    if (cont.participantId === participantId && cont.queueIndex) {
       return cont.queueIndex;
     }
     return cont.queueIndex ? cont.queueIndex + 1 : 1;
@@ -476,17 +489,20 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
 };
 
 export const addOrUpdateContribution = async (ceremonyId: string, contribution: Contribution) => {
+  if (!contribution.queueIndex) {
+    throw new Error(`Attempting to add or update contribution without queueIndex`);
+  }
   const db = firebase.firestore();
   try {
     // Existing contributor - update the record
-    const eventsQuery = db.collection("ceremonies")
+    const indexQuery = db.collection("ceremonies")
       .doc(ceremonyId)
       .collection('contributions')
       .withConverter(contributionConverter)
-      .where('participantId', '==', contribution.participantId)
+      .where('queueIndex', '==', contribution.queueIndex)
       .limit(1);
-    const participantContrib = await eventsQuery.get();
-    if (participantContrib.empty) {
+    const contrib = await indexQuery.get();
+    if (contrib.empty) {
       // New contributor
       const doc = await db
           .doc(`ceremonies/${ceremonyId}`)
@@ -495,10 +511,10 @@ export const addOrUpdateContribution = async (ceremonyId: string, contribution: 
           .doc();
       
       await doc.set(contribution);
-      console.log(`added contribution summary ${doc.id}`);
+      console.log(`added contribution summary ${doc.id} for index ${contribution.queueIndex}`);
     } else {
       // Update existing contributor
-      const doc = participantContrib.docs[0].ref;
+      const doc = contrib.docs[0].ref;
       await doc.update(contribution);
     }
   } catch (e) { throw new Error(`Error adding/updating contribution summary: ${e.message}`);}
