@@ -33,11 +33,16 @@ Things to check:
 * WAITING contributor:
   + stay on page until prior contrib is VERIFIED. Should start
   + stay on page until prior is INVALIDATED. Should start
+    ** Passes **
   + close page while WAITING. Return in < x minutes (x=3?). Should resume position.
+    ** Passes **
   + Close page while WAITING. Stay away for > x minutes. Subsequent WAITING contributor appears. Record should be INVALIDATED and cancelled for re-use, else leave and allow re-use.
+    ** Passes **
   + Close page while WAITING. Stay away for > x minutes. No subsequent WAITING contributor. Record should be left and allow re-use.
+    ** Passes **
 * RUNNING contributor:
   + Start RUNNING, then close page. Wait y minutes (y depends on cct size). Should be INVALIDATED.
+    ** 
   + Start RUNNING, then close page. Return in < y minutes. Expect: Skip cct. Contrib should be INVALIDATED after y minutes. 
 
 

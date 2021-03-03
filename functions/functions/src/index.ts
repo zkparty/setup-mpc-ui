@@ -42,37 +42,40 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRu
       .orderBy('queueIndex')
       .where('queueIndex', '>', lastCompleteIndex)
       .where('status', 'in', ['RUNNING', 'WAITING'])
-      .limit(1)
       .get();
     if (nextContrib.empty) {
-      functions.logger.debug(`No expiry candidate ${ceremony.id}`);
+      //functions.logger.debug(`No expiry candidate ${ceremony.id}`);
       return;
     }
     const contrib = nextContrib.docs[0];
+    const haveLater: boolean = (nextContrib.size > 1);
+    const waiterIndex = contrib.get('queueIndex');
 
-    functions.logger.debug(`next contrib ${nextContrib.docs[0].get('queueIndex')}`);
+    //functions.logger.debug(`next contrib ${nextContrib.docs[0].get('queueIndex')}`);
 
     // Check for excess idle time. INVALIDATE if too long.
     const events = await ceremony.ref
       .collection('events')
       .orderBy('timestamp', 'desc')
+      .where('index', '==', waiterIndex)
       .limit(1)
       .get();
-    let lastSeen = 0;
+    let lastSeen = contrib.createTime.toMillis()/1000;
     if (!events.empty) {
       lastSeen = events.docs[0].get('timestamp').seconds;
-      functions.logger.debug(`have events ${lastSeen}`);
+      //functions.logger.debug(`have events ${lastSeen}`);
     };
     const age = (Date.now()/1000 - lastSeen);
-    const status = nextContrib.docs[0].get('status');
+    const status = contrib.get('status');
     functions.logger.debug(`age ${age} s, status ${status}`);
 
     let expire = false;
     let expectedDur = 600; // seconds
+    const MAX_WAIT_SECONDS = 180;
     if (status === 'WAITING') {
-      // Expire 3 minutes after due time.
-      if (age > 180) {
-        functions.logger.info(`expired waiting contribution ${contrib.id}`);
+      // Expire 3 minutes after due time if anyone else is waiting
+      if (age > MAX_WAIT_SECONDS && haveLater) {
+        functions.logger.info(`expired waiting contribution ${contrib.id} ${waiterIndex}. ${nextContrib.size} waiting`);
         expire = true;
       }
     } else if (status === 'RUNNING') {
@@ -88,13 +91,13 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRu
       }
     }
     if (expire) {
-      functions.logger.info(`Invalidating expired contribution ${contrib.get('queueIndex')} for ${ceremony.get('title')}`)
+      functions.logger.info(`Invalidating expired contribution ${waiterIndex} for ${ceremony.get('title')}`);
       await contrib.ref.set({'status': 'INVALIDATED'}, { merge: true });
       // add event
       await ceremony.ref.collection('events')
         .add({
           eventType: 'INVALIDATED',
-          index: contrib.get('queueIndex'),
+          index: waiterIndex,
           sender: 'WATCHDOG',
           message: `No activity detected for ${Math.floor(age)} seconds for ${status} contribution. Max ${Math.floor(expectedDur)} secs.`,
           timestamp: fbAdmin.firestore.Timestamp.now(),
