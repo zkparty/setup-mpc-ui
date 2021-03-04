@@ -151,7 +151,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 participantAuthId: state.participant?.authId,
                 queueIndex: state.contributionState.queueIndex,
                 priorIndex: state.contributionState.lastValidIndex,
-                lastSeen: Date.now(),
+                lastSeen: new Date(),
                 status: "RUNNING",
             };
             addOrUpdateContribution(action.ceremonyId, contribution);

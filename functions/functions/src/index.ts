@@ -48,7 +48,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRu
       return;
     }
     const contrib = nextContrib.docs[0];
-    const haveLater: boolean = (nextContrib.size > 1);
+    const laterContribsFound: boolean = (nextContrib.size > 1);
     const waiterIndex = contrib.get('queueIndex');
 
     //functions.logger.debug(`next contrib ${nextContrib.docs[0].get('queueIndex')}`);
@@ -70,11 +70,12 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRu
     functions.logger.debug(`age ${age} s, status ${status}`);
 
     let expire = false;
-    let expectedDur = 600; // seconds
+    const DEFAULT_MAX_RUNNING_DURATION = 600;
+    let expectedDur = DEFAULT_MAX_RUNNING_DURATION; // seconds
     const MAX_WAIT_SECONDS = 180;
     if (status === 'WAITING') {
       // Expire 3 minutes after due time if anyone else is waiting
-      if (age > MAX_WAIT_SECONDS && haveLater) {
+      if (age > MAX_WAIT_SECONDS && laterContribsFound) {
         functions.logger.info(`expired waiting contribution ${contrib.id} ${waiterIndex}. ${nextContrib.size} waiting`);
         expire = true;
       }
@@ -83,11 +84,11 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRu
       const numConstraints: number | undefined = ceremony.get('numConstraints');
       if (numConstraints) {
         expectedDur = numConstraints * 10 / 1000;
-        expectedDur = Math.max(expectedDur, 600);
       }
-      expire = (age > expectedDur);
+      expectedDur = Math.max(expectedDur, DEFAULT_MAX_RUNNING_DURATION);
+      expire = (age > expectedDur && laterContribsFound);
       if (expire) {
-        functions.logger.info(`Expired running contribution ${contrib.id}. Expected duration is ${expectedDur}`);
+        functions.logger.info(`Expired running contribution ${contrib.id}. Expected duration is ${expectedDur} seconds`);
       }
     }
     if (expire) {

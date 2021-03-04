@@ -513,9 +513,15 @@ export const addOrUpdateContribution = async (ceremonyId: string, contribution: 
       await doc.set(contribution);
       console.log(`added contribution summary ${doc.id} for index ${contribution.queueIndex}`);
     } else {
-      // Update existing contributor
-      const doc = contrib.docs[0].ref;
-      await doc.update(contribution);
+      // Update existing contribution
+      const doc = contrib.docs[0];
+      const oldStatus = doc.get('status');
+      // Don't allow this if the contrib has been invalidated.
+      if (INVALIDATED === oldStatus) {
+        console.warn(`Invalid contribution status change: ${oldStatus} to ${contribution.status}. Ignored.`);
+      } else {
+        await doc.ref.update(contribution);
+      }
     }
   } catch (e) { throw new Error(`Error adding/updating contribution summary: ${e.message}`);}
 
