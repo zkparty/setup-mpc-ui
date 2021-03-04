@@ -43,9 +43,11 @@ Things to check:
     ** Passes **
 * RUNNING contributor:
   + Start RUNNING, then close page. Wait y minutes (y depends on cct size). Subsequent waiting contributor. Should be INVALIDATED.
-  + Start RUNNING, then close page. Wait y minutes (y depends on cct size). No subsequent waiting contributor. Should be left RUNNING.
-  + Start RUNNING, then close page. Return in < y minutes. Expect: Skip cct. Contrib should be INVALIDATED after y minutes. 
+  + Start RUNNING, then close page. Wait y minutes (y depends on cct size). No subsequent waiting contributor. Should restart RUNNING.
+    ** fails **
+  + Start RUNNING, then close page. Return in < y minutes. Subsequent contrib. Expect: Skip cct. Contrib should be INVALIDATED after y minutes. 
   + Start RUNNING on slow machine (expected to take longer than the max allowed). No subsequent waiting contributor. Should be allowed to complete.
+
   + Start RUNNING on slow machine. Subsequent waiting contributor. Expect: Set to INVALIDATED after max seconds; Status should not be updated to COMPLETE when it finally finishes.
-    ** 
+    ** Passes **
 

@@ -328,9 +328,11 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
       }
     } else {
       const contrib = contSnapshot.docs[0].data();
-      if (contrib.status === WAITING && !found) {
+      if ((contrib.status === WAITING || contrib.status === RUNNING) && !found) {
         // Re-use this
+        found = true;
         contrib.lastSeen = new Date();
+        contrib.status = WAITING;
         await setContribution(ceremony, contrib);
         return true;
       }
