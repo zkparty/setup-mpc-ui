@@ -32,6 +32,7 @@ Things to check:
 
 * WAITING contributor:
   + stay on page until prior contrib is VERIFIED. Should start
+    ** passes **
   + stay on page until prior is INVALIDATED. Should start
     ** Passes **
   + close page while WAITING. Return in < x minutes (x=3?). Should resume position.
@@ -46,4 +47,5 @@ Things to check:
   + Start RUNNING, then close page. Return in < y minutes. Expect: Skip cct. Contrib should be INVALIDATED after y minutes. 
   + Start RUNNING on slow machine (expected to take longer than the max allowed). No subsequent waiting contributor. Should be allowed to complete.
   + Start RUNNING on slow machine. Subsequent waiting contributor. Expect: Set to INVALIDATED after max seconds; Status should not be updated to COMPLETE when it finally finishes.
+    ** 
 
