@@ -3,14 +3,20 @@
 # Full cycle of ZKOPRU circuits
 
 * Fast machine
+  ** passes **
 * Slow machine
+  ** passes **
 * CLI on medium/fast machine
 
 Browsers:
 * Edge
+  ** passes **
 * Chrome
+
 * Firefox
+  ** passes **
 * Brave
+  ** passes **
 * Safari
 
 Things to check:
@@ -25,6 +31,7 @@ Things to check:
 * Browser cycle followed by CLI cycle
 * CLI cycle followed by browser cycle
 * CLI followed by CLI cycle
+  ** passes **
 * browser cycle followed by browser cycle
 
 
@@ -43,11 +50,13 @@ Things to check:
     ** Passes **
 * RUNNING contributor:
   + Start RUNNING, then close page. Wait y minutes (y depends on cct size). Subsequent waiting contributor. Should be INVALIDATED.
+    ** passes **
   + Start RUNNING, then close page. Wait y minutes (y depends on cct size). No subsequent waiting contributor. Should restart RUNNING.
-    ** fails **
-  + Start RUNNING, then close page. Return in < y minutes. Subsequent contrib. Expect: Skip cct. Contrib should be INVALIDATED after y minutes. 
+    ** passes **
+  + Start RUNNING, then close page. Return in < y minutes. Subsequent contrib. Expect: Should restart RUNNING, then pass to subsequent contrib. 
+    ** passes **
   + Start RUNNING on slow machine (expected to take longer than the max allowed). No subsequent waiting contributor. Should be allowed to complete.
-
+    ** passes **
   + Start RUNNING on slow machine. Subsequent waiting contributor. Expect: Set to INVALIDATED after max seconds; Status should not be updated to COMPLETE when it finally finishes.
     ** Passes **
 
