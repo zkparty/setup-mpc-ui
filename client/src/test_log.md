@@ -7,12 +7,13 @@
 * Slow machine
   ** passes **
 * CLI on medium/fast machine
+  ** passes **
 
 Browsers:
 * Edge
   ** passes **
 * Chrome
-
+  ** passes **
 * Firefox
   ** passes **
 * Brave
@@ -29,7 +30,9 @@ Things to check:
 ## CLI/Browser interaction
 
 * Browser cycle followed by CLI cycle
+  ** fail - prior index = new index!!
 * CLI cycle followed by browser cycle
+  ** passes **
 * CLI followed by CLI cycle
   ** passes **
 * browser cycle followed by browser cycle
