@@ -18,7 +18,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { Button } from '@material-ui/core';
+import { Button, makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles({
   table: {
@@ -41,7 +41,7 @@ export default function CircuitsTable(props: any) {
       const idx = findCircuitIndex(circuit.id);
       const update = (c: Ceremony, i: number) => {
         if (i == idx) {
-          console.debug(`updating ceremony ${circuit.id} ${circuit.complete}`);
+          console.debug(`updating circuit ${circuit.id} ${circuit.complete}`);
           return circuit;
         } else {
           return c;
@@ -50,7 +50,7 @@ export default function CircuitsTable(props: any) {
       if (idx >= 0) {
         setCircuits(prev => prev.map(update));
       } else {
-        console.debug(`adding ceremony ${circuit.id} ${circuit.complete}`);
+        console.debug(`adding circuit ${circuit.title}`);
         setCircuits(prev => [...prev, circuit]);
       }
     };
@@ -59,42 +59,42 @@ export default function CircuitsTable(props: any) {
       if (!loaded) {
         // Subscribe to ceremony updates
         ceremonyListener(updateCircuit);
-        console.debug('getCeremonies done');
+        console.debug('ceremony listener started');
         setLoaded(true);
       }
     }, [loaded]);
 
-    const showTranscript = (circuit) => {
-      return (<></>);
+    const showTranscript = (circuit: Ceremony) => {
+      return (<>{circuit.transcript}</>);
     };
   
     return (
       <TableContainer component='div'>
-      <Table className={classes.table} size="small" aria-label="circuits table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Circuit</TableCell>
-            <TableCell align="right">Contributions</TableCell>
-            <TableCell align="right">Target</TableCell>
-            <TableCell align="right">Average Time</TableCell>
-            <TableCell align="right">Transcript</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {circuits.map((circuit, index) => (
-            <TableRow key={index+1}>
-              <TableCell component="th" scope="row">
-                {circuit.numParticipants}
-              </TableCell>
-              <TableCell align="right">{circuit.minParticipants}</TableCell>
-              <TableCell align="right">{circuit.averageDuration}</TableCell>
-              <TableCell align="right">
-                <Button onClick={() => showTranscript(circuit)}>View</Button>
-              </TableCell>
+        <Table className={classes.table} size="small" aria-label="circuits table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Circuit</TableCell>
+              <TableCell align="right">Contributions</TableCell>
+              <TableCell align="right">Target</TableCell>
+              <TableCell align="right">Average Time</TableCell>
+              <TableCell align="right">Transcript</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>    
+          </TableHead>
+          <TableBody>
+            {circuits.map((circuit, index) => (
+              <TableRow key={index+1}>
+                <TableCell component="th" scope="row">
+                  {circuit.numParticipants}
+                </TableCell>
+                <TableCell align="right">{circuit.minParticipants}</TableCell>
+                <TableCell align="right">{circuit.averageDuration}</TableCell>
+                <TableCell align="right">
+                  <Button onClick={() => showTranscript(circuit)}>View</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>    
     )
   };
