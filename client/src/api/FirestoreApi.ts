@@ -12,6 +12,7 @@ const WAITING = "WAITING";
 const PRESELECTION = "PRESELECTION";
 const VERIFIED = "VERIFIED";
 const VERIFY_FAILED = "VERIFY_FAILED";
+const ABORTED = "ABORTED";
 
 const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
   toFirestore: (c: Partial<Ceremony>) => {
@@ -466,7 +467,7 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
   const query = db.collection("ceremonies")
                 .doc(ceremonyId)
                 .collection("events")
-                .where("eventType", "in", [VERIFIED, VERIFY_FAILED, INVALIDATED]);
+                .where("eventType", "in", [VERIFIED, VERIFY_FAILED, INVALIDATED, ABORTED]);
 
   ceremonyQueueListenerUnsub = query.onSnapshot(querySnapshot => {
     //console.debug(`queue listener doc: ${querySnapshot.size}`);

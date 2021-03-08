@@ -337,6 +337,26 @@ export const computeStateReducer = (state: any, action: any):any => {
         case 'SUMMARY_GIST_CREATED': {
             return { ...state, summaryGistUrl: action.data }
         }
+        case 'ABORT_CIRCUIT': {
+            // Invalidate the contribution
+            const contribution = state.contributionState;
+            contribution.status = 'INVALIDATED';
+            const ceremonyId = contribution.ceremony.id;
+            const {ceremony, ...newCont } = contribution;
+            addOrUpdateContribution(ceremonyId, newCont).then(() => {
+                // Add event notifying of error
+                addCeremonyEvent(ceremonyId, createCeremonyEvent(
+                    "ABORTED", 
+                    `Error encountered while processing: ${action.data}`,
+                    contribution.queueIndex
+                )).then(() => {
+                    // Clean up the circuit
+                    endOfCircuit(state.participant.uid, action.dispatch);
+                });
+            });
+            const msg = `Error encountered. This circuit will be skipped.`;
+            newState = addMessage(newState, msg);
+        }
     }
     console.debug(`state after reducer ${newState.step}`);
     return newState;

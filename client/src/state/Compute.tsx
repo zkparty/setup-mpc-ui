@@ -80,9 +80,11 @@ export const startDownload = (ceremonyId: string, index: number, dispatch: Dispa
             ceremonyId,
             data: paramData,
         });
-    }).catch(err => 
-        {console.error(err.message);}
-    );
+    }).catch(err => {
+        console.error(`Error: ${err.message}. Skipping circuit`);
+        // Failed download - abort and invalidate the contribution
+        dispatch({type: 'ABORT_CIRCUIT', data: err.message, dispatch});
+    });
 };
 
 export const startComputation = (params: Uint8Array, entropy: Uint8Array, worker: Worker) => {
