@@ -20,7 +20,7 @@ import { AuthStateContext } from "../state/AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
 import { CeremonyPage } from "./CeremonyPage";
-import CircuitsGrid from './../components/CircuitsGrid';
+import CircuitsTable from '../components/CircuitsTable';
 import Footer from './../components/Footer';
 import AboutPanel from './../components/AboutPanel';
 import { useSelectionContext } from '../state/SelectionContext';
@@ -49,7 +49,7 @@ export const LandingPage = () => {
                   <div>
                     <ParticipantSection />
                     <AboutPanel />
-                    <CircuitsGrid />
+                    <CircuitsTable />
                     <Footer />
                     <Modal
                       open={selection.openModal}
