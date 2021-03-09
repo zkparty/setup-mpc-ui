@@ -19,6 +19,7 @@ Browsers:
 * Brave
   ** passes **
 * Safari
+  ** passes **
 
 Things to check:
 * All circuits completed
@@ -36,6 +37,7 @@ Things to check:
 * CLI followed by CLI cycle
   ** passes **
 * browser cycle followed by browser cycle
+  ** passes **
 
 
 ## Edge cases
