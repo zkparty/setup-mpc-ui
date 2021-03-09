@@ -31,7 +31,7 @@ Things to check:
 ## CLI/Browser interaction
 
 * Browser cycle followed by CLI cycle
-  ** fail - CLI runs before file is ready
+  ** passes **
 * CLI cycle followed by browser cycle
   ** passes **
 * CLI followed by CLI cycle
