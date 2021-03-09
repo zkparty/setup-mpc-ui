@@ -45,6 +45,20 @@ const ceremonyConverter = {
   }
 }
 
+const contributionConverter = {
+  toFirestore: (c) => {
+    if (c.status === COMPLETE) {
+      c.hash = c.hash || '#error';
+    }
+    return c;
+  },
+  fromFirestore: (
+    snapshot,
+    options) => {
+    return jsonToContribution(snapshot.data(options));
+  }
+}
+
 function jsonToCeremony(json) {
   // throws if ceremony is malformed
 
@@ -72,6 +86,17 @@ function jsonToCeremony(json) {
   } catch (e) { 
     console.warn(`Error converting ceremony: ${e.message}`);
     throw e;
+  }
+}
+
+export const jsonToContribution = (json) => {
+  try {
+    return {
+      ...json
+    }
+  } catch (err) {
+    console.error(`Error converting contrib: ${err.message}`);
+    throw err;
   }
 }
 
@@ -175,6 +200,37 @@ const getContribution = async (ceremonyId, index) => {
     throw new Error(`error getting contrib: ${e}`);
   }
 }
+
+export const updateContribution = async (ceremonyId, contribution) => {
+  if (!contribution.queueIndex) {
+    throw new Error(`Attempting to add or update contribution without queueIndex`);
+  }
+  const db = firebase.firestore();
+  try {
+    // Existing contributor - update the record
+    const indexQuery = db.collection("ceremonies")
+      .doc(ceremonyId)
+      .collection('contributions')
+      .withConverter(contributionConverter)
+      .where('queueIndex', '==', contribution.queueIndex)
+      .limit(1);
+    const contrib = await indexQuery.get();
+    if (!contrib.empty) {
+      // Update existing contribution
+      const doc = contrib.docs[0];
+      const oldStatus = doc.get('status');
+      // Don't allow this if the contrib has been invalidated.
+      if ("INVALIDATED" === oldStatus) {
+        console.warn(`Invalid contribution status change: ${oldStatus} to ${contribution.status}. Ignored.`);
+      } else {
+        await doc.ref.update(contribution);
+      }
+    }
+  } catch (e) { throw new Error(`Error adding/updating contribution summary: ${e.message}`);}
+
+};
+
+
 
 async function addParticipant(ceremonyId, participant) {
   participant.messages = [];
@@ -351,4 +407,5 @@ module.exports = {
   addStatusUpdateEvent,
   addContributionEvent,
   addVerificationToContribution,
+  updateContribution,
 };

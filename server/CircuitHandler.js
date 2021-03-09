@@ -10,7 +10,7 @@ const fbSkey = require("./firebase_skey.json");
 const { updateFBCeremony, addStatusUpdateEvent, 
     getFBCeremony, addContributionEvent, 
     addVerificationToContribution,
-    getContribution } = require("./FirebaseApi");
+    getContribution, updateContribution } = require("./FirebaseApi");
 
 const mkdirAsync = util.promisify(fs.mkdir);
 
@@ -217,6 +217,7 @@ async function verifyContribution(ceremonyId, index) {
                     'VERIFY_FAILED',
                     `Contribution failed to be verified.`
                 );
+                updateContribution(ceremonyId, { ...contrib, status: "INVALIDATED" });
             }
 
             // Save verification log
@@ -259,8 +260,7 @@ async function verifyContribution(ceremonyId, index) {
             'VERIFY_FAILED',
             `Error caught while verifying. ${err.message}`
         );
-        // TODO INVALIDATE the contribution
-        // Probably not necessary. VERIFY_FAILED will be detected anyway.
+        updateContribution(ceremonyId, { ...contrib, status: "INVALIDATED" });
     }
 };
 
