@@ -205,7 +205,6 @@ const updateContribution = async (ceremonyId, contribution) => {
   if (!contribution.queueIndex) {
     throw new Error(`Attempting to add or update contribution without queueIndex`);
   }
-  const db = firebase.firestore();
   try {
     // Existing contributor - update the record
     const indexQuery = db.collection("ceremonies")
