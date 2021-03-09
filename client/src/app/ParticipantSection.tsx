@@ -1,5 +1,4 @@
 import React, { Dispatch, useContext, useReducer, useRef } from "react";
-import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
 import { AuthStateContext } from "../state/AuthContext";
 
@@ -10,21 +9,21 @@ import {
   PageContainer,
   lighterBackground,
 } from "../styles";
-import { ContributionState } from "./../types/ceremony";
-import Button from "@material-ui/core/Button";
-import VirtualList from "./../components/MessageList";
+import { ContributionState } from "../types/ceremony";
+import VirtualList from "../components/MessageList";
 import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import { ceremonyContributionListener, 
   ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings } from "../api/FirestoreApi";
-import QueueProgress from './../components/QueueProgress';
+import QueueProgress from '../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
 import { IconButton, LinearProgress, Link } from "@material-ui/core";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
 import { startWorkerThread } from "../state/Compute";
 import TwitterIcon from '@material-ui/icons/Twitter';
 import { createSummaryGist } from "../api/ZKPartyApi";
+import WelcomePanel from "../components/WelcomePanel";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -41,30 +40,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   }),
 );
-
-const StyledButton = styled(Button)`
-  color: accentColor;
-  background: lighterBackground;
-  border-width: thin;
-  border-color: accentColor;
-
-  &:hover {
-    border-color: secondAccent;
-  }
-`
-
-const Acknowledge = ({ contribute }: { contribute: () => void}) => 
-  (<div style={{ display: 'grid', paddingTop: '20px' }}>
-    <StyledButton variant='outlined' onClick={contribute} 
-      style={{color: accentColor, borderWidth: 'thin', borderColor: accentColor }}>
-      Launch
-    </StyledButton>
-   </div>);
-
-const welcomeText = (
-  <Typography variant="body1" align="center">
-  Welcome to zkparty. This page will allow you to participate in a ceremony. Click to your commence your contribution. 
-  </Typography>);
 
 
 const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
@@ -104,10 +79,6 @@ export const ParticipantSection = () => {
     if (dispatch) dispatch({type: 'ADD_MESSAGE', message: msg});
   }
 
-  const handleClick = () => {
-    if (dispatch) dispatch({type: 'ACKNOWLEDGE' });
-  }
-  
   const setContribution = (cs: ContributionState | boolean) => {
     if (ceremonyListenerUnsub.current) ceremonyListenerUnsub.current();
 
@@ -175,7 +146,7 @@ export const ParticipantSection = () => {
     switch (step) {
       case (Step.NOT_ACKNOWLEDGED): {
         // Display welcome text until the 'go ahead' button is clicked.
-        content = (<div>{welcomeText}<Acknowledge contribute={handleClick} /></div>);
+        content = (<WelcomePanel />);
         break;
       }
       case (Step.ACKNOWLEDGED): {

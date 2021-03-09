@@ -3,7 +3,7 @@ import * as React from "react";
 import styled, { css } from "styled-components";
 import Typography from "@material-ui/core/Typography";
 import ButtonAppBar from "../components/ButtonAppBar";
-import { ParticipantSection } from "./ParticipantPage";
+import { ParticipantSection } from "./ParticipantSection";
 
 import {
   accentColor,
