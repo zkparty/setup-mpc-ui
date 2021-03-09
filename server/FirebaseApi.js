@@ -89,7 +89,7 @@ function jsonToCeremony(json) {
   }
 }
 
-export const jsonToContribution = (json) => {
+const jsonToContribution = (json) => {
   try {
     return {
       ...json
