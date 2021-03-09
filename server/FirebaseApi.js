@@ -201,7 +201,7 @@ const getContribution = async (ceremonyId, index) => {
   }
 }
 
-export const updateContribution = async (ceremonyId, contribution) => {
+const updateContribution = async (ceremonyId, contribution) => {
   if (!contribution.queueIndex) {
     throw new Error(`Attempting to add or update contribution without queueIndex`);
   }
