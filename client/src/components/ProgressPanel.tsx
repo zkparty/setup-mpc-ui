@@ -11,6 +11,7 @@ import {
 } from "../styles";
 import styled, { css } from "styled-components";
 import { ComputeDispatchContext, ComputeStateContext, ComputeStatus, Step } from '../state/ComputeStateManager';
+import { Player, Controls } from '@lottiefiles/react-lottie-player';
 
 const StyledButton = styled(Button)`
   color: accentColor;
@@ -60,6 +61,18 @@ const StepProgress = ({ progressPct }: ProgressProps) => {
   );
 }
 
+const Animation = () => {
+  return (
+    <Player autoplay
+      loop
+      src='./38853-circular-lines-02.json' 
+      style={{ height: '419px', width: '423px' }}
+    >
+      <Controls visible={true} buttons={[]} />
+    </Player>
+  );
+}
+
 export default function ProgressPanel(props: any) {
   const state = useContext(ComputeStateContext);
   //const dispatch = useContext(ComputeDispatchContext);
@@ -73,7 +86,7 @@ export default function ProgressPanel(props: any) {
     <div>
       <Grid container spacing={4}>
         <Grid item xs={6} >
-          {lottieAnimation}
+          <Animation />
         </Grid>
         <Grid item xs={12} container direction='column' >
           <Grid item>
