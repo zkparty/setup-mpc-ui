@@ -20,10 +20,10 @@ import Divider from "@material-ui/core/Divider";
 import { IconButton } from "@material-ui/core";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
 import { startWorkerThread } from "../state/Compute";
-import TwitterIcon from '@material-ui/icons/Twitter';
 import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
 import ProgressPanel from "../components/ProgressPanel";
+import AttestationPanel from "../components/AttestationPanel";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -109,13 +109,6 @@ export const ParticipantSection = () => {
         'inactive'}`);
   }; 
   
-  const tweetText = (siteSettings: any, url: string): string => {
-    //const siteSettings = await getSiteSettings();
-    const EOL = '\n';
-    const body = encodeURIComponent(siteSettings.tweetTemplate.replace('{URL}', url).replaceAll('{EOL}', EOL));
-
-    return `https://twitter.com/intent/tweet?text=${body}`;
-  }
 
   // Handle end of series
   if (state.seriesIsComplete && state.userContributions && state.userContributions.length>0 && !state.summaryGistUrl && !summaryStarted.current) {
@@ -142,7 +135,7 @@ export const ParticipantSection = () => {
         break;
       }
       case (Step.ACKNOWLEDGED): {
-        // After 'go ahead' clicked
+        // After 'LAUNCH' clicked
         // Display status messages for all remaining conditions
         // Initialise - get participant ID, load wasm module
         if (dispatch) {
@@ -182,43 +175,15 @@ export const ParticipantSection = () => {
       }
       case (Step.WAITING): {
         // Waiting for a ceremony
-        const { contributionCount, siteSettings, summaryGistUrl } = state;
-        let text=(<></>);
-        if (contributionCount) {
-          text = stepText(`You have contributed to ${contributionCount} ${contributionCount == 1 ? 'ceremony' : 'ceremonies'}. No further ceremonies are ready for your contribution at the moment.`);
-        } else {
-          text = stepText('No ceremonies are ready to accept your contribution at the moment.');
-        }
-        if (summaryGistUrl && siteSettings) {
-          text = (
-            <div>
-              {text}
-              <p></p>
-              {`Your contributions have been recorded `}
-              <a href={summaryGistUrl} target='_blank' style={{ color: textColor }}>here</a>
-              <p></p>
-              <div style = {{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                Tweet your attestation
-                <a href={tweetText(siteSettings, summaryGistUrl)} target='_blank' style={{ color:  '#1DA1F2' }}>
-                    <TwitterIcon fontSize='large' />
-                </a>
-              </div>
-            </div>
-          );
-        }
-        content = (
-            <div style={{ textAlign: 'center' }} >
-              {text}
-            </div>
-          );
+        content = (<AttestationPanel />);
         break;
       }
       case (Step.QUEUED): {
         // Waiting for a ceremony
-        if (contributionState) {
-          console.debug(`contribution state: ${JSON.stringify(contributionState)}`);
-          content = (<ProgressPanel />);
-        }
+        //if (contributionState) {
+        //  console.debug(`contribution state: ${JSON.stringify(contributionState)}`);
+        //}
+        content = (<ProgressPanel />);
         break;
       }
       case (Step.RUNNING): {

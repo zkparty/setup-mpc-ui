@@ -14,8 +14,6 @@ import {
   SectionContainer,
   CeremonyTitle
 } from "../styles";
-import { Ceremony } from "../types/ceremony";
-import { ceremonyListener, getCeremonies, getCeremony } from "../api/FirestoreApi";
 import { AuthStateContext } from "../state/AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
