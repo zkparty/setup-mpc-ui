@@ -9,8 +9,6 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from '@material-ui/core/Toolbar';
 import MenuIcon from '@material-ui/icons/MenuOutlined';
 import SettingsIcon from '@material-ui/icons/Settings';
-import InfoIcon from '@material-ui/icons/Info';
-import GitHubIcon from '@material-ui/icons/GitHub';
 import { ZKTitle } from "./Title";
 import { AuthStateContext, AuthDispatchContext } from "../state/AuthContext";
 import {
@@ -72,35 +70,23 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 // AppBar shows LOGIN or username alongside Github icon
-const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined; }) => {
+const LogoutButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined; }) => {
+  const auth = useContext(AuthStateContext);
 
-  return (
-    <AuthStateContext.Consumer>
-      {Auth => {return (Auth.isLoggedIn && Auth.authUser) ?
-        (<Button
-          aria-controls="github-login"
-          color="inherit"
-          endIcon={<GitHubIcon />}
-          style={{ color: accentColor }}
-          onClick={props.onClick}
-          >
-          {Auth.authUser.displayName || "-"}
-        </Button>)
-      : 
-        (<Button
-          aria-controls="github-login"
-          color="inherit"
-          endIcon={<GitHubIcon >Login</GitHubIcon>}
-          style={{ color: accentColor }}
-          onClick={props.onClick}
-          >
-          Login
-        </Button>)
-      }}
-    </AuthStateContext.Consumer>
+  const enableLogout = (auth.isLoggedIn && auth.authUser);
+
+  return (       
+    <Button
+      aria-controls="github-login"
+      color="inherit"
+      style={{ color: accentColor }}
+      onClick={props.onClick}
+      disabled={!enableLogout}
+      >
+      Logout
+    </Button>
   );
 };
-
 
 const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; }) => {
   const [openAbout, setOpenAbout] = useState(false);
@@ -129,39 +115,22 @@ const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) |
         open={Boolean(props.anchorEl)}
         onClose={props.handleClose}
       >
-      <StyledMenuItem>
-        <ListItemIcon style={{ color: accentColor }} >
-            <SettingsIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText primary="Options" onClick={toggleOptions} style={{ color: accentColor }} />
+        <StyledMenuItem>
+          <ListItemIcon style={{ color: accentColor }} >
+              <SettingsIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Options" onClick={toggleOptions} style={{ color: accentColor }} />
         </StyledMenuItem>
         <StyledMenuItem>
-        <ListItemIcon style={{ color: accentColor }} >
-            <InfoIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText primary="About" onClick={toggleAbout}/>
+          <ListItemText primary="Logout" onClick={toggleAbout}/>
+        </StyledMenuItem>
+        <StyledMenuItem>
+          <ListItemText primary="New Circuit" onClick={toggleAbout}/>
         </StyledMenuItem>
       </StyledMenu>
       <Options open={openOptions} close={toggleOptions} />
       <About open={openAbout} close={toggleAbout} />
     </span>
-  );
-};
-
-const LoginMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: (() => void) | undefined; }) => {
-  return (
-    <StyledMenu
-      id="customized-menu"
-      anchorEl={props.anchorEl}
-      keepMounted
-      open={Boolean(props.anchorEl)}
-      onClose={props.handleClose}
-    >
-      <StyledMenuItem>
-        <Login close={props.handleClose}/>
-      </StyledMenuItem>
-    </StyledMenu>
-
   );
 };
 
@@ -208,8 +177,6 @@ export default function ButtonAppBar() {
           </IconButton>
           <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} />
           <ZKTitle />
-          <LoginButton onClick={handleLoginClick}/>
-          <LoginMenu anchorEl={loginAnchorEl} handleClose={handleLoginClose} />
         </Toolbar>
       </AppBar>
     </div>

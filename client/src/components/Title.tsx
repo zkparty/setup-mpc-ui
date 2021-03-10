@@ -2,19 +2,22 @@ import * as React from "react";
 import styled from "styled-components";
 import {
   accentColor,
+  textColor,
 } from "../styles";
 
 const LandingPageTitle = styled.div`
-  font-size: 50pt;
+  font-family: Shrikhand;
+  font-size: 24px;
   margin-bottom: 32px;
   font-weight: bold;
-  color: ${accentColor};
+  text-transform: lowercase;
+  color: ${textColor};
   cursor: pointer;
   user-select: none;
   flex: 1;
 `;
 
-const TITLE_TEXT = "zkparty";
+const TITLE_TEXT = "zkopru";
 
 export class ZKTitle extends React.Component {
   refreshInterval: number;

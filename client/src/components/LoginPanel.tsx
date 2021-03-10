@@ -11,6 +11,7 @@ import {
 } from "../styles";
 import styled, { css } from "styled-components";
 import { ComputeDispatchContext } from '../state/ComputeStateManager';
+import Login from './Login';
 
 const StyledButton = styled(Button)`
   color: accentColor;
@@ -25,19 +26,7 @@ const StyledButton = styled(Button)`
 
 const project = 'zkopru';
 
-const Acknowledge = ({ contribute }: { contribute: () => void}) => 
-  (<div style={{ display: 'grid', paddingTop: '20px' }}>
-    <StyledButton variant='outlined' onClick={contribute} 
-      style={{color: accentColor, borderWidth: 'thin', borderColor: accentColor }}>
-      Launch
-    </StyledButton>
-   </div>);
-
-export default function WelcomePanel(props: any) {
-  const dispatch = useContext(ComputeDispatchContext);
-  const handleClick = () => {
-    if (dispatch) dispatch({type: 'ACKNOWLEDGE' });
-  }
+export default function LoginPanel(props: any) {
 
   return (
   <div>
@@ -48,6 +37,6 @@ export default function WelcomePanel(props: any) {
     <Typography variant="body1" align="center">
       {`Participate using your GitHub account.`} 
     </Typography>
-    <Acknowledge contribute={handleClick} />
+    <Login />
   </div>);
 }
