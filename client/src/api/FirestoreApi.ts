@@ -105,6 +105,7 @@ export async function getCeremony(id: string): Promise<Ceremony | undefined> {
   return doc.data();
 }
 
+// Return all circuits, with summary contrib counts for each
 export const getCeremonies = async (): Promise<Ceremony[]> => {
   const db = firebase.firestore();
   const ceremonySnapshot = await db
@@ -121,7 +122,7 @@ export const getCeremonies = async (): Promise<Ceremony[]> => {
   return ceremonies;
 }
 
-// Counts the waiting and complete contributions for all ceremonies
+// Counts the waiting and complete contributions for a circuit
 export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference<Ceremony>): Promise<any> => {
   //const db = firebase.firestore();
   const contribQuery = await ref
@@ -209,7 +210,7 @@ export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
       querySnapshot.docChanges().forEach(async docSnapshot => {
         if (docSnapshot.type === 'modified' || docSnapshot.type === 'added') {
-          console.debug(`Ceremony: ${docSnapshot.doc.id}`);
+          console.debug(`Circuit: ${docSnapshot.doc.id}`);
           getCeremonyCount(docSnapshot.doc.ref).then(count => {
             const ceremony = {...docSnapshot.doc.data(), ...count};
             callback(ceremony);

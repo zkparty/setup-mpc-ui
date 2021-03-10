@@ -10,7 +10,7 @@ import {
   lighterBackground,
 } from "../styles";
 import styled, { css } from "styled-components";
-import { ComputeDispatchContext } from '../state/ComputeStateManager';
+import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
 
 const StyledButton = styled(Button)`
   color: accentColor;
@@ -24,12 +24,14 @@ const StyledButton = styled(Button)`
 `
 
 export default function ProgressPanel(props: any) {
-  const dispatch = useContext(ComputeDispatchContext);
+  const state = useContext(ComputeStateContext);
+  //const dispatch = useContext(ComputeDispatchContext);
 
   return (
     <div>
-      <Grid container spacing={2}>
-        <Grid item>
+      <Grid container spacing={4}>
+        <Grid item xs={6} >
+          {lottieAnimation}
         </Grid>
         <Grid item xs={12} container direction='column' >
           <Grid item>
@@ -55,10 +57,10 @@ export default function ProgressPanel(props: any) {
           </Grid>
           <Grid item container direction='row'>
             <Grid item>
-              {}/{}
+              {done}/{total}
             </Grid>
             <Grid item>
-              {Status}
+              {stepStatus}
               <StepProgress />
             </Grid>
           </Grid>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useContext } from "react";
 import {
     accentColor,
     secondAccent,
@@ -19,6 +19,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { Button, makeStyles } from '@material-ui/core';
+import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
 
 const useStyles = makeStyles({
   table: {
@@ -27,14 +28,18 @@ const useStyles = makeStyles({
 });
 
 export default function CircuitsTable(props: any) {
-    const [circuits, setCircuits] = useState<Ceremony[]>([]);
-    const [loaded, setLoaded] = useState(false);
-    const classes = useStyles();
-    console.debug(`render circuits table`);
-  
-    const findCircuitIndex = (id: string): number => {
-      return circuits.findIndex(val => val.id === id);
-    }
+  const state = useContext(ComputeStateContext);
+  const dispatch = useContext(ComputeDispatchContext);
+  //const [circuits, setCircuits] = useState<Ceremony[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const classes = useStyles();
+  console.debug(`render circuits table`);
+
+  const {circuits} = state;
+
+  const findCircuitIndex = (id: string): number => {
+    return circuits.findIndex(val => val.id === id);
+  }
   
     const updateCircuit = (circuit: Ceremony) => {
       //console.log(`${ceremony}`);
@@ -59,7 +64,7 @@ export default function CircuitsTable(props: any) {
       if (!loaded) {
         // Subscribe to ceremony updates
         ceremonyListener(updateCircuit);
-        console.debug('ceremony listener started');
+        console.debug('circuit listener started');
         setLoaded(true);
       }
     }, [loaded]);

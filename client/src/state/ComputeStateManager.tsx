@@ -4,7 +4,6 @@ import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionS
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
 import { createContext, Dispatch, useContext, useReducer } from "react";
 import { startWorkerThread, startDownload, startComputation, startUpload, endOfCircuit, startCreateGist } from './Compute';
-import { database } from 'firebase-admin';
 
 export enum Step {
     NOT_ACKNOWLEDGED,
@@ -81,6 +80,7 @@ export const initialComputeStatus: ComputeStatus = {
 };
 
 interface ComputeContextInterface {
+    circuits: Ceremony[],
     computeStatus: ComputeStatus,
     messages: string [],
     contributionState?: ContributionState,
@@ -100,6 +100,7 @@ interface ComputeContextInterface {
 };
 
 export const initialState: ComputeContextInterface = {
+    circuits: [],
     computeStatus: initialComputeStatus,
     messages: [],
     contributionState: undefined,
