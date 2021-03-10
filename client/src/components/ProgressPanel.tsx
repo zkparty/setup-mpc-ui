@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@material-ui/core';
+import { Grid, LinearProgress, Typography } from '@material-ui/core';
 import Button from "@material-ui/core/Button";
 import * as React from 'react';
 import { useContext } from 'react';
@@ -44,12 +44,30 @@ const stepText = (step: Step, computeStatus: ComputeStatus): string => {
   }
 }
 
+interface ProgressProps {
+  progressPct: number,
+}
+
+const CeremonyProgress = ({ progressPct }: ProgressProps) => {
+  return (
+    <LinearProgress variant="determinate" value={progressPct} style={{ paddingTop: '20px' }} />
+  );
+}
+
+const StepProgress = ({ progressPct }: ProgressProps) => {
+  return (
+    <LinearProgress variant="determinate" value={progressPct} style={{ paddingTop: '20px' }} />
+  );
+}
+
 export default function ProgressPanel(props: any) {
   const state = useContext(ComputeStateContext);
   //const dispatch = useContext(ComputeDispatchContext);
 
   const { circuits, contributionCount, step, computeStatus } = state;
   const cctCount = circuits.length;
+
+  const ceremonyPct = (cctCount>0) ? contributionCount / cctCount : 0;
 
   return (
     <div>
@@ -69,7 +87,7 @@ export default function ProgressPanel(props: any) {
             </Typography>
           </Grid>
           <Grid item>
-            <CeremonyProgress />
+            <CeremonyProgress progressPct={ceremonyPct} />
           </Grid>
           <Grid item container direction='row'>
             <Grid item>
@@ -85,7 +103,7 @@ export default function ProgressPanel(props: any) {
             </Grid>
             <Grid item>
               {stepText(step, computeStatus)}
-              <StepProgress />
+              <StepProgress progressPct={state.progress}/>
             </Grid>
           </Grid>
         </Grid>

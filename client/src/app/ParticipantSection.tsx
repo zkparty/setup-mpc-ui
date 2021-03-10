@@ -16,14 +16,14 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import { ceremonyContributionListener, 
   ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings } from "../api/FirestoreApi";
-import QueueProgress from '../components/QueueProgress';
 import Divider from "@material-ui/core/Divider";
-import { IconButton, LinearProgress, Link } from "@material-ui/core";
+import { IconButton } from "@material-ui/core";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
 import { startWorkerThread } from "../state/Compute";
 import TwitterIcon from '@material-ui/icons/Twitter';
 import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
+import ProgressPanel from "../components/ProgressPanel";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,14 +43,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 
 const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
-
-const queueProgressCard = (contrib: ContributionState) => {
-  return (
-  <QueueProgress 
-    {...contrib}
-  >
-  </QueueProgress>
-)};
 
 export const ParticipantSection = () => {
   const state = useContext(ComputeStateContext);
@@ -225,16 +217,14 @@ export const ParticipantSection = () => {
         // Waiting for a ceremony
         if (contributionState) {
           console.debug(`contribution state: ${JSON.stringify(contributionState)}`);
-          content = queueProgressCard(contributionState);
+          content = (<ProgressPanel />);
         }
         break;
       }
       case (Step.RUNNING): {
-        // We have a ceremony to contribute to. 
-        // Download/Compute/Upload
-        //logState();
 
         if (computeStatus.ready && !computeStatus.running && dispatch) {
+          // TODO Is there a better place to raise this event?
           // Start the computation
           dispatch({
             type: 'START_COMPUTE',
@@ -244,18 +234,7 @@ export const ParticipantSection = () => {
           });
         }
 
-        const progressPct = state.progress;
-
-        content = (<>
-          <Typography variant='h6'>Ceremony: {contributionState?.ceremony.title}</Typography>
-          <Typography variant='h3' style={{ paddingTop: '20px' }}>{
-              !computeStatus.downloaded ? stepText('Downloading ...')
-            : !computeStatus.computed ? stepText('Calculating ...')
-            : stepText('Uploading ...') 
-          }</Typography>
-          <LinearProgress variant="determinate" value={progressPct} style={{ paddingTop: '20px' }} />
-          <Typography variant='body2' style={{ paddingTop: '40px' }}>Warning: Closing this page will interrupt your contribution.</Typography>
-        </>);
+        content = (<ProgressPanel />);
         break;
       }
   }};
@@ -266,9 +245,6 @@ export const ParticipantSection = () => {
           {content}         
         </Paper>
         <Divider className={classes.divider}/>
-        <Paper variant="outlined" className={classes.root}>
-          <VirtualList messages={messages}/>
-        </Paper>
       </div>
   );
 };
