@@ -1,13 +1,11 @@
 import color from "color";
 import styled from "styled-components";
 
-export const background = "#081a24";
-export const lighterBackground = color(background)
-  .lighten(0.6)
-  .toString();
-export const textColor = "#aaa";
-export const accentColor = "#31c41d";
-export const secondAccent = "#731dc4";
+export const background = "#081b24";
+export const lighterBackground = "#0E2936";
+export const textColor = "#FFFFFF";
+export const accentColor = "#00ffd1";
+export const secondAccent = "#D0fff7";
 
 export const PageContainer = styled.div`
   display: flex;

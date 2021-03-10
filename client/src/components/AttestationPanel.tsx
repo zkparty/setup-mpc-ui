@@ -35,7 +35,6 @@ const tweetText = (siteSettings: any, url: string): string => {
 
 export default function AttestationPanel(props: any) {
   const state = useContext(ComputeStateContext);
-  const dispatch = useContext(ComputeDispatchContext);
 
   const { siteSettings, summaryGistUrl } = state;
   let text=(<></>);

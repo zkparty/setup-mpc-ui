@@ -55,22 +55,7 @@ export const startWorkerThread = (dispatch: React.Dispatch<any>) => {
     dispatch({ type: 'SET_WORKER', data: worker });
 };
 
-// export const loadWasm = async () => {
-//     if (worker) {
-//         worker.postMessage({type: 'LOAD_WASM'});
-//     }
-
-//     //if (navigator.serviceWorker.controller) {
-//     //    navigator.serviceWorker.controller.postMessage({type: 'LOAD_WASM'});
-//     //    console.debug('service worker initialised');
-//     //} else {
-//     //    console.log('Do not have controller!');
-//     //}
-// };
-
 export const startDownload = (ceremonyId: string, index: number, dispatch: Dispatch<any>) => {
-    //const dispatch = useContext(ComputeDispatchContext);
-
     // DATA DOWNLOAD
     console.debug(`getting data ${ceremonyId} ${index}`);
     getParamsFile(ceremonyId, index).then( paramData => {

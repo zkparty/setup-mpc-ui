@@ -10,7 +10,6 @@ import {
   lighterBackground,
 } from "../styles";
 import { ContributionState } from "../types/ceremony";
-import VirtualList from "../components/MessageList";
 import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
