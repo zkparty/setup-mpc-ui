@@ -67,8 +67,8 @@ const Animation = () => {
       loop
       src='./38853-circular-lines-02.json' 
       style={{ height: '419px', width: '423px' }}
+      background='transparent'
     >
-      <Controls visible={true} buttons={[]} />
     </Player>
   );
 }

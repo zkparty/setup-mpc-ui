@@ -18,12 +18,14 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { Button, makeStyles } from '@material-ui/core';
+import { Button, makeStyles, Typography } from '@material-ui/core';
 import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
 
 const useStyles = makeStyles({
   table: {
-    minWidth: 650,
+    minWidth: '1092px',
+    color: textColor,
+    backgroundColor: lighterBackground,
   },
 });
 
@@ -61,6 +63,7 @@ export default function CircuitsTable(props: any) {
 
   return (
     <TableContainer component='div'>
+      <Typography variant='h2' style={{ font: 'Inconsolata', fontSize: '48px' , color: '#9f8fff' }}>Circuit Table</Typography>
       <Table className={classes.table} size="small" aria-label="circuits table">
         <TableHead>
           <TableRow>

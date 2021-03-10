@@ -39,7 +39,7 @@ export const LandingPage = () => {
     return (
         <AuthStateContext.Consumer>
           {Auth => {
-            console.debug(`landing page: ${Auth.isCoordinator}`); 
+            console.debug(`landing page: ${Auth.isCoordinator}`);
             return (
               <Fragment>
                 <ButtonAppBar />

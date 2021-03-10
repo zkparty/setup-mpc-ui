@@ -16,7 +16,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { ceremonyContributionListener, 
   ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings } from "../api/FirestoreApi";
 import Divider from "@material-ui/core/Divider";
-import { IconButton } from "@material-ui/core";
+import { Box, IconButton } from "@material-ui/core";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
 import { startWorkerThread } from "../state/Compute";
 import { createSummaryGist } from "../api/ZKPartyApi";
@@ -204,11 +204,10 @@ export const ParticipantSection = () => {
   }};
 
   return (
-      <div className={classes.root}>
-        <Paper variant="outlined" className={classes.root}>
+      <div>
+        <Box className={classes.root}>
           {content}         
-        </Paper>
-        <Divider className={classes.divider}/>
+        </Box>
       </div>
   );
 };
