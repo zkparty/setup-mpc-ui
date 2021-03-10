@@ -10,7 +10,7 @@ import {
   lighterBackground,
 } from "../styles";
 import styled, { css } from "styled-components";
-import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
+import { ComputeDispatchContext, ComputeStateContext, ComputeStatus, Step } from '../state/ComputeStateManager';
 
 const StyledButton = styled(Button)`
   color: accentColor;
@@ -23,9 +23,33 @@ const StyledButton = styled(Button)`
   }
 `
 
+const stepText = (step: Step, computeStatus: ComputeStatus): string => {
+  switch (step) {
+    case Step.ACKNOWLEDGED: 
+    case Step.INITIALISED: 
+    case Step.ENTROPY_COLLECTED: {
+        return 'Preparing';
+    }
+    case Step.QUEUED: 
+    case Step.WAITING: {
+        return 'Waiting';
+    }
+    case Step.RUNNING: {
+      if (!computeStatus.downloaded) return 'Downloading'
+      else if (!computeStatus.computed) return 'Computing'
+      else if (!computeStatus.uploaded) return 'Uploading'
+      return '?';
+    }
+    default: return step.toString();
+  }
+}
+
 export default function ProgressPanel(props: any) {
   const state = useContext(ComputeStateContext);
   //const dispatch = useContext(ComputeDispatchContext);
+
+  const { circuits, contributionCount, step, computeStatus } = state;
+  const cctCount = circuits.length;
 
   return (
     <div>
@@ -57,10 +81,10 @@ export default function ProgressPanel(props: any) {
           </Grid>
           <Grid item container direction='row'>
             <Grid item>
-              {done}/{total}
+              {contributionCount}/{cctCount}
             </Grid>
             <Grid item>
-              {stepStatus}
+              {stepText(step, computeStatus)}
               <StepProgress />
             </Grid>
           </Grid>

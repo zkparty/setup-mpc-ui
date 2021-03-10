@@ -200,11 +200,12 @@ export const ceremonyEventListener = async (ceremonyId: string | undefined, call
     return unsub;
 };
 
-// Listens for updates to ceremony data, to suit the front page ceremony list.
+// Listens for updates to circuit data. Running circuits only.
 export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
     const db = firebase.firestore();
     const query = db.collectionGroup("ceremonies")
-        .withConverter(ceremonyConverter);
+        .withConverter(ceremonyConverter)
+        .where('ceremonyState', '==', RUNNING);
   
     query.onSnapshot(querySnapshot => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);

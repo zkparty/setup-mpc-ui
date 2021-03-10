@@ -53,7 +53,7 @@ export const newParticipant = (uid: string, authId: string): Participant => {
     }
 };
 
-interface ComputeStatus {
+export interface ComputeStatus {
     ready: boolean,
     running: boolean,
     downloading: boolean,
@@ -138,6 +138,21 @@ export const ComputeContextProvider = ({ children }:any) => {
 export const computeStateReducer = (state: any, action: any):any => {
     let newState = {...state};
     switch (action.type) {
+        case 'UPDATE_CIRCUIT': {
+            // A circuit has been added or updated. 
+            const findCircuitIndex = (id: string): number => {
+                return newState.circuits.findIndex((val: Ceremony) => val.id === id);
+            }
+            const circuit: Ceremony = action.data;
+            const idx = findCircuitIndex(circuit.id);
+            if (idx >= 0) {
+              newState.circuits[idx] = circuit;
+            } else {
+              console.debug(`adding circuit ${circuit.title}`);
+              newState.circuits.push(circuit);
+            }
+            return newState;
+        }
         case 'START_COMPUTE': {
             const msg = `It's your turn to contribute`;
             newState = addMessage(state, msg);
