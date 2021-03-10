@@ -75,7 +75,7 @@ export default function CircuitsTable(props: any) {
   };
 
   return (
-    <TableContainer component='div'>
+    <TableContainer component='div' style={{ width: '778px' }}>
       <Typography variant='h2' style={{
          fontFamily: 'Inconsolata',
          fontWeight: 'bold', 
