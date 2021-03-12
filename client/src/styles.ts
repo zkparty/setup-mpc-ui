@@ -9,6 +9,8 @@ export const accentColor = "#00ffd1";
 export const secondAccent = "#D0fff7";
 export const lightBorder = "#5D7078";
 export const darkBorder = "#0E2936";
+export const gray1 = "#333333";
+export const subtleText = "#95a7ae";
 
 export const PageContainer = styled.div`
   display: flex;
