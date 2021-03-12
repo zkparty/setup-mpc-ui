@@ -69,28 +69,18 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-// AppBar shows LOGIN or username alongside Github icon
-const LogoutButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined; }) => {
+interface MainMenuProps {
+  anchorEl: Element | ((element: Element) => Element) | null | undefined; 
+  handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; 
+  logout: () => void;
+}
+
+const MainMenu = (props: MainMenuProps) => {
+  const [openAbout, setOpenAbout] = useState(false);
+  const [openOptions, setOpenOptions] = useState(false);
   const auth = useContext(AuthStateContext);
 
   const enableLogout = (auth.isLoggedIn && auth.authUser);
-
-  return (       
-    <Button
-      aria-controls="github-login"
-      color="inherit"
-      style={{ color: accentColor }}
-      onClick={props.onClick}
-      disabled={!enableLogout}
-      >
-      Logout
-    </Button>
-  );
-};
-
-const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; }) => {
-  const [openAbout, setOpenAbout] = useState(false);
-  const [openOptions, setOpenOptions] = useState(false);
 
   const toggleOptions = () => {
     setOpenOptions(open => {
@@ -122,7 +112,7 @@ const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) |
           <ListItemText primary="Options" onClick={toggleOptions} style={{ color: accentColor }} />
         </StyledMenuItem>
         <StyledMenuItem>
-          <ListItemText primary="Logout" onClick={toggleAbout}/>
+          <ListItemText primary="Logout"  onClick={props.logout}/>
         </StyledMenuItem>
         <StyledMenuItem>
           <ListItemText primary="New Circuit" onClick={toggleAbout}/>
@@ -148,17 +138,10 @@ export default function ButtonAppBar() {
     setMenuAnchorEl(null);
   };
       
-  const handleLoginClick = (event: React.MouseEvent<HTMLElement>) => {
-    setLoginAnchorEl(event.currentTarget);
-  };
-  
-  const handleLoginClose = () => {
-    setLoginAnchorEl(null);
-  };
-
   const handleLogout = () => {
-    console.log('loggin out');
+    console.debug('logging out');
     if (AuthDispatch) AuthDispatch({type: 'LOGOUT'});
+    handleMenuClose();
   }
       
   return (
@@ -175,7 +158,7 @@ export default function ButtonAppBar() {
             >
             <MenuIcon style={{ color: accentColor }}/>
           </IconButton>
-          <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} />
+          <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} logout={handleLogout} />
           <ZKTitle />
         </Toolbar>
       </AppBar>

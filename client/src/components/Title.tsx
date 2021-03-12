@@ -8,8 +8,7 @@ import {
 const LandingPageTitle = styled.div`
   font-family: Shrikhand;
   font-size: 24px;
-  margin-bottom: 32px;
-  font-weight: bold;
+  font-weight: normal;
   text-transform: lowercase;
   color: ${textColor};
   cursor: pointer;

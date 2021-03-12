@@ -23,6 +23,7 @@ import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
 import ProgressPanel from "../components/ProgressPanel";
 import AttestationPanel from "../components/AttestationPanel";
+import LoginPanel from "../components/LoginPanel";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -124,7 +125,7 @@ export const ParticipantSection = () => {
 
   let content = (<></>);
   if (!authState.isLoggedIn) {
-    content = (<Typography variant='body1'>Please login to access this page</Typography>);
+    content = (<LoginPanel />);
   } else {
     //console.debug(`step ${step.toString()}`);
     switch (step) {
