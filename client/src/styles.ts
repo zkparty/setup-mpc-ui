@@ -1,5 +1,6 @@
 import color from "color";
 import styled from "styled-components";
+import WebFont from 'webfontloader';
 
 export const background = "#081b24";
 export const lighterBackground = "#0E2936";
@@ -35,3 +36,14 @@ export const CeremonyTitle = styled.div`
   margin-bottom: 8px;
   color: ${accentColor};
 `;
+
+
+// ##########################
+// Fonts
+//
+
+WebFont.load({
+  google: {
+    families: ['Shrikhand', 'Inconsolata']
+  }
+});
