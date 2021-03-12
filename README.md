@@ -95,7 +95,8 @@ This will display something like the following:
 [INFO]  snarkJS: ZKey Ok!
 ```
 Things to note from the transcript:
-* The hash string under 'Beacon generator' must match the hash of the Ethereum block used to generate the beacon. This can be compared using a block explorer, such as [etherscan](https://etherscan.io). 
+* Contributions are reported from latest to earliest. The first contribution reported is from the beacon. It is followed by participant contributions in reverse order.
+* The hexadecimal string under 'Beacon generator' must match the hash of the Ethereum block used to generate the beacon. This can be compared using a block explorer, such as [etherscan](https://etherscan.io). 
 * If you made a contribution yourself and noted your hash for this circuit, verify it by locating your contribution, using your GitHub user name.
 * Other contributors' hashes can be verified using their public attestations. 
   * For those that tweeted their attestation, the tweet will link to a GitHub gist that contains the hashes for all circuits. 
