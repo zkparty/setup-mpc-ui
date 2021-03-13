@@ -26,7 +26,7 @@ const StyledButton = styled(Button)`
 
   font-family: Inconsolata;
   font-style: normal;
-  font-weight: bold;
+  font-weight: 700;
   font-size: 24px;
   line-height: 140%;
   /* identical to box height, or 34px */
@@ -54,7 +54,7 @@ const WelcomeTitle = styled.div`
   user-select: none;
   flex: 1;
   height: 110px;
-  border: 2px solid ${textColor}
+  -webkit-text-stroke: 2px solid ${textColor}
 `;
 
 const Body = styled.div`
@@ -74,7 +74,7 @@ const Body = styled.div`
 const Acknowledge = ({ contribute }: { contribute: () => void}) => 
   (<div style={{ display: 'grid', paddingTop: '20px' }}>
     <StyledButton variant='outlined' onClick={contribute} >
-      Launch
+      Launch Ceremony
     </StyledButton>
    </div>);
 
@@ -85,7 +85,7 @@ export default function WelcomePanel(props: any) {
   }
 
   return (
-  <div>
+  <div style={{ display: 'flex', flexFlow: 'column', alignItems: 'center' }}>
     <WelcomeTitle>Welcome.</WelcomeTitle>
     <Body>
       {`Thank you for joining us for our trusted setup ceremony!`} 

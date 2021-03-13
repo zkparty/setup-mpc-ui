@@ -24,6 +24,7 @@ import AboutPanel from './../components/AboutPanel';
 import { useSelectionContext } from '../state/SelectionContext';
 import './styles.css';
 import { withStyles } from "@material-ui/core/styles";
+import { Box } from "@material-ui/core";
 
 export const LandingPage = () => {
     const [selection, dispatch] = useSelectionContext();
@@ -45,10 +46,16 @@ export const LandingPage = () => {
                 <ButtonAppBar />
                 <PageContainer>
                   <div>
-                    <ParticipantSection />
-                    <AboutPanel />
+                    <Box style={{ height: '608px' }} >
+                      <ParticipantSection />
+                    </Box>
+                    <Box style={{ height: '486px' }} >
+                      <AboutPanel />
+                    </Box>
                     <CircuitsTable />
-                    <Footer />
+                    <Box style={{ height: '112px' }} >
+                      <Footer />
+                    </Box>
                     <Modal
                       open={selection.openModal}
                       onClose={closeModal}
