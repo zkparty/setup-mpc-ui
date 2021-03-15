@@ -1,4 +1,4 @@
-import { Grid, LinearProgress, Typography } from '@material-ui/core';
+import { Box, Grid, LinearProgress, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { useContext } from 'react';
 import {
@@ -8,6 +8,10 @@ import {
   PageContainer,
   lighterBackground,
   NormalBodyText,
+  SubtleBody,
+  subtleText,
+  gray1,
+  darkerBackground,
 } from "../styles";
 import { ComputeDispatchContext, ComputeStateContext, ComputeStatus, Step } from '../state/ComputeStateManager';
 import { Player } from '@lottiefiles/react-lottie-player';
@@ -28,6 +32,21 @@ const StyledHeader = styled.div`
 
   color: ${accentColor};
 `
+
+const StyledProgressBar = styled(LinearProgress)`
+  padding-top: '10px'; 
+  border-radius: 20px; 
+  background-color: ${darkerBackground};
+
+  & > .MuiLinearProgress-bar.MuiLinearProgress-barColorPrimary {
+    border-radius: 20px;
+    background-color: ${accentColor};
+  }
+
+  &.MuiLinearProgress-root.MuiLinearProgress-colorPrimary {
+    background-color: ${darkerBackground};
+  }
+`;
 
 const stepText = (step: Step, computeStatus: ComputeStatus): string => {
   switch (step) {
@@ -56,13 +75,28 @@ interface ProgressProps {
 
 const CeremonyProgress = ({ progressPct }: ProgressProps) => {
   return (
-    <LinearProgress variant="determinate" value={progressPct} style={{ paddingTop: '20px' }} />
+    <Box display="flex" alignItems="center">
+      <Box width="100%" mr={1}>
+        <StyledProgressBar 
+          variant="determinate" 
+          value={progressPct} 
+          style={{ 
+            width: '549px', 
+          }} />
+      </Box>
+      <Box minWidth={35}>
+        <Typography variant="body2" style={{ color: subtleText }}>{`${Math.round(
+            progressPct
+          )}%`}</Typography>
+      </Box>
+    </Box>
   );
 }
 
 const StepProgress = ({ progressPct }: ProgressProps) => {
   return (
-    <LinearProgress variant="determinate" value={progressPct} style={{ paddingTop: '20px' }} />
+    <StyledProgressBar variant="determinate" value={progressPct} 
+      style={{ width: '156px' }} />
   );
 }
 
@@ -111,21 +145,25 @@ export default function ProgressPanel(props: any) {
           <Grid item>
             <CeremonyProgress progressPct={ceremonyPct} />
           </Grid>
-          <Grid item container direction='row'>
-            <Grid item>
-              Circuit
+          <Grid item container spacing={6} direction='row'>
+            <Grid item container direction='column' style={{ width: '150px' }} >
+              <Grid item style={{ height: '34px' }} >
+                <SubtleBody>Circuit</SubtleBody>
+              </Grid>
+              <Grid item>
+                <NormalBodyText>
+                  {contributionCount}/{cctCount}
+                </NormalBodyText>
+              </Grid>
             </Grid>
-            <Grid item>
-              Status
-            </Grid>
-          </Grid>
-          <Grid item container direction='row'>
-            <Grid item>
-              {contributionCount}/{cctCount}
-            </Grid>
-            <Grid item>
-              {stepText(step, computeStatus)}
-              <StepProgress progressPct={state.progress}/>
+            <Grid item container direction='column' style={{ width: '150px' }} >
+              <Grid item style={{ height: '34px' }} >
+                <SubtleBody>Status</SubtleBody>
+              </Grid>
+              <Grid item>
+                {stepText(step, computeStatus)}
+                <StepProgress progressPct={state.progress}/>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
@@ -133,3 +171,4 @@ export default function ProgressPanel(props: any) {
     </div>
   );
 }
+
