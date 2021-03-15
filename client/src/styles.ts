@@ -1,3 +1,4 @@
+import { Button } from "@material-ui/core";
 import color from "color";
 import styled from "styled-components";
 import WebFont from 'webfontloader';
@@ -39,6 +40,79 @@ export const CeremonyTitle = styled.div`
   font-size: 18pt;
   margin-bottom: 8px;
   color: ${accentColor};
+`;
+
+export const StyledButton = styled.button`
+  background-color: ${accentColor};
+  border-width: thin;
+  border-color: ${accentColor};
+  width: 100px;
+  height: 34px;
+  left: 24px;
+  top: 7px;
+
+  font-family: Inconsolata;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 140%;
+  /* identical to box height, or 34px */
+  
+  display: flex;
+  align-items: center;
+  
+  /* Gray 1 */
+  
+  font-color: ${gray1};
+
+  &:hover {
+    border-color: secondAccent;
+    cursor: grab;
+  }
+`
+
+export const WelcomeTitle = styled.div`
+  font-family: Shrikhand;
+  font-size: 64px;
+  font-weight: normal;
+  color: black;
+  text-align: center;
+  align-items: center;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  user-select: none;
+  flex: 1;
+  height: 110px;
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: ${textColor};
+`;
+
+export const SubtleBody = styled.div`
+  font-family: Inconsolata;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 140%;
+  /* or 34px */
+
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: ${subtleText}
+`
+
+export const NormalBodyText = styled.div`
+  font-family: Inconsolata;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  line-height: 140%;
+  /* or 25px */
+
+
+  /* Text/Normal */
+
+  color: ${textColor};
 `;
 
 

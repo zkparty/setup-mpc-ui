@@ -25,23 +25,6 @@ import ProgressPanel from "../components/ProgressPanel";
 import AttestationPanel from "../components/AttestationPanel";
 import LoginPanel from "../components/LoginPanel";
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
-      height: 200,
-      maxWidth: 650,
-      backgroundColor: lighterBackground,
-      color: textColor,
-    },
-    divider: {
-      color: accentColor,
-      padding: '20px',
-    }
-  }),
-);
-
-
 const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
 
 export const ParticipantSection = () => {
@@ -50,9 +33,8 @@ export const ParticipantSection = () => {
   const authState = useContext(AuthStateContext);
   const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
   const summaryStarted = useRef<boolean>(false);
-  const classes = useStyles();
 
-  const { step, computeStatus, messages, entropy, participant, contributionState } = state;
+  const { step, computeStatus, entropy, participant, contributionState } = state;
 
   const getParticipant = async () => {
     console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
@@ -206,9 +188,7 @@ export const ParticipantSection = () => {
 
   return (
       <div>
-        <Box className={classes.root}>
-          {content}         
-        </Box>
+        {content}         
       </div>
   );
 };

@@ -5,6 +5,7 @@ import firebase from "firebase";
 import { accentColor, lighterBackground } from "../styles";
 import { Button } from "@material-ui/core";
 import { getUserStatus } from "../api/FirestoreApi";
+import { StyledButton } from './../styles';
 
 const Login = () => {
   const [error, setErrors] = useState("");
@@ -52,10 +53,10 @@ const Login = () => {
   };
 
   return (
-    <Button onClick={handleGithubLogin} style={{ color: accentColor, background: lighterBackground }}>
+    <StyledButton onClick={handleGithubLogin} >
       <GitHubIcon />
       &nbsp;Login
-    </Button>
+    </StyledButton>
   );
 };
 

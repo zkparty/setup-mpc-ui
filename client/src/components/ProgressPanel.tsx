@@ -1,5 +1,4 @@
 import { Grid, LinearProgress, Typography } from '@material-ui/core';
-import Button from "@material-ui/core/Button";
 import * as React from 'react';
 import { useContext } from 'react';
 import {
@@ -8,20 +7,26 @@ import {
   textColor,
   PageContainer,
   lighterBackground,
+  NormalBodyText,
 } from "../styles";
-import styled, { css } from "styled-components";
 import { ComputeDispatchContext, ComputeStateContext, ComputeStatus, Step } from '../state/ComputeStateManager';
-import { Player, Controls } from '@lottiefiles/react-lottie-player';
+import { Player } from '@lottiefiles/react-lottie-player';
+import styled from 'styled-components';
 
-const StyledButton = styled(Button)`
-  color: accentColor;
-  background: lighterBackground;
-  border-width: thin;
-  border-color: accentColor;
+const StyledHeader = styled.div`
+  font-family: Inconsolata;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 48px;
+  line-height: 140%;
+  /* or 67px */
 
-  &:hover {
-    border-color: secondAccent;
-  }
+  display: flex;
+  align-items: flex-end;
+
+  /* Primary / Buttons */
+
+  color: ${accentColor};
 `
 
 const stepText = (step: Step, computeStatus: ComputeStatus): string => {
@@ -84,20 +89,24 @@ export default function ProgressPanel(props: any) {
 
   return (
     <div>
-      <Grid container spacing={4}>
-        <Grid item xs={6} >
+      <Grid container spacing={4} direction='row'style={{ display: 'flex' }} >
+        <Grid item xs={10} >
           <Animation />
         </Grid>
-        <Grid item xs={12} container direction='column' >
+        <Grid item xs={11} container direction='column' >
           <Grid item>
-            <Typography variant="h3" align="center">
+            <StyledHeader>
               Contribution Active
-            </Typography>
+            </StyledHeader>
           </Grid>
           <Grid item>
-            <Typography variant="body1" align="center">
-            ATTENTION: Closing this browser window will interrupt your contribution.
-            </Typography>
+            <NormalBodyText>
+            ATTENTION:
+            </NormalBodyText>
+            <br />
+            <NormalBodyText>
+            Closing this browser window will interrupt your contribution.
+            </NormalBodyText>
           </Grid>
           <Grid item>
             <CeremonyProgress progressPct={ceremonyPct} />
