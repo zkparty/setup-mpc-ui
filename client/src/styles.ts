@@ -67,7 +67,7 @@ export const StyledButton = styled.button`
 
   &:hover {
     border-color: secondAccent;
-    cursor: grab;
+    cursor: pointer;
   }
 `
 

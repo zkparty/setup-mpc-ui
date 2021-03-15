@@ -89,11 +89,11 @@ export default function ProgressPanel(props: any) {
 
   return (
     <div>
-      <Grid container spacing={4} direction='row'style={{ display: 'flex' }} >
-        <Grid item xs={10} >
+      <Grid container spacing={4} direction='row' style={{ display: 'flex' }} >
+        <Grid item style={{ width: '45%' }} >
           <Animation />
         </Grid>
-        <Grid item xs={11} container direction='column' >
+        <Grid item container direction='column' style={{ width: '55%' }} >
           <Grid item>
             <StyledHeader>
               Contribution Active
