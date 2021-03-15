@@ -135,7 +135,7 @@ export const endOfCircuit = ( participantId: string, dispatch: Dispatch<any>) =>
     }
 }
 
-const getContributions = (participantId: string, dispatch: Dispatch<any>) => {
+export const getContributions = (participantId: string, dispatch: Dispatch<any>) => {
     console.debug(`getContCount...`);
     getParticipantContributions(participantId).then(
         contribs => {

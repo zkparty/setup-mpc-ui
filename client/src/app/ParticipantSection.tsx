@@ -14,11 +14,11 @@ import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import { ceremonyContributionListener, 
-  ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings } from "../api/FirestoreApi";
+  ceremonyQueueListener, ceremonyQueueListenerUnsub, getParticipantContributions, getSiteSettings } from "../api/FirestoreApi";
 import Divider from "@material-ui/core/Divider";
 import { Box, IconButton } from "@material-ui/core";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
-import { startWorkerThread } from "../state/Compute";
+import { getContributions, startWorkerThread } from "../state/Compute";
 import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
 import ProgressPanel from "../components/ProgressPanel";
@@ -38,10 +38,14 @@ export const ParticipantSection = () => {
 
   const getParticipant = async () => {
     console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
-    if (dispatch) dispatch({ 
-      type: 'SET_PARTICIPANT', 
-      data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username), 
-      accessToken: authState.accessToken });
+    if (dispatch) {
+      dispatch({ 
+        type: 'SET_PARTICIPANT', 
+        data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username), 
+        accessToken: authState.accessToken });
+      // Trigger contribution count for this user
+      getContributions(authState.authUser.uid, dispatch);
+    }
   };
 
   const getEntropy = () => {

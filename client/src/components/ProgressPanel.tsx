@@ -119,7 +119,7 @@ export default function ProgressPanel(props: any) {
   const { circuits, contributionCount, step, computeStatus } = state;
   const cctCount = circuits.length;
 
-  const ceremonyPct = (cctCount>0) ? contributionCount / cctCount : 0;
+  const ceremonyPct = (cctCount>0) ? 100 * contributionCount / cctCount : 0;
 
   return (
     <div>
