@@ -10,13 +10,13 @@ import {
   NormalBodyText,
   SubtleBody,
   subtleText,
-  gray1,
   darkerBackground,
 } from "../styles";
 import { ComputeDispatchContext, ComputeStateContext, ComputeStatus, Step } from '../state/ComputeStateManager';
 import { Player } from '@lottiefiles/react-lottie-player';
 import styled from 'styled-components';
 import VisibilitySensor from 'react-visibility-sensor';
+import AttestationPanel from './AttestationPanel';
 
 const StyledHeader = styled.div`
   font-family: Inconsolata;
@@ -127,12 +127,74 @@ const Animation = () => {
   );
 }
 
+const status = (state: any) => {
+  const { circuits, contributionCount, step, computeStatus, progress } = state;
+  const cctCount = circuits.length;
+  let header = '';
+  let body1 = (<></>);
+  let body2 = (<></>);
+  if (state.step === Step.COMPLETE) {
+    header = 'Contribution Complete.';
+    body1 = (
+      <div>
+        <NormalBodyText>
+        You've successfully contributed to {cctCount} circuits.
+        </NormalBodyText>
+        <br />
+        <NormalBodyText>
+        Thank you for participating!
+        </NormalBodyText>
+      </div>);
+    body2 = (<AttestationPanel />);
+  } else {
+    header = 'Contribution Active.';
+    body1 = (
+      <div>
+        <NormalBodyText>
+        ATTENTION:
+        </NormalBodyText>
+        <br />
+        <NormalBodyText>
+        Closing this browser window will interrupt your contribution.
+        </NormalBodyText>
+      </div>);
+    body2 = (
+      <div>
+        <Grid item>
+          <CeremonyProgress />
+        </Grid>
+        <Grid item container spacing={6} direction='row'>
+          <Grid item container direction='column' style={{ width: '150px' }} >
+            <Grid item style={{ height: '34px' }} >
+              <SubtleBody>Circuit</SubtleBody>
+            </Grid>
+            <Grid item>
+              <NormalBodyText>
+                {contributionCount}/{cctCount}
+              </NormalBodyText>
+            </Grid>
+          </Grid>
+          <Grid item container direction='column' style={{ width: '150px' }} >
+            <Grid item style={{ height: '34px' }} >
+              <SubtleBody>Status</SubtleBody>
+            </Grid>
+            <Grid item>
+              {stepText(step, computeStatus)}
+              <StepProgress progressPct={progress}/>
+            </Grid>
+          </Grid>
+        </Grid>
+      </div>
+    );
+}
+  return { header, body1, body2 };
+}
+
 export default function ProgressPanel(props: any) {
   const state = useContext(ComputeStateContext);
   const dispatch = useContext(ComputeDispatchContext);
 
-  const { circuits, contributionCount, step, computeStatus } = state;
-  const cctCount = circuits.length;
+  const content = status(state);
 
   return (
     <div>
@@ -144,41 +206,14 @@ export default function ProgressPanel(props: any) {
           <Grid item container direction='column' style={{ width: '55%' }} >
             <Grid item>
               <StyledHeader>
-                Contribution Active
+                {content.header}
               </StyledHeader>
             </Grid>
             <Grid item>
-              <NormalBodyText>
-              ATTENTION:
-              </NormalBodyText>
-              <br />
-              <NormalBodyText>
-              Closing this browser window will interrupt your contribution.
-              </NormalBodyText>
+              {content.body1}
             </Grid>
             <Grid item>
-              <CeremonyProgress />
-            </Grid>
-            <Grid item container spacing={6} direction='row'>
-              <Grid item container direction='column' style={{ width: '150px' }} >
-                <Grid item style={{ height: '34px' }} >
-                  <SubtleBody>Circuit</SubtleBody>
-                </Grid>
-                <Grid item>
-                  <NormalBodyText>
-                    {contributionCount}/{cctCount}
-                  </NormalBodyText>
-                </Grid>
-              </Grid>
-              <Grid item container direction='column' style={{ width: '150px' }} >
-                <Grid item style={{ height: '34px' }} >
-                  <SubtleBody>Status</SubtleBody>
-                </Grid>
-                <Grid item>
-                  {stepText(step, computeStatus)}
-                  <StepProgress progressPct={state.progress}/>
-                </Grid>
-              </Grid>
+              {content.body2}
             </Grid>
           </Grid>
         </Grid>

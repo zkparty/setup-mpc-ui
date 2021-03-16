@@ -22,7 +22,6 @@ import { getContributions, startWorkerThread } from "../state/Compute";
 import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
 import ProgressPanel from "../components/ProgressPanel";
-import AttestationPanel from "../components/AttestationPanel";
 import LoginPanel from "../components/LoginPanel";
 
 const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
@@ -188,7 +187,7 @@ export const ParticipantSection = () => {
         break;
       }
       case (Step.COMPLETE): {
-        content = (<AttestationPanel />);
+        content = (<ProgressPanel />);
         break;
       }
   }};
