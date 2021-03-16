@@ -34,7 +34,7 @@ const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
         ceremonyData = {...ceremonyData, endTime: end};
       }
     } catch (err) {
-      console.error(`Unexpected error parsing dates: ${err.message}`);     
+      console.error(`Unexpected error parsing dates: ${err.message}`);
     };
     return {
       ...ceremonyData,

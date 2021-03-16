@@ -95,7 +95,7 @@ export const ParticipantSection = () => {
         'inactive'}`);
   }; 
   
-
+  let content = (<></>);
   // Handle end of series
   if (state.seriesIsComplete && state.userContributions && state.userContributions.length>0 && !state.summaryGistUrl && !summaryStarted.current) {
       summaryStarted.current = true;
@@ -109,7 +109,6 @@ export const ParticipantSection = () => {
       }
   }
 
-  let content = (<></>);
   if (!authState.isLoggedIn) {
     content = (<LoginPanel />);
   } else {
@@ -186,6 +185,10 @@ export const ParticipantSection = () => {
         }
 
         content = (<ProgressPanel />);
+        break;
+      }
+      case (Step.COMPLETE): {
+        content = (<AttestationPanel />);
         break;
       }
   }};

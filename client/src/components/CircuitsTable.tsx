@@ -9,6 +9,8 @@ import {
     SectionContainer,
     CeremonyTitle,
     darkBorder,
+    NormalBodyText,
+    darkerBackground,
   } from "../styles";
 //import './styles.css';
 import { Ceremony } from "../types/ceremony";
@@ -27,7 +29,7 @@ const ceremonyProject = 'zkopru';
 const StyledTable = withStyles({
   root: {
     color: textColor,
-    backgroundColor: lighterBackground,
+    backgroundColor: darkerBackground,
   },
 })(Table);
 
@@ -86,18 +88,14 @@ export default function CircuitsTable(props: any) {
       }}>
         {`${ceremonyProject} circuits`}
       </Typography>
-      <Typography variant='body1' style={{ 
-        fontFamily: 'Inconsolata', 
-        fontSize: '18px', 
-        fontWeight: 'normal',
-        color: textColor, 
+      <NormalBodyText style={{ 
         paddingBottom: '64px',
         }}>
         {`All participants will contribute a computation to ${circuits.length} different circuits. There is no limit
         to the number of contributions each circuit can accept - The more the merrier! 
         Participants receive a hash for each completed circuit, which acts as a signature of 
         their contribution`}
-      </Typography>
+      </NormalBodyText>
       <StyledTable size="small" aria-label="circuits table" >
         <TableHead>
           <TableRow>
@@ -112,7 +110,7 @@ export default function CircuitsTable(props: any) {
             <TableRow key={index+1}>
               <StyledCell align='left' >{index+1}</StyledCell>
               <StyledCell component="th" scope="row" align='left' >
-                {circuit.numParticipants}
+                {circuit.complete}
               </StyledCell>
               <StyledCell align="left">{circuit.averageDuration}</StyledCell>
               <StyledCell align="center">

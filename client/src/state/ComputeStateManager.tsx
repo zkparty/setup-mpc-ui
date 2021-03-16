@@ -13,6 +13,7 @@ export enum Step {
     WAITING,
     QUEUED,
     RUNNING,
+    COMPLETE,
 }
       
 export const createCeremonyEvent = (eventType: string, message: string, index: number | undefined): CeremonyEvent => {
@@ -348,10 +349,10 @@ export const computeStateReducer = (state: any, action: any):any => {
             return { ...state, worker: action.data };
         }
         case 'END_OF_SERIES': {
-            return { ...state, seriesIsComplete: true}
+            return { ...state, seriesIsComplete: true, step: Step.COMPLETE };
         }
         case 'SUMMARY_GIST_CREATED': {
-            return { ...state, summaryGistUrl: action.data }
+            return { ...state, summaryGistUrl: action.data };
         }
         case 'ABORT_CIRCUIT': {
             // Invalidate the contribution
