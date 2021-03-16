@@ -160,7 +160,7 @@ export const ParticipantSection = () => {
       }
       case (Step.WAITING): {
         // Waiting for a ceremony
-        content = (<AttestationPanel />);
+        content = (<ProgressPanel />);
         break;
       }
       case (Step.QUEUED): {

@@ -21,6 +21,7 @@ import { Button, Modal } from '@material-ui/core';
 import Login from './Login';
 import About from './About';
 import Options from './Options';
+import { ComputeStateContext, Step } from '../state/ComputeStateManager';
 
 const StyledMenu = withStyles({
   paper: {
@@ -128,6 +129,7 @@ export default function ButtonAppBar() {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
   const [loginAnchorEl, setLoginAnchorEl] = React.useState<null | HTMLElement>(null);
   const AuthDispatch = React.useContext(AuthDispatchContext);
+  const state = useContext(ComputeStateContext);
   const classes = useStyles();
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -143,10 +145,17 @@ export default function ButtonAppBar() {
     if (AuthDispatch) AuthDispatch({type: 'LOGOUT'});
     handleMenuClose();
   }
+
+  const displayProgress = ((
+    state.step === Step.WAITING || 
+    state.step === Step.QUEUED ||
+    state.step === Step.RUNNING)
+    && !state.isProgressPanelVisible
+  );
       
   return (
     <div className={classes.root}>
-      <AppBar position="static" color="transparent">
+      <AppBar position="sticky" color="transparent">
         <Toolbar>
           <IconButton 
             edge="start" 
@@ -160,6 +169,7 @@ export default function ButtonAppBar() {
           </IconButton>
           <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} logout={handleLogout} />
           <ZKTitle />
+          {displayProgress ? `... show progress here...` : ''}
         </Toolbar>
       </AppBar>
     </div>

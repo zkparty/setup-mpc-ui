@@ -98,6 +98,7 @@ interface ComputeContextInterface {
     siteSettings?: any,
     seriesIsComplete: boolean,
     summaryGistUrl?: string,
+    isProgressPanelVisible: boolean,
 };
 
 export const initialState: ComputeContextInterface = {
@@ -112,6 +113,7 @@ export const initialState: ComputeContextInterface = {
     hash: '',
     contributionCount: 0,
     seriesIsComplete: false,
+    isProgressPanelVisible: true,
 }
 
 const addMessage = (state: any, message: string) => {
@@ -373,6 +375,11 @@ export const computeStateReducer = (state: any, action: any):any => {
             });
             const msg = `Error encountered. This circuit will be skipped.`;
             newState = addMessage(newState, msg);
+            break;
+        }
+        case 'VISIBILITY': {
+            // Progress panel visibililty
+            return {...state, isProgressPanelVisible: action.data};
         }
     }
     console.debug(`state after reducer ${newState.step}`);

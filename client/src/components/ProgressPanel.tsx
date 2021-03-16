@@ -16,6 +16,7 @@ import {
 import { ComputeDispatchContext, ComputeStateContext, ComputeStatus, Step } from '../state/ComputeStateManager';
 import { Player } from '@lottiefiles/react-lottie-player';
 import styled from 'styled-components';
+import VisibilitySensor from 'react-visibility-sensor';
 
 const StyledHeader = styled.div`
   font-family: Inconsolata;
@@ -114,7 +115,7 @@ const Animation = () => {
 
 export default function ProgressPanel(props: any) {
   const state = useContext(ComputeStateContext);
-  //const dispatch = useContext(ComputeDispatchContext);
+  const dispatch = useContext(ComputeDispatchContext);
 
   const { circuits, contributionCount, step, computeStatus } = state;
   const cctCount = circuits.length;
@@ -123,51 +124,53 @@ export default function ProgressPanel(props: any) {
 
   return (
     <div>
-      <Grid container spacing={4} direction='row' style={{ display: 'flex' }} >
-        <Grid item style={{ width: '45%' }} >
-          <Animation />
-        </Grid>
-        <Grid item container direction='column' style={{ width: '55%' }} >
-          <Grid item>
-            <StyledHeader>
-              Contribution Active
-            </StyledHeader>
+      <VisibilitySensor onChange={isVisible => {if (dispatch) dispatch({type:'VISIBILITY', data: isVisible})}}>
+        <Grid container spacing={4} direction='row' style={{ display: 'flex' }} >
+          <Grid item style={{ width: '45%' }} >
+            <Animation />
           </Grid>
-          <Grid item>
-            <NormalBodyText>
-            ATTENTION:
-            </NormalBodyText>
-            <br />
-            <NormalBodyText>
-            Closing this browser window will interrupt your contribution.
-            </NormalBodyText>
-          </Grid>
-          <Grid item>
-            <CeremonyProgress progressPct={ceremonyPct} />
-          </Grid>
-          <Grid item container spacing={6} direction='row'>
-            <Grid item container direction='column' style={{ width: '150px' }} >
-              <Grid item style={{ height: '34px' }} >
-                <SubtleBody>Circuit</SubtleBody>
+          <Grid item container direction='column' style={{ width: '55%' }} >
+            <Grid item>
+              <StyledHeader>
+                Contribution Active
+              </StyledHeader>
+            </Grid>
+            <Grid item>
+              <NormalBodyText>
+              ATTENTION:
+              </NormalBodyText>
+              <br />
+              <NormalBodyText>
+              Closing this browser window will interrupt your contribution.
+              </NormalBodyText>
+            </Grid>
+            <Grid item>
+              <CeremonyProgress progressPct={ceremonyPct} />
+            </Grid>
+            <Grid item container spacing={6} direction='row'>
+              <Grid item container direction='column' style={{ width: '150px' }} >
+                <Grid item style={{ height: '34px' }} >
+                  <SubtleBody>Circuit</SubtleBody>
+                </Grid>
+                <Grid item>
+                  <NormalBodyText>
+                    {contributionCount}/{cctCount}
+                  </NormalBodyText>
+                </Grid>
               </Grid>
-              <Grid item>
-                <NormalBodyText>
-                  {contributionCount}/{cctCount}
-                </NormalBodyText>
+              <Grid item container direction='column' style={{ width: '150px' }} >
+                <Grid item style={{ height: '34px' }} >
+                  <SubtleBody>Status</SubtleBody>
+                </Grid>
+                <Grid item>
+                  {stepText(step, computeStatus)}
+                  <StepProgress progressPct={state.progress}/>
+                </Grid>
               </Grid>
             </Grid>
-            <Grid item container direction='column' style={{ width: '150px' }} >
-              <Grid item style={{ height: '34px' }} >
-                <SubtleBody>Status</SubtleBody>
-              </Grid>
-              <Grid item>
-                {stepText(step, computeStatus)}
-                <StepProgress progressPct={state.progress}/>
-              </Grid>
-            </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      </VisibilitySensor>
     </div>
   );
 }
