@@ -342,7 +342,14 @@ export const computeStateReducer = (state: any, action: any):any => {
             return {...state, entropy: action.data};
         }
         case 'SET_CONTRIBUTIONS': {
-            return {...state, contributionCount: action.data.count, userContributions: action.data.contributions};
+            if (action.data.count == state.circuits.size) {
+                newState.step = Step.COMPLETE;
+            }
+            return {...state, 
+                contributionCount: action.data.count, 
+                userContributions: action.data.contributions,
+                step: newState.step,
+            };
         }
         case 'SET_SETTINGS': {
             return {...state, siteSettings: action.data};

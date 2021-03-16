@@ -16,12 +16,29 @@ import {
   secondAccent,
   textColor,
   background,
+  darkerBackground,
 } from "../styles";
-import { Button, Modal } from '@material-ui/core';
-import Login from './Login';
 import About from './About';
 import Options from './Options';
 import { ComputeStateContext, Step } from '../state/ComputeStateManager';
+import useScrollTrigger from '@material-ui/core/useScrollTrigger';
+
+interface ScrollProps {
+  children: React.ReactElement;
+}
+
+function ElevationScroll(props: ScrollProps) {
+  const { children } = props;
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 0,
+  });
+
+  return React.cloneElement(children, {
+    elevation: trigger ? 4 : 0,
+    style: {backgroundColor: background},
+  });
+}
 
 const StyledMenu = withStyles({
   paper: {
@@ -155,23 +172,25 @@ export default function ButtonAppBar() {
       
   return (
     <div className={classes.root}>
-      <AppBar position="sticky" color="transparent">
-        <Toolbar>
-          <IconButton 
-            edge="start" 
-            className={classes.menuButton} 
-            color="inherit" 
-            aria-label="menu"
-            aria-haspopup="true"
-            onClick={handleMenuClick}
-            >
-            <MenuIcon style={{ color: accentColor }}/>
-          </IconButton>
-          <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} logout={handleLogout} />
-          <ZKTitle />
-          {displayProgress ? `... show progress here...` : ''}
-        </Toolbar>
-      </AppBar>
+      <ElevationScroll>
+        <AppBar color='default'>
+          <Toolbar>
+            <IconButton 
+              edge="start" 
+              className={classes.menuButton} 
+              color="inherit" 
+              aria-label="menu"
+              aria-haspopup="true"
+              onClick={handleMenuClick}
+              >
+              <MenuIcon style={{ color: accentColor }}/>
+            </IconButton>
+            <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} logout={handleLogout} />
+            <ZKTitle />
+            {displayProgress ? `... show progress here...` : ''}
+          </Toolbar>
+        </AppBar>
+      </ElevationScroll>
     </div>
   );
 }
