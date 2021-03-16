@@ -21,8 +21,8 @@ const StyledAccentButton = styled(Button)`
   display: flex;
   align-items: center;
 
-  &:hover {
-    border-color: ${secondAccent};
+  & > a {
+    color: ${inverseText};
   }
 `
 
@@ -32,6 +32,10 @@ const StyledButton = styled(Button)`
   border-radius: 4px;
   width: 216px;
   height: 53px;
+
+  & > a {
+    color: ${inverseText};
+  }
 `
 
 const tweetText = (siteSettings: any, url: string): string => {
