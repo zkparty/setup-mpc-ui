@@ -1,4 +1,4 @@
-import { Box, Grid, LinearProgress, Typography } from '@material-ui/core';
+import { Box, Grid, LinearProgress, LinearProgressProps, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { useContext } from 'react';
 import {
@@ -34,14 +34,25 @@ const StyledHeader = styled.div`
   color: ${accentColor};
 `
 
-const StyledProgressBar = styled(LinearProgress)`
-  padding-top: '10px'; 
+interface ProgressBarProps extends LinearProgressProps {
+  size: string,
+}
+
+const StyledProgressBar = styled(LinearProgress).attrs((props: ProgressBarProps) => ({
+  size: props.size || 'normal',
+}))`
+  padding-top: ${ ({ size }) => {return (size === 'small') ? '0px' : '5px';} }; 
   border-radius: 20px; 
   background-color: ${darkerBackground};
+  border: 2px solid ${darkerBackground};
+  width: ${ ({ size }) => { 
+    if (size === 'normal') return '491px'; 
+    else return 'default' } }; 
 
-  & > .MuiLinearProgress-bar.MuiLinearProgress-barColorPrimary {
+  & > .MuiLinearProgress-barColorPrimary {
     border-radius: 20px;
     background-color: ${accentColor};
+    border-color: ${accentColor};
   }
 
   &.MuiLinearProgress-root.MuiLinearProgress-colorPrimary {
@@ -74,20 +85,24 @@ interface ProgressProps {
   progressPct: number,
 }
 
-const CeremonyProgress = ({ progressPct }: ProgressProps) => {
+export const CeremonyProgress = () => {
+  const state = useContext(ComputeStateContext);
+  const { circuits, contributionCount } = state;
+  const cctCount = circuits.length;
+  const ceremonyPct = (cctCount>0) ? 100 * contributionCount / cctCount : 0;
+
   return (
     <Box display="flex" alignItems="center">
       <Box width="100%" mr={1}>
         <StyledProgressBar 
           variant="determinate" 
-          value={progressPct} 
-          style={{ 
-            width: '549px', 
-          }} />
+          value={ceremonyPct} 
+          size='normal'
+       />
       </Box>
       <Box minWidth={35}>
         <Typography variant="body2" style={{ color: subtleText }}>{`${Math.round(
-            progressPct
+            ceremonyPct
           )}%`}</Typography>
       </Box>
     </Box>
@@ -96,8 +111,7 @@ const CeremonyProgress = ({ progressPct }: ProgressProps) => {
 
 const StepProgress = ({ progressPct }: ProgressProps) => {
   return (
-    <StyledProgressBar variant="determinate" value={progressPct} 
-      style={{ width: '156px' }} />
+    <StyledProgressBar variant="determinate" value={progressPct} size='small' />
   );
 }
 
@@ -119,8 +133,6 @@ export default function ProgressPanel(props: any) {
 
   const { circuits, contributionCount, step, computeStatus } = state;
   const cctCount = circuits.length;
-
-  const ceremonyPct = (cctCount>0) ? 100 * contributionCount / cctCount : 0;
 
   return (
     <div>
@@ -145,7 +157,7 @@ export default function ProgressPanel(props: any) {
               </NormalBodyText>
             </Grid>
             <Grid item>
-              <CeremonyProgress progressPct={ceremonyPct} />
+              <CeremonyProgress />
             </Grid>
             <Grid item container spacing={6} direction='row'>
               <Grid item container direction='column' style={{ width: '150px' }} >

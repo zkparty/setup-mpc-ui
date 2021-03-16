@@ -17,11 +17,13 @@ import {
   textColor,
   background,
   darkerBackground,
+  NormalBodyText,
 } from "../styles";
 import About from './About';
 import Options from './Options';
 import { ComputeStateContext, Step } from '../state/ComputeStateManager';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
+import { CeremonyProgress } from './ProgressPanel';
 
 interface ScrollProps {
   children: React.ReactElement;
@@ -144,7 +146,6 @@ const MainMenu = (props: MainMenuProps) => {
 
 export default function ButtonAppBar() {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [loginAnchorEl, setLoginAnchorEl] = React.useState<null | HTMLElement>(null);
   const AuthDispatch = React.useContext(AuthDispatchContext);
   const state = useContext(ComputeStateContext);
   const classes = useStyles();
@@ -187,7 +188,12 @@ export default function ButtonAppBar() {
             </IconButton>
             <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} logout={handleLogout} />
             <ZKTitle />
-            {displayProgress ? `... show progress here...` : ''}
+            {displayProgress ? 
+              <div style={{ display: 'flex' }}>
+                <NormalBodyText>Your contribution: </NormalBodyText>
+                <CeremonyProgress />
+              </div> 
+            : (<></>)}
           </Toolbar>
         </AppBar>
       </ElevationScroll>
