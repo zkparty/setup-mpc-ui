@@ -122,6 +122,6 @@ export const NormalBodyText = styled.div`
 
 WebFont.load({
   google: {
-    families: ['Shrikhand', 'Inconsolata']
+    families: ['Shrikhand', 'Inconsolata', 'Avenir Next']
   }
 });

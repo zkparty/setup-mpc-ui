@@ -25,6 +25,7 @@ import { Button, withStyles, Typography } from '@material-ui/core';
 import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
 
 const ceremonyProject = 'zkopru';
+const CopyIcon = () => {return (<img src='./Copy Icon.svg' />)};
 
 const StyledTable = withStyles({
   root: {
@@ -51,7 +52,9 @@ export default function CircuitsTable(props: any) {
   //const classes = useStyles();
   console.debug(`render circuits table`);
 
-  const { circuits } = state;
+  const { circuits, participant } = state;
+
+  const isSignedIn = (participant instanceof Object);
 
   const updateCircuit = (circuit: Ceremony) => {
     //console.log(`${ceremony}`);
@@ -71,10 +74,6 @@ export default function CircuitsTable(props: any) {
       setLoaded(true);
     }
   }, [loaded]);
-
-  const showTranscript = (circuit: Ceremony) => {
-    return (<>{circuit.transcript}</>);
-  };
 
   return (
     <TableContainer component='div' style={{ width: '778px' }}>
@@ -103,23 +102,49 @@ export default function CircuitsTable(props: any) {
             <StyledCell style={{ width: '167px' }} align="center">Contributions</StyledCell>
             <StyledCell style={{ width: '156px' }} align="center">Average Time</StyledCell>
             <StyledCell style={{ width: '157px' }} align="center">Transcript</StyledCell>
+            {isSignedIn ? 
+              (<StyledCell style={{ width: '193px' }} align="center">My Hash</StyledCell>) :
+              (<></>)
+            }
           </TableRow>
         </TableHead>
         <TableBody>
-          {circuits.map((circuit, index) => (
-            <TableRow key={index+1}>
-              <StyledCell align='left' >{index+1}</StyledCell>
-              <StyledCell component="th" scope="row" align='left' >
-                {circuit.complete}
-              </StyledCell>
-              <StyledCell align="left">{circuit.averageDuration}</StyledCell>
-              <StyledCell align="center">
-                <Button style={{ color: textColor }} onClick={() => showTranscript(circuit)}>View</Button>
-              </StyledCell>
-            </TableRow>
-          ))}
+          {circuits.map((circuit, index) => 
+            renderRow(circuit, index+1, isSignedIn)
+          )}
         </TableBody>
       </StyledTable>
     </TableContainer>    
     )
   };
+
+  const renderRow = (circuit: any, index: number, isSignedIn: boolean) => {
+
+    const showTranscript = (transcript: string) => {
+      return (<>{transcript}</>);
+    };
+
+    const renderHash = (hash: string) => {
+      return (
+        <div>
+          <NormalBodyText>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
+          <CopyIcon />
+        </div>
+      );
+    }
+
+    return (
+      <TableRow key={index}>
+        <StyledCell align='left' >{index}</StyledCell>
+        <StyledCell component="th" align='left' >
+          {circuit.complete}
+        </StyledCell>
+        <StyledCell align="left">{circuit.averageDuration}</StyledCell>
+        <StyledCell align="center">
+          <Button style={{ color: textColor }} onClick={() => showTranscript(circuit.transcript)}>View</Button>
+        </StyledCell>
+        {isSignedIn ? 
+          <StyledCell align="left">{renderHash(circuit.hash)}</StyledCell> : <></>}
+      </TableRow>
+    );
+  }

@@ -4,10 +4,10 @@ import styled from "styled-components";
 import { textColor } from './../styles';
 
 const StyledBody = styled.div`
-  font-family: Avenir Next;
+  font-family: 'Avenir Next';
   font-style: normal;
   font-weight: normal;
-  font-size: 24px;
+  /*font-size: 24px; */
   line-height: 140%;
   color: ${textColor}
 `;
