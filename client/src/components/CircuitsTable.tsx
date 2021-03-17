@@ -23,6 +23,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { Button, withStyles, Typography } from '@material-ui/core';
 import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
+import styled from 'styled-components';
 
 const ceremonyProject = 'zkopru';
 const CopyIcon = () => {return (<img src='./Copy Icon.svg' />)};
@@ -34,16 +35,28 @@ const StyledTable = withStyles({
   },
 })(Table);
 
-const StyledCell = withStyles({
-  head: {
-    color: textColor,
-  },
-  root: {
-    color: textColor,
-    height: '53px',
-    border: `1px solid ${darkBorder}`,
+const StyledCell = styled(TableCell)`
+  .head: {
+    color: ${textColor};
   }
-})(TableCell);
+
+  .root: {
+    height: 53px;
+    border: 1px solid ${darkBorder};
+  }
+`;
+
+const StyledRow = styled(TableRow)`
+  .head: {
+    color: ${textColor};
+  }
+
+  .root: {
+    color: ${(props: { completed: boolean; }) => props.completed ? accentColor : textColor};
+    height: 53px;
+    border: 1px solid ${darkBorder};
+  }
+`;
 
 export default function CircuitsTable(props: any) {
   const state = useContext(ComputeStateContext);
@@ -131,10 +144,11 @@ export default function CircuitsTable(props: any) {
           <CopyIcon />
         </div>
       );
-    }
+    };
+
 
     return (
-      <TableRow key={index}>
+      <StyledRow key={index} completed={circuit.completed}>
         <StyledCell align='left' >{index}</StyledCell>
         <StyledCell component="th" align='left' >
           {circuit.complete}
@@ -145,6 +159,6 @@ export default function CircuitsTable(props: any) {
         </StyledCell>
         {isSignedIn ? 
           <StyledCell align="left">{renderHash(circuit.hash)}</StyledCell> : <></>}
-      </TableRow>
+      </StyledRow>
     );
   }

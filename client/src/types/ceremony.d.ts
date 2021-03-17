@@ -51,6 +51,8 @@ export interface Ceremony {
   numConstraints?: number;
   averageDuration?: number;
   transcript?: string;
+  hash?: string; // Participant's own hash
+  completed?: boolean; // Participant has completed this circuit
 }
 
 export interface Participant {

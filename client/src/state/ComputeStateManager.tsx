@@ -138,16 +138,28 @@ export const ComputeContextProvider = ({ children }:any) => {
       )    
 };
 
+const findCircuitIndex = (state: ComputeContextInterface, id: string): number => {
+    return state.circuits.findIndex((val: Ceremony) => val.id === id);
+}
+
+const getCurrentCircuit = (state: ComputeContextInterface) => {
+    const cId = state.contributionState?.ceremony.id;
+    if (cId) {
+        const idx = findCircuitIndex(state, cId);
+        if (idx >= 0) {
+            return state.circuits[idx];
+        }
+    }
+    return undefined;
+}
+
 export const computeStateReducer = (state: any, action: any):any => {
     let newState = {...state};
     switch (action.type) {
         case 'UPDATE_CIRCUIT': {
             // A circuit has been added or updated. 
-            const findCircuitIndex = (id: string): number => {
-                return newState.circuits.findIndex((val: Ceremony) => val.id === id);
-            }
             const circuit: Ceremony = action.data;
-            const idx = findCircuitIndex(circuit.id);
+            const idx = findCircuitIndex(newState, circuit.id);
             if (idx >= 0) {
               newState.circuits[idx] = circuit;
             } else {
@@ -216,6 +228,8 @@ export const computeStateReducer = (state: any, action: any):any => {
             const msg = `Hash: ${h}`;
             newState = addMessage(state, msg);
             newState.hash = h;
+            const cct = getCurrentCircuit(state);
+            if (cct) { cct.hash = h; }
             return newState;
         }
         case 'COMPUTE_DONE': {
@@ -282,6 +296,10 @@ export const computeStateReducer = (state: any, action: any):any => {
                 });
                 msg = `Thank you for your contribution.`;
                 newState = addMessage(newState, msg);
+
+                // Mark it complete
+                const cct = getCurrentCircuit(newState);
+                if (cct) { cct.completed = true; }
             }
 
             return newState;
