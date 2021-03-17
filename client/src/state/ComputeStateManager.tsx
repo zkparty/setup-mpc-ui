@@ -138,19 +138,29 @@ export const ComputeContextProvider = ({ children }:any) => {
       )    
 };
 
-const findCircuitIndex = (state: ComputeContextInterface, id: string): number => {
-    return state.circuits.findIndex((val: Ceremony) => val.id === id);
+const findCircuitIndex = (circuits: Ceremony[], id: string): number => {
+    if (!circuits) (console.warn(`circuits will cause findIndex error`));
+    return circuits.findIndex(val => val.id === id);
 }
 
 const getCurrentCircuit = (state: ComputeContextInterface) => {
     const cId = state.contributionState?.ceremony.id;
     if (cId) {
-        const idx = findCircuitIndex(state, cId);
+        const idx = findCircuitIndex(state.circuits, cId);
         if (idx >= 0) {
             return state.circuits[idx];
         }
     }
     return undefined;
+}
+
+const updateCompletedCircuits = (circuits: Ceremony[], contribs: any[]) => {
+    contribs.map(contrib => {
+        const idx = findCircuitIndex(circuits, contrib.ceremony?.id);
+        if (idx >= 0) {
+            circuits[idx].completed = true;
+        }
+    });
 }
 
 export const computeStateReducer = (state: any, action: any):any => {
@@ -159,7 +169,7 @@ export const computeStateReducer = (state: any, action: any):any => {
         case 'UPDATE_CIRCUIT': {
             // A circuit has been added or updated. 
             const circuit: Ceremony = action.data;
-            const idx = findCircuitIndex(newState, circuit.id);
+            const idx = findCircuitIndex(newState.circuits, circuit.id);
             if (idx >= 0) {
               newState.circuits[idx] = circuit;
             } else {
@@ -360,9 +370,11 @@ export const computeStateReducer = (state: any, action: any):any => {
             return {...state, entropy: action.data};
         }
         case 'SET_CONTRIBUTIONS': {
+            // Participant's contributions, loaded from DB
             if (action.data.count == state.circuits.size) {
                 newState.step = Step.COMPLETE;
             }
+            updateCompletedCircuits(state.circuits, action.data.contributions);
             return {...state, 
                 contributionCount: action.data.count, 
                 userContributions: action.data.contributions,

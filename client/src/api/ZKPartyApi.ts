@@ -182,7 +182,7 @@ const addGist = async (summary: string, description: string, authToken: string):
 
   })
   .catch(err => console.warn(`Error creating gist. ${err.message}`));
-  // TODO handle result, get gist url and return it.
+  
   console.debug(`${res ? 'ok' : 'error'}`);
   if (res) return (await res.json()).html_url;
   return '';
