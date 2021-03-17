@@ -11,7 +11,12 @@ const project = 'zkopru';
 export default function LoginPanel(props: any) {
 
   return (
-  <div style={{ display: 'grid', paddingTop: '20px' }} >
+  <div style={{ 
+    display: 'flex',
+    flexDirection: 'column', 
+    alignItems: 'center', 
+    paddingTop: '20px' 
+    }} >
     <WelcomeTitle>{project}</WelcomeTitle>
     <SubtleBody>
       {`Trusted Setup Ceremony March, 2021`} 

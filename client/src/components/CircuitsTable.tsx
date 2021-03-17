@@ -136,12 +136,16 @@ export default function CircuitsTable(props: any) {
     };
 
     const renderHash = (hash: string) => {
-      return (
-        <div>
-          <NormalBodyText>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
-          <CopyIcon />
-        </div>
-      );
+      let content = (<></>);
+      if (hash && hash.length > 0) {
+        content = (
+          <div>
+            <NormalBodyText>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
+            <CopyIcon />
+          </div>
+        );
+      }
+      return (<span>{content}</span>);
     };
 
 
