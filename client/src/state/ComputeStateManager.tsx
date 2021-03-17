@@ -159,6 +159,7 @@ const updateCompletedCircuits = (circuits: Ceremony[], contribs: any[]) => {
         const idx = findCircuitIndex(circuits, contrib.ceremony?.id);
         if (idx >= 0) {
             circuits[idx].completed = true;
+            circuits[idx].hash = contrib.hash;
         }
     });
 }
