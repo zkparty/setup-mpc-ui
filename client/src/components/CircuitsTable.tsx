@@ -11,6 +11,7 @@ import {
     darkBorder,
     NormalBodyText,
     darkerBackground,
+    gray1,
   } from "../styles";
 //import './styles.css';
 import { Ceremony } from "../types/ceremony";
@@ -24,7 +25,6 @@ import TableRow from '@material-ui/core/TableRow';
 import { Button, withStyles, Typography } from '@material-ui/core';
 import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
 import styled from 'styled-components';
-import { inherits } from 'util';
 
 const ceremonyProject = 'zkopru';
 const CopyIcon = () => {return (<img src='./Copy Icon.svg' />)};
@@ -42,17 +42,23 @@ const StyledTable = styled(Table)`
     color: ${textColor};
     background-color: ${darkerBackground};
   }
+
+  & > .complete: {
+    color: #111122;
+  }
 `;
 
-const StyledRow = styled(TableRow)`
+const StyledRow = styled.tr`
+  color: ${(props: { completed?: boolean; }) => props.completed ? accentColor : textColor};
+  height: 53px;
+  border: 1px solid ${darkBorder};
+
   .head: {
     color: ${textColor};
   }
 
-  & > .MuiTableRow-root: {
-    color: ${(props: { completed?: boolean; }) => props.completed ? accentColor : textColor};
-    height: 53px;
-    border: 1px solid ${darkBorder};
+  &.complete: {
+    color: #00ff00;
   }
 `;
 
@@ -140,7 +146,7 @@ export default function CircuitsTable(props: any) {
       if (hash && hash.length > 0) {
         content = (
           <div>
-            <NormalBodyText>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
+            <NormalBodyText style={{ color: 'inherit' }}>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
             <CopyIcon />
           </div>
         );
@@ -150,14 +156,17 @@ export default function CircuitsTable(props: any) {
 
 
     return (
-      <StyledRow key={index} completed={circuit.completed}>
+      <StyledRow key={index} completed={circuit.completed} >
         <StyledCell align='left' >{index}</StyledCell>
         <StyledCell component="th" align='left' >
           {circuit.complete}
         </StyledCell>
         <StyledCell align="left">{circuit.averageDuration}</StyledCell>
         <StyledCell align="center">
-          <Button style={{ color: textColor }} onClick={() => showTranscript(circuit.transcript)}>View</Button>
+          <Button style={{ color: 'inherit' }}
+           onClick={() => showTranscript(circuit.transcript)}>
+            View
+          </Button>
         </StyledCell>
         {isSignedIn ? 
           <StyledCell align="left">{renderHash(circuit.hash)}</StyledCell> : <></>}
