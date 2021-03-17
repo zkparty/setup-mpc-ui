@@ -7,35 +7,35 @@ import {
   accentColor,
   background,
   secondAccent,
+  lighterBackground,
 } from "../styles";
 import styled from "styled-components";
 import { ComputeStateContext } from '../state/ComputeStateManager';
 import TwitterIcon from '@material-ui/icons/Twitter';
 
-const StyledAccentButton = styled(Button)`
+const StyledAccentButton = styled.a`
   color: ${inverseText};
-  background: ${accentColor};
+  background-color: ${accentColor};
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
   border-radius: 4px;
   width: 350px;
   height: 53px;
   display: flex;
   align-items: center;
-
-  & > a {
-    color: ${inverseText};
-  }
+  padding-right: 32px;
 `
 
-const StyledButton = styled(Button)`
+const StyledButton = styled.a`
   color: ${textColor};
-  background: ${background};
+  background: ${lighterBackground};
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
   border-radius: 4px;
   width: 216px;
   height: 53px;
-
-  & > a {
-    color: ${inverseText};
-  }
 `
 
 const tweetText = (siteSettings: any, url: string): string => {
@@ -54,17 +54,14 @@ export default function AttestationPanel(props: any) {
   let text=(<></>);
   if (summaryGistUrl && siteSettings) {
     text = (
-      <div>
-        <StyledAccentButton>
-          <a href={tweetText(siteSettings, summaryGistUrl)} target='_blank' style={{ color:  '#1DA1F2' }}>
+      <div style={{ display: 'flex' }}>
+        <StyledAccentButton
+           href={tweetText(siteSettings, summaryGistUrl)} target='_blank' >
               <TwitterIcon fontSize='large' />
               Share your attestation
-          </a>
         </StyledAccentButton>
-        <StyledButton >
-          <a href={summaryGistUrl} target='_blank' >
-          View you contribution summary
-          </a>
+        <StyledButton href={summaryGistUrl} target='_blank' >
+          View your summary
         </StyledButton>
       </div>
     );
