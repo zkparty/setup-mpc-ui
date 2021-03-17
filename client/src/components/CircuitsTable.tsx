@@ -24,25 +24,23 @@ import TableRow from '@material-ui/core/TableRow';
 import { Button, withStyles, Typography } from '@material-ui/core';
 import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
 import styled from 'styled-components';
+import { inherits } from 'util';
 
 const ceremonyProject = 'zkopru';
 const CopyIcon = () => {return (<img src='./Copy Icon.svg' />)};
 
-const StyledTable = withStyles({
+const StyledCell = withStyles({
   root: {
-    color: textColor,
-    backgroundColor: darkerBackground,
-  },
-})(Table);
-
-const StyledCell = styled(TableCell)`
-  .head: {
-    color: ${textColor};
+    color: 'inherit',
+    height: '53px',
+    border: `1px solid ${darkBorder}`,
   }
+})(TableCell);
 
+const StyledTable = styled(Table)`
   .root: {
-    height: 53px;
-    border: 1px solid ${darkBorder};
+    color: ${textColor};
+    background-color: ${darkerBackground};
   }
 `;
 
@@ -51,8 +49,8 @@ const StyledRow = styled(TableRow)`
     color: ${textColor};
   }
 
-  .root: {
-    color: ${(props: { completed: boolean; }) => props.completed ? accentColor : textColor};
+  & > .MuiTableRow-root: {
+    color: ${(props: { completed?: boolean; }) => props.completed ? accentColor : textColor};
     height: 53px;
     border: 1px solid ${darkBorder};
   }
@@ -110,7 +108,7 @@ export default function CircuitsTable(props: any) {
       </NormalBodyText>
       <StyledTable size="small" aria-label="circuits table" >
         <TableHead>
-          <TableRow>
+          <StyledRow>
             <StyledCell style={{ width: '105px' }}>Circuit</StyledCell>
             <StyledCell style={{ width: '167px' }} align="center">Contributions</StyledCell>
             <StyledCell style={{ width: '156px' }} align="center">Average Time</StyledCell>
@@ -119,7 +117,7 @@ export default function CircuitsTable(props: any) {
               (<StyledCell style={{ width: '193px' }} align="center">My Hash</StyledCell>) :
               (<></>)
             }
-          </TableRow>
+          </StyledRow>
         </TableHead>
         <TableBody>
           {circuits.map((circuit, index) => 
