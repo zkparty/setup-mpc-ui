@@ -46,6 +46,7 @@ const StyledTable = styled(Table)`
 
 `;
 
+
 const StyledRow = styled.tr`
   color: ${(props: { completed?: boolean; }) => props.completed ? accentColor : textColor};
   height: 53px;
@@ -140,10 +141,12 @@ export default function CircuitsTable(props: any) {
       let content = (<></>);
       if (hash && hash.length > 0) {
         content = (
-          <div style={{ display: 'flex', justifyContent: 'space-evenly', }}>
-            <NormalBodyText style={{ color: 'inherit' }}>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
-            <CopyIcon />
-          </div>
+          <CopyToClipboard text={hash} >
+            <span style={{ display: 'flex', justifyContent: 'space-evenly', }}>
+              <NormalBodyText style={{ color: 'inherit' }}>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
+              <CopyIcon />
+            </span>
+          </CopyToClipboard>
         );
       }
       return (<span>{content}</span>);
