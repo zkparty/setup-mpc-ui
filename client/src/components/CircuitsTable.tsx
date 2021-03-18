@@ -137,13 +137,13 @@ export default function CircuitsTable(props: any) {
       return (<>{transcript}</>);
     };
 
-    const renderHash = (hash: string, colour: string) => {
+    const renderHash = (hash: string) => {
       let content = (<></>);
       if (hash && hash.length > 0) {
         content = (
           <CopyToClipboard text={hash} >
             <span style={{ display: 'flex', justifyContent: 'space-evenly', }}>
-              <NormalBodyText style={{ color: 'inherit' }}>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
+              <NormalBodyText style={{ color: 'inherit', fontSize: '18px' }}>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
               <CopyIcon />
             </span>
           </CopyToClipboard>
@@ -161,15 +161,21 @@ export default function CircuitsTable(props: any) {
         </StyledCell>
         <StyledCell align="left">{circuit.averageDuration}</StyledCell>
         <StyledCell align="center">
-          <Button style={{ color: 'inherit' }}
+          <Button style={{ 
+            color: 'inherit', 
+            font: 'Inconsolata 18px', 
+            textTransform: 'none',
+            textDecoration: 'underline', }}
            onClick={() => showTranscript(circuit.transcript)}>
             View
           </Button>
         </StyledCell>
         {isSignedIn ? 
-          <StyledCell align="left">{
-            renderHash(circuit.hash, circuit.completed ? accentColor : textColor)
-            }</StyledCell> : <></>}
+          <StyledCell align="left">
+            {renderHash(circuit.hash)}
+          </StyledCell> : 
+          <></>
+        }
       </StyledRow>
     );
   }
