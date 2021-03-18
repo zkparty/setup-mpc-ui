@@ -28,6 +28,7 @@ import styled from 'styled-components';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import ViewLog from './ViewLog';
 import { startCircuitListener } from '../state/Circuits';
+import moment from 'moment';
 
 const ceremonyProject = 'zkopru';
 const CopyIcon = () => {return (<img src={`./Copy Icon.svg`} />)};
@@ -151,6 +152,9 @@ export default function CircuitsTable(props: any) {
       return (<span>{content}</span>);
     };
 
+    const formatDuration = (avgSecs: number) => {
+      return moment.duration(avgSecs, 'seconds').humanize();
+    }
 
     return (
       <StyledRow key={index} completed={circuit.completed} >
@@ -158,7 +162,7 @@ export default function CircuitsTable(props: any) {
         <StyledCell component="th" align='left' >
           {circuit.complete}
         </StyledCell>
-        <StyledCell align="left">{circuit.averageDuration}</StyledCell>
+        <StyledCell align="left">{formatDuration(circuit.averageSecondsPerContribution)}</StyledCell>
         <StyledCell align="center">
           <Button style={{ 
             color: 'inherit', 
