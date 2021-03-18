@@ -7,8 +7,6 @@ import { Dispatch, useContext } from "react";
 import { ComputeDispatchContext } from './ComputeStateManager';
 import { getParticipantContributions } from '../api/FirestoreApi';
 
-//let worker: Worker | null = null;
-
 export const startWorkerThread = (dispatch: React.Dispatch<any>) => {
     //const dispatch = useContext(ComputeDispatchContext);
 

@@ -62,6 +62,8 @@ const contributionConverter: firebase.firestore.FirestoreDataConverter<Contribut
   }
 }
 
+//=====================================================================================
+
 export async function addCeremony(ceremony: Ceremony): Promise<string> {
     const db = firebase.firestore();
     try {
@@ -125,6 +127,8 @@ export const getCeremonies = async (): Promise<Ceremony[]> => {
 // Counts the waiting and complete contributions for a circuit
 export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference<Ceremony>): Promise<any> => {
   //const db = firebase.firestore();
+  let lastVerifiedIndex = -1;
+  let transcript = undefined;
   const contribQuery = await ref
     .collection('contributions')
     .withConverter(contributionConverter);
@@ -133,12 +137,21 @@ export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference
     .where('status', '==', 'COMPLETE')
     .get();
   const complete = query.size;
+  query.forEach(snap => {
+    const qi = snap.get('queueIndex');
+    const tx = snap.get('verification');
+    if (tx && (qi > lastVerifiedIndex)) {
+      lastVerifiedIndex = qi;
+      transcript = tx;
+    }
+  })
+
   query = await contribQuery  
     .where('status', '==', 'WAITING')
     .get();
   const waiting = query.size;
   console.debug(`complete ${ref.id} ${complete}`);
-  return {complete, waiting};
+  return {complete, waiting, transcript};
 }
 
 export async function getCeremonyContributions(id: string): Promise<ContributionSummary[]> {

@@ -27,6 +27,7 @@ import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeSta
 import styled from 'styled-components';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import ViewLog from './ViewLog';
+import { startCircuitListener } from '../state/Circuits';
 
 const ceremonyProject = 'zkopru';
 const CopyIcon = () => {return (<img src={`./Copy Icon.svg`} />)};
@@ -71,21 +72,10 @@ export default function CircuitsTable(props: any) {
 
   const isSignedIn = (participant instanceof Object);
 
-  const updateCircuit = (circuit: Ceremony) => {
-    //console.log(`${ceremony}`);
-    if (dispatch) {
-      dispatch({
-        type: 'UPDATE_CIRCUIT',
-        data: circuit,
-      })
-    }
-  };
-
   useEffect(() => {
-    if (!loaded) {
+    if (!loaded && dispatch) {
       // Subscribe to ceremony updates
-      ceremonyListener(updateCircuit);
-      console.debug('circuit listener started');
+      startCircuitListener(dispatch);
       setLoaded(true);
     }
   }, [loaded]);
