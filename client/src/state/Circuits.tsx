@@ -3,7 +3,6 @@ import { getParamsFile, uploadParams } from "../api/FileApi";
 import { Ceremony } from "../types/ceremony";
 
 import { Dispatch, useContext } from "react";
-import { ComputeDispatchContext } from './ComputeStateManager';
 import { ceremonyListener, getParticipantContributions } from '../api/FirestoreApi';
 
 export const startCircuitListener = (dispatch: Dispatch<any>) => {
@@ -14,7 +13,7 @@ export const startCircuitListener = (dispatch: Dispatch<any>) => {
         dispatch({
             type: 'UPDATE_CIRCUIT',
             data: circuit,
-        })
+        });
     }
   };
 

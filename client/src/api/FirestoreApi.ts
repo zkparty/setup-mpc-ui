@@ -225,8 +225,8 @@ export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
       querySnapshot.docChanges().forEach(async docSnapshot => {
         if (docSnapshot.type === 'modified' || docSnapshot.type === 'added') {
           console.debug(`Circuit: ${docSnapshot.doc.id}`);
-          getCeremonyCount(docSnapshot.doc.ref).then(count => {
-            const ceremony = {...docSnapshot.doc.data(), ...count};
+          getCeremonyStats(docSnapshot.doc.ref.id).then(stats => {
+            const ceremony = {...docSnapshot.doc.data(), ...stats};
             callback(ceremony);
           });
         }
@@ -429,6 +429,9 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
     currentIndex: 0,
     averageSecondsPerContribution: 0,
     lastValidIndex: 0,
+    complete: 0,
+    waiting: 0,
+    transcript: '',
   };
   // For average time calcs
   let totalSecs = 0;
@@ -451,13 +454,18 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
         || cont.status === RUNNING) {
       if (cont.queueIndex) {
         contributionStats.currentIndex = cont.queueIndex;
-        if (cont.status === COMPLETE) contributionStats.lastValidIndex = cont.queueIndex;
+        if (cont.status === COMPLETE && cont.verification) {
+          contributionStats.lastValidIndex = cont.queueIndex;
+          contributionStats.transcript = cont.verification;
+        }
       }
 
       if (cont.status === COMPLETE && cont.duration) {
         numContribs++;
         totalSecs += cont.duration;
       }
+    } else if (cont.status === WAITING) {
+      contributionStats.waiting ++;
     }
   });
 
@@ -465,6 +473,8 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
       (numContribs > 0) ? 
         Math.floor(totalSecs / numContribs) 
       : ceremonySnap.get('numConstraints') * 5 / 1000; // calc sensible default based on circuit size
+
+  contributionStats.complete = numContribs;
 
   return contributionStats;
 };
