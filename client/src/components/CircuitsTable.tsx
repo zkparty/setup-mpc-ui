@@ -145,7 +145,7 @@ export default function CircuitsTable(props: any) {
       let content = (<></>);
       if (hash && hash.length > 0) {
         content = (
-          <div>
+          <div style={{ display: 'flex', justifyContent: 'space-evenly', }}>
             <NormalBodyText style={{ color: 'inherit' }}>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
             <CopyIcon />
           </div>
