@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect, Fragment, useContext } from "react";
+import { useState, useEffect, Fragment, useContext, useRef } from "react";
 import {
     accentColor,
     secondAccent,
@@ -26,6 +26,7 @@ import { Button, withStyles, Typography } from '@material-ui/core';
 import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
 import styled from 'styled-components';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
+import ViewLog from './ViewLog';
 
 const ceremonyProject = 'zkopru';
 const CopyIcon = () => {return (<img src={`./Copy Icon.svg`} />)};
@@ -62,7 +63,8 @@ export default function CircuitsTable(props: any) {
   const state = useContext(ComputeStateContext);
   const dispatch = useContext(ComputeDispatchContext);
   const [loaded, setLoaded] = useState(false);
-  //const classes = useStyles();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState('');
   console.debug(`render circuits table`);
 
   const { circuits, participant } = state;
@@ -87,6 +89,12 @@ export default function CircuitsTable(props: any) {
       setLoaded(true);
     }
   }, [loaded]);
+
+  const closeTranscript = () => {setModalOpen(false)};
+  const openTranscript = (content: string) => {
+    setModalContent(content || 'nothing');
+    setModalOpen(true);
+  }
 
   return (
     <TableContainer component='div' style={{ width: '778px' }}>
@@ -123,19 +131,20 @@ export default function CircuitsTable(props: any) {
         </TableHead>
         <TableBody>
           {circuits.map((circuit, index) => 
-            renderRow(circuit, index+1, isSignedIn)
+            renderRow(circuit, index+1, isSignedIn, openTranscript)
           )}
         </TableBody>
       </StyledTable>
-    </TableContainer>    
+      <ViewLog 
+        open={modalOpen} 
+        close={closeTranscript} 
+        content={modalContent} 
+        title={`Transcript`} />
+    </TableContainer>
     )
   };
 
-  const renderRow = (circuit: any, index: number, isSignedIn: boolean) => {
-
-    const showTranscript = (transcript: string) => {
-      return (<>{transcript}</>);
-    };
+  const renderRow = (circuit: any, index: number, isSignedIn: boolean, showTranscript: (c: string) => void) => {
 
     const renderHash = (hash: string) => {
       let content = (<></>);
