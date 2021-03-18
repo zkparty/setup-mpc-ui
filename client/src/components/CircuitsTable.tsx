@@ -25,9 +25,10 @@ import TableRow from '@material-ui/core/TableRow';
 import { Button, withStyles, Typography } from '@material-ui/core';
 import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
 import styled from 'styled-components';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 const ceremonyProject = 'zkopru';
-const CopyIcon = () => {return (<img src='./Copy Icon.svg' />)};
+const CopyIcon = () => {return (<img src={`./Copy Icon.svg`} />)};
 
 const StyledCell = withStyles({
   root: {
@@ -43,9 +44,6 @@ const StyledTable = styled(Table)`
     background-color: ${darkerBackground};
   }
 
-  & > .complete: {
-    color: #111122;
-  }
 `;
 
 const StyledRow = styled.tr`
@@ -57,9 +55,6 @@ const StyledRow = styled.tr`
     color: ${textColor};
   }
 
-  &.complete: {
-    color: #00ff00;
-  }
 `;
 
 export default function CircuitsTable(props: any) {
@@ -141,7 +136,7 @@ export default function CircuitsTable(props: any) {
       return (<>{transcript}</>);
     };
 
-    const renderHash = (hash: string) => {
+    const renderHash = (hash: string, colour: string) => {
       let content = (<></>);
       if (hash && hash.length > 0) {
         content = (
@@ -169,7 +164,9 @@ export default function CircuitsTable(props: any) {
           </Button>
         </StyledCell>
         {isSignedIn ? 
-          <StyledCell align="left">{renderHash(circuit.hash)}</StyledCell> : <></>}
+          <StyledCell align="left">{
+            renderHash(circuit.hash, circuit.completed ? accentColor : textColor)
+            }</StyledCell> : <></>}
       </StyledRow>
     );
   }
