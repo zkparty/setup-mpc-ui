@@ -17,6 +17,7 @@ import { Player } from '@lottiefiles/react-lottie-player';
 import styled from 'styled-components';
 import VisibilitySensor from 'react-visibility-sensor';
 import AttestationPanel from './AttestationPanel';
+import { ContributionState } from '../types/ceremony';
 
 const StyledHeader = styled.div`
   font-family: Inconsolata;
@@ -81,6 +82,17 @@ const stepText = (step: Step, computeStatus: ComputeStatus): string => {
   }
 }
 
+const queueStatus = (contribState: ContributionState) => {
+  const queue = contribState.queueIndex - contribState.currentIndex; 
+  const dots = ' .'.repeat(queue);
+  return (
+    <div>
+      <NormalBodyText>{`No. ${queue} in line`}</NormalBodyText>
+      <div style={{ color: accentColor, textAlign: 'right' }}>{dots}</div>
+    </div>
+  );
+};
+
 interface ProgressProps {
   progressPct: number,
 }
@@ -128,12 +140,12 @@ const Animation = () => {
 }
 
 const status = (state: any) => {
-  const { circuits, contributionCount, step, computeStatus, progress } = state;
+  const { circuits, contributionCount, contributionState, step, computeStatus, progress } = state;
   const cctCount = circuits.length;
   let header = '';
   let body1 = (<></>);
   let body2 = (<></>);
-  if (state.step === Step.COMPLETE) {
+  if (step === Step.COMPLETE) {
     header = 'Contribution Complete.';
     body1 = (
       <div>
@@ -147,7 +159,19 @@ const status = (state: any) => {
       </div>);
     body2 = (<AttestationPanel />);
   } else {
-    header = 'Contribution Active.';
+    let statusCell = (<></>);
+    if (step === Step.QUEUED) {
+      header = 'Your are in line.';
+      statusCell = queueStatus(contributionState);
+    } else {
+      header = 'Contribution Active.';
+      statusCell = (
+        <div>
+          {stepText(step, computeStatus)}
+          <StepProgress progressPct={progress}/>
+        </div>
+      );
+    }
     body1 = (
       <div>
         <NormalBodyText>
@@ -179,14 +203,13 @@ const status = (state: any) => {
               <SubtleBody>Status</SubtleBody>
             </Grid>
             <Grid item>
-              {stepText(step, computeStatus)}
-              <StepProgress progressPct={progress}/>
+              {statusCell}
             </Grid>
           </Grid>
         </Grid>
       </div>
     );
-}
+  }
   return { header, body1, body2 };
 }
 

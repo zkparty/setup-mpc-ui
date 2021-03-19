@@ -163,7 +163,7 @@ export const ParticipantSection = () => {
         break;
       }
       case (Step.QUEUED): {
-        // Waiting for a ceremony
+        // Waiting for a circuit
         //if (contributionState) {
         //  console.debug(`contribution state: ${JSON.stringify(contributionState)}`);
         //}
