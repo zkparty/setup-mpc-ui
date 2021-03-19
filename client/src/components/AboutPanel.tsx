@@ -58,7 +58,7 @@ export default function AboutPanel(props: any) {
               borderBottomColor: subtleText,
               paddingLeft: '41px',
               paddingRight: '51px',
-              marginTop: '37px',
+              paddingTop: '37px',
             }}>
             Features
           </Grid>
