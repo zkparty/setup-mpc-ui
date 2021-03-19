@@ -29,9 +29,9 @@ import {CopyToClipboard} from 'react-copy-to-clipboard';
 import ViewLog from './ViewLog';
 import { startCircuitListener } from '../state/Circuits';
 import moment from 'moment';
+import { CopyIcon } from '../icons';
 
 const ceremonyProject = 'zkopru';
-const CopyIcon = () => {return (<img src={`./Copy Icon.svg`} />)};
 
 const StyledCell = withStyles({
   root: {
@@ -144,7 +144,7 @@ export default function CircuitsTable(props: any) {
           <CopyToClipboard text={hash} >
             <span style={{ display: 'flex', justifyContent: 'space-evenly', }}>
               <NormalBodyText style={{ color: 'inherit', fontSize: '18px' }}>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
-              <CopyIcon />
+              {CopyIcon}
             </span>
           </CopyToClipboard>
         );
