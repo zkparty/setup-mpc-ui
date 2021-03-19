@@ -1,7 +1,7 @@
 import { Box, Button, Grid, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { CalendarIcon, LightningIcon, PopOutIcon, ScaleIcon, SecureIcon, StarIcon } from '../icons';
-import { accentColor, inverseText, NormalBodyText, SubtleBody } from '../styles';
+import { accentColor, darkerBackground, inverseText, lighterBackground, NormalBodyText, StyledButton, SubtleBody, subtleText } from '../styles';
 
 const project = 'zkopru';
 
@@ -9,33 +9,33 @@ export default function AboutPanel(props: any) {
     const leftPanel = (
       <Grid container direction='column'>
         <Grid item>
-          <Typography>{`About ${project}`}</Typography>
+          <Typography style={{ marginBottom: '40px', fontSize: '48px' }}>{`about ${project}`}</Typography>
         </Grid>
         <Grid item>
-          <SubtleBody>
+          <SubtleBody style={{ marginBottom: '121px' }}>
             [zk-optimistic-rollup]
           </SubtleBody>
         </Grid>
         <Grid item>
-          <NormalBodyText style={{ wordWrap: 'break-word' }}>
+          <NormalBodyText style={{ wordWrap: 'break-word', marginBottom: '40px' }}>
             Zkopru is a novel layer-2 scaling solution that
             supports private transfers and private atomic
             swaps between ETH, ERC20, ERC721 at a low cost.
           </NormalBodyText>
         </Grid>
         <Grid>
-          <Button style={{ backgroundColor: accentColor, color: inverseText }}>
+          <StyledButton style={{ width: '217px', height: '53px', justifyContent: 'space-evenly' }}>
             Read More
             {PopOutIcon}
-          </Button>
+          </StyledButton>
         </Grid>
       </Grid>
     );
 
     const Feature = (props: any) => {
       return (
-        <Grid item container direction='row' >
-          <Grid item>
+        <Grid item container direction='row' style={{ marginBottom: '42px' }}>
+          <Grid item style={{ marginLeft: '50px', marginRight: '36px' }}>
             {props.icon}
           </Grid>
           <Grid item>
@@ -48,7 +48,18 @@ export default function AboutPanel(props: any) {
     const featuresPanel = (
       <Box>
         <Grid container direction='column' >
-          <Grid item>
+          <Grid item style={{ 
+              fontFamily: 'Inconsolata', 
+              fontSize: '24px', 
+              letterSpacing: '0.1em', 
+              color: subtleText, 
+              textTransform: 'uppercase',
+              borderBottom: '1px',
+              borderBottomColor: subtleText,
+              paddingLeft: '41px',
+              paddingRight: '51px',
+              marginTop: '37px',
+            }}>
             Features
           </Grid>
           <Feature icon={SecureIcon}>zkSNARK Privacy</Feature>
@@ -65,7 +76,7 @@ export default function AboutPanel(props: any) {
         <Grid item style={{ width: '500px' }}>
           {leftPanel}
         </Grid>
-        <Grid item style={{ width: '407px', left: '859px' }}>
+        <Grid item style={{ width: '407px', left: '859px', background: darkerBackground, marginTop: '50px' }}>
           {featuresPanel}
         </Grid>
       </Grid>
