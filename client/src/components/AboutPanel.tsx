@@ -1,7 +1,7 @@
 import { Box, Button, Grid, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { CalendarIcon, LightningIcon, PopOutIcon, ScaleIcon, SecureIcon, StarIcon } from '../icons';
-import { NormalBodyText, SubtleBody } from '../styles';
+import { accentColor, inverseText, NormalBodyText, SubtleBody } from '../styles';
 
 const project = 'zkopru';
 
@@ -17,14 +17,14 @@ export default function AboutPanel(props: any) {
           </SubtleBody>
         </Grid>
         <Grid item>
-          <NormalBodyText>
+          <NormalBodyText style={{ wordWrap: 'break-word' }}>
             Zkopru is a novel layer-2 scaling solution that
-            supports private transfers and private atomic swaps between
-            ETH, ERC20, ERC721 at a low cost.
+            supports private transfers and private atomic
+            swaps between ETH, ERC20, ERC721 at a low cost.
           </NormalBodyText>
         </Grid>
         <Grid>
-          <Button>
+          <Button style={{ backgroundColor: accentColor, color: inverseText }}>
             Read More
             {PopOutIcon}
           </Button>
@@ -34,7 +34,7 @@ export default function AboutPanel(props: any) {
 
     const Feature = (props: any) => {
       return (
-        <Grid item container direction='row'>
+        <Grid item container direction='row' >
           <Grid item>
             {props.icon}
           </Grid>
@@ -47,7 +47,7 @@ export default function AboutPanel(props: any) {
 
     const featuresPanel = (
       <Box>
-        <Grid container direction='column'>
+        <Grid container direction='column' >
           <Grid item>
             Features
           </Grid>
@@ -62,10 +62,10 @@ export default function AboutPanel(props: any) {
 
     return (
       <Grid container direction='row'>
-        <Grid item>
+        <Grid item style={{ width: '500px' }}>
           {leftPanel}
         </Grid>
-        <Grid item>
+        <Grid item style={{ width: '407px', left: '859px' }}>
           {featuresPanel}
         </Grid>
       </Grid>
