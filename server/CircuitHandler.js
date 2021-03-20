@@ -217,7 +217,7 @@ async function verifyContribution(ceremonyId, index) {
                     'VERIFY_FAILED',
                     `Contribution failed to be verified.`
                 );
-                updateContribution(ceremonyId, { ...contrib, status: "INVALIDATED" });
+                updateContribution(ceremonyId, { queueIndex: index, status: "INVALIDATED" });
             }
 
             // Save verification log
