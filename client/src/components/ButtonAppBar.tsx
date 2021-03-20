@@ -18,6 +18,7 @@ import {
   background,
   darkerBackground,
   NormalBodyText,
+  subtleText,
 } from "../styles";
 import Options from './Options';
 import { ComputeStateContext, Step } from '../state/ComputeStateManager';
@@ -193,7 +194,9 @@ export default function ButtonAppBar() {
             {displayProgress ? 
               <div style={{ display: 'flex' }}>
                 {/*<NormalBodyText>Your contribution: </NormalBodyText>*/}
-                <CeremonyProgress format='bar' />
+                <CeremonyProgress format='bar' 
+                  barColor={(state.step === Step.QUEUED) ? subtleText : accentColor}
+                />
               </div> 
             : (<></>)}
           </Toolbar>

@@ -37,10 +37,12 @@ const StyledHeader = styled.div`
 
 interface ProgressBarProps extends LinearProgressProps {
   size: string,
+  barColor: string,
 }
 
 const StyledProgressBar = styled(LinearProgress).attrs((props: ProgressBarProps) => ({
   size: props.size || 'normal',
+  barColor: props.barColor || accentColor,
 }))`
   padding-top: ${ ({ size }) => {return (size === 'small') ? '0px' : '5px';} }; 
   border-radius: 20px; 
@@ -52,8 +54,8 @@ const StyledProgressBar = styled(LinearProgress).attrs((props: ProgressBarProps)
 
   & > .MuiLinearProgress-barColorPrimary {
     border-radius: 20px;
-    background-color: ${accentColor};
-    border-color: ${accentColor};
+    background-color: ${({barColor}) => barColor};
+    border-color: ${({barColor}) => barColor};
   }
 
   &.MuiLinearProgress-root.MuiLinearProgress-colorPrimary {
@@ -105,7 +107,7 @@ export const CeremonyProgress = (props: any) => {
   const { format } = props;
 
   const prefix = (format && format === 'bar') ?
-    (<NormalBodyText>
+    (<NormalBodyText style={{ paddingRight: '20px' }} >
       {`C${contributionCount+1} ${stepText(step, computeStatus)}`}
     </NormalBodyText>)
     :
@@ -113,12 +115,13 @@ export const CeremonyProgress = (props: any) => {
 
   return (
     <Box display="flex" alignItems="center">
-      <Box width="100%" mr={1}>
+      <Box width="100%" mr={1} style={{ display:'flex', flexDirection:'row', alignItems:'center' }} >
         {prefix}
         <StyledProgressBar 
           variant="determinate" 
           value={ceremonyPct} 
           size='normal'
+          barColor={(step === Step.QUEUED) ? subtleText : accentColor}
         />
       </Box>
       <Box minWidth={35}>
