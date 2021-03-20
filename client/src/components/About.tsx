@@ -36,13 +36,6 @@ export default function About(props: any) {
       </div>
     );
 
-    return (
-        <ContentModal
-            open={props.open}
-            close={props.close}
-            title='About the Phase 2 MPC'
-            body={body}
-        />
-    );
+    return body;
 }
   
