@@ -213,6 +213,35 @@ export const ceremonyEventListener = async (ceremonyId: string | undefined, call
     return unsub;
 };
 
+/* Listens for events on all circuits */
+export const circuitEventListener = async (callback: (e: any) => void): Promise<()=>void> => {
+  const db = firebase.firestore();
+  const query = db.collectionGroup("events")
+              .where('timestamp', '>', firebase.firestore.Timestamp.now());
+
+  const unsub = query.onSnapshot(querySnapshot => {
+    //console.debug(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
+    querySnapshot.docChanges().forEach(docSnapshot => {
+      var event = docSnapshot.doc.data();
+      const ceremony = docSnapshot.doc.ref.parent.parent;
+      //console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
+      if (ceremony?.id === ceremonyId) {
+          switch (event.eventType) {
+              case 'PREPARED': {break;}
+              case 'STATUS_UPDATE': {
+                  callback(event);
+                  break;
+              }
+          }
+      }
+    });
+  }, err => {
+    console.warn(`Error while listening for ceremony events ${err}`);
+  });
+  return unsub;
+};
+
+
 // Listens for updates to circuit data. Running circuits only.
 export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
     const db = firebase.firestore();
