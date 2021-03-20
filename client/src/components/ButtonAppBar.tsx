@@ -192,8 +192,8 @@ export default function ButtonAppBar() {
             <ZKTitle />
             {displayProgress ? 
               <div style={{ display: 'flex' }}>
-                <NormalBodyText>Your contribution: </NormalBodyText>
-                <CeremonyProgress />
+                {/*<NormalBodyText>Your contribution: </NormalBodyText>*/}
+                <CeremonyProgress format='bar' />
               </div> 
             : (<></>)}
           </Toolbar>

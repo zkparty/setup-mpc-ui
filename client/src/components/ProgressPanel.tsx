@@ -97,20 +97,29 @@ interface ProgressProps {
   progressPct: number,
 }
 
-export const CeremonyProgress = () => {
+export const CeremonyProgress = (props: any) => {
   const state = useContext(ComputeStateContext);
-  const { circuits, contributionCount } = state;
+  const { circuits, contributionCount, step, computeStatus } = state;
   const cctCount = circuits.length;
   const ceremonyPct = (cctCount>0) ? 100 * contributionCount / cctCount : 0;
+  const { format } = props;
+
+  const prefix = (format && format === 'bar') ?
+    (<NormalBodyText>
+      {`C${contributionCount+1} ${stepText(step, computeStatus)}`}
+    </NormalBodyText>)
+    :
+    (<></>);
 
   return (
     <Box display="flex" alignItems="center">
       <Box width="100%" mr={1}>
+        {prefix}
         <StyledProgressBar 
           variant="determinate" 
           value={ceremonyPct} 
           size='normal'
-       />
+        />
       </Box>
       <Box minWidth={35}>
         <Typography variant="body2" style={{ color: subtleText }}>{`${Math.round(
@@ -194,7 +203,7 @@ const status = (state: any) => {
             </Grid>
             <Grid item>
               <NormalBodyText>
-                {contributionCount}/{cctCount}
+                {contributionCount+1}/{cctCount}
               </NormalBodyText>
             </Grid>
           </Grid>
