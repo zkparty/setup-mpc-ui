@@ -228,12 +228,13 @@ async function verifyContribution(ceremonyId, index) {
             });
             clearLogLock();
             // Save to firestore contribution record
+            let verifFile;
             let ok = verified;
             if (verified) {
                 await addVerificationToContribution(ceremonyId, index, verificationLog);
 
                 // Save to local file
-                const verifFile = localFilePath(`verification_${index}.txt`, true, ceremonyId);
+                verifFile = localFilePath(`verification_${index}.txt`, true, ceremonyId);
                 fs.writeFile(verifFile, verificationLog, err => {
                     if (err) {
                         console.err(`Error writing verification record: ${err.message}`);
@@ -260,7 +261,7 @@ async function verifyContribution(ceremonyId, index) {
             'VERIFY_FAILED',
             `Error caught while verifying. ${err.message}`
         );
-        updateContribution(ceremonyId, { ...contrib, status: "INVALIDATED" });
+        updateContribution(ceremonyId, { queueIndex: index, status: "INVALIDATED" });
     }
 };
 
