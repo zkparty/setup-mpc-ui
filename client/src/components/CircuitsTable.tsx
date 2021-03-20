@@ -27,7 +27,7 @@ import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeSta
 import styled from 'styled-components';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import ViewLog from './ViewLog';
-import { startCircuitListener } from '../state/Circuits';
+import { startCircuitEventListener, startCircuitListener } from '../state/Circuits';
 import moment from 'moment';
 import { CopyIcon } from '../icons';
 
@@ -77,6 +77,7 @@ export default function CircuitsTable(props: any) {
     if (!loaded && dispatch) {
       // Subscribe to ceremony updates
       startCircuitListener(dispatch);
+      startCircuitEventListener(dispatch);
       setLoaded(true);
     }
   }, [loaded]);

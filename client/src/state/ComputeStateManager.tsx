@@ -179,6 +179,15 @@ export const computeStateReducer = (state: any, action: any):any => {
             }
             return newState;
         }
+        case 'INCREMENT_COMPLETE_COUNT': {
+            // Circuit complete - increment the count
+            const cctId = action.data;
+            const idx = findCircuitIndex(newState.circuits, cctId);
+            if (idx >= 0) {
+              newState.circuits[idx].complete++;
+            }
+            return newState;
+        }
         case 'START_COMPUTE': {
             const msg = `It's your turn to contribute`;
             newState = addMessage(state, msg);

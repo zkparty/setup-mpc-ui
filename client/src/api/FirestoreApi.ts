@@ -225,14 +225,8 @@ export const circuitEventListener = async (callback: (e: any) => void): Promise<
       var event = docSnapshot.doc.data();
       const ceremony = docSnapshot.doc.ref.parent.parent;
       //console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
-      if (ceremony?.id === ceremonyId) {
-          switch (event.eventType) {
-              case 'PREPARED': {break;}
-              case 'STATUS_UPDATE': {
-                  callback(event);
-                  break;
-              }
-          }
+      if (event.eventType === 'VERIFIED') {
+        callback(ceremony);
       }
     });
   }, err => {

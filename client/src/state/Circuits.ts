@@ -3,7 +3,7 @@ import { getParamsFile, uploadParams } from "../api/FileApi";
 import { Ceremony } from "../types/ceremony";
 
 import { Dispatch, useContext } from "react";
-import { ceremonyListener, getParticipantContributions } from '../api/FirestoreApi';
+import { ceremonyListener, circuitEventListener, getParticipantContributions } from '../api/FirestoreApi';
 
 export const startCircuitListener = (dispatch: Dispatch<any>) => {
 
@@ -21,4 +21,20 @@ export const startCircuitListener = (dispatch: Dispatch<any>) => {
   console.debug('circuit listener started');
 }
 
+export const startCircuitEventListener = (dispatch: Dispatch<any>) => {
+
+  const updateCircuit = (circuit: Ceremony) => {
+    // Called when circuit verified.
+    // Increment complete count. Refresh verification transcript
+    console.debug(`circuit verified ${circuit.id}`);
+    if (dispatch) {
+      dispatch({
+        type: 'INCREMENT_COMPLETE_COUNT',
+        data: circuit.id,
+      });
+    }
+  }
+
+  return circuitEventListener(updateCircuit);
+}
 
