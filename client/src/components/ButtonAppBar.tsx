@@ -19,11 +19,12 @@ import {
   darkerBackground,
   NormalBodyText,
 } from "../styles";
-import About from './About';
 import Options from './Options';
 import { ComputeStateContext, Step } from '../state/ComputeStateManager';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import { CeremonyProgress } from './ProgressPanel';
+
+const allowReset = true;
 
 interface ScrollProps {
   children: React.ReactElement;
@@ -96,7 +97,6 @@ interface MainMenuProps {
 }
 
 const MainMenu = (props: MainMenuProps) => {
-  const [openAbout, setOpenAbout] = useState(false);
   const [openOptions, setOpenOptions] = useState(false);
   const auth = useContext(AuthStateContext);
 
@@ -109,12 +109,12 @@ const MainMenu = (props: MainMenuProps) => {
     });
   }
 
-  const toggleAbout = () => {
-    setOpenAbout(open => {
-      if (props.handleClose) props.handleClose({}, 'backdropClick');
-      return !open;
-    });
-  }
+  // const toggleAbout = () => {
+  //   setOpenAbout(open => {
+  //     if (props.handleClose) props.handleClose({}, 'backdropClick');
+  //     return !open;
+  //   });
+  // }
 
   return (
     <span>
@@ -125,21 +125,23 @@ const MainMenu = (props: MainMenuProps) => {
         open={Boolean(props.anchorEl)}
         onClose={props.handleClose}
       >
-        <StyledMenuItem>
-          <ListItemIcon style={{ color: accentColor }} >
-              <SettingsIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="Options" onClick={toggleOptions} style={{ color: accentColor }} />
-        </StyledMenuItem>
+          {allowReset ? (
+            <StyledMenuItem>
+              <ListItemIcon style={{ color: accentColor }} >
+                <SettingsIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="Options" onClick={toggleOptions} style={{ color: accentColor }} />
+            </StyledMenuItem>
+            ) : (<></>)
+          }
         <StyledMenuItem>
           <ListItemText primary="Logout"  onClick={props.logout}/>
         </StyledMenuItem>
         <StyledMenuItem>
-          <ListItemText primary="New Circuit" onClick={toggleAbout}/>
+          <ListItemText primary="New Circuit" onClick={() => true}/>
         </StyledMenuItem>
       </StyledMenu>
       <Options open={openOptions} close={toggleOptions} />
-      <About open={openAbout} close={toggleAbout} />
     </span>
   );
 };

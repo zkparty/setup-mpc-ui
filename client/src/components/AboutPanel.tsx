@@ -85,6 +85,15 @@ export default function AboutPanel(props: any) {
     </Box>
   );
 
+  const aboutModal = (modalOpen) ? 
+    <ViewLog 
+      open={modalOpen} 
+      close={closeModal} 
+      content={(<About />)} 
+      title={`About the zkopru trusted setup`} />
+  :
+    (<></>);
+
   return (
     <Box>
       <Grid container direction='row'>
@@ -95,11 +104,7 @@ export default function AboutPanel(props: any) {
           {featuresPanel}
         </Grid>
       </Grid>
-        <ViewLog 
-          open={modalOpen} 
-          close={closeModal} 
-          content={(<About />)} 
-          title={`About the zkopru trusted setup`} />
+      {aboutModal}
     </Box>
   );
 }
