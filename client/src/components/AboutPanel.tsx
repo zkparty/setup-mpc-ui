@@ -2,7 +2,7 @@ import { Box, Button, Grid, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { useState } from 'react';
 import { CalendarIcon, LightningIcon, PopOutIcon, ScaleIcon, SecureIcon, StarIcon } from '../icons';
-import { accentColor, darkerBackground, inverseText, lighterBackground, NormalBodyText, StyledButton, SubtleBody, subtleText } from '../styles';
+import { accentColor, darkerBackground, inverseText, lighterBackground, NormalBodyText, PanelTitle, StyledButton, SubtleBody, subtleText } from '../styles';
 import About from './About';
 import ViewLog from './ViewLog';
 
@@ -21,7 +21,7 @@ export default function AboutPanel(props: any) {
   const leftPanel = (
     <Grid container direction='column'>
       <Grid item>
-        <Typography style={{ marginBottom: '40px', fontSize: '48px' }}>{`about ${project}`}</Typography>
+        <PanelTitle style={{ marginBottom: '40px' }}>{`about ${project}`}</PanelTitle>
       </Grid>
       <Grid item>
         <SubtleBody style={{ marginBottom: '121px' }}>

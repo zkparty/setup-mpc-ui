@@ -201,8 +201,8 @@ const status = (state: any) => {
         </Grid>
         <Grid item container spacing={6} direction='row' style={{ marginTop:'58px' }} >
           <Grid item container direction='column' style={{ width: '150px' }} >
-            <Grid item style={{ height: '34px', alignContent: 'left' }} >
-              <SubtleBody>Circuit</SubtleBody>
+            <Grid item style={{ height: '34px' }} >
+              <SubtleBody style={{ justifyContent: 'left' }}>Circuit</SubtleBody>
             </Grid>
             <Grid item>
               <NormalBodyText>
@@ -212,7 +212,7 @@ const status = (state: any) => {
           </Grid>
           <Grid item container direction='column' style={{ width: '150px' }} >
             <Grid item style={{ height: '34px' }} >
-              <SubtleBody>Status</SubtleBody>
+              <SubtleBody style={{ justifyContent: 'left' }}>Status</SubtleBody>
             </Grid>
             <Grid item>
               {statusCell}

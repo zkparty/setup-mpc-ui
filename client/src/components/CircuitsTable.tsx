@@ -12,6 +12,7 @@ import {
     NormalBodyText,
     darkerBackground,
     gray1,
+    PanelTitle,
   } from "../styles";
 //import './styles.css';
 import { Ceremony } from "../types/ceremony";
@@ -90,19 +91,13 @@ export default function CircuitsTable(props: any) {
 
   return (
     <TableContainer component='div' style={{ width: '778px' }}>
-      <Typography variant='h2' style={{
-         fontFamily: 'Inconsolata',
-         fontWeight: 'bold', 
-         fontSize: '48px' , 
-         color: textColor, 
+      <PanelTitle style={{ 
          height: '100px',
          paddingBottom: '6px',
       }}>
         {`${ceremonyProject} circuits`}
-      </Typography>
-      <NormalBodyText style={{ 
-        paddingBottom: '64px',
-        }}>
+      </PanelTitle>
+      <NormalBodyText style={{ paddingBottom: '64px', }}>
         {`All participants will contribute a computation to ${circuits.length} different circuits. There is no limit
         to the number of contributions each circuit can accept - The more the merrier! 
         Participants receive a hash for each completed circuit, which acts as a signature of 

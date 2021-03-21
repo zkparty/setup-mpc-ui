@@ -116,6 +116,22 @@ export const NormalBodyText = styled.div`
   color: ${textColor};
 `;
 
+export const PanelTitle = styled.div`
+  font-family: Inconsolata;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 48px;
+  line-height: 140%;
+  /* or 67px */
+
+  display: flex;
+  align-items: center;
+
+  /* Text/Normal */
+
+  color: ${textColor};
+`
+
 
 // ##########################
 // Fonts
