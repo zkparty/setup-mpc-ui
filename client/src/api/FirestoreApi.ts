@@ -120,7 +120,7 @@ export const getCeremonies = async (): Promise<Ceremony[]> => {
   const ceremonies = await Promise.all(
     ceremonySnapshot.docs.map(async doc => {
       const count = await getCeremonyStats(doc.ref.id);
-      const c: Ceremony = {...doc.data(), ...count}
+      const c: Ceremony = {...doc.data(), ...count};
       return c;
     }));
   return ceremonies;
@@ -146,7 +146,7 @@ export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference
       lastVerifiedIndex = qi;
       transcript = tx;
     }
-  })
+  });
 
   query = await contribQuery  
     .where('status', '==', 'WAITING')
