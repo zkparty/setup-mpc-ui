@@ -169,7 +169,7 @@ const status = (state: any) => {
         Thank you for participating!
         </NormalBodyText>
       </div>);
-    body2 = (<AttestationPanel />);
+    body2 = (<AttestationPanel style={{ marginTop: '80px' }}/>);
   } else {
     let statusCell = (<></>);
     if (step === Step.QUEUED) {
@@ -185,7 +185,7 @@ const status = (state: any) => {
       );
     }
     body1 = (
-      <div>
+      <div style={{ lineHeight: '0px', width: 'max-content' }}>
         <NormalBodyText>
         ATTENTION:
         </NormalBodyText>
@@ -195,13 +195,13 @@ const status = (state: any) => {
         </NormalBodyText>
       </div>);
     body2 = (
-      <div>
+      <div style={{ marginTop: '80px' }}>
         <Grid item>
           <CeremonyProgress />
         </Grid>
-        <Grid item container spacing={6} direction='row'>
+        <Grid item container spacing={6} direction='row' style={{ marginTop:'58px' }} >
           <Grid item container direction='column' style={{ width: '150px' }} >
-            <Grid item style={{ height: '34px' }} >
+            <Grid item style={{ height: '34px', alignContent: 'left' }} >
               <SubtleBody>Circuit</SubtleBody>
             </Grid>
             <Grid item>
@@ -225,7 +225,7 @@ const status = (state: any) => {
   return { header, body1, body2 };
 }
 
-export default function ProgressPanel(props: any) {
+export default function ProgressPanel() {
   const state = useContext(ComputeStateContext);
   const dispatch = useContext(ComputeDispatchContext);
 
@@ -233,26 +233,26 @@ export default function ProgressPanel(props: any) {
 
   return (
     <div>
-      <VisibilitySensor onChange={isVisible => {if (dispatch) dispatch({type:'VISIBILITY', data: isVisible})}}>
-        <Grid container spacing={4} direction='row' style={{ display: 'flex' }} >
+        <Grid container spacing={4} direction='row' style={{ display: 'flex', paddingTop: '86px' }} >
           <Grid item style={{ width: '45%' }} >
             <Animation />
           </Grid>
-          <Grid item container direction='column' style={{ width: '55%' }} >
+          <Grid item container direction='column' style={{ width: '55%', paddingTop: '41px', display: 'flex', justifyContent: 'space-evenly' }} >
             <Grid item>
-              <StyledHeader>
+              <StyledHeader style={{  }}>
                 {content.header}
               </StyledHeader>
             </Grid>
             <Grid item>
-              {content.body1}
+              <VisibilitySensor onChange={isVisible => {if (dispatch) dispatch({type:'VISIBILITY', data: isVisible})}}>
+                {content.body1}
+              </VisibilitySensor>
             </Grid>
             <Grid item>
               {content.body2}
             </Grid>
           </Grid>
         </Grid>
-      </VisibilitySensor>
     </div>
   );
 }

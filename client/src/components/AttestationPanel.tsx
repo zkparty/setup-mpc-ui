@@ -25,6 +25,7 @@ const StyledAccentButton = styled.a`
   display: flex;
   align-items: center;
   margin-right: 32px;
+  text-decoration: none;
 `
 
 const StyledButton = styled.a`
@@ -37,6 +38,9 @@ const StyledButton = styled.a`
   width: 216px;
   height: 53px;
   align-items: center;
+  display: grid;
+  justify-content: center;
+  text-decoration: none;
 `
 
 const tweetText = (siteSettings: any, url: string): string => {

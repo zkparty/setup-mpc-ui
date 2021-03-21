@@ -97,6 +97,7 @@ export const SubtleBody = styled.div`
 
   display: flex;
   align-items: center;
+  justify-content: space-evenly;
   text-align: center;
   color: ${subtleText}
 `
