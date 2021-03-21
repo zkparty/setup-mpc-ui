@@ -179,6 +179,10 @@ export const computeStateReducer = (state: any, action: any):any => {
             }
             return newState;
         }
+        case 'SET_CIRCUITS': {
+            newState.circuits = action.data;
+            return newState;
+        }
         case 'INCREMENT_COMPLETE_COUNT': {
             // Circuit complete - increment the count
             const cctId = action.data;

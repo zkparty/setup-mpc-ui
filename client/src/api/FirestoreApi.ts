@@ -113,11 +113,13 @@ export const getCeremonies = async (): Promise<Ceremony[]> => {
   const ceremonySnapshot = await db
       .collection("ceremonies")
       .withConverter(ceremonyConverter)
+      .orderBy('sequence')
+      .where('ceremonyState', '==', RUNNING)
       .get();
 
   const ceremonies = await Promise.all(
     ceremonySnapshot.docs.map(async doc => {
-      const count = await getCeremonyCount(doc.ref);
+      const count = await getCeremonyStats(doc.ref.id);
       const c: Ceremony = {...doc.data(), ...count}
       return c;
     }));
@@ -321,7 +323,7 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
   const query = db.collection("ceremonies")
     .withConverter(ceremonyConverter)
     .where('ceremonyState', 'in', states)
-    .orderBy('startTime', 'asc');
+    .orderBy('sequence', 'asc');
 
   let found = false;
 

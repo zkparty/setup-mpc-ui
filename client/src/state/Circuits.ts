@@ -1,24 +1,18 @@
-import * as React from 'react';
-import { getParamsFile, uploadParams } from "../api/FileApi";
 import { Ceremony } from "../types/ceremony";
 
 import { Dispatch, useContext } from "react";
-import { ceremonyListener, circuitEventListener, getParticipantContributions } from '../api/FirestoreApi';
+import { ceremonyListener, circuitEventListener, getCeremonies, getParticipantContributions } from '../api/FirestoreApi';
 
 export const startCircuitListener = (dispatch: Dispatch<any>) => {
 
-  const updateCircuit = (circuit: Ceremony) => {
-    //console.log(`${ceremony}`);
+  getCeremonies().then(circuits => {
     if (dispatch) {
-        dispatch({
-            type: 'UPDATE_CIRCUIT',
-            data: circuit,
-        });
-    }
-  };
-
-  ceremonyListener(updateCircuit);
-  console.debug('circuit listener started');
+      dispatch({
+        type: 'SET_CIRCUITS',
+        data: circuits,
+      })
+  }});
+  console.debug('circuits getter started');
 }
 
 export const startCircuitEventListener = (dispatch: Dispatch<any>) => {
