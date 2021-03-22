@@ -37,13 +37,10 @@ const StyledCell = withStyles({
   }
 })(TableCell);
 
-const StyledTable = styled(Table)`
-  .root: {
-    color: ${textColor};
-    background-color: ${darkerBackground};
-  }
+const StyledTable = styled.table`
+  color: ${textColor};
+  background-color: ${darkerBackground};
 `;
-
 
 const StyledRow = styled.tr`
   color: ${(props: { completed?: boolean; }) => props.completed ? accentColor : textColor};
@@ -70,7 +67,7 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
 
   return (
       <TableContainer component='div'>
-        <StyledTable size="small" aria-label="circuits table" >
+        <StyledTable aria-label="circuits table" >
           <TableHead>
             <StyledRow>
               <StyledCell style={{ width: '105px' }}>Circuit</StyledCell>
