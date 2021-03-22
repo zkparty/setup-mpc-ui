@@ -8,6 +8,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from '@material-ui/core/Toolbar';
 import MenuIcon from '@material-ui/icons/MenuOutlined';
+import CloseIcon from '@material-ui/icons/Close';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { ZKTitle } from "./Title";
 import { AuthStateContext, AuthDispatchContext } from "../state/AuthContext";
@@ -19,6 +20,7 @@ import {
   darkerBackground,
   NormalBodyText,
   subtleText,
+  lighterBackground,
 } from "../styles";
 import Options from './Options';
 import { ComputeStateContext, Step } from '../state/ComputeStateManager';
@@ -46,7 +48,7 @@ function ElevationScroll(props: ScrollProps) {
 
 const StyledMenu = withStyles({
   paper: {
-    border: '1px solid #d3d4d5',
+    border: `1px solid ${lighterBackground}`,
     background: background,
     color: accentColor,
   },
@@ -71,7 +73,7 @@ const StyledMenuItem = withStyles((theme) => ({
     '&:focus': {
       backgroundColor: "unset",
       '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-        color: accentColor,
+        color: textColor,
       },
     },
   },
@@ -136,11 +138,16 @@ const MainMenu = (props: MainMenuProps) => {
             ) : (<></>)
           }
         <StyledMenuItem>
-          <ListItemText primary="Logout"  onClick={props.logout}/>
+          <ListItemText primary="Logout"  
+            onClick={ enableLogout ? props.logout : undefined } 
+            style={{ color: (enableLogout ? textColor : subtleText) }} />
         </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemText primary="New Circuit" onClick={() => true}/>
-        </StyledMenuItem>
+        {auth.isCoordinator ?
+          (<StyledMenuItem>
+            <ListItemText primary="New Circuit" onClick={() => true}/>
+          </StyledMenuItem>) 
+          : (<></>)
+        }
       </StyledMenu>
       <Options open={openOptions} close={toggleOptions} />
     </span>
@@ -154,7 +161,12 @@ export default function ButtonAppBar() {
   const classes = useStyles();
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    // Toggle menu
+    if (menuAnchorEl) {
+      handleMenuClose();
+    } else {
       setMenuAnchorEl(event.currentTarget);
+    }
   };
   
   const handleMenuClose = () => {
@@ -173,6 +185,12 @@ export default function ButtonAppBar() {
     state.step === Step.RUNNING)
     && !state.isProgressPanelVisible
   );
+
+  const menuIcon = (
+      menuAnchorEl ? 
+        (<CloseIcon style={{ color: textColor }}/>)
+      : (<MenuIcon style={{ color: textColor }}/>)
+  );
       
   return (
     <div className={classes.root}>
@@ -187,7 +205,7 @@ export default function ButtonAppBar() {
               aria-haspopup="true"
               onClick={handleMenuClick}
               >
-              <MenuIcon style={{ color: accentColor }}/>
+              {menuIcon}
             </IconButton>
             <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} logout={handleLogout} />
             <ZKTitle />
