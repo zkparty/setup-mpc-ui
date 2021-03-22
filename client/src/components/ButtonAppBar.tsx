@@ -128,20 +128,20 @@ const MainMenu = (props: MainMenuProps) => {
         open={Boolean(props.anchorEl)}
         onClose={props.handleClose}
       >
-          {allowReset ? (
-            <StyledMenuItem>
-              <ListItemIcon style={{ color: accentColor }} >
-                <SettingsIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText primary="Options" onClick={toggleOptions} style={{ color: accentColor }} />
-            </StyledMenuItem>
-            ) : (<></>)
-          }
         <StyledMenuItem>
           <ListItemText primary="Logout"  
             onClick={ enableLogout ? props.logout : undefined } 
             style={{ color: (enableLogout ? textColor : subtleText) }} />
         </StyledMenuItem>
+        {allowReset ? (
+          <StyledMenuItem>
+            <ListItemIcon style={{ color: accentColor }} >
+              <SettingsIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Options" onClick={toggleOptions} style={{ color: accentColor }} />
+          </StyledMenuItem>
+          ) : (<></>)
+        }
         {auth.isCoordinator ?
           (<StyledMenuItem>
             <ListItemText primary="New Circuit" onClick={() => true}/>
