@@ -40,6 +40,8 @@ const StyledCell = withStyles({
 const StyledTable = styled.table`
   color: ${textColor};
   background-color: ${darkerBackground};
+  padding-top: 0px;
+  padding-bottom: 0px;
 `;
 
 const StyledRow = styled.tr`
@@ -73,7 +75,7 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
               <StyledCell style={{ width: '105px' }}>Circuit</StyledCell>
               <StyledCell style={{ width: '167px' }} align="center">Contributions</StyledCell>
               <StyledCell style={{ width: '156px' }} align="center">Average Time</StyledCell>
-              <StyledCell style={{ width: '157px' }} align="center">Transcript</StyledCell>
+              <StyledCell style={{ width: '140px' }} align="center">Transcript</StyledCell>
               {isLoggedIn ? 
                 (<StyledCell style={{ width: '193px' }} align="center">My Hash</StyledCell>) :
                 (<></>)

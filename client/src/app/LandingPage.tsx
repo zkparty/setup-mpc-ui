@@ -36,7 +36,7 @@ export const LandingPage = () => {
     return (
       <Fragment>
         <ButtonAppBar />
-        <PageContainer>
+        <PageContainer style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div>
             <Box style={{ height: '608px' }} >
               <ParticipantSection />
@@ -44,10 +44,7 @@ export const LandingPage = () => {
             <Box style={{ height: '486px' }} >
               <AboutPanel />
             </Box>
-            <CircuitsPanel />
-            <Box style={{ height: '112px' }} >
-              <Footer />
-            </Box>
+            <CircuitsPanel  />
             <Modal
               open={selection.openModal}
               onClose={closeModal}
@@ -63,6 +60,9 @@ export const LandingPage = () => {
             </Modal>
           </div>
         </PageContainer>
+        <Box style={{ height: '112px', backgroundColor: '#000000' }} >
+          <Footer />
+        </Box>
       </Fragment>
   );
 };

@@ -25,7 +25,23 @@ import CircuitsTable from './CircuitsTable';
 
 const ceremonyProject = 'zkopru';
 
-export default function CircuitsPanel(props: any) {
+const tableText = (isLoggedIn: boolean, circuitLength: number) => {
+  return (
+    isLoggedIn ?
+     (`Your participation in the ceremony involves contributing a computation 
+     to ${circuitLength} different circuits. More complex circuits take longer 
+     to run and you may have to wait if someone before you is completing a computation.
+      Your hash is the signature of your contribution.`
+     )
+    :
+     (`All participants will contribute a computation to ${circuitLength} different circuits. There is no limit
+     to the number of contributions each circuit can accept - The more the merrier! 
+     Participants receive a hash for each completed circuit, which acts as a signature of 
+     their contribution`)
+  );
+}
+
+export default function CircuitsPanel() {
   const state = useContext(ComputeStateContext);
   const dispatch = useContext(ComputeDispatchContext);
   const authState = useContext(AuthStateContext);
@@ -33,7 +49,7 @@ export default function CircuitsPanel(props: any) {
   //console.debug(`render circuits table`);
 
   const { circuits } = state;
-  const { isLoggedIn, authUser, } = authState;
+  const { isLoggedIn, } = authState;
 
   useEffect(() => {
     if (!loaded && dispatch) {
@@ -45,7 +61,7 @@ export default function CircuitsPanel(props: any) {
   }, [loaded]);
 
   return (
-    <TableContainer component='div' style={{ width: '778px' }}>
+    <TableContainer component='div' style={{ width: '778px', marginLeft: '80px' }}>
       <PanelTitle style={{ 
          height: '100px',
          paddingBottom: '6px',
@@ -53,10 +69,7 @@ export default function CircuitsPanel(props: any) {
         {`${ceremonyProject} circuits`}
       </PanelTitle>
       <NormalBodyText style={{ paddingBottom: '64px', }}>
-        {`All participants will contribute a computation to ${circuits.length} different circuits. There is no limit
-        to the number of contributions each circuit can accept - The more the merrier! 
-        Participants receive a hash for each completed circuit, which acts as a signature of 
-        their contribution`}
+        {tableText(isLoggedIn, circuits.length)}
       </NormalBodyText>
       <CircuitsTable isLoggedIn={isLoggedIn} circuits={circuits} />
     </TableContainer>
