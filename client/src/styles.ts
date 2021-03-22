@@ -60,13 +60,12 @@ export const StyledButton = styled.button`
   
   display: flex;
   align-items: center;
-  
-  /* Gray 1 */
-  
-  font-color: ${gray1};
+  justify-content: space-evenly;
+    
+  color: ${inverseText};
 
   &:hover {
-    border-color: secondAccent;
+    border-color: ${secondAccent};
     cursor: pointer;
   }
 `

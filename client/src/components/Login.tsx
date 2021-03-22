@@ -53,9 +53,9 @@ const Login = () => {
   };
 
   return (
-    <StyledButton onClick={handleGithubLogin} >
+    <StyledButton onClick={handleGithubLogin} style={{ width: '163px' }}>
       <GitHubIcon />
-      &nbsp;Login
+      Login
     </StyledButton>
   );
 };

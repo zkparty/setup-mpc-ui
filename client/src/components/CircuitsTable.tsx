@@ -23,7 +23,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { Button, withStyles, Typography } from '@material-ui/core';
+import { Button, withStyles } from '@material-ui/core';
 import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
 import styled from 'styled-components';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
@@ -31,6 +31,7 @@ import ViewLog from './ViewLog';
 import { startCircuitEventListener, startCircuitListener } from '../state/Circuits';
 import moment from 'moment';
 import { CopyIcon } from '../icons';
+import { AuthStateContext } from '../state/AuthContext';
 
 const ceremonyProject = 'zkopru';
 
@@ -47,7 +48,6 @@ const StyledTable = styled(Table)`
     color: ${textColor};
     background-color: ${darkerBackground};
   }
-
 `;
 
 
@@ -59,24 +59,25 @@ const StyledRow = styled.tr`
   .head: {
     color: ${textColor};
   }
-
 `;
 
 export default function CircuitsTable(props: any) {
   const state = useContext(ComputeStateContext);
   const dispatch = useContext(ComputeDispatchContext);
+  const authState = useContext(AuthStateContext);
   const [loaded, setLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
-  console.debug(`render circuits table`);
+  //console.debug(`render circuits table`);
 
-  const { circuits, participant } = state;
+  const { circuits } = state;
+  const { isLoggedIn, authUser, } = authState;
 
-  const isSignedIn = (participant instanceof Object);
+  //const isSignedIn = (participant instanceof Object);
 
   useEffect(() => {
     if (!loaded && dispatch) {
-      // Subscribe to ceremony updates
+      // Get circuits. Listen for updates
       startCircuitListener(dispatch);
       startCircuitEventListener(dispatch);
       setLoaded(true);
@@ -110,7 +111,7 @@ export default function CircuitsTable(props: any) {
             <StyledCell style={{ width: '167px' }} align="center">Contributions</StyledCell>
             <StyledCell style={{ width: '156px' }} align="center">Average Time</StyledCell>
             <StyledCell style={{ width: '157px' }} align="center">Transcript</StyledCell>
-            {isSignedIn ? 
+            {isLoggedIn ? 
               (<StyledCell style={{ width: '193px' }} align="center">My Hash</StyledCell>) :
               (<></>)
             }
@@ -118,7 +119,7 @@ export default function CircuitsTable(props: any) {
         </TableHead>
         <TableBody>
           {circuits.map((circuit, index) => 
-            renderRow(circuit, index+1, isSignedIn, openTranscript)
+            renderRow(circuit, index+1, isLoggedIn, openTranscript)
           )}
         </TableBody>
       </StyledTable>
@@ -138,8 +139,10 @@ export default function CircuitsTable(props: any) {
       if (hash && hash.length > 0) {
         content = (
           <CopyToClipboard text={hash} >
-            <span style={{ display: 'flex', justifyContent: 'space-evenly', }}>
-              <NormalBodyText style={{ color: 'inherit', fontSize: '18px' }}>{`${hash.substr(0,3)}...${hash.substr(-3)}`}</NormalBodyText>
+            <span style={{ display: 'flex', justifyContent: 'space-evenly',  }}>
+              <NormalBodyText style={{ color: 'inherit', fontSize: '18px' }}>
+                {`${hash.substr(0,3)}...${hash.substr(-3)}`}
+              </NormalBodyText>
               {CopyIcon}
             </span>
           </CopyToClipboard>
