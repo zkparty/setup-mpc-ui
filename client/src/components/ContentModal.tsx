@@ -1,9 +1,11 @@
-import { Button, Dialog, DialogContent, DialogProps, DialogTitle } from '@material-ui/core';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { Button, Dialog,  DialogProps, IconButton, Typography } from '@material-ui/core';
+import { createStyles, makeStyles, Theme, withStyles, WithStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
-import { NONAME } from 'dns';
 import * as React from 'react';
 import { background, darkerBackground, inverseText, lightBorder, textColor } from '../styles';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import MuiDialogActions from '@material-ui/core/DialogActions';
 
 function getModalStyle() {
   const top = 0;
@@ -14,16 +16,22 @@ function getModalStyle() {
     left: `${left}%`,
     height: '100%',
     width: '100%',
-    //transform: `translate(-20%, -5%)`,
     backgroundColor: background,
     opacity: '0.8',
   };
 }
   
-const useStyles = makeStyles((theme: Theme) =>
+const styles = (theme: Theme) =>
   createStyles({
+    root: {
+      margin: 0,
+      padding: theme.spacing(2),
+    },
     paper: {
       position: 'absolute',
+      transform: `translate(-20%, -5%)`,
+      top: '30%',
+      left: '20%',
       //width: 600,
       backgroundColor: darkerBackground,
       border: `2px solid ${textColor}`,
@@ -42,13 +50,61 @@ const useStyles = makeStyles((theme: Theme) =>
       /*backgroundColor: background,*/
       backgroundColor: 'rgba(14,41,54,0.8)', /* Black w/ opacity */
       /* opacity: '0.8',*/
+    },
+    closeButton: {
+      position: 'absolute',
+      right: theme.spacing(1),
+      top: theme.spacing(1),
+      color: textColor,
+    },
+    title: {
+      color: textColor,
+      backgroundColor: darkerBackground,
     }
-  }),
-);
+  });
+
+export interface DialogTitleProps extends WithStyles<typeof styles> {
+  id: string;
+  children: React.ReactNode;
+  onClose: () => void;
+}
+
+const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
+  const { children, classes, onClose, ...other } = props;
+  return (
+    <MuiDialogTitle disableTypography className={classes.title} {...other}>
+      <Typography variant="h6">{children}</Typography>
+      {onClose ? (
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </MuiDialogTitle>
+  );
+});
+
+const DialogContent = withStyles((theme: Theme) => ({
+  root: {
+    padding: theme.spacing(2),
+    display: 'flex', 
+    justifyContent: 'center', 
+    color: textColor,
+    backgroundColor: background,
+    border: `1px solid ${lightBorder}`,
+    boxSizing: 'border-box',
+},
+}))(MuiDialogContent);
+
+const DialogActions = withStyles((theme: Theme) => ({
+  root: {
+    margin: 0,
+    padding: theme.spacing(1),
+  },
+}))(MuiDialogActions);
 
 export default function ContentModal(props: 
   {open: boolean, close: ()=>void, title?: string, body:JSX.Element}) {
-    const classes = useStyles();
+    //const classes = useStyles(styles);
 
     return (
       <Dialog
@@ -59,30 +115,24 @@ export default function ContentModal(props:
           maxWidth='lg'
           scroll='paper'
           /*fullScreen={true}*/
-          style={getModalStyle()} 
+          /*style={getModalStyle()} 
           className={classes.paper}
-          BackdropProps={{ classes: { root: classes.backDrop } }}
+          BackdropProps={{ classes: { root: classes.backDrop } }}*/
       >
-        <div style={{ position: 'fixed', top: 0, right: 0 }}>
+      {/*  <div style={{ position: 'fixed', top: 0, right: 0 }}>
           <Button onClick={props.close} style={{ color: textColor }}>
             <CloseIcon />
           </Button>
-        </div>
-        <DialogTitle id='scroll-dialog-title' 
-          style={{ color: textColor, backgroundColor: darkerBackground }}>
+    </div> */}
+        <DialogTitle id='scroll-dialog-title' onClose={props.close} >
           {props.title}
         </DialogTitle>
-        <DialogContent dividers={true} 
-          style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            color: textColor,
-            backgroundColor: background,
-            border: `1px solid ${lightBorder}`,
-            boxSizing: 'border-box',
-            }}>
+        <DialogContent dividers={true} >
           {props.body}
         </DialogContent>
+        <DialogActions>
+
+        </DialogActions>
       </Dialog>
     );
 }
