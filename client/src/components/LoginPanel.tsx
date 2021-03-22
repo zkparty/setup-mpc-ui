@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   WelcomeTitle,
   SubtleBody,
+  NormalBodyText,
 } from "../styles";
 import Login from './Login';
 
@@ -21,9 +22,9 @@ export default function LoginPanel(props: any) {
     <SubtleBody>
       {`Trusted Setup Ceremony March, 2021`} 
     </SubtleBody>
-    <Typography variant="body1" align="center">
+    <NormalBodyText style={{ marginTop: '8px' }}>
       {`Participate using your GitHub account.`} 
-    </Typography>
+    </NormalBodyText>
     <Login />
   </div>);
 }

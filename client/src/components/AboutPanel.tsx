@@ -24,7 +24,7 @@ export default function AboutPanel(props: any) {
         <PanelTitle style={{ marginBottom: '40px' }}>{`about ${project}`}</PanelTitle>
       </Grid>
       <Grid item>
-        <SubtleBody style={{ marginBottom: '121px' }}>
+        <SubtleBody style={{ marginBottom: '121px', justifyContent: 'left' }}>
           [zk-optimistic-rollup]
         </SubtleBody>
       </Grid>

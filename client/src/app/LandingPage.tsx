@@ -18,13 +18,13 @@ import { AuthStateContext } from "../state/AuthContext";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
 import { CeremonyPage } from "./CeremonyPage";
-import CircuitsTable from '../components/CircuitsTable';
 import Footer from './../components/Footer';
 import AboutPanel from './../components/AboutPanel';
 import { useSelectionContext } from '../state/SelectionContext';
 import './styles.css';
 import { withStyles } from "@material-ui/core/styles";
 import { Box } from "@material-ui/core";
+import CircuitsPanel from "../components/CircuitsPanel";
 
 export const LandingPage = () => {
     const [selection, dispatch] = useSelectionContext();
@@ -52,7 +52,7 @@ export const LandingPage = () => {
                     <Box style={{ height: '486px' }} >
                       <AboutPanel />
                     </Box>
-                    <CircuitsTable />
+                    <CircuitsPanel />
                     <Box style={{ height: '112px' }} >
                       <Footer />
                     </Box>

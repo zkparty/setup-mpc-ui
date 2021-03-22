@@ -16,7 +16,6 @@ import {
   } from "../styles";
 //import './styles.css';
 import { Ceremony } from "../types/ceremony";
-import { ceremonyListener, getCeremonies, getCeremony } from "../api/FirestoreApi";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -24,16 +23,11 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { Button, withStyles } from '@material-ui/core';
-import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
 import styled from 'styled-components';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import ViewLog from './ViewLog';
-import { startCircuitEventListener, startCircuitListener } from '../state/Circuits';
 import moment from 'moment';
 import { CopyIcon } from '../icons';
-import { AuthStateContext } from '../state/AuthContext';
-
-const ceremonyProject = 'zkopru';
 
 const StyledCell = withStyles({
   root: {
@@ -61,28 +55,12 @@ const StyledRow = styled.tr`
   }
 `;
 
-export default function CircuitsTable(props: any) {
-  const state = useContext(ComputeStateContext);
-  const dispatch = useContext(ComputeDispatchContext);
-  const authState = useContext(AuthStateContext);
-  const [loaded, setLoaded] = useState(false);
+export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ceremony[] }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState('');
   //console.debug(`render circuits table`);
 
-  const { circuits } = state;
-  const { isLoggedIn, authUser, } = authState;
-
-  //const isSignedIn = (participant instanceof Object);
-
-  useEffect(() => {
-    if (!loaded && dispatch) {
-      // Get circuits. Listen for updates
-      startCircuitListener(dispatch);
-      startCircuitEventListener(dispatch);
-      setLoaded(true);
-    }
-  }, [loaded]);
+  const { circuits, isLoggedIn } = props;
 
   const closeTranscript = () => {setModalOpen(false)};
   const openTranscript = (content: string) => {
@@ -91,44 +69,32 @@ export default function CircuitsTable(props: any) {
   }
 
   return (
-    <TableContainer component='div' style={{ width: '778px' }}>
-      <PanelTitle style={{ 
-         height: '100px',
-         paddingBottom: '6px',
-      }}>
-        {`${ceremonyProject} circuits`}
-      </PanelTitle>
-      <NormalBodyText style={{ paddingBottom: '64px', }}>
-        {`All participants will contribute a computation to ${circuits.length} different circuits. There is no limit
-        to the number of contributions each circuit can accept - The more the merrier! 
-        Participants receive a hash for each completed circuit, which acts as a signature of 
-        their contribution`}
-      </NormalBodyText>
-      <StyledTable size="small" aria-label="circuits table" >
-        <TableHead>
-          <StyledRow>
-            <StyledCell style={{ width: '105px' }}>Circuit</StyledCell>
-            <StyledCell style={{ width: '167px' }} align="center">Contributions</StyledCell>
-            <StyledCell style={{ width: '156px' }} align="center">Average Time</StyledCell>
-            <StyledCell style={{ width: '157px' }} align="center">Transcript</StyledCell>
-            {isLoggedIn ? 
-              (<StyledCell style={{ width: '193px' }} align="center">My Hash</StyledCell>) :
-              (<></>)
-            }
-          </StyledRow>
-        </TableHead>
-        <TableBody>
-          {circuits.map((circuit, index) => 
-            renderRow(circuit, index+1, isLoggedIn, openTranscript)
-          )}
-        </TableBody>
-      </StyledTable>
-      <ViewLog 
-        open={modalOpen} 
-        close={closeTranscript} 
-        content={modalContent} 
-        title={`Transcript`} />
-    </TableContainer>
+      <TableContainer component='div'>
+        <StyledTable size="small" aria-label="circuits table" >
+          <TableHead>
+            <StyledRow>
+              <StyledCell style={{ width: '105px' }}>Circuit</StyledCell>
+              <StyledCell style={{ width: '167px' }} align="center">Contributions</StyledCell>
+              <StyledCell style={{ width: '156px' }} align="center">Average Time</StyledCell>
+              <StyledCell style={{ width: '157px' }} align="center">Transcript</StyledCell>
+              {isLoggedIn ? 
+                (<StyledCell style={{ width: '193px' }} align="center">My Hash</StyledCell>) :
+                (<></>)
+              }
+            </StyledRow>
+          </TableHead>
+          <TableBody>
+            {circuits.map((circuit, index) => 
+              renderRow(circuit, index+1, isLoggedIn, openTranscript)
+            )}
+          </TableBody>
+        </StyledTable>
+        <ViewLog 
+          open={modalOpen} 
+          close={closeTranscript} 
+          content={modalContent} 
+          title={`Transcript`} />
+      </TableContainer>
     )
   };
 
