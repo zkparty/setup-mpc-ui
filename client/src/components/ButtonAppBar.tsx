@@ -135,10 +135,7 @@ const MainMenu = (props: MainMenuProps) => {
         </StyledMenuItem>
         {allowReset ? (
           <StyledMenuItem>
-            <ListItemIcon style={{ color: accentColor }} >
-              <SettingsIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Options" onClick={toggleOptions} style={{ color: accentColor }} />
+            <ListItemText primary="Options" onClick={toggleOptions} style={{ color: textColor }} />
           </StyledMenuItem>
           ) : (<></>)
         }

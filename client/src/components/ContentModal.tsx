@@ -6,15 +6,17 @@ import * as React from 'react';
 import { background, darkerBackground, inverseText, lightBorder, textColor } from '../styles';
 
 function getModalStyle() {
-  const top = 10;
-  const left = 30;
+  const top = 0;
+  const left = 0;
 
   return {
     top: `${top}%`,
     left: `${left}%`,
-    transform: `translate(-20%, -5%)`,
+    height: '100%',
+    width: '100%',
+    //transform: `translate(-20%, -5%)`,
     backgroundColor: background,
-    backgroundOpacity: '0.8',
+    opacity: '0.8',
   };
 }
   
@@ -29,8 +31,17 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(2, 4, 3),
     },
     backDrop: {
-      backgroundColor: background,
-      backgroundOpacity: '0.8',
+      position: 'fixed', /* Stay in place */
+      //zIndex: -1, /* Sit on top */
+      left: 0,
+      top: 0,
+      width: '100%', /* Full width */
+      height: '100%', /* Full height */
+      overflow: 'auto', /* Enable scroll if needed */
+      /*backgroundColor: rgb(0,0,0), /* Fallback color */
+      /*backgroundColor: background,*/
+      backgroundColor: 'rgba(14,41,54,0.8)', /* Black w/ opacity */
+      /* opacity: '0.8',*/
     }
   }),
 );
@@ -47,6 +58,7 @@ export default function ContentModal(props:
           aria-describedby="scroll-dialog-description"
           maxWidth='lg'
           scroll='paper'
+          /*fullScreen={true}*/
           style={getModalStyle()} 
           className={classes.paper}
           BackdropProps={{ classes: { root: classes.backDrop } }}
