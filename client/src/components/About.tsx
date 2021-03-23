@@ -1,7 +1,7 @@
 import { Typography } from '@material-ui/core';
 import styled from 'styled-components';
 import * as React from 'react';
-import { H3Title, HighlightBodyText, NormalBodyText, SubtleBody } from '../styles';
+import { accentColor, H3Title, HighlightBodyText, NormalBodyText, SubtleBody } from '../styles';
 
 const Section = styled.div`
   margin-bottom: 32px;
@@ -76,7 +76,7 @@ export default function About(props: any) {
   if (props.isParticipant) {
     body = (
       <div>
-        <H3Title>Important!</H3Title>
+        <H3Title style={{ color: accentColor }}>Important!</H3Title>
         <Section>
           <HighlightBodyText>
             DO NOT CLOSE OR REFRESH THE SITE while the ceremony is running. 
