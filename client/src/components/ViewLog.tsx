@@ -3,7 +3,7 @@ import * as React from 'react';
 import ContentModal from './ContentModal';
 
 export default function ViewLog(props: 
-    {open: boolean, close: ()=>void, content: string | JSX.Element, title?: string }) {
+    {open: boolean, close: ()=>void, content: string | JSX.Element, title?: string | JSX.Element }) {
 
     let body = (<></>);
     if (typeof props.content === 'string') {

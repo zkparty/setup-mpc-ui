@@ -13,6 +13,7 @@ import {
     darkerBackground,
     gray1,
     PanelTitle,
+    H3Title,
   } from "../styles";
 //import './styles.css';
 import { Ceremony } from "../types/ceremony";
@@ -56,14 +57,14 @@ const StyledRow = styled.tr`
 
 export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ceremony[] }) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState('');
+  const [modalContent, setModalContent] = useState({title: (<></>), content: (<></>)});
   //console.debug(`render circuits table`);
 
   const { circuits, isLoggedIn } = props;
 
   const closeTranscript = () => {setModalOpen(false)};
-  const openTranscript = (content: string) => {
-    setModalContent(content || 'nothing');
+  const openTranscript = (title: JSX.Element, content: JSX.Element) => {
+    setModalContent({title, content});
     setModalOpen(true);
   }
 
@@ -91,13 +92,14 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
         <ViewLog 
           open={modalOpen} 
           close={closeTranscript} 
-          content={modalContent} 
-          title={`Transcript`} />
+          content={modalContent.content} 
+          title={modalContent.title} />
       </TableContainer>
     )
   };
 
-  const renderRow = (circuit: any, index: number, isSignedIn: boolean, showTranscript: (c: string) => void) => {
+  const renderRow = (circuit: any, index: number, 
+    isSignedIn: boolean, showTranscript: (title: JSX.Element, body: JSX.Element ) => void) => {
 
     const renderHash = (hash: string) => {
       let content = (<></>);
@@ -120,6 +122,46 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
       return moment.duration(avgSecs, 'seconds').humanize();
     }
 
+    const formatTranscript = (circuit: Ceremony) => {
+      const { transcript, sequence, numConstraints, circuitFileName } = circuit;
+      
+      if (!transcript) return;
+
+      const title = (
+        <div>
+          <H3Title>Verification Transcript</H3Title>
+          <NormalBodyText>{`Circuit ${sequence}`}</NormalBodyText>
+          <NormalBodyText>{`Circuit File: ${circuitFileName}`}</NormalBodyText>
+          <NormalBodyText>{`Constraints: ${numConstraints}`}</NormalBodyText>
+        </div>
+      );
+      
+      const lineStyle = { 
+        marginBlockStart: '0em', 
+        marginBlockEnd: '0em' 
+      };
+      const linesToJsx = (content: string) => {
+        const lines: string[] = content.split('\n');
+        const body= lines.map(v => 
+          (<p style={lineStyle}>{v}</p>));
+        return (<div>{body}</div>);
+      };
+
+      const body = (
+        <div>
+          <CopyToClipboard text={transcript} >
+            <span style={{ display: 'flex', justifyContent: 'space-evenly',  }}>
+              <NormalBodyText>Copy to clipboard</NormalBodyText>
+              {CopyIcon}
+            </span>
+          </CopyToClipboard>
+          {linesToJsx(transcript)}
+        </div>
+      );
+
+      showTranscript(title, body);
+    }
+
     return (
       <StyledRow key={index} completed={circuit.completed} >
         <StyledCell align='left' >{index}</StyledCell>
@@ -133,7 +175,7 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
             font: 'Inconsolata 18px', 
             textTransform: 'none',
             textDecoration: 'underline', }}
-           onClick={() => showTranscript(circuit.transcript)}>
+           onClick={() => formatTranscript(circuit)}>
             View
           </Button>
         </StyledCell>

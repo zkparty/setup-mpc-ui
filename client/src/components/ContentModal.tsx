@@ -105,7 +105,7 @@ const DialogActions = withStyles((theme: Theme) => ({
 }))(MuiDialogActions);
 
 export default function ContentModal(props: 
-  {open: boolean, close: ()=>void, title?: string, body:JSX.Element}) {
+  {open: boolean, close: ()=>void, title?: string | JSX.Element, body:JSX.Element}) {
     //const classes = useStyles(styles);
 
     return (
