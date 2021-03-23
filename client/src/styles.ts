@@ -1,6 +1,6 @@
 import { Button } from "@material-ui/core";
 import color from "color";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import WebFont from 'webfontloader';
 
 export const background = "#081b24";
@@ -86,34 +86,45 @@ export const WelcomeTitle = styled.div`
   -webkit-text-stroke-color: ${textColor};
 `;
 
-export const SubtleBody = styled.div`
-  font-family: Inconsolata;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 24px;
-  line-height: 140%;
-  /* or 34px */
-
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  text-align: center;
-  color: ${subtleText}
-`
-
-export const NormalBodyText = styled.div`
+const textBase = css`
   font-family: Inconsolata;
   font-style: normal;
   font-weight: normal;
   font-size: 18px;
   line-height: 140%;
-  /* or 25px */
-
-
-  /* Text/Normal */
+  /* or 34px */
 
   color: ${textColor};
 `;
+
+export const SubtleBody = styled.div`
+  ${textBase}
+  font-weight: bold;
+  font-size: 16px;
+
+  color: ${subtleText};
+`;
+
+export const SubtleBodyCentred = styled.div`
+  ${textBase}
+  font-weight: bold;
+  font-size: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  text-align: center;
+  color: ${subtleText};
+`
+
+export const NormalBodyText = styled.div`
+  ${textBase}
+`;
+
+export const HighlightBodyText = styled.div`
+  ${textBase}
+  color: ${accentColor};
+`
 
 export const PanelTitle = styled.div`
   font-family: Inconsolata;
@@ -129,6 +140,17 @@ export const PanelTitle = styled.div`
   /* Text/Normal */
 
   color: ${textColor};
+`
+
+export const H3Title = styled.div`
+  font-family: Inconsolata;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 140%;
+  /* or 34px */
+  color: ${textColor};
+  marginBottom: 32px;
 `
 
 

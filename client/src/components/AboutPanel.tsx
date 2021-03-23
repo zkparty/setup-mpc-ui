@@ -1,7 +1,8 @@
 import { Box, Button, Grid, Typography } from '@material-ui/core';
 import * as React from 'react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { CalendarIcon, LightningIcon, PopOutIcon, ScaleIcon, SecureIcon, StarIcon } from '../icons';
+import { AuthStateContext } from '../state/AuthContext';
 import { accentColor, darkerBackground, inverseText, lighterBackground, NormalBodyText, PanelTitle, StyledButton, SubtleBody, subtleText } from '../styles';
 import About from './About';
 import ViewLog from './ViewLog';
@@ -10,6 +11,7 @@ const project = 'zkopru';
 
 export default function AboutPanel(props: any) {
   const [modalOpen, setModalOpen] = useState(false);
+  const authState = useContext(AuthStateContext);
   //const [modalContent, setModalContent] = useState('');
 
   const closeModal = () => {setModalOpen(false)};
@@ -89,7 +91,7 @@ export default function AboutPanel(props: any) {
     <ViewLog 
       open={modalOpen} 
       close={closeModal} 
-      content={(<About />)} 
+      content={(<About isParticipant={authState.isLoggedIn} />)} 
       title={`About the zkopru trusted setup`} />
   :
     (<></>);

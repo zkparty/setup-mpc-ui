@@ -31,8 +31,8 @@ const styles = (theme: Theme) =>
       position: 'absolute',
       transform: `translate(-20%, -5%)`,
       top: '30%',
-      left: '20%',
-      //width: 600,
+      left: '40%',
+      width: '60%',
       backgroundColor: darkerBackground,
       border: `2px solid ${textColor}`,
       boxShadow: theme.shadows[5],
@@ -114,9 +114,9 @@ export default function ContentModal(props:
           aria-describedby="scroll-dialog-description"
           maxWidth='lg'
           scroll='paper'
+          /*className={classes.paper}*/
           /*fullScreen={true}*/
-          /*style={getModalStyle()} 
-          className={classes.paper}
+          /*style={getModalStyle()}           
           BackdropProps={{ classes: { root: classes.backDrop } }}*/
       >
       {/*  <div style={{ position: 'fixed', top: 0, right: 0 }}>
@@ -130,9 +130,6 @@ export default function ContentModal(props:
         <DialogContent dividers={true} >
           {props.body}
         </DialogContent>
-        <DialogActions>
-
-        </DialogActions>
       </Dialog>
     );
 }
