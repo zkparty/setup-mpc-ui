@@ -147,10 +147,18 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
         return (<div>{body}</div>);
       };
 
+      const copyStyle = { 
+        display: 'flex', 
+        justifyContent: 'space-evenly',
+        width: '245px',
+        background: darkerBackground,
+        borderRadius: '30px',
+        marginBottom: '41px',
+      };
       const body = (
         <div>
           <CopyToClipboard text={transcript} >
-            <span style={{ display: 'flex', justifyContent: 'space-evenly',  }}>
+            <span style={copyStyle}>
               <NormalBodyText>Copy to clipboard</NormalBodyText>
               {CopyIcon}
             </span>
