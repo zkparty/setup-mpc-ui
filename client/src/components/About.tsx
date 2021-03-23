@@ -71,8 +71,8 @@ export default function About(props: any) {
           It’s an ongoing effort led by Wei Jie of the Ethereum 
           Foundation and the basis for many other ceremonies 
           such as tornado.cash and Hermez. The second step is 
-          called Phase 2 and is circuit-specific, so it should 
-          be done separately for each different SNARK. Our 
+          called Phase 2 and is circuit-specific, so it is 
+          done separately for each different SNARK circuit. Our 
           phase 2 is based on the [!insertNumber!]th 
           contribution [!insertLink!] to Perpetual Powers of Tau ceremony.
           </NormalBodyText>
@@ -102,7 +102,7 @@ export default function About(props: any) {
           <H3Title>What to expect</H3Title>
           <NormalBodyText>
           Each circuit can only have one contributor at any given time.
-          You may or may not be placed in a que to contribute to any of the 16 circuits. 
+          You may or may not be placed in a queue to contribute to any of the 16 circuits. 
           <br /><br />
           You will be notified when you are actively contributing or waiting. 
           Once you have contributed to all 16 circuits you will see a link

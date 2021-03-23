@@ -150,7 +150,7 @@ export const H3Title = styled.div`
   line-height: 140%;
   /* or 34px */
   color: ${textColor};
-  marginBottom: 32px;
+  margin-bottom: 32px;
 `
 
 
