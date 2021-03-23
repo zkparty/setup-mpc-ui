@@ -8,9 +8,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from '@material-ui/core/Toolbar';
 import MenuIcon from '@material-ui/icons/MenuOutlined';
+import CloseIcon from '@material-ui/icons/Close';
 import SettingsIcon from '@material-ui/icons/Settings';
-import InfoIcon from '@material-ui/icons/Info';
-import GitHubIcon from '@material-ui/icons/GitHub';
 import { ZKTitle } from "./Title";
 import { AuthStateContext, AuthDispatchContext } from "../state/AuthContext";
 import {
@@ -18,15 +17,38 @@ import {
   secondAccent,
   textColor,
   background,
+  darkerBackground,
+  NormalBodyText,
+  subtleText,
+  lighterBackground,
 } from "../styles";
-import { Button, Modal } from '@material-ui/core';
-import Login from './Login';
-import About from './About';
 import Options from './Options';
+import { ComputeStateContext, Step } from '../state/ComputeStateManager';
+import useScrollTrigger from '@material-ui/core/useScrollTrigger';
+import { CeremonyProgress } from './ProgressPanel';
+
+const allowReset = true;
+
+interface ScrollProps {
+  children: React.ReactElement;
+}
+
+function ElevationScroll(props: ScrollProps) {
+  const { children } = props;
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 0,
+  });
+
+  return React.cloneElement(children, {
+    elevation: trigger ? 4 : 0,
+    style: {backgroundColor: background},
+  });
+}
 
 const StyledMenu = withStyles({
   paper: {
-    border: '1px solid #d3d4d5',
+    border: `1px solid ${lighterBackground}`,
     background: background,
     color: accentColor,
   },
@@ -51,7 +73,7 @@ const StyledMenuItem = withStyles((theme) => ({
     '&:focus': {
       backgroundColor: "unset",
       '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-        color: accentColor,
+        color: textColor,
       },
     },
   },
@@ -71,40 +93,17 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-// AppBar shows LOGIN or username alongside Github icon
-const LoginButton = (props: { onClick: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined; }) => {
+interface MainMenuProps {
+  anchorEl: Element | ((element: Element) => Element) | null | undefined; 
+  handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; 
+  logout: () => void;
+}
 
-  return (
-    <AuthStateContext.Consumer>
-      {Auth => {return (Auth.isLoggedIn && Auth.authUser) ?
-        (<Button
-          aria-controls="github-login"
-          color="inherit"
-          endIcon={<GitHubIcon />}
-          style={{ color: accentColor }}
-          onClick={props.onClick}
-          >
-          {Auth.authUser.displayName || "-"}
-        </Button>)
-      : 
-        (<Button
-          aria-controls="github-login"
-          color="inherit"
-          endIcon={<GitHubIcon >Login</GitHubIcon>}
-          style={{ color: accentColor }}
-          onClick={props.onClick}
-          >
-          Login
-        </Button>)
-      }}
-    </AuthStateContext.Consumer>
-  );
-};
-
-
-const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; }) => {
-  const [openAbout, setOpenAbout] = useState(false);
+const MainMenu = (props: MainMenuProps) => {
   const [openOptions, setOpenOptions] = useState(false);
+  const auth = useContext(AuthStateContext);
+
+  const enableLogout = (auth.isLoggedIn && auth.authUser);
 
   const toggleOptions = () => {
     setOpenOptions(open => {
@@ -113,12 +112,12 @@ const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) |
     });
   }
 
-  const toggleAbout = () => {
-    setOpenAbout(open => {
-      if (props.handleClose) props.handleClose({}, 'backdropClick');
-      return !open;
-    });
-  }
+  // const toggleAbout = () => {
+  //   setOpenAbout(open => {
+  //     if (props.handleClose) props.handleClose({}, 'backdropClick');
+  //     return !open;
+  //   });
+  // }
 
   return (
     <span>
@@ -129,89 +128,95 @@ const MainMenu = (props: { anchorEl: Element | ((element: Element) => Element) |
         open={Boolean(props.anchorEl)}
         onClose={props.handleClose}
       >
-      <StyledMenuItem>
-        <ListItemIcon style={{ color: accentColor }} >
-            <SettingsIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText primary="Options" onClick={toggleOptions} style={{ color: accentColor }} />
-        </StyledMenuItem>
         <StyledMenuItem>
-        <ListItemIcon style={{ color: accentColor }} >
-            <InfoIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText primary="About" onClick={toggleAbout}/>
+          <ListItemText primary="Logout"  
+            onClick={ enableLogout ? props.logout : undefined } 
+            style={{ color: (enableLogout ? textColor : subtleText) }} />
         </StyledMenuItem>
+        {allowReset ? (
+          <StyledMenuItem>
+            <ListItemText primary="Options" onClick={toggleOptions} style={{ color: textColor }} />
+          </StyledMenuItem>
+          ) : (<></>)
+        }
+        {auth.isCoordinator ?
+          (<StyledMenuItem>
+            <ListItemText primary="New Circuit" onClick={() => true}/>
+          </StyledMenuItem>) 
+          : (<></>)
+        }
       </StyledMenu>
       <Options open={openOptions} close={toggleOptions} />
-      <About open={openAbout} close={toggleAbout} />
     </span>
-  );
-};
-
-const LoginMenu = (props: { anchorEl: Element | ((element: Element) => Element) | null | undefined; handleClose: (() => void) | undefined; }) => {
-  return (
-    <StyledMenu
-      id="customized-menu"
-      anchorEl={props.anchorEl}
-      keepMounted
-      open={Boolean(props.anchorEl)}
-      onClose={props.handleClose}
-    >
-      <StyledMenuItem>
-        <Login close={props.handleClose}/>
-      </StyledMenuItem>
-    </StyledMenu>
-
   );
 };
 
 export default function ButtonAppBar() {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [loginAnchorEl, setLoginAnchorEl] = React.useState<null | HTMLElement>(null);
   const AuthDispatch = React.useContext(AuthDispatchContext);
+  const state = useContext(ComputeStateContext);
   const classes = useStyles();
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    // Toggle menu
+    if (menuAnchorEl) {
+      handleMenuClose();
+    } else {
       setMenuAnchorEl(event.currentTarget);
+    }
   };
   
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
   };
       
-  const handleLoginClick = (event: React.MouseEvent<HTMLElement>) => {
-    setLoginAnchorEl(event.currentTarget);
-  };
-  
-  const handleLoginClose = () => {
-    setLoginAnchorEl(null);
-  };
-
   const handleLogout = () => {
-    console.log('loggin out');
+    console.debug('logging out');
     if (AuthDispatch) AuthDispatch({type: 'LOGOUT'});
+    handleMenuClose();
   }
+
+  const displayProgress = ((
+    state.step === Step.WAITING || 
+    state.step === Step.QUEUED ||
+    state.step === Step.RUNNING)
+    && !state.isProgressPanelVisible
+  );
+
+  const menuIcon = (
+      menuAnchorEl ? 
+        (<CloseIcon style={{ color: textColor }}/>)
+      : (<MenuIcon style={{ color: textColor }}/>)
+  );
       
   return (
     <div className={classes.root}>
-      <AppBar position="static" color="transparent">
-        <Toolbar>
-          <IconButton 
-            edge="start" 
-            className={classes.menuButton} 
-            color="inherit" 
-            aria-label="menu"
-            aria-haspopup="true"
-            onClick={handleMenuClick}
-            >
-            <MenuIcon style={{ color: accentColor }}/>
-          </IconButton>
-          <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} />
-          <ZKTitle />
-          <LoginButton onClick={handleLoginClick}/>
-          <LoginMenu anchorEl={loginAnchorEl} handleClose={handleLoginClose} />
-        </Toolbar>
-      </AppBar>
+      <ElevationScroll>
+        <AppBar color='default'>
+          <Toolbar>
+            <IconButton 
+              edge="start" 
+              className={classes.menuButton} 
+              color="inherit" 
+              aria-label="menu"
+              aria-haspopup="true"
+              onClick={handleMenuClick}
+              >
+              {menuIcon}
+            </IconButton>
+            <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} logout={handleLogout} />
+            <ZKTitle />
+            {displayProgress ? 
+              <div style={{ display: 'flex' }}>
+                {/*<NormalBodyText>Your contribution: </NormalBodyText>*/}
+                <CeremonyProgress format='bar' 
+                  barColor={(state.step === Step.QUEUED) ? subtleText : accentColor}
+                />
+              </div> 
+            : (<></>)}
+          </Toolbar>
+        </AppBar>
+      </ElevationScroll>
     </div>
   );
 }

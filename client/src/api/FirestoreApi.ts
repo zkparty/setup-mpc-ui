@@ -34,7 +34,7 @@ const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
         ceremonyData = {...ceremonyData, endTime: end};
       }
     } catch (err) {
-      console.error(`Unexpected error parsing dates: ${err.message}`);     
+      console.error(`Unexpected error parsing dates: ${err.message}`);
     };
     return {
       ...ceremonyData,
@@ -61,6 +61,8 @@ const contributionConverter: firebase.firestore.FirestoreDataConverter<Contribut
     return jsonToContribution(snapshot.data(options));
   }
 }
+
+//=====================================================================================
 
 export async function addCeremony(ceremony: Ceremony): Promise<string> {
     const db = firebase.firestore();
@@ -105,25 +107,30 @@ export async function getCeremony(id: string): Promise<Ceremony | undefined> {
   return doc.data();
 }
 
+// Return all circuits, with summary contrib counts for each
 export const getCeremonies = async (): Promise<Ceremony[]> => {
   const db = firebase.firestore();
   const ceremonySnapshot = await db
       .collection("ceremonies")
       .withConverter(ceremonyConverter)
+      .orderBy('sequence')
+      .where('ceremonyState', '==', RUNNING)
       .get();
 
   const ceremonies = await Promise.all(
     ceremonySnapshot.docs.map(async doc => {
-      const count = await getCeremonyCount(doc.ref);
-      const c: Ceremony = {...doc.data(), ...count}
+      const count = await getCeremonyStats(doc.ref.id);
+      const c: Ceremony = {...doc.data(), ...count};
       return c;
     }));
   return ceremonies;
 }
 
-// Counts the waiting and complete contributions for all ceremonies
+// Counts the waiting and complete contributions for a circuit
 export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference<Ceremony>): Promise<any> => {
   //const db = firebase.firestore();
+  let lastVerifiedIndex = -1;
+  let transcript = undefined;
   const contribQuery = await ref
     .collection('contributions')
     .withConverter(contributionConverter);
@@ -132,12 +139,21 @@ export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference
     .where('status', '==', 'COMPLETE')
     .get();
   const complete = query.size;
+  query.forEach(snap => {
+    const qi = snap.get('queueIndex');
+    const tx = snap.get('verification');
+    if (tx && (qi > lastVerifiedIndex)) {
+      lastVerifiedIndex = qi;
+      transcript = tx;
+    }
+  });
+
   query = await contribQuery  
     .where('status', '==', 'WAITING')
     .get();
   const waiting = query.size;
   console.debug(`complete ${ref.id} ${complete}`);
-  return {complete, waiting};
+  return {complete, waiting, transcript};
 }
 
 export async function getCeremonyContributions(id: string): Promise<ContributionSummary[]> {
@@ -199,19 +215,43 @@ export const ceremonyEventListener = async (ceremonyId: string | undefined, call
     return unsub;
 };
 
-// Listens for updates to ceremony data, to suit the front page ceremony list.
+/* Listens for events on all circuits */
+export const circuitEventListener = async (callback: (e: any) => void): Promise<()=>void> => {
+  const db = firebase.firestore();
+  const query = db.collectionGroup("events")
+              .where('timestamp', '>', firebase.firestore.Timestamp.now());
+
+  const unsub = query.onSnapshot(querySnapshot => {
+    //console.debug(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
+    querySnapshot.docChanges().forEach(docSnapshot => {
+      var event = docSnapshot.doc.data();
+      const ceremony = docSnapshot.doc.ref.parent.parent;
+      //console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
+      if (event.eventType === 'VERIFIED') {
+        callback(ceremony);
+      }
+    });
+  }, err => {
+    console.warn(`Error while listening for ceremony events ${err}`);
+  });
+  return unsub;
+};
+
+
+// Listens for updates to circuit data. Running circuits only.
 export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
     const db = firebase.firestore();
     const query = db.collectionGroup("ceremonies")
-        .withConverter(ceremonyConverter);
+        .withConverter(ceremonyConverter)
+        .where('ceremonyState', '==', RUNNING);
   
     query.onSnapshot(querySnapshot => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
       querySnapshot.docChanges().forEach(async docSnapshot => {
         if (docSnapshot.type === 'modified' || docSnapshot.type === 'added') {
-          console.debug(`Ceremony: ${docSnapshot.doc.id}`);
-          getCeremonyCount(docSnapshot.doc.ref).then(count => {
-            const ceremony = {...docSnapshot.doc.data(), ...count};
+          console.debug(`Circuit: ${docSnapshot.doc.id}`);
+          getCeremonyStats(docSnapshot.doc.ref.id).then(stats => {
+            const ceremony = {...docSnapshot.doc.data(), ...stats};
             callback(ceremony);
           });
         }
@@ -283,7 +323,7 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
   const query = db.collection("ceremonies")
     .withConverter(ceremonyConverter)
     .where('ceremonyState', 'in', states)
-    .orderBy('startTime', 'asc');
+    .orderBy('sequence', 'asc');
 
   let found = false;
 
@@ -414,6 +454,9 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
     currentIndex: 0,
     averageSecondsPerContribution: 0,
     lastValidIndex: 0,
+    complete: 0,
+    waiting: 0,
+    transcript: '',
   };
   // For average time calcs
   let totalSecs = 0;
@@ -436,13 +479,18 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
         || cont.status === RUNNING) {
       if (cont.queueIndex) {
         contributionStats.currentIndex = cont.queueIndex;
-        if (cont.status === COMPLETE) contributionStats.lastValidIndex = cont.queueIndex;
+        if (cont.status === COMPLETE && cont.verification) {
+          contributionStats.lastValidIndex = cont.queueIndex;
+          contributionStats.transcript = cont.verification;
+        }
       }
 
       if (cont.status === COMPLETE && cont.duration) {
         numContribs++;
         totalSecs += cont.duration;
       }
+    } else if (cont.status === WAITING) {
+      contributionStats.waiting ++;
     }
   });
 
@@ -450,6 +498,8 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
       (numContribs > 0) ? 
         Math.floor(totalSecs / numContribs) 
       : ceremonySnap.get('numConstraints') * 5 / 1000; // calc sensible default based on circuit size
+
+  contributionStats.complete = numContribs;
 
   return contributionStats;
 };

@@ -4,7 +4,6 @@ import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionS
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
 import { createContext, Dispatch, useContext, useReducer } from "react";
 import { startWorkerThread, startDownload, startComputation, startUpload, endOfCircuit, startCreateGist } from './Compute';
-import { database } from 'firebase-admin';
 
 export enum Step {
     NOT_ACKNOWLEDGED,
@@ -14,6 +13,7 @@ export enum Step {
     WAITING,
     QUEUED,
     RUNNING,
+    COMPLETE,
 }
       
 export const createCeremonyEvent = (eventType: string, message: string, index: number | undefined): CeremonyEvent => {
@@ -54,7 +54,7 @@ export const newParticipant = (uid: string, authId: string): Participant => {
     }
 };
 
-interface ComputeStatus {
+export interface ComputeStatus {
     ready: boolean,
     running: boolean,
     downloading: boolean,
@@ -81,6 +81,7 @@ export const initialComputeStatus: ComputeStatus = {
 };
 
 interface ComputeContextInterface {
+    circuits: Ceremony[],
     computeStatus: ComputeStatus,
     messages: string [],
     contributionState?: ContributionState,
@@ -97,9 +98,11 @@ interface ComputeContextInterface {
     siteSettings?: any,
     seriesIsComplete: boolean,
     summaryGistUrl?: string,
+    isProgressPanelVisible: boolean,
 };
 
 export const initialState: ComputeContextInterface = {
+    circuits: [],
     computeStatus: initialComputeStatus,
     messages: [],
     contributionState: undefined,
@@ -110,6 +113,7 @@ export const initialState: ComputeContextInterface = {
     hash: '',
     contributionCount: 0,
     seriesIsComplete: false,
+    isProgressPanelVisible: true,
 }
 
 const addMessage = (state: any, message: string) => {
@@ -134,9 +138,60 @@ export const ComputeContextProvider = ({ children }:any) => {
       )    
 };
 
+const findCircuitIndex = (circuits: Ceremony[], id: string): number => {
+    if (!circuits) (console.warn(`circuits will cause findIndex error`));
+    return circuits.findIndex(val => val.id === id);
+}
+
+const getCurrentCircuit = (state: ComputeContextInterface) => {
+    const cId = state.contributionState?.ceremony.id;
+    if (cId) {
+        const idx = findCircuitIndex(state.circuits, cId);
+        if (idx >= 0) {
+            return state.circuits[idx];
+        }
+    }
+    return undefined;
+}
+
+const updateCompletedCircuits = (circuits: Ceremony[], contribs: any[]) => {
+    contribs.map(contrib => {
+        const idx = findCircuitIndex(circuits, contrib.ceremony?.id);
+        if (idx >= 0) {
+            circuits[idx].completed = true;
+            circuits[idx].hash = contrib.hash;
+        }
+    });
+}
+
 export const computeStateReducer = (state: any, action: any):any => {
     let newState = {...state};
     switch (action.type) {
+        case 'UPDATE_CIRCUIT': {
+            // A circuit has been added or updated. 
+            const circuit: Ceremony = action.data;
+            const idx = findCircuitIndex(newState.circuits, circuit.id);
+            if (idx >= 0) {
+              newState.circuits[idx] = circuit;
+            } else {
+              console.debug(`adding circuit ${circuit.title}`);
+              newState.circuits.push(circuit);
+            }
+            return newState;
+        }
+        case 'SET_CIRCUITS': {
+            newState.circuits = action.data;
+            return newState;
+        }
+        case 'INCREMENT_COMPLETE_COUNT': {
+            // Circuit complete - increment the count
+            const cctId = action.data;
+            const idx = findCircuitIndex(newState.circuits, cctId);
+            if (idx >= 0) {
+              newState.circuits[idx].complete++;
+            }
+            return newState;
+        }
         case 'START_COMPUTE': {
             const msg = `It's your turn to contribute`;
             newState = addMessage(state, msg);
@@ -197,6 +252,8 @@ export const computeStateReducer = (state: any, action: any):any => {
             const msg = `Hash: ${h}`;
             newState = addMessage(state, msg);
             newState.hash = h;
+            const cct = getCurrentCircuit(state);
+            if (cct) { cct.hash = h; }
             return newState;
         }
         case 'COMPUTE_DONE': {
@@ -263,6 +320,10 @@ export const computeStateReducer = (state: any, action: any):any => {
                 });
                 msg = `Thank you for your contribution.`;
                 newState = addMessage(newState, msg);
+
+                // Mark it complete
+                const cct = getCurrentCircuit(newState);
+                if (cct) { cct.completed = true; }
             }
 
             return newState;
@@ -323,7 +384,16 @@ export const computeStateReducer = (state: any, action: any):any => {
             return {...state, entropy: action.data};
         }
         case 'SET_CONTRIBUTIONS': {
-            return {...state, contributionCount: action.data.count, userContributions: action.data.contributions};
+            // Participant's contributions, loaded from DB
+            if (action.data.count == state.circuits.size) {
+                newState.step = Step.COMPLETE;
+            }
+            updateCompletedCircuits(state.circuits, action.data.contributions);
+            return {...state, 
+                contributionCount: action.data.count, 
+                userContributions: action.data.contributions,
+                step: newState.step,
+            };
         }
         case 'SET_SETTINGS': {
             return {...state, siteSettings: action.data};
@@ -332,10 +402,10 @@ export const computeStateReducer = (state: any, action: any):any => {
             return { ...state, worker: action.data };
         }
         case 'END_OF_SERIES': {
-            return { ...state, seriesIsComplete: true}
+            return { ...state, seriesIsComplete: true, step: Step.COMPLETE };
         }
         case 'SUMMARY_GIST_CREATED': {
-            return { ...state, summaryGistUrl: action.data }
+            return { ...state, summaryGistUrl: action.data };
         }
         case 'ABORT_CIRCUIT': {
             // Invalidate the contribution
@@ -356,6 +426,11 @@ export const computeStateReducer = (state: any, action: any):any => {
             });
             const msg = `Error encountered. This circuit will be skipped.`;
             newState = addMessage(newState, msg);
+            break;
+        }
+        case 'VISIBILITY': {
+            // Progress panel visibililty
+            return {...state, isProgressPanelVisible: action.data};
         }
     }
     console.debug(`state after reducer ${newState.step}`);

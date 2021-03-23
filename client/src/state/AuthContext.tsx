@@ -77,6 +77,7 @@ export const authStateReducer = (state: any, action: any):any => {
       return {...newState, isLoggedIn: true, authUser: {...state.authUser, ...action.user}, loaded: true };
     }
     case 'LOGOUT': {
+      firebase.auth().signOut();
       return {...newState, isLoggedIn: false, authUser: null, isCoordinator: false, accessToken: null, loaded: true};
     }
     case 'SET_COORDINATOR': {
