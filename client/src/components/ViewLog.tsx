@@ -18,6 +18,7 @@ export default function ViewLog(props:
                 {temp}
             </Typography>);
     } else {
+        // JSX.Element
         body = props.content;
     }
 

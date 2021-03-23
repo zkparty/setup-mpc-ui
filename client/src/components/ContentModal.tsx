@@ -17,7 +17,8 @@ function getModalStyle() {
     height: '100%',
     width: '100%',
     backgroundColor: background,
-    opacity: '0.8',
+    //opacity: '0.8',
+    padding: '50px',
   };
 }
   
@@ -85,13 +86,14 @@ const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
 
 const DialogContent = withStyles((theme: Theme) => ({
   root: {
-    padding: theme.spacing(2),
+    padding: '60px',
     display: 'flex', 
     justifyContent: 'center', 
     color: textColor,
     backgroundColor: background,
     border: `1px solid ${lightBorder}`,
     boxSizing: 'border-box',
+    maxWidth: '656px',
 },
 }))(MuiDialogContent);
 
@@ -113,7 +115,7 @@ export default function ContentModal(props:
           aria-labelledby="scroll-dialog-title"
           aria-describedby="scroll-dialog-description"
           maxWidth='lg'
-          scroll='paper'
+          scroll='paper'          
           /*className={classes.paper}*/
           /*fullScreen={true}*/
           /*style={getModalStyle()}           
