@@ -20,6 +20,7 @@ const Login = () => {
     provider.addScope('read:user');
     provider.addScope('gist');
 
+    try {
     firebase
      .auth()
      .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -45,7 +46,10 @@ const Login = () => {
           });
         })
         .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
-      }) 
+      })
+    } catch (err) {
+      console.warn(err.message);
+    } 
   };
 
   const logOut = () => {

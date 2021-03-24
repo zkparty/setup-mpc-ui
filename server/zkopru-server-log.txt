@@ -1,0 +1,3139 @@
+24 March, 2021. ~05:30 UTC
+root@zkopru-mpc:~/zkopru# npm -v
+6.14.11
+root@zkopru-mpc:~/zkopru#
+root@zkopru-mpc:~/zkopru# node -v
+v14.16.0
+root@zkopru-mpc:~/zkopru#
+
+Server app installed:
+git clone https://github.com/glamperd/setup-mpc-ui
+
+cloned at commit 1651ac12603e42b278b60f12d0e759910a143a90
+
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server# mkdir data
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server#
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server#
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server# cd data
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data# mkdir ceremony_data
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data# mkdir ptau
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data# ls
+ceremony_data  ptau
+
+
+// Powers-of-Tau file downloads
+
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data# cd ptau
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau# wget https://www.dropbox.com/sh/mn47gnepqu88mzl/AABUJYyC5CYI5YZgj1GdDFDka/powersOfTau28_hez_final_15.ptau?dl=0
+--2021-03-24 05:38:06--  https://www.dropbox.com/sh/mn47gnepqu88mzl/AABUJYyC5CYI5YZgj1GdDFDka/powersOfTau28_hez_final_15.ptau?dl=0
+Resolving www.dropbox.com (www.dropbox.com)... 2620:100:6022:18::a27d:4212, 162.125.67.18
+Connecting to www.dropbox.com (www.dropbox.com)|2620:100:6022:18::a27d:4212|:443... connected.
+HTTP request sent, awaiting response... 301 Moved Permanently
+Location: /sh/raw/mn47gnepqu88mzl/AABUJYyC5CYI5YZgj1GdDFDka/powersOfTau28_hez_final_15.ptau [following]
+--2021-03-24 05:38:07--  https://www.dropbox.com/sh/raw/mn47gnepqu88mzl/AABUJYyC5CYI5YZgj1GdDFDka/powersOfTau28_hez_final_15.ptau
+Reusing existing connection to [www.dropbox.com]:443.
+HTTP request sent, awaiting response... 302 Found
+Location: https://ucda234f6d0f12d082d5a269708f.dl.dropboxusercontent.com/cd/0/inline/BLSaITBEf00T4Q3K8izF43ELofgN08ykKyBEpcBjIC-jb-sgn_2xbXHcM9-rzsb-RcWUZ_RPX_pk6Ptv0RqiCpON1VewZSXE3Uv0CMIMtx8EFlvUSiHW4RqnasTEMHJolG0Emh2W3l_8m42F5ME35Krn/file# [following]
+--2021-03-24 05:38:07--  https://ucda234f6d0f12d082d5a269708f.dl.dropboxusercontent.com/cd/0/inline/BLSaITBEf00T4Q3K8izF43ELofgN08ykKyBEpcBjIC-jb-sgn_2xbXHcM9-rzsb-RcWUZ_RPX_pk6Ptv0RqiCpON1VewZSXE3Uv0CMIMtx8EFlvUSiHW4RqnasTEMHJolG0Emh2W3l_8m42F5ME35Krn/file
+Resolving ucda234f6d0f12d082d5a269708f.dl.dropboxusercontent.com (ucda234f6d0f12d082d5a269708f.dl.dropboxusercontent.com)... 2620:100:6022:15::a27d:420f, 162.125.67.15
+Connecting to ucda234f6d0f12d082d5a269708f.dl.dropboxusercontent.com (ucda234f6d0f12d082d5a269708f.dl.dropboxusercontent.com)|2620:100:6022:15::a27d:420f|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: /cd/0/inline2/BLQYzVgq0pTiI7Tu0C0vFBBWNIHIQM98PHSDeda2f4PVgiij9ebEIY23c_GYShqSIqDGBeEAwVgLZLpiaV2bEyInPdLOCd5gpJcHbHSLDsg6f2S2TevHpTA1GocRs8khbFBh3DHrLuyNMy6O7H8Kmaz8G4RuG2lLIEQBVd0wCKx7GYd10YUUVD6-FNXnS79lx_dVhWynTEDoAPbYz-uYXSuyk8QZVtJRVqm-CgL2VtqmJlu9UksUXP_bZGu_ybteJGckLb5tkoj5u3XW98qjkC7lbbpnN62Z0UOyTQfeBO0wB4Xxw3hqgIjlyGTgmzoP2YmxdPPeAfP2hWnrPXSmkIFPrpXAjFNd6Cp7I5xc4uHQ7q5c-tPJxKj-TAiQqD3mvSk/file [following]
+--2021-03-24 05:38:08--  https://ucda234f6d0f12d082d5a269708f.dl.dropboxusercontent.com/cd/0/inline2/BLQYzVgq0pTiI7Tu0C0vFBBWNIHIQM98PHSDeda2f4PVgiij9ebEIY23c_GYShqSIqDGBeEAwVgLZLpiaV2bEyInPdLOCd5gpJcHbHSLDsg6f2S2TevHpTA1GocRs8khbFBh3DHrLuyNMy6O7H8Kmaz8G4RuG2lLIEQBVd0wCKx7GYd10YUUVD6-FNXnS79lx_dVhWynTEDoAPbYz-uYXSuyk8QZVtJRVqm-CgL2VtqmJlu9UksUXP_bZGu_ybteJGckLb5tkoj5u3XW98qjkC7lbbpnN62Z0UOyTQfeBO0wB4Xxw3hqgIjlyGTgmzoP2YmxdPPeAfP2hWnrPXSmkIFPrpXAjFNd6Cp7I5xc4uHQ7q5c-tPJxKj-TAiQqD3mvSk/file
+Reusing existing connection to [ucda234f6d0f12d082d5a269708f.dl.dropboxusercontent.com]:443.
+HTTP request sent, awaiting response... 200 OK
+Length: 37831832 (36M) [application/octet-stream]
+Saving to: ‘powersOfTau28_hez_final_15.ptau?dl=0’
+
+powersOfTau28_hez_final_15.ptau?dl=0   100%[===========================================================================>]  36.08M  13.5MB/s    in 2.7s
+
+2021-03-24 05:38:11 (13.5 MB/s) - ‘powersOfTau28_hez_final_15.ptau?dl=0’ saved [37831832/37831832]
+
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau# ls -l
+total 36948
+-rw-r--r-- 1 root root 37831832 Mar 24 05:38 'powersOfTau28_hez_final_15.ptau?dl=0'
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau#
+
+wget https://www.dropbox.com/sh/mn47gnepqu88mzl/AAAI-XPJ7jKfw6FfZzqhiFspa/powersOfTau28_hez_final_16.ptau?dl=0
+
+Saving to: ‘powersOfTau28_hez_final_16.ptau?dl=0’
+
+powersOfTau28_hez_final_16.ptau?dl=0   100%[===========================================================================>]  72.08M  19.6MB/s    in 3.7s
+
+2021-03-24 05:40:06 (19.6 MB/s) - ‘powersOfTau28_hez_final_16.ptau?dl=0’ saved [75580568/75580568]
+
+
+wget https://www.dropbox.com/sh/mn47gnepqu88mzl/AACFE-eD4MW90b7xbiE6PQVVa/powersOfTau28_hez_final_17.ptau?dl=0
+--2021-03-24 05:42:55--  https://www.dropbox.com/sh/mn47gnepqu88mzl/AACFE-eD4MW90b7xbiE6PQVVa/powersOfTau28_hez_final_17.ptau?dl=0
+Resolving www.dropbox.com (www.dropbox.com)... 2620:100:6022:18::a27d:4212, 162.125.67.18
+
+HTTP request sent, awaiting response... 200 OK
+Length: 151078040 (144M) [application/octet-stream]
+Saving to: ‘powersOfTau28_hez_final_17.ptau?dl=0’
+
+powersOfTau28_hez_final_17.ptau?dl=0   100%[===========================================================================>] 144.08M  22.1MB/s    in 6.9s
+
+2021-03-24 05:43:05 (20.8 MB/s) - ‘powersOfTau28_hez_final_17.ptau?dl=0’ saved [151078040/151078040]
+
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau# ls -l
+total 258300
+-rw-r--r-- 1 root root  37831832 Mar 24 05:38 'powersOfTau28_hez_final_15.ptau?dl=0'
+-rw-r--r-- 1 root root  75580568 Mar 24 05:40 'powersOfTau28_hez_final_16.ptau?dl=0'
+-rw-r--r-- 1 root root 151078040 Mar 24 05:43 'powersOfTau28_hez_final_17.ptau?dl=0'
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau#
+
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau# mv 'powersOfTau28_hez_final_15.ptau?dl=0' pot15_final.ptau
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau# mv 'powersOfTau28_hez_final_16.ptau?dl=0' pot16_final.ptau
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau# mv 'powersOfTau28_hez_final_17.ptau?dl=0' pot17_final.ptau
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau#
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau# ls -l
+total 258300
+-rw-r--r-- 1 root root  37831832 Mar 24 05:38 pot15_final.ptau
+-rw-r--r-- 1 root root  75580568 Mar 24 05:40 pot16_final.ptau
+-rw-r--r-- 1 root root 151078040 Mar 24 05:43 pot17_final.ptau
+
+
+
+// Circom & snarkjs
+
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server# sudo npm install -g circom
+/usr/bin/circom -> /usr/lib/node_modules/circom/cli.js
+npm WARN optional SKIPPING OPTIONAL DEPENDENCY: fsevents@~2.3.1 (node_modules/circom/node_modules/chokidar/node_modules/fsevents):
+npm WARN notsup SKIPPING OPTIONAL DEPENDENCY: Unsupported platform for fsevents@2.3.2: wanted {"os":"darwin","arch":"any"} (current: {"os":"linux","arch":"x64"})
+
++ circom@0.5.42
+added 147 packages from 77 contributors in 15.684s
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server# sudo npm install -g snarkjs
+/usr/bin/snarkjs -> /usr/lib/node_modules/snarkjs/build/cli.cjs
++ snarkjs@0.3.60
+added 16 packages from 8 contributors in 5.312s
+
+
+
+// Verify PoT files
+
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau#
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau# snarkjs ptv pot15_final.ptau
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: Next challenge hash:
+                c74fe0e3 40ab2cf2 1b2f618f 8c54c5a7
+                261c5484 3e106ebe 69556dba 52c82f5a
+                dbd59897 743f774f 2e3e2d2d 45838e9f
+                69671613 370bfd50 b5ee8bab db37e98a
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #55:
+[INFO]  snarkJS: Next Challenge:
+                74ba2bca c21fad58 bf413799 d5ac962a
+                c4a344fb 1b4c1e88 0bd89e4b b4221270
+                113cb4c4 8aa8cd37 eb4fa234 904ff959
+                f726e785 ce7c5608 bb061b2e 0d7480be
+[INFO]  snarkJS: Response Hash:
+                6e61deb8 4491e9f6 e31287ca 05655fd6
+                3a1bcde7 43f2157b 63464ccc 6bcd83f3
+                78f466af dcefdc3d 867ff75f deef53b9
+                998aa5d9 5818732a 98e4eaf3 98a1ce05
+[INFO]  snarkJS: Response Hash:
+                00d0b99a 5ccb65af a5872f82 5f2388f3
+                2f6fd96e d1e58e83 cb921037 447d980d
+                7bfb8a08 11d90a36 01846bbc ee2216ae
+                aec90e60 e2490e5d 09ea36bf 3222840f
+[INFO]  snarkJS: Beacon generator: e586fccaf245c9a1d7e78294d4802018f3001149a71b8f10cd997ef8235aa372
+[INFO]  snarkJS: Beacon iterations Exp: 10
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #54: jarrad
+[INFO]  snarkJS: Next Challenge:
+                00d0b99a 5ccb65af a5872f82 5f2388f3
+                2f6fd96e d1e58e83 cb921037 447d980d
+                7bfb8a08 11d90a36 01846bbc ee2216ae
+                aec90e60 e2490e5d 09ea36bf 3222840f
+[INFO]  snarkJS: Response Hash:
+                7f1229b8 321fd1b7 935dc9ca 5ebf1d16
+                572f25c9 e936798d 3a2cfbbf 7b6c21d0
+                8c681b03 6cded940 006dec27 0d51facf
+                a1b24f27 698e98ba bd3555a4 6490fca7
+[INFO]  snarkJS: Response Hash:
+                fbad44fc ea6d5052 70046563 04093552
+                d29be00d 7fcd2d62 7e07c1b0 15c6eb97
+                4ea9262c aa4633cd 306c7f55 7d839c78
+                f9a408c9 5cfaef06 f916e37d 182ae94b
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #53: juan
+[INFO]  snarkJS: Next Challenge:
+                fbad44fc ea6d5052 70046563 04093552
+                d29be00d 7fcd2d62 7e07c1b0 15c6eb97
+                4ea9262c aa4633cd 306c7f55 7d839c78
+                f9a408c9 5cfaef06 f916e37d 182ae94b
+[INFO]  snarkJS: Response Hash:
+                b34c97e0 e4bbd8fd 2053d343 60b09ee0
+                4eb68736 34a7ecd0 8066dc22 b367472a
+                cfa8f4fb c5438674 3e8c48dc 02db95c2
+                6d8816e1 ad04df21 1e6f9f0b f01bf695
+[INFO]  snarkJS: Response Hash:
+                3f02cb8d 89177b2e 9ffe3b1b be0a8f43
+                154eb960 2e8985f6 c84314a3 d47dfd60
+                e098313d b52d7a08 60de1403 0aae4a49
+                64458814 3daf0779 fadf6d9f 2526df43
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #52: zaki
+[INFO]  snarkJS: Next Challenge:
+                3f02cb8d 89177b2e 9ffe3b1b be0a8f43
+                154eb960 2e8985f6 c84314a3 d47dfd60
+                e098313d b52d7a08 60de1403 0aae4a49
+                64458814 3daf0779 fadf6d9f 2526df43
+[INFO]  snarkJS: Response Hash:
+                991c7525 41bc610b c6931b33 ed31be6b
+                8e8c04ea 317a32db 0e294038 5785185a
+                f456f7b3 065fee76 7f1d4817 f8ec5a9d
+                368d11db e39b20b2 0bcbc6b6 b02b15a3
+[INFO]  snarkJS: Response Hash:
+                01e99205 db3311bf 535b3316 e265050a
+                062a4491 f43c0e14 60bfe0ce acf196d6
+                b78559b8 015a3463 40aea8d5 03f2d9b9
+                a6e1b3f0 a54d2d22 d4ed1d92 16c09402
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #51: joe
+[INFO]  snarkJS: Next Challenge:
+                01e99205 db3311bf 535b3316 e265050a
+                062a4491 f43c0e14 60bfe0ce acf196d6
+                b78559b8 015a3463 40aea8d5 03f2d9b9
+                a6e1b3f0 a54d2d22 d4ed1d92 16c09402
+[INFO]  snarkJS: Response Hash:
+                6b157096 fa63b56d f6e1607a c58296eb
+                62d1d6bb fd58aa5a 6247e217 4c47d18b
+                d2a313cd c9b0b786 5c6b7f0d 61e364e3
+                0066ce2e 89bbaf3d ec5a8388 1bbb2aed
+[INFO]  snarkJS: Response Hash:
+                e6571d37 a66e7fbd ebd3ba93 6bd8c23c
+                140bb178 fb329657 2bed8709 063e3610
+                e99a5198 3f793bc2 b84d76ed f286d6e7
+                80cc879b ab7e1c6a 61bf8a9f 8fd160d7
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #50: weijie
+[INFO]  snarkJS: Next Challenge:
+                e6571d37 a66e7fbd ebd3ba93 6bd8c23c
+                140bb178 fb329657 2bed8709 063e3610
+                e99a5198 3f793bc2 b84d76ed f286d6e7
+                80cc879b ab7e1c6a 61bf8a9f 8fd160d7
+[INFO]  snarkJS: Response Hash:
+                11611a89 05056363 781d2039 487f00fe
+                ad74a86f d2bb6f7d a67ba3a0 c4ba71ca
+                7a943185 ec26beb7 391984f5 f60c61f4
+                54a4ca17 a9db1631 7e597971 8129460f
+[INFO]  snarkJS: Response Hash:
+                025d2ee9 4c4cf08f 6a2adeff 90075f4d
+                f4c29632 2e6fa910 815813ab 5e30f5b7
+                2d88b8b9 bda180ed 03c26cd5 2705ee1f
+                17d615f9 aa3d9a56 4434d457 d00c95d9
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #49: jordi
+[INFO]  snarkJS: Next Challenge:
+                025d2ee9 4c4cf08f 6a2adeff 90075f4d
+                f4c29632 2e6fa910 815813ab 5e30f5b7
+                2d88b8b9 bda180ed 03c26cd5 2705ee1f
+                17d615f9 aa3d9a56 4434d457 d00c95d9
+[INFO]  snarkJS: Response Hash:
+                1ccb74ca 75f43945 8fd1fda3 c3937669
+                ed672302 47c101a2 940f0d88 90a8eb9f
+                24efda2a d2f3c2d2 b0718d01 5caddba2
+                afbe49a1 a82e38c7 9ec78df6 6479bf91
+[INFO]  snarkJS: Response Hash:
+                ede3b130 b045333f 3de41950 aedc7006
+                e8fa2d28 7faa24d5 fc4a7338 c631a52f
+                8d47199d 4649b153 f175eb1d 0863c83f
+                a0d746a6 6f774d08 6743c4d4 d136cfe0
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #48: tyler
+[INFO]  snarkJS: Next Challenge:
+                ede3b130 b045333f 3de41950 aedc7006
+                e8fa2d28 7faa24d5 fc4a7338 c631a52f
+                8d47199d 4649b153 f175eb1d 0863c83f
+                a0d746a6 6f774d08 6743c4d4 d136cfe0
+[INFO]  snarkJS: Response Hash:
+                08896cef 6150e35c b1e16685 6f8e5699
+                2be30192 6dc217f2 5e162393 92df2d49
+                a82d1f9b 25205431 fd484707 f8e15d2c
+                bb75d3f1 36bed23f dc268a6a e2d7bc8d
+[INFO]  snarkJS: Response Hash:
+                5d38986e 613436f8 f29f713f 967a083c
+                730a1d34 1a1d2c0f fe7c29ca 3e1b6184
+                40412cff 8eeab16b 5a14bf42 1763e61b
+                3cefdf6c a5715027 56331ffb 960fa61e
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #47: saravanan
+[INFO]  snarkJS: Next Challenge:
+                5d38986e 613436f8 f29f713f 967a083c
+                730a1d34 1a1d2c0f fe7c29ca 3e1b6184
+                40412cff 8eeab16b 5a14bf42 1763e61b
+                3cefdf6c a5715027 56331ffb 960fa61e
+[INFO]  snarkJS: Response Hash:
+                2a015b49 55e1f882 5615c666 f0e9fb0b
+                8c2408c1 49682347 e7c0c3a1 9482b640
+                59a63dbb 7cfc9c00 5eceb1b4 a67118ce
+                d79f649f 9433437d f653427e 83955d4f
+[INFO]  snarkJS: Response Hash:
+                5aac215d a5d5efcb c8badb59 67fd43b5
+                b9b0a9ec f653fc5b d8604a05 869ecce3
+                20d3dafc 42de3eef 05ec318f 94e08552
+                c386b7e1 6a340f0f e9004f93 52fd1a61
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #46: tkorwin
+[INFO]  snarkJS: Next Challenge:
+                5aac215d a5d5efcb c8badb59 67fd43b5
+                b9b0a9ec f653fc5b d8604a05 869ecce3
+                20d3dafc 42de3eef 05ec318f 94e08552
+                c386b7e1 6a340f0f e9004f93 52fd1a61
+[INFO]  snarkJS: Response Hash:
+                f6124334 8acc3313 f3197405 d22b5ed1
+                b552967f 4eadd830 012ad991 c151574f
+                d9a8fed7 9a4a9706 bb852438 7b8180a7
+                1ccec376 b69e0426 91d9a01a 0c28102b
+[INFO]  snarkJS: Response Hash:
+                939038cd 2dc5a1c0 20f368d2 bfad8686
+                950fdf7e c2d2e192 a7d59509 3068816b
+                becd914b a293dd8a cb6d18c7 b5116b66
+                ea54d915 d47a89cc fbe2d5a3 444dfbed
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #45: ben
+[INFO]  snarkJS: Next Challenge:
+                939038cd 2dc5a1c0 20f368d2 bfad8686
+                950fdf7e c2d2e192 a7d59509 3068816b
+                becd914b a293dd8a cb6d18c7 b5116b66
+                ea54d915 d47a89cc fbe2d5a3 444dfbed
+[INFO]  snarkJS: Response Hash:
+                213b9ab7 06ea361c 50a34515 47f17bf6
+                370acade b17466a9 3db23b9b d4326375
+                785ac440 639809a4 398c603e 031861f2
+                c388ae35 9df8b31d 09994e82 885ddf06
+[INFO]  snarkJS: Response Hash:
+                c13dedda 076022e6 be2d634d a910930c
+                2154b002 99d4db5c 5462f13f d5fb19f4
+                8cda31bb 63e65a6f cdc6b482 0cc6a4ad
+                dbfe7ed2 446beab8 b63b7214 1fdc0c80
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #44: yingtong
+[INFO]  snarkJS: Next Challenge:
+                c13dedda 076022e6 be2d634d a910930c
+                2154b002 99d4db5c 5462f13f d5fb19f4
+                8cda31bb 63e65a6f cdc6b482 0cc6a4ad
+                dbfe7ed2 446beab8 b63b7214 1fdc0c80
+[INFO]  snarkJS: Response Hash:
+                e4ee7ebc 787ec108 af7597d6 868c8df1
+                d9cc4d97 e5ef8beb 9d94f055 c8a9d651
+                bd1d7b0f 1f8bdb6e 4a9ab754 c72ad6ca
+                3df58aa3 c9976a98 8163f527 17116f6e
+[INFO]  snarkJS: Response Hash:
+                05985261 72c5fece a3ff71a5 5af41344
+                42569917 25ad3148 1231c4cf 765d9ecd
+                9fd681c4 f7a25717 bb2eab34 49bb4417
+                059498b9 f5a5e4ba b630424f 2c0d3605
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #43: albert
+[INFO]  snarkJS: Next Challenge:
+                05985261 72c5fece a3ff71a5 5af41344
+                42569917 25ad3148 1231c4cf 765d9ecd
+                9fd681c4 f7a25717 bb2eab34 49bb4417
+                059498b9 f5a5e4ba b630424f 2c0d3605
+[INFO]  snarkJS: Response Hash:
+                60df61e1 f6d84fb3 8f14d515 1f5f02a8
+                45fb9baa 97abaee7 7fbc743a 0dcbc59b
+                6886f6dc 51720340 a6387b5a d172b003
+                d9700d11 6f24ab12 eb722036 b3da1e04
+[INFO]  snarkJS: Response Hash:
+                294dc1ce 3c381dee 7a12ab13 8813ba7d
+                c61ba46f 8e1b6165 ee23c623 af42f0a4
+                5a090951 5558548a 85c7b1b8 12156ff4
+                cb14eb7d 0aa9b35b 4ffdecaa 2bcfe37c
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #42: vaibhav
+[INFO]  snarkJS: Next Challenge:
+                294dc1ce 3c381dee 7a12ab13 8813ba7d
+                c61ba46f 8e1b6165 ee23c623 af42f0a4
+                5a090951 5558548a 85c7b1b8 12156ff4
+                cb14eb7d 0aa9b35b 4ffdecaa 2bcfe37c
+[INFO]  snarkJS: Response Hash:
+                e8e7293c 3acd49c7 c20418ff 9b2ac179
+                304228a9 f47580b5 57367782 6b3ef007
+                ee6be1d2 699110f7 efa54ef2 d40cda33
+                2da5071b 231e047c 253b11cc 933acc53
+[INFO]  snarkJS: Response Hash:
+                41c03ca8 6cc9df98 d80073e6 93c09d46
+                42cbadb7 a8752934 049db2dd 79016523
+                99d1e13d 90ab9b54 57860f55 914efe1f
+                f87f7b5e 7fc86993 774a7236 0aaa716a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #41: evan
+[INFO]  snarkJS: Next Challenge:
+                41c03ca8 6cc9df98 d80073e6 93c09d46
+                42cbadb7 a8752934 049db2dd 79016523
+                99d1e13d 90ab9b54 57860f55 914efe1f
+                f87f7b5e 7fc86993 774a7236 0aaa716a
+[INFO]  snarkJS: Response Hash:
+                8d6a4bcc c44e751a 54b3b818 2997cbe8
+                24e018ad 959e66d2 4c1db2f5 337790ad
+                390e4a11 d65b89e7 4d04d56e 81d558ca
+                90a80b18 0e51b55b f4a07786 28a70f77
+[INFO]  snarkJS: Response Hash:
+                b262f934 ab2368cc aa86772d 586040a5
+                1d284338 d9f41f47 833c19a4 335d4fc6
+                e8e8eccd 17723291 b92bb348 4ef6f6d1
+                99563e61 b2a49634 e081d7c5 44e5bfed
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #40: weitang
+[INFO]  snarkJS: Next Challenge:
+                b262f934 ab2368cc aa86772d 586040a5
+                1d284338 d9f41f47 833c19a4 335d4fc6
+                e8e8eccd 17723291 b92bb348 4ef6f6d1
+                99563e61 b2a49634 e081d7c5 44e5bfed
+[INFO]  snarkJS: Response Hash:
+                276a5a94 26cee943 0cc3c64b 6049f912
+                4a8c4297 3ffec2bf a60983b2 37fec0aa
+                98247803 596d2ac1 2076bf37 7104ab68
+                c2c2a879 fbc7fcf8 b9168b52 5f1f7916
+[INFO]  snarkJS: Response Hash:
+                79043f5f 7a2e81a2 e7aca5bf c02a375f
+                6b3beb0c 5aa7e3f8 b942201a f3e0d43e
+                b33efd3a 10b10323 8a93eaad 3462180e
+                56eea585 e4f30715 3df06e81 d6150275
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #39: wanseob
+[INFO]  snarkJS: Next Challenge:
+                79043f5f 7a2e81a2 e7aca5bf c02a375f
+                6b3beb0c 5aa7e3f8 b942201a f3e0d43e
+                b33efd3a 10b10323 8a93eaad 3462180e
+                56eea585 e4f30715 3df06e81 d6150275
+[INFO]  snarkJS: Response Hash:
+                ed29ba79 b1392ba7 4ff572b8 6ed743b9
+                3b94da14 e54eb4a5 4d2fa6f0 cbd47b99
+                13516c95 f53b6a07 845676c5 1b081f2d
+                64a14d26 0809d9bb 2db1bf8d 9bccf584
+[INFO]  snarkJS: Response Hash:
+                ac95544f 0e1eab30 0cbd826c 7ce0ccf5
+                58559b95 cf450ed1 0f472063 fa50bb5e
+                159734c0 a50cdd1a 8413eb92 a7b4947e
+                6e66b8d0 cdb3a19c 85897e42 ee1811e1
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #38: james
+[INFO]  snarkJS: Next Challenge:
+                ac95544f 0e1eab30 0cbd826c 7ce0ccf5
+                58559b95 cf450ed1 0f472063 fa50bb5e
+                159734c0 a50cdd1a 8413eb92 a7b4947e
+                6e66b8d0 cdb3a19c 85897e42 ee1811e1
+[INFO]  snarkJS: Response Hash:
+                036438ed c68d3a36 6ba0517f 5b4a0e79
+                f6d5efe5 6fd2514a bb674c9d f6126eda
+                854fd11b eb274969 095149d7 7de76179
+                45176503 158beaf9 fc6f9fa5 9aef2aaf
+[INFO]  snarkJS: Response Hash:
+                8d77dba2 eada39e2 2a75a8ad 8c0f40f8
+                0dcefa59 4c6a89ea 28f448df 8bced1b5
+                3ee80e03 9247d88f 9efb734e cbaf9245
+                badd9177 5e8b1dd6 07725db7 facf734b
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #37: chihcheng
+[INFO]  snarkJS: Next Challenge:
+                8d77dba2 eada39e2 2a75a8ad 8c0f40f8
+                0dcefa59 4c6a89ea 28f448df 8bced1b5
+                3ee80e03 9247d88f 9efb734e cbaf9245
+                badd9177 5e8b1dd6 07725db7 facf734b
+[INFO]  snarkJS: Response Hash:
+                e51f44c2 c3d398d4 fcc3cbae 3a63b449
+                dcfe2aef baab3ad5 a8c7a782 23abd337
+                fb30b676 31caa2f9 af515317 945d5c5e
+                80cf7197 1777af17 072e3ed2 dc6c1d9b
+[INFO]  snarkJS: Response Hash:
+                e406add7 6da9abd4 d2bd81b3 e6fbf721
+                3fdeb18d 3a3b8b3e c35a0a0d c04bcc19
+                c7c94362 8bdc1f9c 974a6053 2f5fe053
+                fc53a956 a11f0b40 990cc734 f0d496d1
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #36: stefaan
+[INFO]  snarkJS: Next Challenge:
+                e406add7 6da9abd4 d2bd81b3 e6fbf721
+                3fdeb18d 3a3b8b3e c35a0a0d c04bcc19
+                c7c94362 8bdc1f9c 974a6053 2f5fe053
+                fc53a956 a11f0b40 990cc734 f0d496d1
+[INFO]  snarkJS: Response Hash:
+                3b3630a0 e4fa0ef1 4e1086d8 60cae23a
+                fa635c65 cae2971e 702a7ccc f13e3820
+                5507dc4a 9cfdd8f1 481fac94 0ef1bd01
+                46e73740 66d1493d 1114f328 73eb6f27
+[INFO]  snarkJS: Response Hash:
+                33247048 366e6228 5a69d257 601f1ee5
+                2aa5d123 8b0fceb8 aaaca087 614dfa95
+                6eb377b9 683bb551 16ece5d4 023e3e3f
+                5b154993 1048ba07 b5a4b37c 463e9b2c
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #35: leonard
+[INFO]  snarkJS: Next Challenge:
+                33247048 366e6228 5a69d257 601f1ee5
+                2aa5d123 8b0fceb8 aaaca087 614dfa95
+                6eb377b9 683bb551 16ece5d4 023e3e3f
+                5b154993 1048ba07 b5a4b37c 463e9b2c
+[INFO]  snarkJS: Response Hash:
+                8557483d 85297ec7 455ce374 406319a6
+                2b18f0fa 4b640dbf a7712e19 8df6cc4a
+                ca80c0b6 0ef147f4 42e29c48 35855b14
+                b070e58c 32aecdb4 af713e05 f936af1b
+[INFO]  snarkJS: Response Hash:
+                8fddfae2 385f5fc1 f6def277 e341ccb2
+                c3a78108 e2d7efdd 77c556b5 6305e612
+                2fe0bb4f 27a16743 29d8fbb0 c9520076
+                ae8ee1b1 5da13eff 58914d28 de9459be
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #34: igor
+[INFO]  snarkJS: Next Challenge:
+                8fddfae2 385f5fc1 f6def277 e341ccb2
+                c3a78108 e2d7efdd 77c556b5 6305e612
+                2fe0bb4f 27a16743 29d8fbb0 c9520076
+                ae8ee1b1 5da13eff 58914d28 de9459be
+[INFO]  snarkJS: Response Hash:
+                8fa4bda0 e8305faf 99461689 11782792
+                5f9c2025 9237b9c0 dea73175 6c907526
+                47eeba78 f27a0391 9ec8b6ff 46c1afa3
+                f57bd7a5 307f9c4e 35d4f5ed 2fabd316
+[INFO]  snarkJS: Response Hash:
+                5e4226c9 b037c98d 6207ee8f 8056c651
+                d3686215 74dcf7ac 67cf6908 43dc8072
+                4f8c8f62 7d3a0e33 4d82934e 24d17e89
+                300c767f 91c03ca2 13742e0d 25c6ac09
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #33: oskar
+[INFO]  snarkJS: Next Challenge:
+                5e4226c9 b037c98d 6207ee8f 8056c651
+                d3686215 74dcf7ac 67cf6908 43dc8072
+                4f8c8f62 7d3a0e33 4d82934e 24d17e89
+                300c767f 91c03ca2 13742e0d 25c6ac09
+[INFO]  snarkJS: Response Hash:
+                cd052845 3b0cca20 3956bb23 333473be
+                c12c14a8 cb7102ef e437f8d4 07f23463
+                6e77e1e7 d44c4176 608ad290 a2d83f48
+                78ccb222 c1e7c60b f5a8ab38 542ce634
+[INFO]  snarkJS: Response Hash:
+                daa7c3b5 570966a7 1180db03 c0d76def
+                00395cb6 95c90736 d9c7c240 8bc76b33
+                bda8ee88 f495b77d 1927a94d 37e67726
+                89e7cb8a 1796c863 5c1153fc 6d6b6f42
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #32: josephc
+[INFO]  snarkJS: Next Challenge:
+                daa7c3b5 570966a7 1180db03 c0d76def
+                00395cb6 95c90736 d9c7c240 8bc76b33
+                bda8ee88 f495b77d 1927a94d 37e67726
+                89e7cb8a 1796c863 5c1153fc 6d6b6f42
+[INFO]  snarkJS: Response Hash:
+                527fe68c 16219d86 018de364 fc5701b1
+                44fc5b68 eb063c9a 8c4e8405 b35f4561
+                b55363df 6d9adf82 8792c7b1 92a595b4
+                4aadbea7 cdef918a 11bfe65a 89c9e4a3
+[INFO]  snarkJS: Response Hash:
+                7695680f c6eb5d11 e31b48be a122428a
+                11cf5429 d54b7d9d cd24c879 9876ae61
+                6850f232 0f68964d b26e04dd 06ce5747
+                965e7f41 aefa1eec 790e9566 5c0e6342
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #31: golem
+[INFO]  snarkJS: Next Challenge:
+                7695680f c6eb5d11 e31b48be a122428a
+                11cf5429 d54b7d9d cd24c879 9876ae61
+                6850f232 0f68964d b26e04dd 06ce5747
+                965e7f41 aefa1eec 790e9566 5c0e6342
+[INFO]  snarkJS: Response Hash:
+                241902b0 c9386b3e bb03a786 a4db8b47
+                7727b8cd 97e4547b 45cd5205 3ce0c4e7
+                cf3d7e36 933f38fb a9283593 2f15b8dc
+                950d111b 7b0b4f4a efdb16df 5f6a799a
+[INFO]  snarkJS: Response Hash:
+                f70c2829 5e85dff9 c2109a7e 8f6d3451
+                1b2199b6 84670acc a460d26a 3a944b93
+                4e65635c 811bd65f bd833147 d27bcfad
+                a8b0548e a5bef208 1c684910 a8f6fe95
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #30: anant
+[INFO]  snarkJS: Next Challenge:
+                f70c2829 5e85dff9 c2109a7e 8f6d3451
+                1b2199b6 84670acc a460d26a 3a944b93
+                4e65635c 811bd65f bd833147 d27bcfad
+                a8b0548e a5bef208 1c684910 a8f6fe95
+[INFO]  snarkJS: Response Hash:
+                b7fdb609 ef13689a 0fec2af6 ed8192ed
+                ef3b107a e5379b06 695fd244 b385d382
+                47d1218a 686a71c1 989e016a 92da0b6a
+                3c058b0f 9f8b625b 7d053344 7c3fd57c
+[INFO]  snarkJS: Response Hash:
+                e70de5af e726056f 7018fd3d 9c48c756
+                f05a952f d5cf3c27 6e87c5cc f84f315e
+                948d77eb b4bfde3e 48a00ee1 ccea08ff
+                f7ac5231 36d9b0f3 df13c24c 3831970a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #29: gustavo
+[INFO]  snarkJS: Next Challenge:
+                e70de5af e726056f 7018fd3d 9c48c756
+                f05a952f d5cf3c27 6e87c5cc f84f315e
+                948d77eb b4bfde3e 48a00ee1 ccea08ff
+                f7ac5231 36d9b0f3 df13c24c 3831970a
+[INFO]  snarkJS: Response Hash:
+                6c645c14 0f037c35 24e71613 a5902d95
+                d407a124 01582a7d d2ed1b13 62a86883
+                cda9e8c1 543704f6 e2476b30 685e433d
+                0a349652 d919ad9a fe9410c1 7127cd3d
+[INFO]  snarkJS: Response Hash:
+                aa470426 518e2a2e 287b1b18 92767431
+                5646e93d d4f2ec4b d5beb54e 0d78f331
+                9e98e46a 0d50dcf7 3f06bb7e 7258a752
+                635d176e 8101350d 3d61108a 58e08962
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #28: dimitris
+[INFO]  snarkJS: Next Challenge:
+                aa470426 518e2a2e 287b1b18 92767431
+                5646e93d d4f2ec4b d5beb54e 0d78f331
+                9e98e46a 0d50dcf7 3f06bb7e 7258a752
+                635d176e 8101350d 3d61108a 58e08962
+[INFO]  snarkJS: Response Hash:
+                1488bd2d 1acf5ec7 c3636ff2 ba23cf99
+                7cf9ef7e eee6af0f 98150c11 e1c18b14
+                6c7225ed 6cecbe0d 749b8d2f b96a3139
+                04ec9b9c d5035958 f77dae70 75d3326e
+[INFO]  snarkJS: Response Hash:
+                f71e9315 058c1c88 ba4cd22e 01f86242
+                d81b5e74 de829ad8 8bd7ecef 475ca3ce
+                d59eaa77 7e2ebfd3 14c38bde 84a47ebf
+                c3143252 9c978b84 b25cddf7 a6212371
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #27: alex
+[INFO]  snarkJS: Next Challenge:
+                f71e9315 058c1c88 ba4cd22e 01f86242
+                d81b5e74 de829ad8 8bd7ecef 475ca3ce
+                d59eaa77 7e2ebfd3 14c38bde 84a47ebf
+                c3143252 9c978b84 b25cddf7 a6212371
+[INFO]  snarkJS: Response Hash:
+                379ecd36 fd2650c0 2196c9b4 13ea0f28
+                2d5545c9 ed270075 fd5b5000 60a41e67
+                8d5b75fc b22221b4 2636b741 0c45d9a1
+                68a4bf12 a6e91efc 14e09be2 20780990
+[INFO]  snarkJS: Response Hash:
+                10bdaa12 81af4408 8d52f74e a0a68574
+                10c43fda cf11a54b 123c14e9 90501cbc
+                91267417 db60661e bf911d30 bd800684
+                e2ce8ddc c3ee68c0 e37640fa 22553b98
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #26: geoff
+[INFO]  snarkJS: Next Challenge:
+                10bdaa12 81af4408 8d52f74e a0a68574
+                10c43fda cf11a54b 123c14e9 90501cbc
+                91267417 db60661e bf911d30 bd800684
+                e2ce8ddc c3ee68c0 e37640fa 22553b98
+[INFO]  snarkJS: Response Hash:
+                0eb5712a f476dd2f b5fe6419 9eb269f9
+                e945c281 71d09687 f373a02a 11f53cbd
+                c3df2fc9 77529e2f 9a51c428 4547f6df
+                e49eb1aa 3a46c508 27566b0b ac5fa5af
+[INFO]  snarkJS: Response Hash:
+                bbe7103c 4d477e68 31055c95 03d66ae0
+                4d6cedd7 509e2478 bd567555 0f265017
+                b54f10c1 fb8b7217 28c2e505 110e5bbf
+                c9911702 d9ef1416 b76bb4a3 43c0fe90
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #25: stefan
+[INFO]  snarkJS: Next Challenge:
+                bbe7103c 4d477e68 31055c95 03d66ae0
+                4d6cedd7 509e2478 bd567555 0f265017
+                b54f10c1 fb8b7217 28c2e505 110e5bbf
+                c9911702 d9ef1416 b76bb4a3 43c0fe90
+[INFO]  snarkJS: Response Hash:
+                7f45bf22 6b33ae9a a8f63ce6 bdd35975
+                7984d114 97200427 014e64ae 7dfee818
+                de42d36d 9f2e9cd7 71c5d500 f164287c
+                428d8af0 a1eb3a18 b40a5dd2 a2b6dc9e
+[INFO]  snarkJS: Response Hash:
+                ab45d9d9 de4a950d a97ae2b1 d20fb7c6
+                1b6d1098 6cb02d41 8a8be0c6 4e2c99d6
+                c000a914 c03d9ab2 71ee07c0 990a41fb
+                56971420 2c380711 d722350c c19a1152
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #24: vb
+[INFO]  snarkJS: Next Challenge:
+                ab45d9d9 de4a950d a97ae2b1 d20fb7c6
+                1b6d1098 6cb02d41 8a8be0c6 4e2c99d6
+                c000a914 c03d9ab2 71ee07c0 990a41fb
+                56971420 2c380711 d722350c c19a1152
+[INFO]  snarkJS: Response Hash:
+                31ea680a 591f8062 6cad18b7 1f72218c
+                6fe1be52 493e6be0 b709a2cc 87a585d6
+                dfaae025 6ea6a569 373d89d4 cd8b6587
+                aec1ed9a d1fbf69c c9c46d4d 4acccc98
+[INFO]  snarkJS: Response Hash:
+                7474dc21 f794d4ac fe75ceb7 36774ca0
+                5df34e59 40646583 c12d4f72 05f7cf40
+                aa45aef8 9f0da9ac f8ef1b4e b398638e
+                4dc84557 1a3e2e9f 1c92615d 68ba80d5
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #23: shomari
+[INFO]  snarkJS: Next Challenge:
+                7474dc21 f794d4ac fe75ceb7 36774ca0
+                5df34e59 40646583 c12d4f72 05f7cf40
+                aa45aef8 9f0da9ac f8ef1b4e b398638e
+                4dc84557 1a3e2e9f 1c92615d 68ba80d5
+[INFO]  snarkJS: Response Hash:
+                008a80a3 373a99ce 2c2f83e2 896147bb
+                f51cd431 128299cf eb36f85e 009e49ce
+                4da5ae54 601858e6 1bd4a4cd bebb0c63
+                247e7841 fa692b32 0856f9f7 aaf54640
+[INFO]  snarkJS: Response Hash:
+                14e4fe77 59391f2c 6988e790 2abd6343
+                cc27d259 80883aec 39a88d1e 415610b2
+                25e0aa5a c1ec9f5a 40b69989 4767ac75
+                983e5ca5 441ebbc6 ca66a61d 049c9112
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #22: roman
+[INFO]  snarkJS: Next Challenge:
+                14e4fe77 59391f2c 6988e790 2abd6343
+                cc27d259 80883aec 39a88d1e 415610b2
+                25e0aa5a c1ec9f5a 40b69989 4767ac75
+                983e5ca5 441ebbc6 ca66a61d 049c9112
+[INFO]  snarkJS: Response Hash:
+                d49e62bd 44ce5741 48dcc541 05b52e71
+                d89b3466 834eeba0 609b2b39 dc8c6033
+                4929ad4c 73a36bca 0113ad70 c960e6ed
+                dacc9e93 67e19901 e6c92263 a4e8d3e0
+[INFO]  snarkJS: Response Hash:
+                dfcaaa51 9ada2419 256d73b4 1d944815
+                4ff1b687 5874d44c f4e18be8 e933966e
+                08db79db 40878856 78138e60 d3c82a9a
+                7d50735c 449af38a 76d9ac9c 81af7e2a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #21: rf
+[INFO]  snarkJS: Next Challenge:
+                dfcaaa51 9ada2419 256d73b4 1d944815
+                4ff1b687 5874d44c f4e18be8 e933966e
+                08db79db 40878856 78138e60 d3c82a9a
+                7d50735c 449af38a 76d9ac9c 81af7e2a
+[INFO]  snarkJS: Response Hash:
+                287647b5 6cfe5115 f9367f2c 2962c12b
+                0a1947a7 85e2522d 9751d929 5c9b5a37
+                bed0204f f022abb2 7771e477 bb18d024
+                845c861e 663696db dc34739b 3fd86822
+[INFO]  snarkJS: Response Hash:
+                0ba142a6 f4403ff4 1d6ab339 6708f4d0
+                d5e567f3 2d6b293b dcdad335 09533246
+                a475da20 b0cf3f2f b4bff3bb 6d82ccf4
+                7f43d5ea 6623de42 57d65f3f be285915
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #20: edu
+[INFO]  snarkJS: Next Challenge:
+                0ba142a6 f4403ff4 1d6ab339 6708f4d0
+                d5e567f3 2d6b293b dcdad335 09533246
+                a475da20 b0cf3f2f b4bff3bb 6d82ccf4
+                7f43d5ea 6623de42 57d65f3f be285915
+[INFO]  snarkJS: Response Hash:
+                e9d2416c 15ed22d9 c6b7c2f5 683c21e9
+                9409df85 b068b3a1 f0c63984 061e13b2
+                1905b533 724ce1c8 7d756409 36706c9c
+                0026d811 64e17e1f 7b84e735 392835f6
+[INFO]  snarkJS: Response Hash:
+                5bfc6971 5a5f57d2 9170410c 04cfb19d
+                b079de9d a94f9b81 770d7cfd 6cfb7b14
+                d05e3268 596722a6 546a40b6 79194ce9
+                682d3956 23a664a9 a7d836c9 67a41d7d
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #19: petr
+[INFO]  snarkJS: Next Challenge:
+                5bfc6971 5a5f57d2 9170410c 04cfb19d
+                b079de9d a94f9b81 770d7cfd 6cfb7b14
+                d05e3268 596722a6 546a40b6 79194ce9
+                682d3956 23a664a9 a7d836c9 67a41d7d
+[INFO]  snarkJS: Response Hash:
+                98900cd9 b12a8619 aaa134ee e1a20ec8
+                89acc1af ca5a8131 c8b92c47 60f3b6b2
+                6132ec96 31c7e735 4547252f 2d578d29
+                3fcb91af d797edd1 b28fef9e 7105b5b8
+[INFO]  snarkJS: Response Hash:
+                729cd42c 9fa0328d d3faa58e 5fdd80b9
+                94270562 af70a380 f017bb9a 6099d742
+                8865b173 824c7547 10d2ccf0 667508f4
+                e7bf5f33 30660b5b 1dda4364 256926fc
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #18: cody
+[INFO]  snarkJS: Next Challenge:
+                729cd42c 9fa0328d d3faa58e 5fdd80b9
+                94270562 af70a380 f017bb9a 6099d742
+                8865b173 824c7547 10d2ccf0 667508f4
+                e7bf5f33 30660b5b 1dda4364 256926fc
+[INFO]  snarkJS: Response Hash:
+                28349fa9 f600daca 6b62e35d 8583ded4
+                132c7376 0447693b 9a4028ca 3b9b2437
+                7133c40e e33acdc2 3f59a34a f481abe7
+                7e3232e8 07f2cff7 1ffcf196 dab58baa
+[INFO]  snarkJS: Response Hash:
+                89a6b171 315d4522 99b25f19 a8fd5ff8
+                40d15b67 623953cd c8eb0c22 73d2a277
+                026e16be bacebd22 d3b72a44 b1091b5a
+                0a33d2ba b1546e9d fd42a01d bdd0596b
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #17: philip
+[INFO]  snarkJS: Next Challenge:
+                89a6b171 315d4522 99b25f19 a8fd5ff8
+                40d15b67 623953cd c8eb0c22 73d2a277
+                026e16be bacebd22 d3b72a44 b1091b5a
+                0a33d2ba b1546e9d fd42a01d bdd0596b
+[INFO]  snarkJS: Response Hash:
+                eaf5d6d3 821690bb 16070bc4 fed04f9f
+                aa652baf 9d959ad9 ae394bc1 d51d3beb
+                84d0ffd9 66328257 4956f171 79fa5fea
+                e5b6e77c 7eb509f1 925e1b92 ccb9d51a
+[INFO]  snarkJS: Response Hash:
+                af608b45 96865150 0c5b4f09 1ea38f34
+                fa7bee9b 75192c28 719e200d a483cc1d
+                e9db8db4 2c73de9e 92fb47ac 8a4554e8
+                e91044b1 a9d471ab b67b64fa 7eb9337d
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #16: aurel
+[INFO]  snarkJS: Next Challenge:
+                af608b45 96865150 0c5b4f09 1ea38f34
+                fa7bee9b 75192c28 719e200d a483cc1d
+                e9db8db4 2c73de9e 92fb47ac 8a4554e8
+                e91044b1 a9d471ab b67b64fa 7eb9337d
+[INFO]  snarkJS: Response Hash:
+                93a88218 13e1ae6b 59485741 002013e9
+                94faa680 5ee25e17 4787fcc9 63a3ae08
+                b2a71e4c 9d5563e4 fb91335d d6f98396
+                aa0536c5 fc19fc54 fcf164ab 99307249
+[INFO]  snarkJS: Response Hash:
+                1dcfa3a3 2135ab8d 1adca012 b01a4e63
+                42be7688 022183fb 0e28d1ac 762dcf3a
+                4bf2cf25 71f83624 c37cbaa5 30676bd8
+                0fa00411 c6e586e5 47a70d95 4085d4cd
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #15: anon0
+[INFO]  snarkJS: Next Challenge:
+                1dcfa3a3 2135ab8d 1adca012 b01a4e63
+                42be7688 022183fb 0e28d1ac 762dcf3a
+                4bf2cf25 71f83624 c37cbaa5 30676bd8
+                0fa00411 c6e586e5 47a70d95 4085d4cd
+[INFO]  snarkJS: Response Hash:
+                ba95f869 eabeb87c c1c55f21 6aed17ef
+                e96a832c 1571dcb3 556b85e0 434c45b2
+                0220dc2b 67af7012 12354f58 71b40d4a
+                0887b7b4 c485d2f3 43c65624 12ca5c31
+[INFO]  snarkJS: Response Hash:
+                ad1d6f7d 105fe751 56ae95ab 9c289094
+                5aca0552 61902a80 eb6b5f7c 98996f80
+                5575ba0d 05dfddc8 df75506c b22911a4
+                182a852b 4ee4953d 25c37841 cee60084
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #14: weijie
+[INFO]  snarkJS: Next Challenge:
+                ad1d6f7d 105fe751 56ae95ab 9c289094
+                5aca0552 61902a80 eb6b5f7c 98996f80
+                5575ba0d 05dfddc8 df75506c b22911a4
+                182a852b 4ee4953d 25c37841 cee60084
+[INFO]  snarkJS: Response Hash:
+                1fb91ad1 54ef9d58 b03f7cc8 9ada45ed
+                94b7a3a9 748c8f08 a6f2655f fd31483e
+                6b012d28 e47544cb 50e8c8fe 1f3cc72e
+                1305b7ad bdc49b80 68876d19 4b5d0a60
+[INFO]  snarkJS: Response Hash:
+                a85053ff 17c3c395 e4c6ede7 4fe7df4d
+                85e64700 bff1a066 c429a515 db5fbbb4
+                04958b99 9304c2ae b8b537d3 55a38651
+                9fb531f7 34e8bd17 eeb7c85c aab3501e
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #13: kevin
+[INFO]  snarkJS: Next Challenge:
+                a85053ff 17c3c395 e4c6ede7 4fe7df4d
+                85e64700 bff1a066 c429a515 db5fbbb4
+                04958b99 9304c2ae b8b537d3 55a38651
+                9fb531f7 34e8bd17 eeb7c85c aab3501e
+[INFO]  snarkJS: Response Hash:
+                c22a8a27 15feadad 42217518 ecca2788
+                fb771d57 8aa1f8e0 cef98ef5 7e6565b8
+                bf5ab833 298417de 5cddff07 520231b2
+                54ddc9c2 72817bf2 aae0d4ec 584500dc
+[INFO]  snarkJS: Response Hash:
+                e83607eb 942b3ac1 394dfb2a 36b465a0
+                3bcea042 a8bceafe 16daa05d 7dc143dd
+                d9c3e807 7490083b be2839ad 8be6bbdd
+                f1e90896 d14eab37 0ea33fd0 c0d3c11e
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #12: daniel
+[INFO]  snarkJS: Next Challenge:
+                e83607eb 942b3ac1 394dfb2a 36b465a0
+                3bcea042 a8bceafe 16daa05d 7dc143dd
+                d9c3e807 7490083b be2839ad 8be6bbdd
+                f1e90896 d14eab37 0ea33fd0 c0d3c11e
+[INFO]  snarkJS: Response Hash:
+                e38344af 2ccbb361 e5afe696 1a71a66b
+                1a5f319f ce49143d 2218509b 59cc5d44
+                04f3315f 3bde6a3c a556f3f4 9cc30578
+                0b958f8c 65a0727b 0da32273 3bf8cde4
+[INFO]  snarkJS: Response Hash:
+                f36bf303 7f19f750 dc8edb45 30522048
+                4090acb5 12e96c50 149618fa 007d3b8f
+                d9103148 f6d5c5d2 62449ca1 b332b43c
+                f8d6afb2 71bf2a11 24bcf4b2 143f0477
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #11: zhiniang
+[INFO]  snarkJS: Next Challenge:
+                f36bf303 7f19f750 dc8edb45 30522048
+                4090acb5 12e96c50 149618fa 007d3b8f
+                d9103148 f6d5c5d2 62449ca1 b332b43c
+                f8d6afb2 71bf2a11 24bcf4b2 143f0477
+[INFO]  snarkJS: Response Hash:
+                c72fa936 1a701827 9f9a2d78 501dc242
+                53e62a2f e871f056 3c8dd530 c4ee6761
+                e8bad30e 2e4cabc8 21b159c8 7fc554e7
+                18faf6e7 b303bc5e c0865ff8 86fbea48
+[INFO]  snarkJS: Response Hash:
+                ac890865 8234b4f0 b8f4e3c3 0f6acc34
+                38d3f297 734b62b9 c7b1157f 93d7eed2
+                ba05c59d e663cebc 08049076 3cfbee1e
+                5e231123 7714661e 67b43cca 921da027
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #10: vano
+[INFO]  snarkJS: Next Challenge:
+                ac890865 8234b4f0 b8f4e3c3 0f6acc34
+                38d3f297 734b62b9 c7b1157f 93d7eed2
+                ba05c59d e663cebc 08049076 3cfbee1e
+                5e231123 7714661e 67b43cca 921da027
+[INFO]  snarkJS: Response Hash:
+                ed65fac5 4967c6ee abfd8350 2eceb53c
+                a7ccd0bf d35353ee c5350c37 06988b8b
+                f1590b10 fe8388ab fbeb088c 8843fb80
+                4fe885d6 0bd6d8fb 7cd47eef c93b778b
+[INFO]  snarkJS: Response Hash:
+                7fde382d 1bc12ae7 d3d99879 648e416b
+                0540f39d 5e8f4945 229a7faa e97c3630
+                9d54bf8b b8a0813c 67f89d19 9b2111b9
+                0adb93c2 6b80fdd4 e3fe3640 860b7731
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #9: brecht
+[INFO]  snarkJS: Next Challenge:
+                7fde382d 1bc12ae7 d3d99879 648e416b
+                0540f39d 5e8f4945 229a7faa e97c3630
+                9d54bf8b b8a0813c 67f89d19 9b2111b9
+                0adb93c2 6b80fdd4 e3fe3640 860b7731
+[INFO]  snarkJS: Response Hash:
+                2f21e33e d267b2c5 31fbafb1 89beb370
+                a30166bf f9d97c02 42b7f3fc c650022c
+                61868f0e b2000578 d852fb4a 71ceb9e9
+                49337de4 9ec3ac48 1f2092db aac7a1de
+[INFO]  snarkJS: Response Hash:
+                af1d28b6 e1c2e68f 5c871f3e 01856f25
+                2ef4f745 a3e39e3d 2aa3bc40 7f82b4a5
+                feb2ba4c 303f90fb 15c86929 0611b732
+                be31f29a 15e5d609 6f555cd0 683e5421
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #8: mike
+[INFO]  snarkJS: Next Challenge:
+                af1d28b6 e1c2e68f 5c871f3e 01856f25
+                2ef4f745 a3e39e3d 2aa3bc40 7f82b4a5
+                feb2ba4c 303f90fb 15c86929 0611b732
+                be31f29a 15e5d609 6f555cd0 683e5421
+[INFO]  snarkJS: Response Hash:
+                cf0abf2f 06b4f5d1 3ab6ff1b 59e1ff40
+                a9a2e9b4 fdf27eac 0b1345e8 c89cbc3f
+                142d00d9 742d8e1a cc996425 cc626531
+                fb1be7b2 86640d09 c2909072 f26b9a3e
+[INFO]  snarkJS: Response Hash:
+                10e6b25c 4b066b59 a5b837d2 460a78b1
+                59edb6cb 2018ae0a a74b7555 499c9690
+                b16b4f38 99fa8147 b9bc4602 5b634eef
+                8e998fa2 44f9fe64 4df29ee9 a0944e7a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #7: youssef
+[INFO]  snarkJS: Next Challenge:
+                10e6b25c 4b066b59 a5b837d2 460a78b1
+                59edb6cb 2018ae0a a74b7555 499c9690
+                b16b4f38 99fa8147 b9bc4602 5b634eef
+                8e998fa2 44f9fe64 4df29ee9 a0944e7a
+[INFO]  snarkJS: Response Hash:
+                f34b3fe3 bf71c731 424d0b95 16ac3751
+                a2250b26 23648f74 58361bce 9616a233
+                e5aef57e 8cdd0f3c 555e1e0e e4feeace
+                c5f2342b 860d0975 4c450972 72d99b26
+[INFO]  snarkJS: Response Hash:
+                3e1140e5 66971cbd e6308dc3 d3f2ef4e
+                2c36bb4d b16704ed 0ffd26ee 7d80ccce
+                f2b46aa4 6feadf3e 2da8c43e ccf7588a
+                09e6cd94 85a4dd05 20af752d b0f24128
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #6: zac
+[INFO]  snarkJS: Next Challenge:
+                3e1140e5 66971cbd e6308dc3 d3f2ef4e
+                2c36bb4d b16704ed 0ffd26ee 7d80ccce
+                f2b46aa4 6feadf3e 2da8c43e ccf7588a
+                09e6cd94 85a4dd05 20af752d b0f24128
+[INFO]  snarkJS: Response Hash:
+                fbb8512f 393ffd01 7c20b1b6 6f7f5cf2
+                05f1de39 4fa987a7 03dc3fc6 c3957613
+                b33e69a9 143ae272 cd3e02b1 4db3c5d4
+                24ab0695 27e3e813 2a7b7ecf 8bbd05df
+[INFO]  snarkJS: Response Hash:
+                a7b3c130 cd8dbd26 769cfbcb e4c9a4ef
+                9055d13b ac932854 81c1007c acf51d29
+                c00dd146 d73a6670 47f65200 ae227e01
+                d589c609 04d263a4 1f5f187d 03fcc692
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #5: amrullah
+[INFO]  snarkJS: Next Challenge:
+                a7b3c130 cd8dbd26 769cfbcb e4c9a4ef
+                9055d13b ac932854 81c1007c acf51d29
+                c00dd146 d73a6670 47f65200 ae227e01
+                d589c609 04d263a4 1f5f187d 03fcc692
+[INFO]  snarkJS: Response Hash:
+                6201ec95 c960e694 4471bf9d ad3fe42c
+                b1b47a86 6d9c27ea 1c44f418 2a5622d4
+                663e5b4f 454d2a2a b7b7c546 397c46a7
+                72402e6c 7e3fbbd8 a921120d 00d19af2
+[INFO]  snarkJS: Response Hash:
+                635b55a6 a0c3c809 6843c9ab c06f40f0
+                e60fac21 df00b5c2 e2edbcc2 e4f4e0c2
+                f4d196f9 b34b95be 43e9f905 723e6a58
+                da92df24 f2035d85 3841ce4f 3518ee60
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #4: pepesha
+[INFO]  snarkJS: Next Challenge:
+                635b55a6 a0c3c809 6843c9ab c06f40f0
+                e60fac21 df00b5c2 e2edbcc2 e4f4e0c2
+                f4d196f9 b34b95be 43e9f905 723e6a58
+                da92df24 f2035d85 3841ce4f 3518ee60
+[INFO]  snarkJS: Response Hash:
+                e66da21e 696219ed a217664b 8deb0a30
+                b37f376b 16aae752 f5491015 2b2307f4
+                508d04b4 124d4e95 8c391d41 6dfc04a8
+                2db73c84 f8aa87f3 ba652eec 7b18b407
+[INFO]  snarkJS: Response Hash:
+                01401c5e 781fc7c8 aae99b16 0f14a86b
+                16a0a5e3 19d48fd0 4eaba3db 8a0fefa7
+                bf0854bc 9bf67893 36b8680f 261151bc
+                1d2aca16 3aa74c50 19c817bf dbc4d21d
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #3: poma
+[INFO]  snarkJS: Next Challenge:
+                01401c5e 781fc7c8 aae99b16 0f14a86b
+                16a0a5e3 19d48fd0 4eaba3db 8a0fefa7
+                bf0854bc 9bf67893 36b8680f 261151bc
+                1d2aca16 3aa74c50 19c817bf dbc4d21d
+[INFO]  snarkJS: Response Hash:
+                65c6c7bd f97d1259 ccac23b0 2fc35af4
+                73818991 93a0b9d3 82c5bee5 2159d5d1
+                1ceaa64c f8558471 3e954bdf a5c0e628
+                ab75b48d 0fda7dfb 6d1690d9 5361201c
+[INFO]  snarkJS: Response Hash:
+                9ff247f1 38a11751 05137ace d8c9766c
+                5eeccef3 5b892c62 c55eae78 7301991b
+                05b66649 b00c48f2 7501b30d 1538f5d8
+                0e2da3ed f163a978 5fba5b47 352f7d04
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #2: kobi
+[INFO]  snarkJS: Next Challenge:
+                9ff247f1 38a11751 05137ace d8c9766c
+                5eeccef3 5b892c62 c55eae78 7301991b
+                05b66649 b00c48f2 7501b30d 1538f5d8
+                0e2da3ed f163a978 5fba5b47 352f7d04
+[INFO]  snarkJS: Response Hash:
+                edec0294 eb450803 ec0ef7e1 7573f238
+                5663016b 6b47b9cc 8c9396cb 5ed36732
+                fcc6b6e3 abf5f8ac 61d6761d d565b203
+                936e475a 00f6e9ba 047e5991 4340fd1f
+[INFO]  snarkJS: Response Hash:
+                5e72e26e 38b46d06 7b797eb5 929e18e7
+                eda11ae0 cf429bb8 c04af72d 8a2633b5
+                625f8cbe bb07b61b 510403d4 bf644357
+                a80ea08d 7d5cc04d 58a8aa4d 2d9084ea
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #1: weijie
+[INFO]  snarkJS: Next Challenge:
+                5e72e26e 38b46d06 7b797eb5 929e18e7
+                eda11ae0 cf429bb8 c04af72d 8a2633b5
+                625f8cbe bb07b61b 510403d4 bf644357
+                a80ea08d 7d5cc04d 58a8aa4d 2d9084ea
+[INFO]  snarkJS: Response Hash:
+                398b99a4 3f0214e0 2b7483ea 96b8ac0d
+                1e2aa662 7b6e9e3b 9fe0b043 2803be29
+                f014b567 8fd83cfa 0abee8ca 07d7655c
+                b6682b52 7a7965aa 1f99f02a 89afb712
+[INFO]  snarkJS: Response Hash:
+                93da9192 0d5a54a8 a0fde55c d9dc3a10
+                c4f3eef7 68b62c09 48741370 864254b4
+                c1920f3f 29d4ebc0 ef3acecf 2e2db63a
+                755713d7 7e1ed773 47a56fbc 317c7a93
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Powers of Tau Ok!
+
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau# snarkjs ptv pot16_final.ptau
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: Next challenge hash:
+                a6cd1c50 023dba90 82efbc0e a031b129
+                8f72ed5d cb5727fb 70c566a2 a724506d
+                b420d4da 73f5a43f e57b44f2 0f036f36
+                c16c1f76 eb55498e ab5d787b 0f2650ce
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #55:
+[INFO]  snarkJS: Next Challenge:
+                74ba2bca c21fad58 bf413799 d5ac962a
+                c4a344fb 1b4c1e88 0bd89e4b b4221270
+                113cb4c4 8aa8cd37 eb4fa234 904ff959
+                f726e785 ce7c5608 bb061b2e 0d7480be
+[INFO]  snarkJS: Response Hash:
+                6e61deb8 4491e9f6 e31287ca 05655fd6
+                3a1bcde7 43f2157b 63464ccc 6bcd83f3
+                78f466af dcefdc3d 867ff75f deef53b9
+                998aa5d9 5818732a 98e4eaf3 98a1ce05
+[INFO]  snarkJS: Response Hash:
+                00d0b99a 5ccb65af a5872f82 5f2388f3
+                2f6fd96e d1e58e83 cb921037 447d980d
+                7bfb8a08 11d90a36 01846bbc ee2216ae
+                aec90e60 e2490e5d 09ea36bf 3222840f
+[INFO]  snarkJS: Beacon generator: e586fccaf245c9a1d7e78294d4802018f3001149a71b8f10cd997ef8235aa372
+[INFO]  snarkJS: Beacon iterations Exp: 10
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #54: jarrad
+[INFO]  snarkJS: Next Challenge:
+                00d0b99a 5ccb65af a5872f82 5f2388f3
+                2f6fd96e d1e58e83 cb921037 447d980d
+                7bfb8a08 11d90a36 01846bbc ee2216ae
+                aec90e60 e2490e5d 09ea36bf 3222840f
+[INFO]  snarkJS: Response Hash:
+                7f1229b8 321fd1b7 935dc9ca 5ebf1d16
+                572f25c9 e936798d 3a2cfbbf 7b6c21d0
+                8c681b03 6cded940 006dec27 0d51facf
+                a1b24f27 698e98ba bd3555a4 6490fca7
+[INFO]  snarkJS: Response Hash:
+                fbad44fc ea6d5052 70046563 04093552
+                d29be00d 7fcd2d62 7e07c1b0 15c6eb97
+                4ea9262c aa4633cd 306c7f55 7d839c78
+                f9a408c9 5cfaef06 f916e37d 182ae94b
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #53: juan
+[INFO]  snarkJS: Next Challenge:
+                fbad44fc ea6d5052 70046563 04093552
+                d29be00d 7fcd2d62 7e07c1b0 15c6eb97
+                4ea9262c aa4633cd 306c7f55 7d839c78
+                f9a408c9 5cfaef06 f916e37d 182ae94b
+[INFO]  snarkJS: Response Hash:
+                b34c97e0 e4bbd8fd 2053d343 60b09ee0
+                4eb68736 34a7ecd0 8066dc22 b367472a
+                cfa8f4fb c5438674 3e8c48dc 02db95c2
+                6d8816e1 ad04df21 1e6f9f0b f01bf695
+[INFO]  snarkJS: Response Hash:
+                3f02cb8d 89177b2e 9ffe3b1b be0a8f43
+                154eb960 2e8985f6 c84314a3 d47dfd60
+                e098313d b52d7a08 60de1403 0aae4a49
+                64458814 3daf0779 fadf6d9f 2526df43
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #52: zaki
+[INFO]  snarkJS: Next Challenge:
+                3f02cb8d 89177b2e 9ffe3b1b be0a8f43
+                154eb960 2e8985f6 c84314a3 d47dfd60
+                e098313d b52d7a08 60de1403 0aae4a49
+                64458814 3daf0779 fadf6d9f 2526df43
+[INFO]  snarkJS: Response Hash:
+                991c7525 41bc610b c6931b33 ed31be6b
+                8e8c04ea 317a32db 0e294038 5785185a
+                f456f7b3 065fee76 7f1d4817 f8ec5a9d
+                368d11db e39b20b2 0bcbc6b6 b02b15a3
+[INFO]  snarkJS: Response Hash:
+                01e99205 db3311bf 535b3316 e265050a
+                062a4491 f43c0e14 60bfe0ce acf196d6
+                b78559b8 015a3463 40aea8d5 03f2d9b9
+                a6e1b3f0 a54d2d22 d4ed1d92 16c09402
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #51: joe
+[INFO]  snarkJS: Next Challenge:
+                01e99205 db3311bf 535b3316 e265050a
+                062a4491 f43c0e14 60bfe0ce acf196d6
+                b78559b8 015a3463 40aea8d5 03f2d9b9
+                a6e1b3f0 a54d2d22 d4ed1d92 16c09402
+[INFO]  snarkJS: Response Hash:
+                6b157096 fa63b56d f6e1607a c58296eb
+                62d1d6bb fd58aa5a 6247e217 4c47d18b
+                d2a313cd c9b0b786 5c6b7f0d 61e364e3
+                0066ce2e 89bbaf3d ec5a8388 1bbb2aed
+[INFO]  snarkJS: Response Hash:
+                e6571d37 a66e7fbd ebd3ba93 6bd8c23c
+                140bb178 fb329657 2bed8709 063e3610
+                e99a5198 3f793bc2 b84d76ed f286d6e7
+                80cc879b ab7e1c6a 61bf8a9f 8fd160d7
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #50: weijie
+[INFO]  snarkJS: Next Challenge:
+                e6571d37 a66e7fbd ebd3ba93 6bd8c23c
+                140bb178 fb329657 2bed8709 063e3610
+                e99a5198 3f793bc2 b84d76ed f286d6e7
+                80cc879b ab7e1c6a 61bf8a9f 8fd160d7
+[INFO]  snarkJS: Response Hash:
+                11611a89 05056363 781d2039 487f00fe
+                ad74a86f d2bb6f7d a67ba3a0 c4ba71ca
+                7a943185 ec26beb7 391984f5 f60c61f4
+                54a4ca17 a9db1631 7e597971 8129460f
+[INFO]  snarkJS: Response Hash:
+                025d2ee9 4c4cf08f 6a2adeff 90075f4d
+                f4c29632 2e6fa910 815813ab 5e30f5b7
+                2d88b8b9 bda180ed 03c26cd5 2705ee1f
+                17d615f9 aa3d9a56 4434d457 d00c95d9
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #49: jordi
+[INFO]  snarkJS: Next Challenge:
+                025d2ee9 4c4cf08f 6a2adeff 90075f4d
+                f4c29632 2e6fa910 815813ab 5e30f5b7
+                2d88b8b9 bda180ed 03c26cd5 2705ee1f
+                17d615f9 aa3d9a56 4434d457 d00c95d9
+[INFO]  snarkJS: Response Hash:
+                1ccb74ca 75f43945 8fd1fda3 c3937669
+                ed672302 47c101a2 940f0d88 90a8eb9f
+                24efda2a d2f3c2d2 b0718d01 5caddba2
+                afbe49a1 a82e38c7 9ec78df6 6479bf91
+[INFO]  snarkJS: Response Hash:
+                ede3b130 b045333f 3de41950 aedc7006
+                e8fa2d28 7faa24d5 fc4a7338 c631a52f
+                8d47199d 4649b153 f175eb1d 0863c83f
+                a0d746a6 6f774d08 6743c4d4 d136cfe0
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #48: tyler
+[INFO]  snarkJS: Next Challenge:
+                ede3b130 b045333f 3de41950 aedc7006
+                e8fa2d28 7faa24d5 fc4a7338 c631a52f
+                8d47199d 4649b153 f175eb1d 0863c83f
+                a0d746a6 6f774d08 6743c4d4 d136cfe0
+[INFO]  snarkJS: Response Hash:
+                08896cef 6150e35c b1e16685 6f8e5699
+                2be30192 6dc217f2 5e162393 92df2d49
+                a82d1f9b 25205431 fd484707 f8e15d2c
+                bb75d3f1 36bed23f dc268a6a e2d7bc8d
+[INFO]  snarkJS: Response Hash:
+                5d38986e 613436f8 f29f713f 967a083c
+                730a1d34 1a1d2c0f fe7c29ca 3e1b6184
+                40412cff 8eeab16b 5a14bf42 1763e61b
+                3cefdf6c a5715027 56331ffb 960fa61e
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #47: saravanan
+[INFO]  snarkJS: Next Challenge:
+                5d38986e 613436f8 f29f713f 967a083c
+                730a1d34 1a1d2c0f fe7c29ca 3e1b6184
+                40412cff 8eeab16b 5a14bf42 1763e61b
+                3cefdf6c a5715027 56331ffb 960fa61e
+[INFO]  snarkJS: Response Hash:
+                2a015b49 55e1f882 5615c666 f0e9fb0b
+                8c2408c1 49682347 e7c0c3a1 9482b640
+                59a63dbb 7cfc9c00 5eceb1b4 a67118ce
+                d79f649f 9433437d f653427e 83955d4f
+[INFO]  snarkJS: Response Hash:
+                5aac215d a5d5efcb c8badb59 67fd43b5
+                b9b0a9ec f653fc5b d8604a05 869ecce3
+                20d3dafc 42de3eef 05ec318f 94e08552
+                c386b7e1 6a340f0f e9004f93 52fd1a61
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #46: tkorwin
+[INFO]  snarkJS: Next Challenge:
+                5aac215d a5d5efcb c8badb59 67fd43b5
+                b9b0a9ec f653fc5b d8604a05 869ecce3
+                20d3dafc 42de3eef 05ec318f 94e08552
+                c386b7e1 6a340f0f e9004f93 52fd1a61
+[INFO]  snarkJS: Response Hash:
+                f6124334 8acc3313 f3197405 d22b5ed1
+                b552967f 4eadd830 012ad991 c151574f
+                d9a8fed7 9a4a9706 bb852438 7b8180a7
+                1ccec376 b69e0426 91d9a01a 0c28102b
+[INFO]  snarkJS: Response Hash:
+                939038cd 2dc5a1c0 20f368d2 bfad8686
+                950fdf7e c2d2e192 a7d59509 3068816b
+                becd914b a293dd8a cb6d18c7 b5116b66
+                ea54d915 d47a89cc fbe2d5a3 444dfbed
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #45: ben
+[INFO]  snarkJS: Next Challenge:
+                939038cd 2dc5a1c0 20f368d2 bfad8686
+                950fdf7e c2d2e192 a7d59509 3068816b
+                becd914b a293dd8a cb6d18c7 b5116b66
+                ea54d915 d47a89cc fbe2d5a3 444dfbed
+[INFO]  snarkJS: Response Hash:
+                213b9ab7 06ea361c 50a34515 47f17bf6
+                370acade b17466a9 3db23b9b d4326375
+                785ac440 639809a4 398c603e 031861f2
+                c388ae35 9df8b31d 09994e82 885ddf06
+[INFO]  snarkJS: Response Hash:
+                c13dedda 076022e6 be2d634d a910930c
+                2154b002 99d4db5c 5462f13f d5fb19f4
+                8cda31bb 63e65a6f cdc6b482 0cc6a4ad
+                dbfe7ed2 446beab8 b63b7214 1fdc0c80
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #44: yingtong
+[INFO]  snarkJS: Next Challenge:
+                c13dedda 076022e6 be2d634d a910930c
+                2154b002 99d4db5c 5462f13f d5fb19f4
+                8cda31bb 63e65a6f cdc6b482 0cc6a4ad
+                dbfe7ed2 446beab8 b63b7214 1fdc0c80
+[INFO]  snarkJS: Response Hash:
+                e4ee7ebc 787ec108 af7597d6 868c8df1
+                d9cc4d97 e5ef8beb 9d94f055 c8a9d651
+                bd1d7b0f 1f8bdb6e 4a9ab754 c72ad6ca
+                3df58aa3 c9976a98 8163f527 17116f6e
+[INFO]  snarkJS: Response Hash:
+                05985261 72c5fece a3ff71a5 5af41344
+                42569917 25ad3148 1231c4cf 765d9ecd
+                9fd681c4 f7a25717 bb2eab34 49bb4417
+                059498b9 f5a5e4ba b630424f 2c0d3605
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #43: albert
+[INFO]  snarkJS: Next Challenge:
+                05985261 72c5fece a3ff71a5 5af41344
+                42569917 25ad3148 1231c4cf 765d9ecd
+                9fd681c4 f7a25717 bb2eab34 49bb4417
+                059498b9 f5a5e4ba b630424f 2c0d3605
+[INFO]  snarkJS: Response Hash:
+                60df61e1 f6d84fb3 8f14d515 1f5f02a8
+                45fb9baa 97abaee7 7fbc743a 0dcbc59b
+                6886f6dc 51720340 a6387b5a d172b003
+                d9700d11 6f24ab12 eb722036 b3da1e04
+[INFO]  snarkJS: Response Hash:
+                294dc1ce 3c381dee 7a12ab13 8813ba7d
+                c61ba46f 8e1b6165 ee23c623 af42f0a4
+                5a090951 5558548a 85c7b1b8 12156ff4
+                cb14eb7d 0aa9b35b 4ffdecaa 2bcfe37c
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #42: vaibhav
+[INFO]  snarkJS: Next Challenge:
+                294dc1ce 3c381dee 7a12ab13 8813ba7d
+                c61ba46f 8e1b6165 ee23c623 af42f0a4
+                5a090951 5558548a 85c7b1b8 12156ff4
+                cb14eb7d 0aa9b35b 4ffdecaa 2bcfe37c
+[INFO]  snarkJS: Response Hash:
+                e8e7293c 3acd49c7 c20418ff 9b2ac179
+                304228a9 f47580b5 57367782 6b3ef007
+                ee6be1d2 699110f7 efa54ef2 d40cda33
+                2da5071b 231e047c 253b11cc 933acc53
+[INFO]  snarkJS: Response Hash:
+                41c03ca8 6cc9df98 d80073e6 93c09d46
+                42cbadb7 a8752934 049db2dd 79016523
+                99d1e13d 90ab9b54 57860f55 914efe1f
+                f87f7b5e 7fc86993 774a7236 0aaa716a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #41: evan
+[INFO]  snarkJS: Next Challenge:
+                41c03ca8 6cc9df98 d80073e6 93c09d46
+                42cbadb7 a8752934 049db2dd 79016523
+                99d1e13d 90ab9b54 57860f55 914efe1f
+                f87f7b5e 7fc86993 774a7236 0aaa716a
+[INFO]  snarkJS: Response Hash:
+                8d6a4bcc c44e751a 54b3b818 2997cbe8
+                24e018ad 959e66d2 4c1db2f5 337790ad
+                390e4a11 d65b89e7 4d04d56e 81d558ca
+                90a80b18 0e51b55b f4a07786 28a70f77
+[INFO]  snarkJS: Response Hash:
+                b262f934 ab2368cc aa86772d 586040a5
+                1d284338 d9f41f47 833c19a4 335d4fc6
+                e8e8eccd 17723291 b92bb348 4ef6f6d1
+                99563e61 b2a49634 e081d7c5 44e5bfed
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #40: weitang
+[INFO]  snarkJS: Next Challenge:
+                b262f934 ab2368cc aa86772d 586040a5
+                1d284338 d9f41f47 833c19a4 335d4fc6
+                e8e8eccd 17723291 b92bb348 4ef6f6d1
+                99563e61 b2a49634 e081d7c5 44e5bfed
+[INFO]  snarkJS: Response Hash:
+                276a5a94 26cee943 0cc3c64b 6049f912
+                4a8c4297 3ffec2bf a60983b2 37fec0aa
+                98247803 596d2ac1 2076bf37 7104ab68
+                c2c2a879 fbc7fcf8 b9168b52 5f1f7916
+[INFO]  snarkJS: Response Hash:
+                79043f5f 7a2e81a2 e7aca5bf c02a375f
+                6b3beb0c 5aa7e3f8 b942201a f3e0d43e
+                b33efd3a 10b10323 8a93eaad 3462180e
+                56eea585 e4f30715 3df06e81 d6150275
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #39: wanseob
+[INFO]  snarkJS: Next Challenge:
+                79043f5f 7a2e81a2 e7aca5bf c02a375f
+                6b3beb0c 5aa7e3f8 b942201a f3e0d43e
+                b33efd3a 10b10323 8a93eaad 3462180e
+                56eea585 e4f30715 3df06e81 d6150275
+[INFO]  snarkJS: Response Hash:
+                ed29ba79 b1392ba7 4ff572b8 6ed743b9
+                3b94da14 e54eb4a5 4d2fa6f0 cbd47b99
+                13516c95 f53b6a07 845676c5 1b081f2d
+                64a14d26 0809d9bb 2db1bf8d 9bccf584
+[INFO]  snarkJS: Response Hash:
+                ac95544f 0e1eab30 0cbd826c 7ce0ccf5
+                58559b95 cf450ed1 0f472063 fa50bb5e
+                159734c0 a50cdd1a 8413eb92 a7b4947e
+                6e66b8d0 cdb3a19c 85897e42 ee1811e1
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #38: james
+[INFO]  snarkJS: Next Challenge:
+                ac95544f 0e1eab30 0cbd826c 7ce0ccf5
+                58559b95 cf450ed1 0f472063 fa50bb5e
+                159734c0 a50cdd1a 8413eb92 a7b4947e
+                6e66b8d0 cdb3a19c 85897e42 ee1811e1
+[INFO]  snarkJS: Response Hash:
+                036438ed c68d3a36 6ba0517f 5b4a0e79
+                f6d5efe5 6fd2514a bb674c9d f6126eda
+                854fd11b eb274969 095149d7 7de76179
+                45176503 158beaf9 fc6f9fa5 9aef2aaf
+[INFO]  snarkJS: Response Hash:
+                8d77dba2 eada39e2 2a75a8ad 8c0f40f8
+                0dcefa59 4c6a89ea 28f448df 8bced1b5
+                3ee80e03 9247d88f 9efb734e cbaf9245
+                badd9177 5e8b1dd6 07725db7 facf734b
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #37: chihcheng
+[INFO]  snarkJS: Next Challenge:
+                8d77dba2 eada39e2 2a75a8ad 8c0f40f8
+                0dcefa59 4c6a89ea 28f448df 8bced1b5
+                3ee80e03 9247d88f 9efb734e cbaf9245
+                badd9177 5e8b1dd6 07725db7 facf734b
+[INFO]  snarkJS: Response Hash:
+                e51f44c2 c3d398d4 fcc3cbae 3a63b449
+                dcfe2aef baab3ad5 a8c7a782 23abd337
+                fb30b676 31caa2f9 af515317 945d5c5e
+                80cf7197 1777af17 072e3ed2 dc6c1d9b
+[INFO]  snarkJS: Response Hash:
+                e406add7 6da9abd4 d2bd81b3 e6fbf721
+                3fdeb18d 3a3b8b3e c35a0a0d c04bcc19
+                c7c94362 8bdc1f9c 974a6053 2f5fe053
+                fc53a956 a11f0b40 990cc734 f0d496d1
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #36: stefaan
+[INFO]  snarkJS: Next Challenge:
+                e406add7 6da9abd4 d2bd81b3 e6fbf721
+                3fdeb18d 3a3b8b3e c35a0a0d c04bcc19
+                c7c94362 8bdc1f9c 974a6053 2f5fe053
+                fc53a956 a11f0b40 990cc734 f0d496d1
+[INFO]  snarkJS: Response Hash:
+                3b3630a0 e4fa0ef1 4e1086d8 60cae23a
+                fa635c65 cae2971e 702a7ccc f13e3820
+                5507dc4a 9cfdd8f1 481fac94 0ef1bd01
+                46e73740 66d1493d 1114f328 73eb6f27
+[INFO]  snarkJS: Response Hash:
+                33247048 366e6228 5a69d257 601f1ee5
+                2aa5d123 8b0fceb8 aaaca087 614dfa95
+                6eb377b9 683bb551 16ece5d4 023e3e3f
+                5b154993 1048ba07 b5a4b37c 463e9b2c
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #35: leonard
+[INFO]  snarkJS: Next Challenge:
+                33247048 366e6228 5a69d257 601f1ee5
+                2aa5d123 8b0fceb8 aaaca087 614dfa95
+                6eb377b9 683bb551 16ece5d4 023e3e3f
+                5b154993 1048ba07 b5a4b37c 463e9b2c
+[INFO]  snarkJS: Response Hash:
+                8557483d 85297ec7 455ce374 406319a6
+                2b18f0fa 4b640dbf a7712e19 8df6cc4a
+                ca80c0b6 0ef147f4 42e29c48 35855b14
+                b070e58c 32aecdb4 af713e05 f936af1b
+[INFO]  snarkJS: Response Hash:
+                8fddfae2 385f5fc1 f6def277 e341ccb2
+                c3a78108 e2d7efdd 77c556b5 6305e612
+                2fe0bb4f 27a16743 29d8fbb0 c9520076
+                ae8ee1b1 5da13eff 58914d28 de9459be
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #34: igor
+[INFO]  snarkJS: Next Challenge:
+                8fddfae2 385f5fc1 f6def277 e341ccb2
+                c3a78108 e2d7efdd 77c556b5 6305e612
+                2fe0bb4f 27a16743 29d8fbb0 c9520076
+                ae8ee1b1 5da13eff 58914d28 de9459be
+[INFO]  snarkJS: Response Hash:
+                8fa4bda0 e8305faf 99461689 11782792
+                5f9c2025 9237b9c0 dea73175 6c907526
+                47eeba78 f27a0391 9ec8b6ff 46c1afa3
+                f57bd7a5 307f9c4e 35d4f5ed 2fabd316
+[INFO]  snarkJS: Response Hash:
+                5e4226c9 b037c98d 6207ee8f 8056c651
+                d3686215 74dcf7ac 67cf6908 43dc8072
+                4f8c8f62 7d3a0e33 4d82934e 24d17e89
+                300c767f 91c03ca2 13742e0d 25c6ac09
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #33: oskar
+[INFO]  snarkJS: Next Challenge:
+                5e4226c9 b037c98d 6207ee8f 8056c651
+                d3686215 74dcf7ac 67cf6908 43dc8072
+                4f8c8f62 7d3a0e33 4d82934e 24d17e89
+                300c767f 91c03ca2 13742e0d 25c6ac09
+[INFO]  snarkJS: Response Hash:
+                cd052845 3b0cca20 3956bb23 333473be
+                c12c14a8 cb7102ef e437f8d4 07f23463
+                6e77e1e7 d44c4176 608ad290 a2d83f48
+                78ccb222 c1e7c60b f5a8ab38 542ce634
+[INFO]  snarkJS: Response Hash:
+                daa7c3b5 570966a7 1180db03 c0d76def
+                00395cb6 95c90736 d9c7c240 8bc76b33
+                bda8ee88 f495b77d 1927a94d 37e67726
+                89e7cb8a 1796c863 5c1153fc 6d6b6f42
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #32: josephc
+[INFO]  snarkJS: Next Challenge:
+                daa7c3b5 570966a7 1180db03 c0d76def
+                00395cb6 95c90736 d9c7c240 8bc76b33
+                bda8ee88 f495b77d 1927a94d 37e67726
+                89e7cb8a 1796c863 5c1153fc 6d6b6f42
+[INFO]  snarkJS: Response Hash:
+                527fe68c 16219d86 018de364 fc5701b1
+                44fc5b68 eb063c9a 8c4e8405 b35f4561
+                b55363df 6d9adf82 8792c7b1 92a595b4
+                4aadbea7 cdef918a 11bfe65a 89c9e4a3
+[INFO]  snarkJS: Response Hash:
+                7695680f c6eb5d11 e31b48be a122428a
+                11cf5429 d54b7d9d cd24c879 9876ae61
+                6850f232 0f68964d b26e04dd 06ce5747
+                965e7f41 aefa1eec 790e9566 5c0e6342
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #31: golem
+[INFO]  snarkJS: Next Challenge:
+                7695680f c6eb5d11 e31b48be a122428a
+                11cf5429 d54b7d9d cd24c879 9876ae61
+                6850f232 0f68964d b26e04dd 06ce5747
+                965e7f41 aefa1eec 790e9566 5c0e6342
+[INFO]  snarkJS: Response Hash:
+                241902b0 c9386b3e bb03a786 a4db8b47
+                7727b8cd 97e4547b 45cd5205 3ce0c4e7
+                cf3d7e36 933f38fb a9283593 2f15b8dc
+                950d111b 7b0b4f4a efdb16df 5f6a799a
+[INFO]  snarkJS: Response Hash:
+                f70c2829 5e85dff9 c2109a7e 8f6d3451
+                1b2199b6 84670acc a460d26a 3a944b93
+                4e65635c 811bd65f bd833147 d27bcfad
+                a8b0548e a5bef208 1c684910 a8f6fe95
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #30: anant
+[INFO]  snarkJS: Next Challenge:
+                f70c2829 5e85dff9 c2109a7e 8f6d3451
+                1b2199b6 84670acc a460d26a 3a944b93
+                4e65635c 811bd65f bd833147 d27bcfad
+                a8b0548e a5bef208 1c684910 a8f6fe95
+[INFO]  snarkJS: Response Hash:
+                b7fdb609 ef13689a 0fec2af6 ed8192ed
+                ef3b107a e5379b06 695fd244 b385d382
+                47d1218a 686a71c1 989e016a 92da0b6a
+                3c058b0f 9f8b625b 7d053344 7c3fd57c
+[INFO]  snarkJS: Response Hash:
+                e70de5af e726056f 7018fd3d 9c48c756
+                f05a952f d5cf3c27 6e87c5cc f84f315e
+                948d77eb b4bfde3e 48a00ee1 ccea08ff
+                f7ac5231 36d9b0f3 df13c24c 3831970a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #29: gustavo
+[INFO]  snarkJS: Next Challenge:
+                e70de5af e726056f 7018fd3d 9c48c756
+                f05a952f d5cf3c27 6e87c5cc f84f315e
+                948d77eb b4bfde3e 48a00ee1 ccea08ff
+                f7ac5231 36d9b0f3 df13c24c 3831970a
+[INFO]  snarkJS: Response Hash:
+                6c645c14 0f037c35 24e71613 a5902d95
+                d407a124 01582a7d d2ed1b13 62a86883
+                cda9e8c1 543704f6 e2476b30 685e433d
+                0a349652 d919ad9a fe9410c1 7127cd3d
+[INFO]  snarkJS: Response Hash:
+                aa470426 518e2a2e 287b1b18 92767431
+                5646e93d d4f2ec4b d5beb54e 0d78f331
+                9e98e46a 0d50dcf7 3f06bb7e 7258a752
+                635d176e 8101350d 3d61108a 58e08962
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #28: dimitris
+[INFO]  snarkJS: Next Challenge:
+                aa470426 518e2a2e 287b1b18 92767431
+                5646e93d d4f2ec4b d5beb54e 0d78f331
+                9e98e46a 0d50dcf7 3f06bb7e 7258a752
+                635d176e 8101350d 3d61108a 58e08962
+[INFO]  snarkJS: Response Hash:
+                1488bd2d 1acf5ec7 c3636ff2 ba23cf99
+                7cf9ef7e eee6af0f 98150c11 e1c18b14
+                6c7225ed 6cecbe0d 749b8d2f b96a3139
+                04ec9b9c d5035958 f77dae70 75d3326e
+[INFO]  snarkJS: Response Hash:
+                f71e9315 058c1c88 ba4cd22e 01f86242
+                d81b5e74 de829ad8 8bd7ecef 475ca3ce
+                d59eaa77 7e2ebfd3 14c38bde 84a47ebf
+                c3143252 9c978b84 b25cddf7 a6212371
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #27: alex
+[INFO]  snarkJS: Next Challenge:
+                f71e9315 058c1c88 ba4cd22e 01f86242
+                d81b5e74 de829ad8 8bd7ecef 475ca3ce
+                d59eaa77 7e2ebfd3 14c38bde 84a47ebf
+                c3143252 9c978b84 b25cddf7 a6212371
+[INFO]  snarkJS: Response Hash:
+                379ecd36 fd2650c0 2196c9b4 13ea0f28
+                2d5545c9 ed270075 fd5b5000 60a41e67
+                8d5b75fc b22221b4 2636b741 0c45d9a1
+                68a4bf12 a6e91efc 14e09be2 20780990
+[INFO]  snarkJS: Response Hash:
+                10bdaa12 81af4408 8d52f74e a0a68574
+                10c43fda cf11a54b 123c14e9 90501cbc
+                91267417 db60661e bf911d30 bd800684
+                e2ce8ddc c3ee68c0 e37640fa 22553b98
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #26: geoff
+[INFO]  snarkJS: Next Challenge:
+                10bdaa12 81af4408 8d52f74e a0a68574
+                10c43fda cf11a54b 123c14e9 90501cbc
+                91267417 db60661e bf911d30 bd800684
+                e2ce8ddc c3ee68c0 e37640fa 22553b98
+[INFO]  snarkJS: Response Hash:
+                0eb5712a f476dd2f b5fe6419 9eb269f9
+                e945c281 71d09687 f373a02a 11f53cbd
+                c3df2fc9 77529e2f 9a51c428 4547f6df
+                e49eb1aa 3a46c508 27566b0b ac5fa5af
+[INFO]  snarkJS: Response Hash:
+                bbe7103c 4d477e68 31055c95 03d66ae0
+                4d6cedd7 509e2478 bd567555 0f265017
+                b54f10c1 fb8b7217 28c2e505 110e5bbf
+                c9911702 d9ef1416 b76bb4a3 43c0fe90
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #25: stefan
+[INFO]  snarkJS: Next Challenge:
+                bbe7103c 4d477e68 31055c95 03d66ae0
+                4d6cedd7 509e2478 bd567555 0f265017
+                b54f10c1 fb8b7217 28c2e505 110e5bbf
+                c9911702 d9ef1416 b76bb4a3 43c0fe90
+[INFO]  snarkJS: Response Hash:
+                7f45bf22 6b33ae9a a8f63ce6 bdd35975
+                7984d114 97200427 014e64ae 7dfee818
+                de42d36d 9f2e9cd7 71c5d500 f164287c
+                428d8af0 a1eb3a18 b40a5dd2 a2b6dc9e
+[INFO]  snarkJS: Response Hash:
+                ab45d9d9 de4a950d a97ae2b1 d20fb7c6
+                1b6d1098 6cb02d41 8a8be0c6 4e2c99d6
+                c000a914 c03d9ab2 71ee07c0 990a41fb
+                56971420 2c380711 d722350c c19a1152
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #24: vb
+[INFO]  snarkJS: Next Challenge:
+                ab45d9d9 de4a950d a97ae2b1 d20fb7c6
+                1b6d1098 6cb02d41 8a8be0c6 4e2c99d6
+                c000a914 c03d9ab2 71ee07c0 990a41fb
+                56971420 2c380711 d722350c c19a1152
+[INFO]  snarkJS: Response Hash:
+                31ea680a 591f8062 6cad18b7 1f72218c
+                6fe1be52 493e6be0 b709a2cc 87a585d6
+                dfaae025 6ea6a569 373d89d4 cd8b6587
+                aec1ed9a d1fbf69c c9c46d4d 4acccc98
+[INFO]  snarkJS: Response Hash:
+                7474dc21 f794d4ac fe75ceb7 36774ca0
+                5df34e59 40646583 c12d4f72 05f7cf40
+                aa45aef8 9f0da9ac f8ef1b4e b398638e
+                4dc84557 1a3e2e9f 1c92615d 68ba80d5
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #23: shomari
+[INFO]  snarkJS: Next Challenge:
+                7474dc21 f794d4ac fe75ceb7 36774ca0
+                5df34e59 40646583 c12d4f72 05f7cf40
+                aa45aef8 9f0da9ac f8ef1b4e b398638e
+                4dc84557 1a3e2e9f 1c92615d 68ba80d5
+[INFO]  snarkJS: Response Hash:
+                008a80a3 373a99ce 2c2f83e2 896147bb
+                f51cd431 128299cf eb36f85e 009e49ce
+                4da5ae54 601858e6 1bd4a4cd bebb0c63
+                247e7841 fa692b32 0856f9f7 aaf54640
+[INFO]  snarkJS: Response Hash:
+                14e4fe77 59391f2c 6988e790 2abd6343
+                cc27d259 80883aec 39a88d1e 415610b2
+                25e0aa5a c1ec9f5a 40b69989 4767ac75
+                983e5ca5 441ebbc6 ca66a61d 049c9112
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #22: roman
+[INFO]  snarkJS: Next Challenge:
+                14e4fe77 59391f2c 6988e790 2abd6343
+                cc27d259 80883aec 39a88d1e 415610b2
+                25e0aa5a c1ec9f5a 40b69989 4767ac75
+                983e5ca5 441ebbc6 ca66a61d 049c9112
+[INFO]  snarkJS: Response Hash:
+                d49e62bd 44ce5741 48dcc541 05b52e71
+                d89b3466 834eeba0 609b2b39 dc8c6033
+                4929ad4c 73a36bca 0113ad70 c960e6ed
+                dacc9e93 67e19901 e6c92263 a4e8d3e0
+[INFO]  snarkJS: Response Hash:
+                dfcaaa51 9ada2419 256d73b4 1d944815
+                4ff1b687 5874d44c f4e18be8 e933966e
+                08db79db 40878856 78138e60 d3c82a9a
+                7d50735c 449af38a 76d9ac9c 81af7e2a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #21: rf
+[INFO]  snarkJS: Next Challenge:
+                dfcaaa51 9ada2419 256d73b4 1d944815
+                4ff1b687 5874d44c f4e18be8 e933966e
+                08db79db 40878856 78138e60 d3c82a9a
+                7d50735c 449af38a 76d9ac9c 81af7e2a
+[INFO]  snarkJS: Response Hash:
+                287647b5 6cfe5115 f9367f2c 2962c12b
+                0a1947a7 85e2522d 9751d929 5c9b5a37
+                bed0204f f022abb2 7771e477 bb18d024
+                845c861e 663696db dc34739b 3fd86822
+[INFO]  snarkJS: Response Hash:
+                0ba142a6 f4403ff4 1d6ab339 6708f4d0
+                d5e567f3 2d6b293b dcdad335 09533246
+                a475da20 b0cf3f2f b4bff3bb 6d82ccf4
+                7f43d5ea 6623de42 57d65f3f be285915
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #20: edu
+[INFO]  snarkJS: Next Challenge:
+                0ba142a6 f4403ff4 1d6ab339 6708f4d0
+                d5e567f3 2d6b293b dcdad335 09533246
+                a475da20 b0cf3f2f b4bff3bb 6d82ccf4
+                7f43d5ea 6623de42 57d65f3f be285915
+[INFO]  snarkJS: Response Hash:
+                e9d2416c 15ed22d9 c6b7c2f5 683c21e9
+                9409df85 b068b3a1 f0c63984 061e13b2
+                1905b533 724ce1c8 7d756409 36706c9c
+                0026d811 64e17e1f 7b84e735 392835f6
+[INFO]  snarkJS: Response Hash:
+                5bfc6971 5a5f57d2 9170410c 04cfb19d
+                b079de9d a94f9b81 770d7cfd 6cfb7b14
+                d05e3268 596722a6 546a40b6 79194ce9
+                682d3956 23a664a9 a7d836c9 67a41d7d
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #19: petr
+[INFO]  snarkJS: Next Challenge:
+                5bfc6971 5a5f57d2 9170410c 04cfb19d
+                b079de9d a94f9b81 770d7cfd 6cfb7b14
+                d05e3268 596722a6 546a40b6 79194ce9
+                682d3956 23a664a9 a7d836c9 67a41d7d
+[INFO]  snarkJS: Response Hash:
+                98900cd9 b12a8619 aaa134ee e1a20ec8
+                89acc1af ca5a8131 c8b92c47 60f3b6b2
+                6132ec96 31c7e735 4547252f 2d578d29
+                3fcb91af d797edd1 b28fef9e 7105b5b8
+[INFO]  snarkJS: Response Hash:
+                729cd42c 9fa0328d d3faa58e 5fdd80b9
+                94270562 af70a380 f017bb9a 6099d742
+                8865b173 824c7547 10d2ccf0 667508f4
+                e7bf5f33 30660b5b 1dda4364 256926fc
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #18: cody
+[INFO]  snarkJS: Next Challenge:
+                729cd42c 9fa0328d d3faa58e 5fdd80b9
+                94270562 af70a380 f017bb9a 6099d742
+                8865b173 824c7547 10d2ccf0 667508f4
+                e7bf5f33 30660b5b 1dda4364 256926fc
+[INFO]  snarkJS: Response Hash:
+                28349fa9 f600daca 6b62e35d 8583ded4
+                132c7376 0447693b 9a4028ca 3b9b2437
+                7133c40e e33acdc2 3f59a34a f481abe7
+                7e3232e8 07f2cff7 1ffcf196 dab58baa
+[INFO]  snarkJS: Response Hash:
+                89a6b171 315d4522 99b25f19 a8fd5ff8
+                40d15b67 623953cd c8eb0c22 73d2a277
+                026e16be bacebd22 d3b72a44 b1091b5a
+                0a33d2ba b1546e9d fd42a01d bdd0596b
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #17: philip
+[INFO]  snarkJS: Next Challenge:
+                89a6b171 315d4522 99b25f19 a8fd5ff8
+                40d15b67 623953cd c8eb0c22 73d2a277
+                026e16be bacebd22 d3b72a44 b1091b5a
+                0a33d2ba b1546e9d fd42a01d bdd0596b
+[INFO]  snarkJS: Response Hash:
+                eaf5d6d3 821690bb 16070bc4 fed04f9f
+                aa652baf 9d959ad9 ae394bc1 d51d3beb
+                84d0ffd9 66328257 4956f171 79fa5fea
+                e5b6e77c 7eb509f1 925e1b92 ccb9d51a
+[INFO]  snarkJS: Response Hash:
+                af608b45 96865150 0c5b4f09 1ea38f34
+                fa7bee9b 75192c28 719e200d a483cc1d
+                e9db8db4 2c73de9e 92fb47ac 8a4554e8
+                e91044b1 a9d471ab b67b64fa 7eb9337d
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #16: aurel
+[INFO]  snarkJS: Next Challenge:
+                af608b45 96865150 0c5b4f09 1ea38f34
+                fa7bee9b 75192c28 719e200d a483cc1d
+                e9db8db4 2c73de9e 92fb47ac 8a4554e8
+                e91044b1 a9d471ab b67b64fa 7eb9337d
+[INFO]  snarkJS: Response Hash:
+                93a88218 13e1ae6b 59485741 002013e9
+                94faa680 5ee25e17 4787fcc9 63a3ae08
+                b2a71e4c 9d5563e4 fb91335d d6f98396
+                aa0536c5 fc19fc54 fcf164ab 99307249
+[INFO]  snarkJS: Response Hash:
+                1dcfa3a3 2135ab8d 1adca012 b01a4e63
+                42be7688 022183fb 0e28d1ac 762dcf3a
+                4bf2cf25 71f83624 c37cbaa5 30676bd8
+                0fa00411 c6e586e5 47a70d95 4085d4cd
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #15: anon0
+[INFO]  snarkJS: Next Challenge:
+                1dcfa3a3 2135ab8d 1adca012 b01a4e63
+                42be7688 022183fb 0e28d1ac 762dcf3a
+                4bf2cf25 71f83624 c37cbaa5 30676bd8
+                0fa00411 c6e586e5 47a70d95 4085d4cd
+[INFO]  snarkJS: Response Hash:
+                ba95f869 eabeb87c c1c55f21 6aed17ef
+                e96a832c 1571dcb3 556b85e0 434c45b2
+                0220dc2b 67af7012 12354f58 71b40d4a
+                0887b7b4 c485d2f3 43c65624 12ca5c31
+[INFO]  snarkJS: Response Hash:
+                ad1d6f7d 105fe751 56ae95ab 9c289094
+                5aca0552 61902a80 eb6b5f7c 98996f80
+                5575ba0d 05dfddc8 df75506c b22911a4
+                182a852b 4ee4953d 25c37841 cee60084
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #14: weijie
+[INFO]  snarkJS: Next Challenge:
+                ad1d6f7d 105fe751 56ae95ab 9c289094
+                5aca0552 61902a80 eb6b5f7c 98996f80
+                5575ba0d 05dfddc8 df75506c b22911a4
+                182a852b 4ee4953d 25c37841 cee60084
+[INFO]  snarkJS: Response Hash:
+                1fb91ad1 54ef9d58 b03f7cc8 9ada45ed
+                94b7a3a9 748c8f08 a6f2655f fd31483e
+                6b012d28 e47544cb 50e8c8fe 1f3cc72e
+                1305b7ad bdc49b80 68876d19 4b5d0a60
+[INFO]  snarkJS: Response Hash:
+                a85053ff 17c3c395 e4c6ede7 4fe7df4d
+                85e64700 bff1a066 c429a515 db5fbbb4
+                04958b99 9304c2ae b8b537d3 55a38651
+                9fb531f7 34e8bd17 eeb7c85c aab3501e
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #13: kevin
+[INFO]  snarkJS: Next Challenge:
+                a85053ff 17c3c395 e4c6ede7 4fe7df4d
+                85e64700 bff1a066 c429a515 db5fbbb4
+                04958b99 9304c2ae b8b537d3 55a38651
+                9fb531f7 34e8bd17 eeb7c85c aab3501e
+[INFO]  snarkJS: Response Hash:
+                c22a8a27 15feadad 42217518 ecca2788
+                fb771d57 8aa1f8e0 cef98ef5 7e6565b8
+                bf5ab833 298417de 5cddff07 520231b2
+                54ddc9c2 72817bf2 aae0d4ec 584500dc
+[INFO]  snarkJS: Response Hash:
+                e83607eb 942b3ac1 394dfb2a 36b465a0
+                3bcea042 a8bceafe 16daa05d 7dc143dd
+                d9c3e807 7490083b be2839ad 8be6bbdd
+                f1e90896 d14eab37 0ea33fd0 c0d3c11e
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #12: daniel
+[INFO]  snarkJS: Next Challenge:
+                e83607eb 942b3ac1 394dfb2a 36b465a0
+                3bcea042 a8bceafe 16daa05d 7dc143dd
+                d9c3e807 7490083b be2839ad 8be6bbdd
+                f1e90896 d14eab37 0ea33fd0 c0d3c11e
+[INFO]  snarkJS: Response Hash:
+                e38344af 2ccbb361 e5afe696 1a71a66b
+                1a5f319f ce49143d 2218509b 59cc5d44
+                04f3315f 3bde6a3c a556f3f4 9cc30578
+                0b958f8c 65a0727b 0da32273 3bf8cde4
+[INFO]  snarkJS: Response Hash:
+                f36bf303 7f19f750 dc8edb45 30522048
+                4090acb5 12e96c50 149618fa 007d3b8f
+                d9103148 f6d5c5d2 62449ca1 b332b43c
+                f8d6afb2 71bf2a11 24bcf4b2 143f0477
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #11: zhiniang
+[INFO]  snarkJS: Next Challenge:
+                f36bf303 7f19f750 dc8edb45 30522048
+                4090acb5 12e96c50 149618fa 007d3b8f
+                d9103148 f6d5c5d2 62449ca1 b332b43c
+                f8d6afb2 71bf2a11 24bcf4b2 143f0477
+[INFO]  snarkJS: Response Hash:
+                c72fa936 1a701827 9f9a2d78 501dc242
+                53e62a2f e871f056 3c8dd530 c4ee6761
+                e8bad30e 2e4cabc8 21b159c8 7fc554e7
+                18faf6e7 b303bc5e c0865ff8 86fbea48
+[INFO]  snarkJS: Response Hash:
+                ac890865 8234b4f0 b8f4e3c3 0f6acc34
+                38d3f297 734b62b9 c7b1157f 93d7eed2
+                ba05c59d e663cebc 08049076 3cfbee1e
+                5e231123 7714661e 67b43cca 921da027
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #10: vano
+[INFO]  snarkJS: Next Challenge:
+                ac890865 8234b4f0 b8f4e3c3 0f6acc34
+                38d3f297 734b62b9 c7b1157f 93d7eed2
+                ba05c59d e663cebc 08049076 3cfbee1e
+                5e231123 7714661e 67b43cca 921da027
+[INFO]  snarkJS: Response Hash:
+                ed65fac5 4967c6ee abfd8350 2eceb53c
+                a7ccd0bf d35353ee c5350c37 06988b8b
+                f1590b10 fe8388ab fbeb088c 8843fb80
+                4fe885d6 0bd6d8fb 7cd47eef c93b778b
+[INFO]  snarkJS: Response Hash:
+                7fde382d 1bc12ae7 d3d99879 648e416b
+                0540f39d 5e8f4945 229a7faa e97c3630
+                9d54bf8b b8a0813c 67f89d19 9b2111b9
+                0adb93c2 6b80fdd4 e3fe3640 860b7731
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #9: brecht
+[INFO]  snarkJS: Next Challenge:
+                7fde382d 1bc12ae7 d3d99879 648e416b
+                0540f39d 5e8f4945 229a7faa e97c3630
+                9d54bf8b b8a0813c 67f89d19 9b2111b9
+                0adb93c2 6b80fdd4 e3fe3640 860b7731
+[INFO]  snarkJS: Response Hash:
+                2f21e33e d267b2c5 31fbafb1 89beb370
+                a30166bf f9d97c02 42b7f3fc c650022c
+                61868f0e b2000578 d852fb4a 71ceb9e9
+                49337de4 9ec3ac48 1f2092db aac7a1de
+[INFO]  snarkJS: Response Hash:
+                af1d28b6 e1c2e68f 5c871f3e 01856f25
+                2ef4f745 a3e39e3d 2aa3bc40 7f82b4a5
+                feb2ba4c 303f90fb 15c86929 0611b732
+                be31f29a 15e5d609 6f555cd0 683e5421
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #8: mike
+[INFO]  snarkJS: Next Challenge:
+                af1d28b6 e1c2e68f 5c871f3e 01856f25
+                2ef4f745 a3e39e3d 2aa3bc40 7f82b4a5
+                feb2ba4c 303f90fb 15c86929 0611b732
+                be31f29a 15e5d609 6f555cd0 683e5421
+[INFO]  snarkJS: Response Hash:
+                cf0abf2f 06b4f5d1 3ab6ff1b 59e1ff40
+                a9a2e9b4 fdf27eac 0b1345e8 c89cbc3f
+                142d00d9 742d8e1a cc996425 cc626531
+                fb1be7b2 86640d09 c2909072 f26b9a3e
+[INFO]  snarkJS: Response Hash:
+                10e6b25c 4b066b59 a5b837d2 460a78b1
+                59edb6cb 2018ae0a a74b7555 499c9690
+                b16b4f38 99fa8147 b9bc4602 5b634eef
+                8e998fa2 44f9fe64 4df29ee9 a0944e7a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #7: youssef
+[INFO]  snarkJS: Next Challenge:
+                10e6b25c 4b066b59 a5b837d2 460a78b1
+                59edb6cb 2018ae0a a74b7555 499c9690
+                b16b4f38 99fa8147 b9bc4602 5b634eef
+                8e998fa2 44f9fe64 4df29ee9 a0944e7a
+[INFO]  snarkJS: Response Hash:
+                f34b3fe3 bf71c731 424d0b95 16ac3751
+                a2250b26 23648f74 58361bce 9616a233
+                e5aef57e 8cdd0f3c 555e1e0e e4feeace
+                c5f2342b 860d0975 4c450972 72d99b26
+[INFO]  snarkJS: Response Hash:
+                3e1140e5 66971cbd e6308dc3 d3f2ef4e
+                2c36bb4d b16704ed 0ffd26ee 7d80ccce
+                f2b46aa4 6feadf3e 2da8c43e ccf7588a
+                09e6cd94 85a4dd05 20af752d b0f24128
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #6: zac
+[INFO]  snarkJS: Next Challenge:
+                3e1140e5 66971cbd e6308dc3 d3f2ef4e
+                2c36bb4d b16704ed 0ffd26ee 7d80ccce
+                f2b46aa4 6feadf3e 2da8c43e ccf7588a
+                09e6cd94 85a4dd05 20af752d b0f24128
+[INFO]  snarkJS: Response Hash:
+                fbb8512f 393ffd01 7c20b1b6 6f7f5cf2
+                05f1de39 4fa987a7 03dc3fc6 c3957613
+                b33e69a9 143ae272 cd3e02b1 4db3c5d4
+                24ab0695 27e3e813 2a7b7ecf 8bbd05df
+[INFO]  snarkJS: Response Hash:
+                a7b3c130 cd8dbd26 769cfbcb e4c9a4ef
+                9055d13b ac932854 81c1007c acf51d29
+                c00dd146 d73a6670 47f65200 ae227e01
+                d589c609 04d263a4 1f5f187d 03fcc692
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #5: amrullah
+[INFO]  snarkJS: Next Challenge:
+                a7b3c130 cd8dbd26 769cfbcb e4c9a4ef
+                9055d13b ac932854 81c1007c acf51d29
+                c00dd146 d73a6670 47f65200 ae227e01
+                d589c609 04d263a4 1f5f187d 03fcc692
+[INFO]  snarkJS: Response Hash:
+                6201ec95 c960e694 4471bf9d ad3fe42c
+                b1b47a86 6d9c27ea 1c44f418 2a5622d4
+                663e5b4f 454d2a2a b7b7c546 397c46a7
+                72402e6c 7e3fbbd8 a921120d 00d19af2
+[INFO]  snarkJS: Response Hash:
+                635b55a6 a0c3c809 6843c9ab c06f40f0
+                e60fac21 df00b5c2 e2edbcc2 e4f4e0c2
+                f4d196f9 b34b95be 43e9f905 723e6a58
+                da92df24 f2035d85 3841ce4f 3518ee60
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #4: pepesha
+[INFO]  snarkJS: Next Challenge:
+                635b55a6 a0c3c809 6843c9ab c06f40f0
+                e60fac21 df00b5c2 e2edbcc2 e4f4e0c2
+                f4d196f9 b34b95be 43e9f905 723e6a58
+                da92df24 f2035d85 3841ce4f 3518ee60
+[INFO]  snarkJS: Response Hash:
+                e66da21e 696219ed a217664b 8deb0a30
+                b37f376b 16aae752 f5491015 2b2307f4
+                508d04b4 124d4e95 8c391d41 6dfc04a8
+                2db73c84 f8aa87f3 ba652eec 7b18b407
+[INFO]  snarkJS: Response Hash:
+                01401c5e 781fc7c8 aae99b16 0f14a86b
+                16a0a5e3 19d48fd0 4eaba3db 8a0fefa7
+                bf0854bc 9bf67893 36b8680f 261151bc
+                1d2aca16 3aa74c50 19c817bf dbc4d21d
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #3: poma
+[INFO]  snarkJS: Next Challenge:
+                01401c5e 781fc7c8 aae99b16 0f14a86b
+                16a0a5e3 19d48fd0 4eaba3db 8a0fefa7
+                bf0854bc 9bf67893 36b8680f 261151bc
+                1d2aca16 3aa74c50 19c817bf dbc4d21d
+[INFO]  snarkJS: Response Hash:
+                65c6c7bd f97d1259 ccac23b0 2fc35af4
+                73818991 93a0b9d3 82c5bee5 2159d5d1
+                1ceaa64c f8558471 3e954bdf a5c0e628
+                ab75b48d 0fda7dfb 6d1690d9 5361201c
+[INFO]  snarkJS: Response Hash:
+                9ff247f1 38a11751 05137ace d8c9766c
+                5eeccef3 5b892c62 c55eae78 7301991b
+                05b66649 b00c48f2 7501b30d 1538f5d8
+                0e2da3ed f163a978 5fba5b47 352f7d04
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #2: kobi
+[INFO]  snarkJS: Next Challenge:
+                9ff247f1 38a11751 05137ace d8c9766c
+                5eeccef3 5b892c62 c55eae78 7301991b
+                05b66649 b00c48f2 7501b30d 1538f5d8
+                0e2da3ed f163a978 5fba5b47 352f7d04
+[INFO]  snarkJS: Response Hash:
+                edec0294 eb450803 ec0ef7e1 7573f238
+                5663016b 6b47b9cc 8c9396cb 5ed36732
+                fcc6b6e3 abf5f8ac 61d6761d d565b203
+                936e475a 00f6e9ba 047e5991 4340fd1f
+[INFO]  snarkJS: Response Hash:
+                5e72e26e 38b46d06 7b797eb5 929e18e7
+                eda11ae0 cf429bb8 c04af72d 8a2633b5
+                625f8cbe bb07b61b 510403d4 bf644357
+                a80ea08d 7d5cc04d 58a8aa4d 2d9084ea
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #1: weijie
+[INFO]  snarkJS: Next Challenge:
+                5e72e26e 38b46d06 7b797eb5 929e18e7
+                eda11ae0 cf429bb8 c04af72d 8a2633b5
+                625f8cbe bb07b61b 510403d4 bf644357
+                a80ea08d 7d5cc04d 58a8aa4d 2d9084ea
+[INFO]  snarkJS: Response Hash:
+                398b99a4 3f0214e0 2b7483ea 96b8ac0d
+                1e2aa662 7b6e9e3b 9fe0b043 2803be29
+                f014b567 8fd83cfa 0abee8ca 07d7655c
+                b6682b52 7a7965aa 1f99f02a 89afb712
+[INFO]  snarkJS: Response Hash:
+                93da9192 0d5a54a8 a0fde55c d9dc3a10
+                c4f3eef7 68b62c09 48741370 864254b4
+                c1920f3f 29d4ebc0 ef3acecf 2e2db63a
+                755713d7 7e1ed773 47a56fbc 317c7a93
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Powers of Tau Ok!
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau#
+
+
+:~/zkopru/setup-mpc-ui/server/data/ptau# snarkjs ptv pot17_final.ptau
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: Next challenge hash:
+                ba6d670d 43a7ccbd 9837ffe0 657b1fed
+                fbf32232 0133d982 4a43be29 b53433c9
+                cec14b75 09f8fc3b b20f15e2 06e323c3
+                c93b6c4b 9a5c23d9 3e18e56c b4e1a72e
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #55:
+[INFO]  snarkJS: Next Challenge:
+                74ba2bca c21fad58 bf413799 d5ac962a
+                c4a344fb 1b4c1e88 0bd89e4b b4221270
+                113cb4c4 8aa8cd37 eb4fa234 904ff959
+                f726e785 ce7c5608 bb061b2e 0d7480be
+[INFO]  snarkJS: Response Hash:
+                6e61deb8 4491e9f6 e31287ca 05655fd6
+                3a1bcde7 43f2157b 63464ccc 6bcd83f3
+                78f466af dcefdc3d 867ff75f deef53b9
+                998aa5d9 5818732a 98e4eaf3 98a1ce05
+[INFO]  snarkJS: Response Hash:
+                00d0b99a 5ccb65af a5872f82 5f2388f3
+                2f6fd96e d1e58e83 cb921037 447d980d
+                7bfb8a08 11d90a36 01846bbc ee2216ae
+                aec90e60 e2490e5d 09ea36bf 3222840f
+[INFO]  snarkJS: Beacon generator: e586fccaf245c9a1d7e78294d4802018f3001149a71b8f10cd997ef8235aa372
+[INFO]  snarkJS: Beacon iterations Exp: 10
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #54: jarrad
+[INFO]  snarkJS: Next Challenge:
+                00d0b99a 5ccb65af a5872f82 5f2388f3
+                2f6fd96e d1e58e83 cb921037 447d980d
+                7bfb8a08 11d90a36 01846bbc ee2216ae
+                aec90e60 e2490e5d 09ea36bf 3222840f
+[INFO]  snarkJS: Response Hash:
+                7f1229b8 321fd1b7 935dc9ca 5ebf1d16
+                572f25c9 e936798d 3a2cfbbf 7b6c21d0
+                8c681b03 6cded940 006dec27 0d51facf
+                a1b24f27 698e98ba bd3555a4 6490fca7
+[INFO]  snarkJS: Response Hash:
+                fbad44fc ea6d5052 70046563 04093552
+                d29be00d 7fcd2d62 7e07c1b0 15c6eb97
+                4ea9262c aa4633cd 306c7f55 7d839c78
+                f9a408c9 5cfaef06 f916e37d 182ae94b
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #53: juan
+[INFO]  snarkJS: Next Challenge:
+                fbad44fc ea6d5052 70046563 04093552
+                d29be00d 7fcd2d62 7e07c1b0 15c6eb97
+                4ea9262c aa4633cd 306c7f55 7d839c78
+                f9a408c9 5cfaef06 f916e37d 182ae94b
+[INFO]  snarkJS: Response Hash:
+                b34c97e0 e4bbd8fd 2053d343 60b09ee0
+                4eb68736 34a7ecd0 8066dc22 b367472a
+                cfa8f4fb c5438674 3e8c48dc 02db95c2
+                6d8816e1 ad04df21 1e6f9f0b f01bf695
+[INFO]  snarkJS: Response Hash:
+                3f02cb8d 89177b2e 9ffe3b1b be0a8f43
+                154eb960 2e8985f6 c84314a3 d47dfd60
+                e098313d b52d7a08 60de1403 0aae4a49
+                64458814 3daf0779 fadf6d9f 2526df43
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #52: zaki
+[INFO]  snarkJS: Next Challenge:
+                3f02cb8d 89177b2e 9ffe3b1b be0a8f43
+                154eb960 2e8985f6 c84314a3 d47dfd60
+                e098313d b52d7a08 60de1403 0aae4a49
+                64458814 3daf0779 fadf6d9f 2526df43
+[INFO]  snarkJS: Response Hash:
+                991c7525 41bc610b c6931b33 ed31be6b
+                8e8c04ea 317a32db 0e294038 5785185a
+                f456f7b3 065fee76 7f1d4817 f8ec5a9d
+                368d11db e39b20b2 0bcbc6b6 b02b15a3
+[INFO]  snarkJS: Response Hash:
+                01e99205 db3311bf 535b3316 e265050a
+                062a4491 f43c0e14 60bfe0ce acf196d6
+                b78559b8 015a3463 40aea8d5 03f2d9b9
+                a6e1b3f0 a54d2d22 d4ed1d92 16c09402
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #51: joe
+[INFO]  snarkJS: Next Challenge:
+                01e99205 db3311bf 535b3316 e265050a
+                062a4491 f43c0e14 60bfe0ce acf196d6
+                b78559b8 015a3463 40aea8d5 03f2d9b9
+                a6e1b3f0 a54d2d22 d4ed1d92 16c09402
+[INFO]  snarkJS: Response Hash:
+                6b157096 fa63b56d f6e1607a c58296eb
+                62d1d6bb fd58aa5a 6247e217 4c47d18b
+                d2a313cd c9b0b786 5c6b7f0d 61e364e3
+                0066ce2e 89bbaf3d ec5a8388 1bbb2aed
+[INFO]  snarkJS: Response Hash:
+                e6571d37 a66e7fbd ebd3ba93 6bd8c23c
+                140bb178 fb329657 2bed8709 063e3610
+                e99a5198 3f793bc2 b84d76ed f286d6e7
+                80cc879b ab7e1c6a 61bf8a9f 8fd160d7
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #50: weijie
+[INFO]  snarkJS: Next Challenge:
+                e6571d37 a66e7fbd ebd3ba93 6bd8c23c
+                140bb178 fb329657 2bed8709 063e3610
+                e99a5198 3f793bc2 b84d76ed f286d6e7
+                80cc879b ab7e1c6a 61bf8a9f 8fd160d7
+[INFO]  snarkJS: Response Hash:
+                11611a89 05056363 781d2039 487f00fe
+                ad74a86f d2bb6f7d a67ba3a0 c4ba71ca
+                7a943185 ec26beb7 391984f5 f60c61f4
+                54a4ca17 a9db1631 7e597971 8129460f
+[INFO]  snarkJS: Response Hash:
+                025d2ee9 4c4cf08f 6a2adeff 90075f4d
+                f4c29632 2e6fa910 815813ab 5e30f5b7
+                2d88b8b9 bda180ed 03c26cd5 2705ee1f
+                17d615f9 aa3d9a56 4434d457 d00c95d9
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #49: jordi
+[INFO]  snarkJS: Next Challenge:
+                025d2ee9 4c4cf08f 6a2adeff 90075f4d
+                f4c29632 2e6fa910 815813ab 5e30f5b7
+                2d88b8b9 bda180ed 03c26cd5 2705ee1f
+                17d615f9 aa3d9a56 4434d457 d00c95d9
+[INFO]  snarkJS: Response Hash:
+                1ccb74ca 75f43945 8fd1fda3 c3937669
+                ed672302 47c101a2 940f0d88 90a8eb9f
+                24efda2a d2f3c2d2 b0718d01 5caddba2
+                afbe49a1 a82e38c7 9ec78df6 6479bf91
+[INFO]  snarkJS: Response Hash:
+                ede3b130 b045333f 3de41950 aedc7006
+                e8fa2d28 7faa24d5 fc4a7338 c631a52f
+                8d47199d 4649b153 f175eb1d 0863c83f
+                a0d746a6 6f774d08 6743c4d4 d136cfe0
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #48: tyler
+[INFO]  snarkJS: Next Challenge:
+                ede3b130 b045333f 3de41950 aedc7006
+                e8fa2d28 7faa24d5 fc4a7338 c631a52f
+                8d47199d 4649b153 f175eb1d 0863c83f
+                a0d746a6 6f774d08 6743c4d4 d136cfe0
+[INFO]  snarkJS: Response Hash:
+                08896cef 6150e35c b1e16685 6f8e5699
+                2be30192 6dc217f2 5e162393 92df2d49
+                a82d1f9b 25205431 fd484707 f8e15d2c
+                bb75d3f1 36bed23f dc268a6a e2d7bc8d
+[INFO]  snarkJS: Response Hash:
+                5d38986e 613436f8 f29f713f 967a083c
+                730a1d34 1a1d2c0f fe7c29ca 3e1b6184
+                40412cff 8eeab16b 5a14bf42 1763e61b
+                3cefdf6c a5715027 56331ffb 960fa61e
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #47: saravanan
+[INFO]  snarkJS: Next Challenge:
+                5d38986e 613436f8 f29f713f 967a083c
+                730a1d34 1a1d2c0f fe7c29ca 3e1b6184
+                40412cff 8eeab16b 5a14bf42 1763e61b
+                3cefdf6c a5715027 56331ffb 960fa61e
+[INFO]  snarkJS: Response Hash:
+                2a015b49 55e1f882 5615c666 f0e9fb0b
+                8c2408c1 49682347 e7c0c3a1 9482b640
+                59a63dbb 7cfc9c00 5eceb1b4 a67118ce
+                d79f649f 9433437d f653427e 83955d4f
+[INFO]  snarkJS: Response Hash:
+                5aac215d a5d5efcb c8badb59 67fd43b5
+                b9b0a9ec f653fc5b d8604a05 869ecce3
+                20d3dafc 42de3eef 05ec318f 94e08552
+                c386b7e1 6a340f0f e9004f93 52fd1a61
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #46: tkorwin
+[INFO]  snarkJS: Next Challenge:
+                5aac215d a5d5efcb c8badb59 67fd43b5
+                b9b0a9ec f653fc5b d8604a05 869ecce3
+                20d3dafc 42de3eef 05ec318f 94e08552
+                c386b7e1 6a340f0f e9004f93 52fd1a61
+[INFO]  snarkJS: Response Hash:
+                f6124334 8acc3313 f3197405 d22b5ed1
+                b552967f 4eadd830 012ad991 c151574f
+                d9a8fed7 9a4a9706 bb852438 7b8180a7
+                1ccec376 b69e0426 91d9a01a 0c28102b
+[INFO]  snarkJS: Response Hash:
+                939038cd 2dc5a1c0 20f368d2 bfad8686
+                950fdf7e c2d2e192 a7d59509 3068816b
+                becd914b a293dd8a cb6d18c7 b5116b66
+                ea54d915 d47a89cc fbe2d5a3 444dfbed
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #45: ben
+[INFO]  snarkJS: Next Challenge:
+                939038cd 2dc5a1c0 20f368d2 bfad8686
+                950fdf7e c2d2e192 a7d59509 3068816b
+                becd914b a293dd8a cb6d18c7 b5116b66
+                ea54d915 d47a89cc fbe2d5a3 444dfbed
+[INFO]  snarkJS: Response Hash:
+                213b9ab7 06ea361c 50a34515 47f17bf6
+                370acade b17466a9 3db23b9b d4326375
+                785ac440 639809a4 398c603e 031861f2
+                c388ae35 9df8b31d 09994e82 885ddf06
+[INFO]  snarkJS: Response Hash:
+                c13dedda 076022e6 be2d634d a910930c
+                2154b002 99d4db5c 5462f13f d5fb19f4
+                8cda31bb 63e65a6f cdc6b482 0cc6a4ad
+                dbfe7ed2 446beab8 b63b7214 1fdc0c80
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #44: yingtong
+[INFO]  snarkJS: Next Challenge:
+                c13dedda 076022e6 be2d634d a910930c
+                2154b002 99d4db5c 5462f13f d5fb19f4
+                8cda31bb 63e65a6f cdc6b482 0cc6a4ad
+                dbfe7ed2 446beab8 b63b7214 1fdc0c80
+[INFO]  snarkJS: Response Hash:
+                e4ee7ebc 787ec108 af7597d6 868c8df1
+                d9cc4d97 e5ef8beb 9d94f055 c8a9d651
+                bd1d7b0f 1f8bdb6e 4a9ab754 c72ad6ca
+                3df58aa3 c9976a98 8163f527 17116f6e
+[INFO]  snarkJS: Response Hash:
+                05985261 72c5fece a3ff71a5 5af41344
+                42569917 25ad3148 1231c4cf 765d9ecd
+                9fd681c4 f7a25717 bb2eab34 49bb4417
+                059498b9 f5a5e4ba b630424f 2c0d3605
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #43: albert
+[INFO]  snarkJS: Next Challenge:
+                05985261 72c5fece a3ff71a5 5af41344
+                42569917 25ad3148 1231c4cf 765d9ecd
+                9fd681c4 f7a25717 bb2eab34 49bb4417
+                059498b9 f5a5e4ba b630424f 2c0d3605
+[INFO]  snarkJS: Response Hash:
+                60df61e1 f6d84fb3 8f14d515 1f5f02a8
+                45fb9baa 97abaee7 7fbc743a 0dcbc59b
+                6886f6dc 51720340 a6387b5a d172b003
+                d9700d11 6f24ab12 eb722036 b3da1e04
+[INFO]  snarkJS: Response Hash:
+                294dc1ce 3c381dee 7a12ab13 8813ba7d
+                c61ba46f 8e1b6165 ee23c623 af42f0a4
+                5a090951 5558548a 85c7b1b8 12156ff4
+                cb14eb7d 0aa9b35b 4ffdecaa 2bcfe37c
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #42: vaibhav
+[INFO]  snarkJS: Next Challenge:
+                294dc1ce 3c381dee 7a12ab13 8813ba7d
+                c61ba46f 8e1b6165 ee23c623 af42f0a4
+                5a090951 5558548a 85c7b1b8 12156ff4
+                cb14eb7d 0aa9b35b 4ffdecaa 2bcfe37c
+[INFO]  snarkJS: Response Hash:
+                e8e7293c 3acd49c7 c20418ff 9b2ac179
+                304228a9 f47580b5 57367782 6b3ef007
+                ee6be1d2 699110f7 efa54ef2 d40cda33
+                2da5071b 231e047c 253b11cc 933acc53
+[INFO]  snarkJS: Response Hash:
+                41c03ca8 6cc9df98 d80073e6 93c09d46
+                42cbadb7 a8752934 049db2dd 79016523
+                99d1e13d 90ab9b54 57860f55 914efe1f
+                f87f7b5e 7fc86993 774a7236 0aaa716a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #41: evan
+[INFO]  snarkJS: Next Challenge:
+                41c03ca8 6cc9df98 d80073e6 93c09d46
+                42cbadb7 a8752934 049db2dd 79016523
+                99d1e13d 90ab9b54 57860f55 914efe1f
+                f87f7b5e 7fc86993 774a7236 0aaa716a
+[INFO]  snarkJS: Response Hash:
+                8d6a4bcc c44e751a 54b3b818 2997cbe8
+                24e018ad 959e66d2 4c1db2f5 337790ad
+                390e4a11 d65b89e7 4d04d56e 81d558ca
+                90a80b18 0e51b55b f4a07786 28a70f77
+[INFO]  snarkJS: Response Hash:
+                b262f934 ab2368cc aa86772d 586040a5
+                1d284338 d9f41f47 833c19a4 335d4fc6
+                e8e8eccd 17723291 b92bb348 4ef6f6d1
+                99563e61 b2a49634 e081d7c5 44e5bfed
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #40: weitang
+[INFO]  snarkJS: Next Challenge:
+                b262f934 ab2368cc aa86772d 586040a5
+                1d284338 d9f41f47 833c19a4 335d4fc6
+                e8e8eccd 17723291 b92bb348 4ef6f6d1
+                99563e61 b2a49634 e081d7c5 44e5bfed
+[INFO]  snarkJS: Response Hash:
+                276a5a94 26cee943 0cc3c64b 6049f912
+                4a8c4297 3ffec2bf a60983b2 37fec0aa
+                98247803 596d2ac1 2076bf37 7104ab68
+                c2c2a879 fbc7fcf8 b9168b52 5f1f7916
+[INFO]  snarkJS: Response Hash:
+                79043f5f 7a2e81a2 e7aca5bf c02a375f
+                6b3beb0c 5aa7e3f8 b942201a f3e0d43e
+                b33efd3a 10b10323 8a93eaad 3462180e
+                56eea585 e4f30715 3df06e81 d6150275
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #39: wanseob
+[INFO]  snarkJS: Next Challenge:
+                79043f5f 7a2e81a2 e7aca5bf c02a375f
+                6b3beb0c 5aa7e3f8 b942201a f3e0d43e
+                b33efd3a 10b10323 8a93eaad 3462180e
+                56eea585 e4f30715 3df06e81 d6150275
+[INFO]  snarkJS: Response Hash:
+                ed29ba79 b1392ba7 4ff572b8 6ed743b9
+                3b94da14 e54eb4a5 4d2fa6f0 cbd47b99
+                13516c95 f53b6a07 845676c5 1b081f2d
+                64a14d26 0809d9bb 2db1bf8d 9bccf584
+[INFO]  snarkJS: Response Hash:
+                ac95544f 0e1eab30 0cbd826c 7ce0ccf5
+                58559b95 cf450ed1 0f472063 fa50bb5e
+                159734c0 a50cdd1a 8413eb92 a7b4947e
+                6e66b8d0 cdb3a19c 85897e42 ee1811e1
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #38: james
+[INFO]  snarkJS: Next Challenge:
+                ac95544f 0e1eab30 0cbd826c 7ce0ccf5
+                58559b95 cf450ed1 0f472063 fa50bb5e
+                159734c0 a50cdd1a 8413eb92 a7b4947e
+                6e66b8d0 cdb3a19c 85897e42 ee1811e1
+[INFO]  snarkJS: Response Hash:
+                036438ed c68d3a36 6ba0517f 5b4a0e79
+                f6d5efe5 6fd2514a bb674c9d f6126eda
+                854fd11b eb274969 095149d7 7de76179
+                45176503 158beaf9 fc6f9fa5 9aef2aaf
+[INFO]  snarkJS: Response Hash:
+                8d77dba2 eada39e2 2a75a8ad 8c0f40f8
+                0dcefa59 4c6a89ea 28f448df 8bced1b5
+                3ee80e03 9247d88f 9efb734e cbaf9245
+                badd9177 5e8b1dd6 07725db7 facf734b
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #37: chihcheng
+[INFO]  snarkJS: Next Challenge:
+                8d77dba2 eada39e2 2a75a8ad 8c0f40f8
+                0dcefa59 4c6a89ea 28f448df 8bced1b5
+                3ee80e03 9247d88f 9efb734e cbaf9245
+                badd9177 5e8b1dd6 07725db7 facf734b
+[INFO]  snarkJS: Response Hash:
+                e51f44c2 c3d398d4 fcc3cbae 3a63b449
+                dcfe2aef baab3ad5 a8c7a782 23abd337
+                fb30b676 31caa2f9 af515317 945d5c5e
+                80cf7197 1777af17 072e3ed2 dc6c1d9b
+[INFO]  snarkJS: Response Hash:
+                e406add7 6da9abd4 d2bd81b3 e6fbf721
+                3fdeb18d 3a3b8b3e c35a0a0d c04bcc19
+                c7c94362 8bdc1f9c 974a6053 2f5fe053
+                fc53a956 a11f0b40 990cc734 f0d496d1
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #36: stefaan
+[INFO]  snarkJS: Next Challenge:
+                e406add7 6da9abd4 d2bd81b3 e6fbf721
+                3fdeb18d 3a3b8b3e c35a0a0d c04bcc19
+                c7c94362 8bdc1f9c 974a6053 2f5fe053
+                fc53a956 a11f0b40 990cc734 f0d496d1
+[INFO]  snarkJS: Response Hash:
+                3b3630a0 e4fa0ef1 4e1086d8 60cae23a
+                fa635c65 cae2971e 702a7ccc f13e3820
+                5507dc4a 9cfdd8f1 481fac94 0ef1bd01
+                46e73740 66d1493d 1114f328 73eb6f27
+[INFO]  snarkJS: Response Hash:
+                33247048 366e6228 5a69d257 601f1ee5
+                2aa5d123 8b0fceb8 aaaca087 614dfa95
+                6eb377b9 683bb551 16ece5d4 023e3e3f
+                5b154993 1048ba07 b5a4b37c 463e9b2c
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #35: leonard
+[INFO]  snarkJS: Next Challenge:
+                33247048 366e6228 5a69d257 601f1ee5
+                2aa5d123 8b0fceb8 aaaca087 614dfa95
+                6eb377b9 683bb551 16ece5d4 023e3e3f
+                5b154993 1048ba07 b5a4b37c 463e9b2c
+[INFO]  snarkJS: Response Hash:
+                8557483d 85297ec7 455ce374 406319a6
+                2b18f0fa 4b640dbf a7712e19 8df6cc4a
+                ca80c0b6 0ef147f4 42e29c48 35855b14
+                b070e58c 32aecdb4 af713e05 f936af1b
+[INFO]  snarkJS: Response Hash:
+                8fddfae2 385f5fc1 f6def277 e341ccb2
+                c3a78108 e2d7efdd 77c556b5 6305e612
+                2fe0bb4f 27a16743 29d8fbb0 c9520076
+                ae8ee1b1 5da13eff 58914d28 de9459be
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #34: igor
+[INFO]  snarkJS: Next Challenge:
+                8fddfae2 385f5fc1 f6def277 e341ccb2
+                c3a78108 e2d7efdd 77c556b5 6305e612
+                2fe0bb4f 27a16743 29d8fbb0 c9520076
+                ae8ee1b1 5da13eff 58914d28 de9459be
+[INFO]  snarkJS: Response Hash:
+                8fa4bda0 e8305faf 99461689 11782792
+                5f9c2025 9237b9c0 dea73175 6c907526
+                47eeba78 f27a0391 9ec8b6ff 46c1afa3
+                f57bd7a5 307f9c4e 35d4f5ed 2fabd316
+[INFO]  snarkJS: Response Hash:
+                5e4226c9 b037c98d 6207ee8f 8056c651
+                d3686215 74dcf7ac 67cf6908 43dc8072
+                4f8c8f62 7d3a0e33 4d82934e 24d17e89
+                300c767f 91c03ca2 13742e0d 25c6ac09
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #33: oskar
+[INFO]  snarkJS: Next Challenge:
+                5e4226c9 b037c98d 6207ee8f 8056c651
+                d3686215 74dcf7ac 67cf6908 43dc8072
+                4f8c8f62 7d3a0e33 4d82934e 24d17e89
+                300c767f 91c03ca2 13742e0d 25c6ac09
+[INFO]  snarkJS: Response Hash:
+                cd052845 3b0cca20 3956bb23 333473be
+                c12c14a8 cb7102ef e437f8d4 07f23463
+                6e77e1e7 d44c4176 608ad290 a2d83f48
+                78ccb222 c1e7c60b f5a8ab38 542ce634
+[INFO]  snarkJS: Response Hash:
+                daa7c3b5 570966a7 1180db03 c0d76def
+                00395cb6 95c90736 d9c7c240 8bc76b33
+                bda8ee88 f495b77d 1927a94d 37e67726
+                89e7cb8a 1796c863 5c1153fc 6d6b6f42
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #32: josephc
+[INFO]  snarkJS: Next Challenge:
+                daa7c3b5 570966a7 1180db03 c0d76def
+                00395cb6 95c90736 d9c7c240 8bc76b33
+                bda8ee88 f495b77d 1927a94d 37e67726
+                89e7cb8a 1796c863 5c1153fc 6d6b6f42
+[INFO]  snarkJS: Response Hash:
+                527fe68c 16219d86 018de364 fc5701b1
+                44fc5b68 eb063c9a 8c4e8405 b35f4561
+                b55363df 6d9adf82 8792c7b1 92a595b4
+                4aadbea7 cdef918a 11bfe65a 89c9e4a3
+[INFO]  snarkJS: Response Hash:
+                7695680f c6eb5d11 e31b48be a122428a
+                11cf5429 d54b7d9d cd24c879 9876ae61
+                6850f232 0f68964d b26e04dd 06ce5747
+                965e7f41 aefa1eec 790e9566 5c0e6342
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #31: golem
+[INFO]  snarkJS: Next Challenge:
+                7695680f c6eb5d11 e31b48be a122428a
+                11cf5429 d54b7d9d cd24c879 9876ae61
+                6850f232 0f68964d b26e04dd 06ce5747
+                965e7f41 aefa1eec 790e9566 5c0e6342
+[INFO]  snarkJS: Response Hash:
+                241902b0 c9386b3e bb03a786 a4db8b47
+                7727b8cd 97e4547b 45cd5205 3ce0c4e7
+                cf3d7e36 933f38fb a9283593 2f15b8dc
+                950d111b 7b0b4f4a efdb16df 5f6a799a
+[INFO]  snarkJS: Response Hash:
+                f70c2829 5e85dff9 c2109a7e 8f6d3451
+                1b2199b6 84670acc a460d26a 3a944b93
+                4e65635c 811bd65f bd833147 d27bcfad
+                a8b0548e a5bef208 1c684910 a8f6fe95
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #30: anant
+[INFO]  snarkJS: Next Challenge:
+                f70c2829 5e85dff9 c2109a7e 8f6d3451
+                1b2199b6 84670acc a460d26a 3a944b93
+                4e65635c 811bd65f bd833147 d27bcfad
+                a8b0548e a5bef208 1c684910 a8f6fe95
+[INFO]  snarkJS: Response Hash:
+                b7fdb609 ef13689a 0fec2af6 ed8192ed
+                ef3b107a e5379b06 695fd244 b385d382
+                47d1218a 686a71c1 989e016a 92da0b6a
+                3c058b0f 9f8b625b 7d053344 7c3fd57c
+[INFO]  snarkJS: Response Hash:
+                e70de5af e726056f 7018fd3d 9c48c756
+                f05a952f d5cf3c27 6e87c5cc f84f315e
+                948d77eb b4bfde3e 48a00ee1 ccea08ff
+                f7ac5231 36d9b0f3 df13c24c 3831970a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #29: gustavo
+[INFO]  snarkJS: Next Challenge:
+                e70de5af e726056f 7018fd3d 9c48c756
+                f05a952f d5cf3c27 6e87c5cc f84f315e
+                948d77eb b4bfde3e 48a00ee1 ccea08ff
+                f7ac5231 36d9b0f3 df13c24c 3831970a
+[INFO]  snarkJS: Response Hash:
+                6c645c14 0f037c35 24e71613 a5902d95
+                d407a124 01582a7d d2ed1b13 62a86883
+                cda9e8c1 543704f6 e2476b30 685e433d
+                0a349652 d919ad9a fe9410c1 7127cd3d
+[INFO]  snarkJS: Response Hash:
+                aa470426 518e2a2e 287b1b18 92767431
+                5646e93d d4f2ec4b d5beb54e 0d78f331
+                9e98e46a 0d50dcf7 3f06bb7e 7258a752
+                635d176e 8101350d 3d61108a 58e08962
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #28: dimitris
+[INFO]  snarkJS: Next Challenge:
+                aa470426 518e2a2e 287b1b18 92767431
+                5646e93d d4f2ec4b d5beb54e 0d78f331
+                9e98e46a 0d50dcf7 3f06bb7e 7258a752
+                635d176e 8101350d 3d61108a 58e08962
+[INFO]  snarkJS: Response Hash:
+                1488bd2d 1acf5ec7 c3636ff2 ba23cf99
+                7cf9ef7e eee6af0f 98150c11 e1c18b14
+                6c7225ed 6cecbe0d 749b8d2f b96a3139
+                04ec9b9c d5035958 f77dae70 75d3326e
+[INFO]  snarkJS: Response Hash:
+                f71e9315 058c1c88 ba4cd22e 01f86242
+                d81b5e74 de829ad8 8bd7ecef 475ca3ce
+                d59eaa77 7e2ebfd3 14c38bde 84a47ebf
+                c3143252 9c978b84 b25cddf7 a6212371
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #27: alex
+[INFO]  snarkJS: Next Challenge:
+                f71e9315 058c1c88 ba4cd22e 01f86242
+                d81b5e74 de829ad8 8bd7ecef 475ca3ce
+                d59eaa77 7e2ebfd3 14c38bde 84a47ebf
+                c3143252 9c978b84 b25cddf7 a6212371
+[INFO]  snarkJS: Response Hash:
+                379ecd36 fd2650c0 2196c9b4 13ea0f28
+                2d5545c9 ed270075 fd5b5000 60a41e67
+                8d5b75fc b22221b4 2636b741 0c45d9a1
+                68a4bf12 a6e91efc 14e09be2 20780990
+[INFO]  snarkJS: Response Hash:
+                10bdaa12 81af4408 8d52f74e a0a68574
+                10c43fda cf11a54b 123c14e9 90501cbc
+                91267417 db60661e bf911d30 bd800684
+                e2ce8ddc c3ee68c0 e37640fa 22553b98
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #26: geoff
+[INFO]  snarkJS: Next Challenge:
+                10bdaa12 81af4408 8d52f74e a0a68574
+                10c43fda cf11a54b 123c14e9 90501cbc
+                91267417 db60661e bf911d30 bd800684
+                e2ce8ddc c3ee68c0 e37640fa 22553b98
+[INFO]  snarkJS: Response Hash:
+                0eb5712a f476dd2f b5fe6419 9eb269f9
+                e945c281 71d09687 f373a02a 11f53cbd
+                c3df2fc9 77529e2f 9a51c428 4547f6df
+                e49eb1aa 3a46c508 27566b0b ac5fa5af
+[INFO]  snarkJS: Response Hash:
+                bbe7103c 4d477e68 31055c95 03d66ae0
+                4d6cedd7 509e2478 bd567555 0f265017
+                b54f10c1 fb8b7217 28c2e505 110e5bbf
+                c9911702 d9ef1416 b76bb4a3 43c0fe90
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #25: stefan
+[INFO]  snarkJS: Next Challenge:
+                bbe7103c 4d477e68 31055c95 03d66ae0
+                4d6cedd7 509e2478 bd567555 0f265017
+                b54f10c1 fb8b7217 28c2e505 110e5bbf
+                c9911702 d9ef1416 b76bb4a3 43c0fe90
+[INFO]  snarkJS: Response Hash:
+                7f45bf22 6b33ae9a a8f63ce6 bdd35975
+                7984d114 97200427 014e64ae 7dfee818
+                de42d36d 9f2e9cd7 71c5d500 f164287c
+                428d8af0 a1eb3a18 b40a5dd2 a2b6dc9e
+[INFO]  snarkJS: Response Hash:
+                ab45d9d9 de4a950d a97ae2b1 d20fb7c6
+                1b6d1098 6cb02d41 8a8be0c6 4e2c99d6
+                c000a914 c03d9ab2 71ee07c0 990a41fb
+                56971420 2c380711 d722350c c19a1152
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #24: vb
+[INFO]  snarkJS: Next Challenge:
+                ab45d9d9 de4a950d a97ae2b1 d20fb7c6
+                1b6d1098 6cb02d41 8a8be0c6 4e2c99d6
+                c000a914 c03d9ab2 71ee07c0 990a41fb
+                56971420 2c380711 d722350c c19a1152
+[INFO]  snarkJS: Response Hash:
+                31ea680a 591f8062 6cad18b7 1f72218c
+                6fe1be52 493e6be0 b709a2cc 87a585d6
+                dfaae025 6ea6a569 373d89d4 cd8b6587
+                aec1ed9a d1fbf69c c9c46d4d 4acccc98
+[INFO]  snarkJS: Response Hash:
+                7474dc21 f794d4ac fe75ceb7 36774ca0
+                5df34e59 40646583 c12d4f72 05f7cf40
+                aa45aef8 9f0da9ac f8ef1b4e b398638e
+                4dc84557 1a3e2e9f 1c92615d 68ba80d5
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #23: shomari
+[INFO]  snarkJS: Next Challenge:
+                7474dc21 f794d4ac fe75ceb7 36774ca0
+                5df34e59 40646583 c12d4f72 05f7cf40
+                aa45aef8 9f0da9ac f8ef1b4e b398638e
+                4dc84557 1a3e2e9f 1c92615d 68ba80d5
+[INFO]  snarkJS: Response Hash:
+                008a80a3 373a99ce 2c2f83e2 896147bb
+                f51cd431 128299cf eb36f85e 009e49ce
+                4da5ae54 601858e6 1bd4a4cd bebb0c63
+                247e7841 fa692b32 0856f9f7 aaf54640
+[INFO]  snarkJS: Response Hash:
+                14e4fe77 59391f2c 6988e790 2abd6343
+                cc27d259 80883aec 39a88d1e 415610b2
+                25e0aa5a c1ec9f5a 40b69989 4767ac75
+                983e5ca5 441ebbc6 ca66a61d 049c9112
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #22: roman
+[INFO]  snarkJS: Next Challenge:
+                14e4fe77 59391f2c 6988e790 2abd6343
+                cc27d259 80883aec 39a88d1e 415610b2
+                25e0aa5a c1ec9f5a 40b69989 4767ac75
+                983e5ca5 441ebbc6 ca66a61d 049c9112
+[INFO]  snarkJS: Response Hash:
+                d49e62bd 44ce5741 48dcc541 05b52e71
+                d89b3466 834eeba0 609b2b39 dc8c6033
+                4929ad4c 73a36bca 0113ad70 c960e6ed
+                dacc9e93 67e19901 e6c92263 a4e8d3e0
+[INFO]  snarkJS: Response Hash:
+                dfcaaa51 9ada2419 256d73b4 1d944815
+                4ff1b687 5874d44c f4e18be8 e933966e
+                08db79db 40878856 78138e60 d3c82a9a
+                7d50735c 449af38a 76d9ac9c 81af7e2a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #21: rf
+[INFO]  snarkJS: Next Challenge:
+                dfcaaa51 9ada2419 256d73b4 1d944815
+                4ff1b687 5874d44c f4e18be8 e933966e
+                08db79db 40878856 78138e60 d3c82a9a
+                7d50735c 449af38a 76d9ac9c 81af7e2a
+[INFO]  snarkJS: Response Hash:
+                287647b5 6cfe5115 f9367f2c 2962c12b
+                0a1947a7 85e2522d 9751d929 5c9b5a37
+                bed0204f f022abb2 7771e477 bb18d024
+                845c861e 663696db dc34739b 3fd86822
+[INFO]  snarkJS: Response Hash:
+                0ba142a6 f4403ff4 1d6ab339 6708f4d0
+                d5e567f3 2d6b293b dcdad335 09533246
+                a475da20 b0cf3f2f b4bff3bb 6d82ccf4
+                7f43d5ea 6623de42 57d65f3f be285915
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #20: edu
+[INFO]  snarkJS: Next Challenge:
+                0ba142a6 f4403ff4 1d6ab339 6708f4d0
+                d5e567f3 2d6b293b dcdad335 09533246
+                a475da20 b0cf3f2f b4bff3bb 6d82ccf4
+                7f43d5ea 6623de42 57d65f3f be285915
+[INFO]  snarkJS: Response Hash:
+                e9d2416c 15ed22d9 c6b7c2f5 683c21e9
+                9409df85 b068b3a1 f0c63984 061e13b2
+                1905b533 724ce1c8 7d756409 36706c9c
+                0026d811 64e17e1f 7b84e735 392835f6
+[INFO]  snarkJS: Response Hash:
+                5bfc6971 5a5f57d2 9170410c 04cfb19d
+                b079de9d a94f9b81 770d7cfd 6cfb7b14
+                d05e3268 596722a6 546a40b6 79194ce9
+                682d3956 23a664a9 a7d836c9 67a41d7d
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #19: petr
+[INFO]  snarkJS: Next Challenge:
+                5bfc6971 5a5f57d2 9170410c 04cfb19d
+                b079de9d a94f9b81 770d7cfd 6cfb7b14
+                d05e3268 596722a6 546a40b6 79194ce9
+                682d3956 23a664a9 a7d836c9 67a41d7d
+[INFO]  snarkJS: Response Hash:
+                98900cd9 b12a8619 aaa134ee e1a20ec8
+                89acc1af ca5a8131 c8b92c47 60f3b6b2
+                6132ec96 31c7e735 4547252f 2d578d29
+                3fcb91af d797edd1 b28fef9e 7105b5b8
+[INFO]  snarkJS: Response Hash:
+                729cd42c 9fa0328d d3faa58e 5fdd80b9
+                94270562 af70a380 f017bb9a 6099d742
+                8865b173 824c7547 10d2ccf0 667508f4
+                e7bf5f33 30660b5b 1dda4364 256926fc
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #18: cody
+[INFO]  snarkJS: Next Challenge:
+                729cd42c 9fa0328d d3faa58e 5fdd80b9
+                94270562 af70a380 f017bb9a 6099d742
+                8865b173 824c7547 10d2ccf0 667508f4
+                e7bf5f33 30660b5b 1dda4364 256926fc
+[INFO]  snarkJS: Response Hash:
+                28349fa9 f600daca 6b62e35d 8583ded4
+                132c7376 0447693b 9a4028ca 3b9b2437
+                7133c40e e33acdc2 3f59a34a f481abe7
+                7e3232e8 07f2cff7 1ffcf196 dab58baa
+[INFO]  snarkJS: Response Hash:
+                89a6b171 315d4522 99b25f19 a8fd5ff8
+                40d15b67 623953cd c8eb0c22 73d2a277
+                026e16be bacebd22 d3b72a44 b1091b5a
+                0a33d2ba b1546e9d fd42a01d bdd0596b
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #17: philip
+[INFO]  snarkJS: Next Challenge:
+                89a6b171 315d4522 99b25f19 a8fd5ff8
+                40d15b67 623953cd c8eb0c22 73d2a277
+                026e16be bacebd22 d3b72a44 b1091b5a
+                0a33d2ba b1546e9d fd42a01d bdd0596b
+[INFO]  snarkJS: Response Hash:
+                eaf5d6d3 821690bb 16070bc4 fed04f9f
+                aa652baf 9d959ad9 ae394bc1 d51d3beb
+                84d0ffd9 66328257 4956f171 79fa5fea
+                e5b6e77c 7eb509f1 925e1b92 ccb9d51a
+[INFO]  snarkJS: Response Hash:
+                af608b45 96865150 0c5b4f09 1ea38f34
+                fa7bee9b 75192c28 719e200d a483cc1d
+                e9db8db4 2c73de9e 92fb47ac 8a4554e8
+                e91044b1 a9d471ab b67b64fa 7eb9337d
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #16: aurel
+[INFO]  snarkJS: Next Challenge:
+                af608b45 96865150 0c5b4f09 1ea38f34
+                fa7bee9b 75192c28 719e200d a483cc1d
+                e9db8db4 2c73de9e 92fb47ac 8a4554e8
+                e91044b1 a9d471ab b67b64fa 7eb9337d
+[INFO]  snarkJS: Response Hash:
+                93a88218 13e1ae6b 59485741 002013e9
+                94faa680 5ee25e17 4787fcc9 63a3ae08
+                b2a71e4c 9d5563e4 fb91335d d6f98396
+                aa0536c5 fc19fc54 fcf164ab 99307249
+[INFO]  snarkJS: Response Hash:
+                1dcfa3a3 2135ab8d 1adca012 b01a4e63
+                42be7688 022183fb 0e28d1ac 762dcf3a
+                4bf2cf25 71f83624 c37cbaa5 30676bd8
+                0fa00411 c6e586e5 47a70d95 4085d4cd
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #15: anon0
+[INFO]  snarkJS: Next Challenge:
+                1dcfa3a3 2135ab8d 1adca012 b01a4e63
+                42be7688 022183fb 0e28d1ac 762dcf3a
+                4bf2cf25 71f83624 c37cbaa5 30676bd8
+                0fa00411 c6e586e5 47a70d95 4085d4cd
+[INFO]  snarkJS: Response Hash:
+                ba95f869 eabeb87c c1c55f21 6aed17ef
+                e96a832c 1571dcb3 556b85e0 434c45b2
+                0220dc2b 67af7012 12354f58 71b40d4a
+                0887b7b4 c485d2f3 43c65624 12ca5c31
+[INFO]  snarkJS: Response Hash:
+                ad1d6f7d 105fe751 56ae95ab 9c289094
+                5aca0552 61902a80 eb6b5f7c 98996f80
+                5575ba0d 05dfddc8 df75506c b22911a4
+                182a852b 4ee4953d 25c37841 cee60084
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #14: weijie
+[INFO]  snarkJS: Next Challenge:
+                ad1d6f7d 105fe751 56ae95ab 9c289094
+                5aca0552 61902a80 eb6b5f7c 98996f80
+                5575ba0d 05dfddc8 df75506c b22911a4
+                182a852b 4ee4953d 25c37841 cee60084
+[INFO]  snarkJS: Response Hash:
+                1fb91ad1 54ef9d58 b03f7cc8 9ada45ed
+                94b7a3a9 748c8f08 a6f2655f fd31483e
+                6b012d28 e47544cb 50e8c8fe 1f3cc72e
+                1305b7ad bdc49b80 68876d19 4b5d0a60
+[INFO]  snarkJS: Response Hash:
+                a85053ff 17c3c395 e4c6ede7 4fe7df4d
+                85e64700 bff1a066 c429a515 db5fbbb4
+                04958b99 9304c2ae b8b537d3 55a38651
+                9fb531f7 34e8bd17 eeb7c85c aab3501e
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #13: kevin
+[INFO]  snarkJS: Next Challenge:
+                a85053ff 17c3c395 e4c6ede7 4fe7df4d
+                85e64700 bff1a066 c429a515 db5fbbb4
+                04958b99 9304c2ae b8b537d3 55a38651
+                9fb531f7 34e8bd17 eeb7c85c aab3501e
+[INFO]  snarkJS: Response Hash:
+                c22a8a27 15feadad 42217518 ecca2788
+                fb771d57 8aa1f8e0 cef98ef5 7e6565b8
+                bf5ab833 298417de 5cddff07 520231b2
+                54ddc9c2 72817bf2 aae0d4ec 584500dc
+[INFO]  snarkJS: Response Hash:
+                e83607eb 942b3ac1 394dfb2a 36b465a0
+                3bcea042 a8bceafe 16daa05d 7dc143dd
+                d9c3e807 7490083b be2839ad 8be6bbdd
+                f1e90896 d14eab37 0ea33fd0 c0d3c11e
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #12: daniel
+[INFO]  snarkJS: Next Challenge:
+                e83607eb 942b3ac1 394dfb2a 36b465a0
+                3bcea042 a8bceafe 16daa05d 7dc143dd
+                d9c3e807 7490083b be2839ad 8be6bbdd
+                f1e90896 d14eab37 0ea33fd0 c0d3c11e
+[INFO]  snarkJS: Response Hash:
+                e38344af 2ccbb361 e5afe696 1a71a66b
+                1a5f319f ce49143d 2218509b 59cc5d44
+                04f3315f 3bde6a3c a556f3f4 9cc30578
+                0b958f8c 65a0727b 0da32273 3bf8cde4
+[INFO]  snarkJS: Response Hash:
+                f36bf303 7f19f750 dc8edb45 30522048
+                4090acb5 12e96c50 149618fa 007d3b8f
+                d9103148 f6d5c5d2 62449ca1 b332b43c
+                f8d6afb2 71bf2a11 24bcf4b2 143f0477
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #11: zhiniang
+[INFO]  snarkJS: Next Challenge:
+                f36bf303 7f19f750 dc8edb45 30522048
+                4090acb5 12e96c50 149618fa 007d3b8f
+                d9103148 f6d5c5d2 62449ca1 b332b43c
+                f8d6afb2 71bf2a11 24bcf4b2 143f0477
+[INFO]  snarkJS: Response Hash:
+                c72fa936 1a701827 9f9a2d78 501dc242
+                53e62a2f e871f056 3c8dd530 c4ee6761
+                e8bad30e 2e4cabc8 21b159c8 7fc554e7
+                18faf6e7 b303bc5e c0865ff8 86fbea48
+[INFO]  snarkJS: Response Hash:
+                ac890865 8234b4f0 b8f4e3c3 0f6acc34
+                38d3f297 734b62b9 c7b1157f 93d7eed2
+                ba05c59d e663cebc 08049076 3cfbee1e
+                5e231123 7714661e 67b43cca 921da027
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #10: vano
+[INFO]  snarkJS: Next Challenge:
+                ac890865 8234b4f0 b8f4e3c3 0f6acc34
+                38d3f297 734b62b9 c7b1157f 93d7eed2
+                ba05c59d e663cebc 08049076 3cfbee1e
+                5e231123 7714661e 67b43cca 921da027
+[INFO]  snarkJS: Response Hash:
+                ed65fac5 4967c6ee abfd8350 2eceb53c
+                a7ccd0bf d35353ee c5350c37 06988b8b
+                f1590b10 fe8388ab fbeb088c 8843fb80
+                4fe885d6 0bd6d8fb 7cd47eef c93b778b
+[INFO]  snarkJS: Response Hash:
+                7fde382d 1bc12ae7 d3d99879 648e416b
+                0540f39d 5e8f4945 229a7faa e97c3630
+                9d54bf8b b8a0813c 67f89d19 9b2111b9
+                0adb93c2 6b80fdd4 e3fe3640 860b7731
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #9: brecht
+[INFO]  snarkJS: Next Challenge:
+                7fde382d 1bc12ae7 d3d99879 648e416b
+                0540f39d 5e8f4945 229a7faa e97c3630
+                9d54bf8b b8a0813c 67f89d19 9b2111b9
+                0adb93c2 6b80fdd4 e3fe3640 860b7731
+[INFO]  snarkJS: Response Hash:
+                2f21e33e d267b2c5 31fbafb1 89beb370
+                a30166bf f9d97c02 42b7f3fc c650022c
+                61868f0e b2000578 d852fb4a 71ceb9e9
+                49337de4 9ec3ac48 1f2092db aac7a1de
+[INFO]  snarkJS: Response Hash:
+                af1d28b6 e1c2e68f 5c871f3e 01856f25
+                2ef4f745 a3e39e3d 2aa3bc40 7f82b4a5
+                feb2ba4c 303f90fb 15c86929 0611b732
+                be31f29a 15e5d609 6f555cd0 683e5421
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #8: mike
+[INFO]  snarkJS: Next Challenge:
+                af1d28b6 e1c2e68f 5c871f3e 01856f25
+                2ef4f745 a3e39e3d 2aa3bc40 7f82b4a5
+                feb2ba4c 303f90fb 15c86929 0611b732
+                be31f29a 15e5d609 6f555cd0 683e5421
+[INFO]  snarkJS: Response Hash:
+                cf0abf2f 06b4f5d1 3ab6ff1b 59e1ff40
+                a9a2e9b4 fdf27eac 0b1345e8 c89cbc3f
+                142d00d9 742d8e1a cc996425 cc626531
+                fb1be7b2 86640d09 c2909072 f26b9a3e
+[INFO]  snarkJS: Response Hash:
+                10e6b25c 4b066b59 a5b837d2 460a78b1
+                59edb6cb 2018ae0a a74b7555 499c9690
+                b16b4f38 99fa8147 b9bc4602 5b634eef
+                8e998fa2 44f9fe64 4df29ee9 a0944e7a
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #7: youssef
+[INFO]  snarkJS: Next Challenge:
+                10e6b25c 4b066b59 a5b837d2 460a78b1
+                59edb6cb 2018ae0a a74b7555 499c9690
+                b16b4f38 99fa8147 b9bc4602 5b634eef
+                8e998fa2 44f9fe64 4df29ee9 a0944e7a
+[INFO]  snarkJS: Response Hash:
+                f34b3fe3 bf71c731 424d0b95 16ac3751
+                a2250b26 23648f74 58361bce 9616a233
+                e5aef57e 8cdd0f3c 555e1e0e e4feeace
+                c5f2342b 860d0975 4c450972 72d99b26
+[INFO]  snarkJS: Response Hash:
+                3e1140e5 66971cbd e6308dc3 d3f2ef4e
+                2c36bb4d b16704ed 0ffd26ee 7d80ccce
+                f2b46aa4 6feadf3e 2da8c43e ccf7588a
+                09e6cd94 85a4dd05 20af752d b0f24128
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #6: zac
+[INFO]  snarkJS: Next Challenge:
+                3e1140e5 66971cbd e6308dc3 d3f2ef4e
+                2c36bb4d b16704ed 0ffd26ee 7d80ccce
+                f2b46aa4 6feadf3e 2da8c43e ccf7588a
+                09e6cd94 85a4dd05 20af752d b0f24128
+[INFO]  snarkJS: Response Hash:
+                fbb8512f 393ffd01 7c20b1b6 6f7f5cf2
+                05f1de39 4fa987a7 03dc3fc6 c3957613
+                b33e69a9 143ae272 cd3e02b1 4db3c5d4
+                24ab0695 27e3e813 2a7b7ecf 8bbd05df
+[INFO]  snarkJS: Response Hash:
+                a7b3c130 cd8dbd26 769cfbcb e4c9a4ef
+                9055d13b ac932854 81c1007c acf51d29
+                c00dd146 d73a6670 47f65200 ae227e01
+                d589c609 04d263a4 1f5f187d 03fcc692
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #5: amrullah
+[INFO]  snarkJS: Next Challenge:
+                a7b3c130 cd8dbd26 769cfbcb e4c9a4ef
+                9055d13b ac932854 81c1007c acf51d29
+                c00dd146 d73a6670 47f65200 ae227e01
+                d589c609 04d263a4 1f5f187d 03fcc692
+[INFO]  snarkJS: Response Hash:
+                6201ec95 c960e694 4471bf9d ad3fe42c
+                b1b47a86 6d9c27ea 1c44f418 2a5622d4
+                663e5b4f 454d2a2a b7b7c546 397c46a7
+                72402e6c 7e3fbbd8 a921120d 00d19af2
+[INFO]  snarkJS: Response Hash:
+                635b55a6 a0c3c809 6843c9ab c06f40f0
+                e60fac21 df00b5c2 e2edbcc2 e4f4e0c2
+                f4d196f9 b34b95be 43e9f905 723e6a58
+                da92df24 f2035d85 3841ce4f 3518ee60
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #4: pepesha
+[INFO]  snarkJS: Next Challenge:
+                635b55a6 a0c3c809 6843c9ab c06f40f0
+                e60fac21 df00b5c2 e2edbcc2 e4f4e0c2
+                f4d196f9 b34b95be 43e9f905 723e6a58
+                da92df24 f2035d85 3841ce4f 3518ee60
+[INFO]  snarkJS: Response Hash:
+                e66da21e 696219ed a217664b 8deb0a30
+                b37f376b 16aae752 f5491015 2b2307f4
+                508d04b4 124d4e95 8c391d41 6dfc04a8
+                2db73c84 f8aa87f3 ba652eec 7b18b407
+[INFO]  snarkJS: Response Hash:
+                01401c5e 781fc7c8 aae99b16 0f14a86b
+                16a0a5e3 19d48fd0 4eaba3db 8a0fefa7
+                bf0854bc 9bf67893 36b8680f 261151bc
+                1d2aca16 3aa74c50 19c817bf dbc4d21d
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #3: poma
+[INFO]  snarkJS: Next Challenge:
+                01401c5e 781fc7c8 aae99b16 0f14a86b
+                16a0a5e3 19d48fd0 4eaba3db 8a0fefa7
+                bf0854bc 9bf67893 36b8680f 261151bc
+                1d2aca16 3aa74c50 19c817bf dbc4d21d
+[INFO]  snarkJS: Response Hash:
+                65c6c7bd f97d1259 ccac23b0 2fc35af4
+                73818991 93a0b9d3 82c5bee5 2159d5d1
+                1ceaa64c f8558471 3e954bdf a5c0e628
+                ab75b48d 0fda7dfb 6d1690d9 5361201c
+[INFO]  snarkJS: Response Hash:
+                9ff247f1 38a11751 05137ace d8c9766c
+                5eeccef3 5b892c62 c55eae78 7301991b
+                05b66649 b00c48f2 7501b30d 1538f5d8
+                0e2da3ed f163a978 5fba5b47 352f7d04
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #2: kobi
+[INFO]  snarkJS: Next Challenge:
+                9ff247f1 38a11751 05137ace d8c9766c
+                5eeccef3 5b892c62 c55eae78 7301991b
+                05b66649 b00c48f2 7501b30d 1538f5d8
+                0e2da3ed f163a978 5fba5b47 352f7d04
+[INFO]  snarkJS: Response Hash:
+                edec0294 eb450803 ec0ef7e1 7573f238
+                5663016b 6b47b9cc 8c9396cb 5ed36732
+                fcc6b6e3 abf5f8ac 61d6761d d565b203
+                936e475a 00f6e9ba 047e5991 4340fd1f
+[INFO]  snarkJS: Response Hash:
+                5e72e26e 38b46d06 7b797eb5 929e18e7
+                eda11ae0 cf429bb8 c04af72d 8a2633b5
+                625f8cbe bb07b61b 510403d4 bf644357
+                a80ea08d 7d5cc04d 58a8aa4d 2d9084ea
+[INFO]  snarkJS: Powers Of tau file OK!
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Contribution #1: weijie
+[INFO]  snarkJS: Next Challenge:
+                5e72e26e 38b46d06 7b797eb5 929e18e7
+                eda11ae0 cf429bb8 c04af72d 8a2633b5
+                625f8cbe bb07b61b 510403d4 bf644357
+                a80ea08d 7d5cc04d 58a8aa4d 2d9084ea
+[INFO]  snarkJS: Response Hash:
+                398b99a4 3f0214e0 2b7483ea 96b8ac0d
+                1e2aa662 7b6e9e3b 9fe0b043 2803be29
+                f014b567 8fd83cfa 0abee8ca 07d7655c
+                b6682b52 7a7965aa 1f99f02a 89afb712
+[INFO]  snarkJS: Response Hash:
+                93da9192 0d5a54a8 a0fde55c d9dc3a10
+                c4f3eef7 68b62c09 48741370 864254b4
+                c1920f3f 29d4ebc0 ef3acecf 2e2db63a
+                755713d7 7e1ed773 47a56fbc 317c7a93
+[INFO]  snarkJS: -----------------------------------------------------
+[INFO]  snarkJS: Powers of Tau Ok!
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data/ptau#
+
+
+
+// ZKOPRU build
+
+git clone -b v1-audit fix git clone https://github.com/zkopru-network/zkopru
+
+cd zkopru 
+
+(install prerequisites: make, gcc, g++)
+yarn 
+...
+...
+(ok)
+
+yarn build 
+
+
+

@@ -82,7 +82,7 @@ export default function AboutPanel(props: any) {
         <Feature icon={ScaleIcon}>Optimistic Rollup Scaling</Feature>
         <Feature icon={StarIcon}>Compliance Compatibility</Feature>
         <Feature icon={LightningIcon}>Instant Withdrawals</Feature>
-        <Feature icon={CalendarIcon}>Pay in Advance</Feature>
+        <Feature icon={CalendarIcon}>Privacy Pool for ERC20/NFTs</Feature>
       </Grid>
     </Box>
   );
