@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useReducer } from "react";
 import { createGlobalStyle } from "styled-components";
-import { textColor } from "../styles";
+import { background, textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
 import { AuthContextProvider, authStateReducer, defaultAuth } from "../state/AuthContext";
 import { SelectionContextProvider } from '../state/SelectionContext';
@@ -37,7 +37,7 @@ const App = () => {
 
 const GlobalStyle = createGlobalStyle`
   body {
-    background-color: #081a24;
+    background-color: ${background};
     color: ${textColor};
     margin: 0;
     font-family: 'Inconsolata', monospace;

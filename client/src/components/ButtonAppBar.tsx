@@ -27,7 +27,7 @@ import { ComputeStateContext, Step } from '../state/ComputeStateManager';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import { CeremonyProgress } from './ProgressPanel';
 
-const allowReset = true;
+const allowReset = false; // if true, the 'Options' panel is available
 
 interface ScrollProps {
   children: React.ReactElement;
@@ -141,7 +141,7 @@ const MainMenu = (props: MainMenuProps) => {
         }
         {auth.isCoordinator ?
           (<StyledMenuItem>
-            <ListItemText primary="New Circuit" onClick={() => true}/>
+            <ListItemText primary="New Circuit" onClick={() => true} style={{ color: textColor }}/>
           </StyledMenuItem>) 
           : (<></>)
         }

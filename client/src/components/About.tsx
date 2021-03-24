@@ -1,7 +1,7 @@
 import { Typography } from '@material-ui/core';
 import styled from 'styled-components';
 import * as React from 'react';
-import { accentColor, H3Title, HighlightBodyText, NormalBodyText, SubtleBody } from '../styles';
+import { accentColor, H3Title, HighlightBodyText, NormalBodyText, SubtleBody, subtleText } from '../styles';
 
 const Section = styled.div`
   margin-bottom: 32px;
@@ -9,6 +9,10 @@ const Section = styled.div`
 
 const paragraph = styled.div`
   margin-bottom: 16px;
+`;
+
+const StyledLink = styled.a`
+  color: ${subtleText};
 `;
 
 const expectSection = (
@@ -30,9 +34,9 @@ const verifySection = (
     hash. Please copy and paste it to a document you save on your computer.
     You will be able to use it to verify that your contribution was
     used by the next participant once we upload the complete contribution 
-    transcript to our website, _______.
+    transcript to our <StyledLink href='https://zkopru.network' target='_blank'>website</StyledLink>.
     <br /><br />
-    Follow us on Twitter @_____ or Telegram @____ to be updated when
+    Join us in <StyledLink href='https://t.me/zkopru' target='_blank'>Telegram</StyledLink> to be updated when
     that document becomes available. 
     </NormalBodyText>    
   </Section>

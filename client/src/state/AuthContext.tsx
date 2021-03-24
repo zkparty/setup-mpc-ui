@@ -37,9 +37,10 @@ export const AuthContextProvider = ({ children }:any) => {
             getUserStatus(user.email)
               .then((resp: string) => {
                 console.log(`privs: ${resp}`);
-                //Auth.setCoordinator("COORDINATOR" === resp);
-                // TODO - revert to correct test. temporary for testing
-                dispatch({type: 'SET_COORDINATOR'});
+                if ("COORDINATOR" === resp) {
+                  // TODO - revert to correct test. temporary for testing
+                  dispatch({type: 'SET_COORDINATOR'});
+                }
               });
           } else {
             console.warn(`user email not available`);
