@@ -262,7 +262,8 @@ async function verifyContribution(ceremonyId, index) {
             `Error caught while verifying. ${err.message}`
         );
         updateContribution(ceremonyId, { queueIndex: index, status: "INVALIDATED" });
-    }
+        clearLogLock();
+    } 
 };
 
 // Get powers of tau file and return its local path.
