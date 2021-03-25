@@ -3127,6 +3127,18 @@ git clone -b v1-audit fix git clone https://github.com/zkopru-network/zkopru
 
 cd zkopru 
 
+root@zkopru-mpc:~/zkopru/zkopru# git log
+commit 9c609ba8a177370734c9ea22a21cfc20c44df5cb (HEAD, tag: audit-v1-fix)
+Merge: 05ce60f a102026
+Author: Wanseob Lim <email@wanseob.com>
+Date:   Tue Mar 23 02:44:31 2021 +0900
+
+    Merge pull request #173 from zkopru-network/audit-fix
+
+    audit fix - 1
+...
+
+
 (install prerequisites: make, gcc, g++)
 yarn 
 ...
@@ -3134,6 +3146,198 @@ yarn
 (ok)
 
 yarn build 
+...
+lerna success - @zkopru/zk-wizard
+Done in 313.61s.
+root@zkopru-mpc:~/zkopru/zkopru#
+
+// Build circuits
+
+root@zkopru-mpc:~/zkopru/zkopru# cd packages/circuits
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits# yarn compile
+yarn run v1.22.5
+$ ./script/compile_circuits.sh
+Circuit compile result: zk_transaction_1_1
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 18570
+[INFO]  snarkJS: # of Constraints: 18522
+[INFO]  snarkJS: # of Private Inputs: 66
+[INFO]  snarkJS: # of Public Inputs: 12
+[INFO]  snarkJS: # of Outputs: 0
+Circuit compile result: zk_transaction_1_2
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 19670
+[INFO]  snarkJS: # of Constraints: 19620
+[INFO]  snarkJS: # of Private Inputs: 72
+[INFO]  snarkJS: # of Public Inputs: 20
+[INFO]  snarkJS: # of Outputs: 0
+Circuit compile result: zk_transaction_1_3
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 20776
+[INFO]  snarkJS: # of Constraints: 20724
+[INFO]  snarkJS: # of Private Inputs: 78
+[INFO]  snarkJS: # of Public Inputs: 28
+[INFO]  snarkJS: # of Outputs: 0
+Circuit compile result: zk_transaction_1_4
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 21888
+[INFO]  snarkJS: # of Constraints: 21834
+[INFO]  snarkJS: # of Private Inputs: 84
+[INFO]  snarkJS: # of Public Inputs: 36
+[INFO]  snarkJS: # of Outputs: 0
+Circuit compile result: zk_transaction_2_1
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 36075
+[INFO]  snarkJS: # of Constraints: 35983
+[INFO]  snarkJS: # of Private Inputs: 126
+[INFO]  snarkJS: # of Public Inputs: 14
+[INFO]  snarkJS: # of Outputs: 0
+Circuit compile result: zk_transaction_2_2
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 37201
+[INFO]  snarkJS: # of Constraints: 37107
+[INFO]  snarkJS: # of Private Inputs: 132
+[INFO]  snarkJS: # of Public Inputs: 22
+[INFO]  snarkJS: # of Outputs: 0
+Circuit compile result: zk_transaction_2_3
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 38333
+[INFO]  snarkJS: # of Constraints: 38237
+[INFO]  snarkJS: # of Private Inputs: 138
+[INFO]  snarkJS: # of Public Inputs: 30
+[INFO]  snarkJS: # of Outputs: 0
+Circuit compile result: zk_transaction_2_4
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 39471
+[INFO]  snarkJS: # of Constraints: 39373
+[INFO]  snarkJS: # of Private Inputs: 144
+[INFO]  snarkJS: # of Public Inputs: 38
+[INFO]  snarkJS: # of Outputs: 0
+./script/compile_circuits.sh: line 9:  9105 Killed                  node --stack-size=8192 $(which circom) "$circuit" -r "$prefix.r1cs"
+Circuit compile result: zk_transaction_3_1
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 53586
+[INFO]  snarkJS: # of Constraints: 53450
+[INFO]  snarkJS: # of Private Inputs: 186
+[INFO]  snarkJS: # of Public Inputs: 16
+[INFO]  snarkJS: # of Outputs: 0
+./script/compile_circuits.sh: line 19:  8991 Killed                  node --stack-size=8192 $(which circom) "$circuit" -c "$prefix.c"
+./script/compile_circuits.sh: line 19:  9079 Killed                  node --stack-size=8192 $(which circom) "$circuit" -c "$prefix.c"
+Circuit compile result: zk_transaction_3_2
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 54738
+[INFO]  snarkJS: # of Constraints: 54600
+[INFO]  snarkJS: # of Private Inputs: 192
+[INFO]  snarkJS: # of Public Inputs: 24
+[INFO]  snarkJS: # of Outputs: 0
+Circuit compile result: zk_transaction_3_3
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 55896
+[INFO]  snarkJS: # of Constraints: 55756
+[INFO]  snarkJS: # of Private Inputs: 198
+[INFO]  snarkJS: # of Public Inputs: 32
+[INFO]  snarkJS: # of Outputs: 0
+./script/compile_circuits.sh: line 9:  9308 Killed                  node --stack-size=8192 $(which circom) "$circuit" -r "$prefix.r1cs"
+./script/compile_circuits.sh: line 9:  9265 Killed                  node --stack-size=8192 $(which circom) "$circuit" -r "$prefix.r1cs"
+./script/compile_circuits.sh: line 19:  9268 Killed                  node --stack-size=8192 $(which circom) "$circuit" -c "$prefix.c"
+./script/compile_circuits.sh: line 19:  9317 Killed                  node --stack-size=8192 $(which circom) "$circuit" -c "$prefix.c"
+./script/compile_circuits.sh: line 19:  9321 Killed                  node --stack-size=8192 $(which circom) "$circuit" -s "$prefix.sym"
+Circuit compile result: zk_transaction_4_2
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 72281
+[INFO]  snarkJS: # of Constraints: 72099
+[INFO]  snarkJS: # of Private Inputs: 252
+[INFO]  snarkJS: # of Public Inputs: 26
+[INFO]  snarkJS: # of Outputs: 0
+Circuit compile result: zk_transaction_4_4
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 74655
+[INFO]  snarkJS: # of Constraints: 74469
+[INFO]  snarkJS: # of Private Inputs: 264
+[INFO]  snarkJS: # of Public Inputs: 42
+[INFO]  snarkJS: # of Outputs: 0
+./script/compile_circuits.sh: line 19:  9269 Killed                  node --stack-size=8192 $(which circom) "$circuit" -w "$prefix.wasm"
+[ERROR] snarkJS: [Error: ENOENT: no such file or directory, open 'build/circuits/zk_transaction_3_4.r1cs'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'build/circuits/zk_transaction_3_4.r1cs'
+}
+[ERROR] snarkJS: [Error: ENOENT: no such file or directory, open 'build/circuits/zk_transaction_4_1.r1cs'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'build/circuits/zk_transaction_4_1.r1cs'
+}
+[ERROR] snarkJS: [Error: ENOENT: no such file or directory, open 'build/circuits/zk_transaction_4_3.r1cs'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'build/circuits/zk_transaction_4_3.r1cs'
+}
+Done in 906.89s.
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits#
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits#
+
+... manually build the missed circuits:
+
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits# circom impls/zk_transaction_4_1.circom -r build/circuits/zk_transaction_4_1.r1cs
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits# snarkjs info -r build/circuits/zk_transaction_4_1.r1cs
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 71103
+[INFO]  snarkJS: # of Constraints: 70923
+[INFO]  snarkJS: # of Private Inputs: 246
+[INFO]  snarkJS: # of Public Inputs: 18
+[INFO]  snarkJS: # of Labels: 334351
+[INFO]  snarkJS: # of Outputs: 0
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits# circom impls/zk_transaction_4_2.circom -r build/circuits/zk_transaction_4_2.r1cs
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits# snarkjs info -r build/circuits/zk_transaction_4_2.r1cs
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 72281
+[INFO]  snarkJS: # of Constraints: 72099
+[INFO]  snarkJS: # of Private Inputs: 252
+[INFO]  snarkJS: # of Public Inputs: 26
+[INFO]  snarkJS: # of Labels: 338755
+[INFO]  snarkJS: # of Outputs: 0
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits# circom impls/zk_transaction_4_3.circom -r build/circuits/zk_transaction_4_3.r1cs
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits# snarkjs info -r build/circuits/zk_transaction_4_3.r1cs
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 73465
+[INFO]  snarkJS: # of Constraints: 73281
+[INFO]  snarkJS: # of Private Inputs: 258
+[INFO]  snarkJS: # of Public Inputs: 34
+[INFO]  snarkJS: # of Labels: 343207
+[INFO]  snarkJS: # of Outputs: 0
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits# circom impls/zk_transaction_3_4.circom -r build/circuits/zk_transaction_3_4.r1cs
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits# snarkjs info -r build/circuits/zk_transaction_3_4.r1cs
+[INFO]  snarkJS: Curve: bn-128
+[INFO]  snarkJS: # of Wires: 57060
+[INFO]  snarkJS: # of Constraints: 56918
+[INFO]  snarkJS: # of Private Inputs: 204
+[INFO]  snarkJS: # of Public Inputs: 40
+[INFO]  snarkJS: # of Labels: 264585
+[INFO]  snarkJS: # of Outputs: 0
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits#
+
+root@zkopru-mpc:~/zkopru/zkopru/packages/circuits# md5sum build/circuits/*.r1cs
+233a7ee22aa69ec55fafece356a248e6  build/circuits/zk_transaction_1_1.r1cs
+e1f28110c33a52fe356d3d350ec320a4  build/circuits/zk_transaction_1_2.r1cs
+8a3ac2869876f8fe104f2ebd3e399783  build/circuits/zk_transaction_1_3.r1cs
+bf70da0504acfabc4a7ba23afb69092b  build/circuits/zk_transaction_1_4.r1cs
+7fa7ed44a0f53dcf64c06c1c203e725b  build/circuits/zk_transaction_2_1.r1cs
+7d600c9d554f2b9e38033902214432c8  build/circuits/zk_transaction_2_2.r1cs
+b08a60d5834e78ad08ce3ec9f013bb46  build/circuits/zk_transaction_2_3.r1cs
+36f23dbcb5592436a8da973975a5ce6d  build/circuits/zk_transaction_2_4.r1cs
+e414c424278693664716f4845da4187e  build/circuits/zk_transaction_3_1.r1cs
+378242f313647e5a8ca24ac3b5fc8c78  build/circuits/zk_transaction_3_2.r1cs
+f992348d1346d9e3cf01c0fffac5fb54  build/circuits/zk_transaction_3_3.r1cs
+2220d133561621e5b5809c1cf527f963  build/circuits/zk_transaction_3_4.r1cs
+bb8883439fc8046a95363e52c158f3e8  build/circuits/zk_transaction_4_1.r1cs
+cb4bfe300db04e32bde85c8ecfefa18e  build/circuits/zk_transaction_4_2.r1cs
+556e0e74087e11309cb61a658bb6005e  build/circuits/zk_transaction_4_3.r1cs
+38a7e0fbfccf08ab373da5d805f9895a  build/circuits/zk_transaction_4_4.r1cs
+
+
 
 
 

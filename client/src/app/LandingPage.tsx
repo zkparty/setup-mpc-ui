@@ -10,7 +10,8 @@ import {
   PageContainer,
   lighterBackground,
   SectionContainer,
-  CeremonyTitle
+  CeremonyTitle,
+  inverseText
 } from "../styles";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";
@@ -60,7 +61,7 @@ export const LandingPage = () => {
             </Modal>
           </div>
         </PageContainer>
-        <Box style={{ height: '112px', backgroundColor: '#000000' }} >
+        <Box style={{ height: '112px', backgroundColor: inverseText }} >
           <Footer />
         </Box>
       </Fragment>

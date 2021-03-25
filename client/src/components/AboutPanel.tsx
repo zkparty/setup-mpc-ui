@@ -1,7 +1,8 @@
 import { Box, Button, Grid, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { useContext, useState } from 'react';
-import { CalendarIcon, LightningIcon, PopOutIcon, ScaleIcon, SecureIcon, StarIcon } from '../icons';
+import { CalendarIcon, LightningIcon, PopOutIcon, ScaleIcon, SecureIcon, StarIcon, } from '../icons';
+import PoolIcon from '@material-ui/icons/Pool';
 import { AuthStateContext } from '../state/AuthContext';
 import { accentColor, darkerBackground, inverseText, lighterBackground, NormalBodyText, PanelTitle, StyledButton, SubtleBody, subtleText } from '../styles';
 import About from './About';
@@ -82,7 +83,7 @@ export default function AboutPanel(props: any) {
         <Feature icon={ScaleIcon}>Optimistic Rollup Scaling</Feature>
         <Feature icon={StarIcon}>Compliance Compatibility</Feature>
         <Feature icon={LightningIcon}>Instant Withdrawals</Feature>
-        <Feature icon={CalendarIcon}>Privacy Pool for ERC20/NFTs</Feature>
+        <Feature icon={(<PoolIcon />)}>Privacy Pool for ERC20/NFTs</Feature>
       </Grid>
     </Box>
   );
