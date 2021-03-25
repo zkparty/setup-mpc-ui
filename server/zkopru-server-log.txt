@@ -3338,6 +3338,2309 @@ cb4bfe300db04e32bde85c8ecfefa18e  build/circuits/zk_transaction_4_2.r1cs
 38a7e0fbfccf08ab373da5d805f9895a  build/circuits/zk_transaction_4_4.r1cs
 
 
+// Circuit preparation: Add to FB, make zkey, make params 
+
+// Circuit 1
+Time: 2021-03-25T04:05:54.809Z
+GET / 404 5.031 ms - 139
+Ceremony events notified: 1
+Time: 2021-03-25T04:12:40.375Z
+changed doc: added
+Event: {"message":"ceremony_data/hIfLWePJPn6ldES7OZjB/zk_transaction_1_1.r1cs","sender":"COORDINATOR","eventType":"CIRCUIT_FILE_UPLOAD","timestamp":645560,"_nanoseconds":177000000},"acknowledged":false} ceremony Id: hIfLWePJPn6ldES7OZjB
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit hIfLWePJPn6ldES7OZjB
+Ceremony events notified: 1
+Time: 2021-03-25T04:12:40.852Z
+changed doc: removed
+Files: ceremony_data/hIfLWePJPn6ldES7OZjB/
+found matching file ceremony_data/hIfLWePJPn6ldES7OZjB/zk_transaction_1_1.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/hIfLWePJPn6ldES7OZjB/ created
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/hIfLWePJPn6ldES7OZjB/zk_transaction_1_1.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/hIfLWePJPn6ldES7OZjB/zk_transaction_1_1.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 18570
+[catcher] # of Constraints: 18522
+[catcher] # of Private Inputs: 66
+[catcher] # of Public Inputs: 12
+[catcher] # of Labels: 86371
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 18570
+m: # of Constraints: 18522
+m: # of Private Inputs: 66
+m: # of Public Inputs: 12
+m: # of Labels: 86371
+m: # of Outputs: 0
+#Constraints: 18522
+Powers needed: 15
+Ceremony updated
+PoT file: pot15_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/18522
+[console] processing constraints: 10000/18522
+[console] writing coeffs: 0/45248
+[console] Writing points start IC: 0/13
+Event added for ceremony hIfLWePJPn6ldES7OZjB. Id: cauhLmTh8JKXtkVpnokf
+[console] Writing points end IC: 0/13
+[console] spliting buffer: 0/32768
+[console] spliting buffer: 10000/32768
+[console] spliting buffer: 20000/32768
+[console] spliting buffer: 30000/32768
+[console] HashingHPoints: 0/32768
+[console] HashingHPoints: 16384/32768
+[console] Writing points start C: 0/18557
+[console] Writing points start C: 5247/18557
+[console] Writing points start C: 8224/18557
+[console] Writing points start C: 11247/18557
+[console] Writing points end C: 0/18557
+[console] Writing points end C: 11247/18557
+[console] Writing points end C: 5247/18557
+[console] Writing points end C: 8224/18557
+[console] Writing points start C: 14229/18557
+[console] Writing points start C: 17191/18557
+[console] Writing points end C: 17191/18557
+[console] Writing points end C: 14229/18557
+[console] Writing points start A: 0/18570
+[console] Writing points end A: 0/18570
+[console] Writing points start B1: 0/18570
+[console] Writing points end B1: 0/18570
+[console] Writing points start B2: 0/18570
+[console] Writing points end B2: 0/18570
+[console] Circuit hash:
+                b4b75896 16410283 c555f55f 7ced1962
+                321bb12b 4c4bad45 895256bc e94c1413
+                dc18ac06 cbcce18c 16328cc8 6b00acce
+                e1edc02d 60bd6972 84f4b5a5 e3c20c35
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/hIfLWePJPn6ldES7OZjB/ph2_0000.zkey
+[console] undefined: fft 15 mix start: 0/4
+[console] undefined: fft 15 mix start: 1/4
+[console] undefined: fft 15 mix start: 2/4
+[console] undefined: fft 15 mix start: 3/4
+Event added for ceremony hIfLWePJPn6ldES7OZjB. Id: 8RVqoPikicWmkL58pEWs
+[console] undefined: fft 15 mix end: 1/4
+[console] undefined: fft 15 mix end: 3/4
+[console] undefined: fft 15 mix end: 0/4
+[console] undefined: fft 15 mix end: 2/4
+[console] undefined: fft  15  join: 14/15
+[console] undefined: fft 15 join  14/15  1/2 0/1
+[console] undefined: fft 15 join  14/15  2/2 0/1
+[console] undefined: fft  15  join: 15/15
+[console] undefined: fft 15 join  15/15  1/1 1/2
+[console] undefined: fft 15 join  15/15  1/1 0/2
+Event added for ceremony hIfLWePJPn6ldES7OZjB. Id: 28aX3wX5wcS150SurxGs
+Params uploaded to ceremony_data/hIfLWePJPn6ldES7OZjB/ph2_0000.params.
+Time: 2021-03-25T04:14:05.767Z
+Event added for ceremony hIfLWePJPn6ldES7OZjB. Id: vlFWKJzILZMKftRgsDhP
+
+
+// Circuit 2
+Ceremony events notified: 1
+Time: 2021-03-25T04:19:24.815Z
+changed doc: added
+Event: {"eventType":"CIRCUIT_FILE_UPLOAD","sender":"COORDINATOR","acknowledged":false,"timestamp":{"_seconds":1616645964,"_nanoseconds":367000000},"message":"ceremony_data/3lHsQDxM4lQKxkwA0Oyj/zk_transaction_1_2.r1cs"} ceremony Id: 3lHsQDxM4lQKxkwA0Oyj
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit 3lHsQDxM4lQKxkwA0Oyj
+Files: ceremony_data/3lHsQDxM4lQKxkwA0Oyj/
+found matching file ceremony_data/3lHsQDxM4lQKxkwA0Oyj/zk_transaction_1_2.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/3lHsQDxM4lQKxkwA0Oyj/ created
+Ceremony events notified: 1
+Time: 2021-03-25T04:19:25.282Z
+changed doc: removed
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/3lHsQDxM4lQKxkwA0Oyj/zk_transaction_1_2.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/3lHsQDxM4lQKxkwA0Oyj/zk_transaction_1_2.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 19670
+[catcher] # of Constraints: 19620
+[catcher] # of Private Inputs: 72
+[catcher] # of Public Inputs: 20
+[catcher] # of Labels: 90361
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 19670
+m: # of Constraints: 19620
+m: # of Private Inputs: 72
+m: # of Public Inputs: 20
+m: # of Labels: 90361
+m: # of Outputs: 0
+#Constraints: 19620
+Powers needed: 15
+Ceremony updated
+PoT file: pot15_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/19620
+[console] processing constraints: 10000/19620
+[console] writing coeffs: 0/48974
+[console] Writing points start IC: 0/21
+Event added for ceremony 3lHsQDxM4lQKxkwA0Oyj. Id: VpQdmvgADGia8uqMbUIH
+[console] Writing points end IC: 0/21
+[console] spliting buffer: 0/32768
+[console] spliting buffer: 10000/32768
+[console] spliting buffer: 20000/32768
+[console] spliting buffer: 30000/32768
+[console] HashingHPoints: 0/32768
+[console] HashingHPoints: 16384/32768
+[console] Writing points start C: 0/19649
+[console] Writing points start C: 5250/19649
+[console] Writing points start C: 8227/19649
+[console] Writing points start C: 11243/19649
+[console] Writing points end C: 5250/19649
+[console] Writing points end C: 11243/19649
+[console] Writing points end C: 8227/19649
+[console] Writing points end C: 0/19649
+[console] Writing points start C: 14232/19649
+[console] Writing points start C: 17194/19649
+[console] Writing points end C: 17194/19649
+[console] Writing points end C: 14232/19649
+[console] Writing points start A: 0/19670
+[console] Writing points end A: 0/19670
+[console] Writing points start B1: 0/19670
+[console] Writing points end B1: 0/19670
+[console] Writing points start B2: 0/19670
+[console] Writing points end B2: 0/19670
+[console] Circuit hash:
+                e1ef01d7 485af046 7ed8a91c a8c1e9d4
+                1556fb4b 1e5a7eb3 4f8c2640 f3981cb2
+                ca4ede60 6abf6752 bb9b1713 ad782979
+                8ac56039 18fd479d ca128cc9 cf74dc72
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/3lHsQDxM4lQKxkwA0Oyj/ph2_0000.zkey
+[console] undefined: fft 15 mix start: 0/4
+[console] undefined: fft 15 mix start: 1/4
+[console] undefined: fft 15 mix start: 2/4
+[console] undefined: fft 15 mix start: 3/4
+Event added for ceremony 3lHsQDxM4lQKxkwA0Oyj. Id: zAQhULx2YJFCW57kKUYa
+[console] undefined: fft 15 mix end: 3/4
+[console] undefined: fft 15 mix end: 0/4
+[console] undefined: fft 15 mix end: 1/4
+[console] undefined: fft 15 mix end: 2/4
+[console] undefined: fft  15  join: 14/15
+[console] undefined: fft 15 join  14/15  1/2 0/1
+[console] undefined: fft 15 join  14/15  2/2 0/1
+[console] undefined: fft  15  join: 15/15
+[console] undefined: fft 15 join  15/15  1/1 0/2
+[console] undefined: fft 15 join  15/15  1/1 1/2
+Event added for ceremony 3lHsQDxM4lQKxkwA0Oyj. Id: nmXn1ci0uFOT1KRt2qUC
+Params uploaded to ceremony_data/3lHsQDxM4lQKxkwA0Oyj/ph2_0000.params.
+Time: 2021-03-25T04:20:50.416Z
+Event added for ceremony 3lHsQDxM4lQKxkwA0Oyj. Id: YNbfAG27CB0r2XVLU6TQ
+
+
+// Circuit 3
+
+Ceremony events notified: 1
+Time: 2021-03-25T04:27:06.813Z
+changed doc: added
+Event: {"timestamp":{"_seconds":1616646426,"_nanoseconds":540000000},"message":"ceremony_data/k9CJHwJoeSRMGtjHUiF6/zk_transaction_1_3.r1cs","sender":"COORDINATOR","eventType":"CIRCUIT_FILE_UPLOAD","acknowledged":false} ceremony Id: k9CJHwJoeSRMGtjHUiF6
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit k9CJHwJoeSRMGtjHUiF6
+Ceremony events notified: 1
+Time: 2021-03-25T04:27:07.318Z
+changed doc: removed
+Files: ceremony_data/k9CJHwJoeSRMGtjHUiF6/
+found matching file ceremony_data/k9CJHwJoeSRMGtjHUiF6/zk_transaction_1_3.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/k9CJHwJoeSRMGtjHUiF6/ created
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/k9CJHwJoeSRMGtjHUiF6/zk_transaction_1_3.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/k9CJHwJoeSRMGtjHUiF6/zk_transaction_1_3.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 20776
+[catcher] # of Constraints: 20724
+[catcher] # of Private Inputs: 78
+[catcher] # of Public Inputs: 28
+[catcher] # of Labels: 94399
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 20776
+m: # of Constraints: 20724
+m: # of Private Inputs: 78
+m: # of Public Inputs: 28
+m: # of Labels: 94399
+m: # of Outputs: 0
+#Constraints: 20724
+Powers needed: 15
+Ceremony updated
+PoT file: pot15_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/20724
+[console] processing constraints: 10000/20724
+[console] processing constraints: 20000/20724
+[console] writing coeffs: 0/52716
+[console] Writing points start IC: 0/29
+Event added for ceremony k9CJHwJoeSRMGtjHUiF6. Id: eKoYUUfJwlVbQeDipaH2
+[console] Writing points end IC: 0/29
+[console] spliting buffer: 0/32768
+[console] spliting buffer: 10000/32768
+[console] spliting buffer: 20000/32768
+[console] spliting buffer: 30000/32768
+[console] HashingHPoints: 0/32768
+[console] HashingHPoints: 16384/32768
+[console] Writing points start C: 0/20747
+[console] Writing points start C: 5250/20747
+[console] Writing points start C: 8230/20747
+[console] Writing points start C: 11238/20747
+[console] Writing points end C: 5250/20747
+[console] Writing points end C: 8230/20747
+[console] Writing points end C: 11238/20747
+[console] Writing points end C: 0/20747
+[console] Writing points start C: 14235/20747
+[console] Writing points start C: 17200/20747
+[console] Writing points end C: 17200/20747
+[console] Writing points end C: 14235/20747
+[console] Writing points start A: 0/20776
+[console] Writing points end A: 0/20776
+[console] Writing points start B1: 0/20776
+[console] Writing points end B1: 0/20776
+[console] Writing points start B2: 0/20776
+[console] Writing points end B2: 0/20776
+[console] Circuit hash:
+                251bd930 64fa19cf 0a59977e c3bd3b7b
+                e48384a1 8d28772a b7ce7940 129a7d8c
+                1275a391 dce78c96 886f1690 52930e9b
+                ddf647d1 27576911 b029abca dca85f42
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/k9CJHwJoeSRMGtjHUiF6/ph2_0000.zkey
+[console] undefined: fft 15 mix start: 0/4
+[console] undefined: fft 15 mix start: 1/4
+[console] undefined: fft 15 mix start: 2/4
+[console] undefined: fft 15 mix start: 3/4
+Event added for ceremony k9CJHwJoeSRMGtjHUiF6. Id: kReiIXv37Z1ndX4oLpLk
+[console] undefined: fft 15 mix end: 3/4
+[console] undefined: fft 15 mix end: 1/4
+[console] undefined: fft 15 mix end: 2/4
+[console] undefined: fft 15 mix end: 0/4
+[console] undefined: fft  15  join: 14/15
+[console] undefined: fft 15 join  14/15  1/2 0/1
+[console] undefined: fft 15 join  14/15  2/2 0/1
+[console] undefined: fft  15  join: 15/15
+[console] undefined: fft 15 join  15/15  1/1 0/2
+[console] undefined: fft 15 join  15/15  1/1 1/2
+Event added for ceremony k9CJHwJoeSRMGtjHUiF6. Id: HIXxIxcgES0XOQi32eXh
+Params uploaded to ceremony_data/k9CJHwJoeSRMGtjHUiF6/ph2_0000.params.
+Time: 2021-03-25T04:28:33.110Z
+Event added for ceremony k9CJHwJoeSRMGtjHUiF6. Id: 8pJISSExYEtErGj1US7x
+
+
+// Circuit 4
+
+Ceremony events notified: 1
+Time: 2021-03-25T04:30:00.311Z
+changed doc: added
+Event: {"acknowledged":false,"eventType":"CIRCUIT_FILE_UPLOAD","timestamp":{"_seconds":1616646600,"_nanoseconds":13000000},"message":"ceremony_data/VgOEuoAjThuaDosXRroW/zk_transaction_1_4.r1cs","sender":"COORDINATOR"} ceremony Id: VgOEuoAjThuaDosXRroW
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit VgOEuoAjThuaDosXRroW
+Ceremony events notified: 1
+Time: 2021-03-25T04:30:00.783Z
+changed doc: removed
+Files: ceremony_data/VgOEuoAjThuaDosXRroW/
+found matching file ceremony_data/VgOEuoAjThuaDosXRroW/zk_transaction_1_4.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/VgOEuoAjThuaDosXRroW/ created
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/VgOEuoAjThuaDosXRroW/zk_transaction_1_4.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/VgOEuoAjThuaDosXRroW/zk_transaction_1_4.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 21888
+[catcher] # of Constraints: 21834
+[catcher] # of Private Inputs: 84
+[catcher] # of Public Inputs: 36
+[catcher] # of Labels: 98485
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 21888
+m: # of Constraints: 21834
+m: # of Private Inputs: 84
+m: # of Public Inputs: 36
+m: # of Labels: 98485
+m: # of Outputs: 0
+#Constraints: 21834
+Powers needed: 15
+Ceremony updated
+PoT file: pot15_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/21834
+[console] processing constraints: 10000/21834
+[console] processing constraints: 20000/21834
+[console] writing coeffs: 0/56474
+[console] Writing points start IC: 0/37
+[console] Configuring big array IC: 10000/10185
+Event added for ceremony VgOEuoAjThuaDosXRroW. Id: NtTeOza7wfgjxX7jgbKh
+[console] Writing points end IC: 0/37
+[console] spliting buffer: 0/32768
+[console] spliting buffer: 10000/32768
+[console] spliting buffer: 20000/32768
+[console] spliting buffer: 30000/32768
+[console] HashingHPoints: 0/32768
+[console] HashingHPoints: 16384/32768
+[console] Writing points start C: 0/21851
+[console] Writing points start C: 5250/21851
+[console] Writing points start C: 8230/21851
+[console] Writing points start C: 11214/21851
+[console] Writing points end C: 0/21851
+[console] Writing points end C: 11214/21851
+[console] Writing points end C: 5250/21851
+[console] Writing points end C: 8230/21851
+[console] Writing points start C: 14232/21851
+[console] Writing points start C: 17198/21851
+[console] Writing points end C: 17198/21851
+[console] Writing points end C: 14232/21851
+[console] Writing points start A: 0/21888
+[console] Writing points end A: 0/21888
+[console] Writing points start B1: 0/21888
+[console] Writing points end B1: 0/21888
+[console] Writing points start B2: 0/21888
+[console] Writing points end B2: 0/21888
+[console] Circuit hash:
+                b446715f e003a420 56a50bd3 96f011dd
+                7ff7ed1f 9e4c9a66 e151bf37 bdb1cfa7
+                7a111c85 699303d1 812eba5b 2004b510
+                074855d5 bbb36f4d 61cfca47 378b78fb
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/VgOEuoAjThuaDosXRroW/ph2_0000.zkey
+[console] undefined: fft 15 mix start: 0/4
+[console] undefined: fft 15 mix start: 1/4
+[console] undefined: fft 15 mix start: 2/4
+[console] undefined: fft 15 mix start: 3/4
+Event added for ceremony VgOEuoAjThuaDosXRroW. Id: OJlZNdXtvQQJX9aF29yB
+
+[console] undefined: fft 15 mix end: 0/4
+[console] undefined: fft 15 mix end: 2/4
+[console] undefined: fft 15 mix end: 1/4
+[console] undefined: fft 15 mix end: 3/4
+[console] undefined: fft  15  join: 14/15
+[console] undefined: fft 15 join  14/15  1/2 0/1
+[console] undefined: fft 15 join  14/15  2/2 0/1
+[console] undefined: fft  15  join: 15/15
+[console] undefined: fft 15 join  15/15  1/1 1/2
+[console] undefined: fft 15 join  15/15  1/1 0/2
+Event added for ceremony VgOEuoAjThuaDosXRroW. Id: muOnoYO5CqhqusXSaXFw
+Params uploaded to ceremony_data/VgOEuoAjThuaDosXRroW/ph2_0000.params.
+Time: 2021-03-25T04:31:30.076Z
+Event added for ceremony VgOEuoAjThuaDosXRroW. Id: 77VbDhI8UKCknVdD6lSY
+
+// Circuit 5
+
+Ceremony events notified: 1
+Time: 2021-03-25T04:33:50.885Z
+changed doc: added
+Event: {"sender":"COORDINATOR","acknowledged":false,"eventType":"CIRCUIT_FILE_UPLOAD","timestamp":{"_seconds":1616646830,"_nanoseconds":690000000},"message":"ceremony_data/btlNv8naLSHxVoZbjUJS/zk_transaction_2_1.r1cs"} ceremony Id: btlNv8naLSHxVoZbjUJS
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit btlNv8naLSHxVoZbjUJS
+Ceremony events notified: 1
+Time: 2021-03-25T04:33:51.376Z
+changed doc: removed
+Files: ceremony_data/btlNv8naLSHxVoZbjUJS/
+found matching file ceremony_data/btlNv8naLSHxVoZbjUJS/zk_transaction_2_1.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/btlNv8naLSHxVoZbjUJS/ created
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/btlNv8naLSHxVoZbjUJS/zk_transaction_2_1.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/btlNv8naLSHxVoZbjUJS/zk_transaction_2_1.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 36075
+[catcher] # of Constraints: 35983
+[catcher] # of Private Inputs: 126
+[catcher] # of Public Inputs: 14
+[catcher] # of Labels: 168983
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 36075
+m: # of Constraints: 35983
+m: # of Private Inputs: 126
+m: # of Public Inputs: 14
+m: # of Labels: 168983
+m: # of Outputs: 0
+#Constraints: 35983
+Powers needed: 16
+Ceremony updated
+PoT file: pot16_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/35983
+[console] processing constraints: 10000/35983
+[console] processing constraints: 20000/35983
+[console] processing constraints: 30000/35983
+[console] writing coeffs: 0/86863
+[console] Writing points start IC: 0/15
+[console] Configuring big array IC: 10000/15394
+Event added for ceremony btlNv8naLSHxVoZbjUJS. Id: a6Iw9iwUEJAJjEogmxcN
+[console] Writing points end IC: 0/15
+[console] spliting buffer: 0/65536
+[console] spliting buffer: 10000/65536
+[console] spliting buffer: 20000/65536
+[console] spliting buffer: 30000/65536
+[console] spliting buffer: 40000/65536
+[console] spliting buffer: 50000/65536
+[console] spliting buffer: 60000/65536
+[console] HashingHPoints: 0/65536
+[console] HashingHPoints: 16384/65536
+[console] HashingHPoints: 32768/65536
+[console] HashingHPoints: 49152/65536
+[console] Writing points start C: 0/36060
+[console] Writing points start C: 4509/36060
+[console] Writing points start C: 10490/36060
+[console] Writing points start C: 13486/36060
+[console] Writing points end C: 0/36060
+[console] Writing points end C: 10490/36060
+[console] Writing points end C: 13486/36060
+[console] Writing points end C: 4509/36060
+[console] Writing points start C: 16443/36060
+[console] Writing points start C: 19451/36060
+[console] Writing points start C: 22467/36060
+[console] Writing points start C: 25431/36060
+[console] Writing points end C: 16443/36060
+[console] Writing points end C: 19451/36060
+[console] Writing points end C: 25431/36060
+[console] Writing points end C: 22467/36060
+[console] Writing points start C: 28388/36060
+[console] Writing points start C: 31430/36060
+[console] Writing points start C: 34409/36060
+[console] Writing points end C: 34409/36060
+[console] Writing points end C: 31430/36060
+[console] Writing points end C: 28388/36060
+[console] Writing points start A: 0/36075
+[console] Writing points start A: 29149/36075
+[console] Writing points end A: 29149/36075
+[console] Writing points end A: 0/36075
+[console] Writing points start B1: 0/36075
+[console] Writing points start B1: 24651/36075
+[console] Writing points end B1: 24651/36075
+[console] Writing points end B1: 0/36075
+[console] Writing points start B2: 0/36075
+[console] Writing points start B2: 24651/36075
+[console] Writing points end B2: 24651/36075
+[console] Writing points end B2: 0/36075
+[console] Circuit hash:
+                bbff9bb0 c45b5f61 97de2dcd b2725a6b
+                0e6c95ee 3de02e21 5c418869 c69c0d86
+                102e33ac d2bf3dd6 96348475 8c84a401
+                d92c1a05 a475dcff f0bb0ca2 93d78a37
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/btlNv8naLSHxVoZbjUJS/ph2_0000.zkey
+[console] undefined: fft 16 mix start: 0/4
+[console] undefined: fft 16 mix start: 1/4
+[console] undefined: fft 16 mix start: 2/4
+[console] undefined: fft 16 mix start: 3/4
+Event added for ceremony btlNv8naLSHxVoZbjUJS. Id: xGgBDU3zVOQCtdGpHBfY
+[console] undefined: fft 16 mix end: 1/4
+[console] undefined: fft 16 mix end: 3/4
+[console] undefined: fft 16 mix end: 0/4
+[console] undefined: fft 16 mix end: 2/4
+[console] undefined: fft  16  join: 15/16
+[console] undefined: fft 16 join  15/16  1/2 0/1
+[console] undefined: fft 16 join  15/16  2/2 0/1
+[console] undefined: fft  16  join: 16/16
+[console] undefined: fft 16 join  16/16  1/1 0/2
+[console] undefined: fft 16 join  16/16  1/1 1/2
+Event added for ceremony btlNv8naLSHxVoZbjUJS. Id: H53GJoEdIV29tWjLAsI3
+Params uploaded to ceremony_data/btlNv8naLSHxVoZbjUJS/ph2_0000.params.
+Time: 2021-03-25T04:36:16.495Z
+Event added for ceremony btlNv8naLSHxVoZbjUJS. Id: XrQCQW1AzlOkRE9AJVTo
+
+// Circuit 6
+
+Ceremony events notified: 1
+Time: 2021-03-25T04:38:03.555Z
+changed doc: added
+Event: {"eventType":"CIRCUIT_FILE_UPLOAD","acknowledged":false,"timestamp":{"_seconds":1616647083,"_nanoseconds":366000000},"message":"ceremony_data/d0eQ24D01KCNaAHd8nM8/zk_transaction_2_2.r1cs","sender":"COORDINATOR"} ceremony Id: d0eQ24D01KCNaAHd8nM8
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit d0eQ24D01KCNaAHd8nM8
+Files: ceremony_data/d0eQ24D01KCNaAHd8nM8/
+found matching file ceremony_data/d0eQ24D01KCNaAHd8nM8/zk_transaction_2_2.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/d0eQ24D01KCNaAHd8nM8/ created
+Ceremony events notified: 1
+Time: 2021-03-25T04:38:04.058Z
+changed doc: removed
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/d0eQ24D01KCNaAHd8nM8/zk_transaction_2_2.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/d0eQ24D01KCNaAHd8nM8/zk_transaction_2_2.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 37201
+[catcher] # of Constraints: 37107
+[catcher] # of Private Inputs: 132
+[catcher] # of Public Inputs: 22
+[catcher] # of Labels: 173111
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 37201
+m: # of Constraints: 37107
+m: # of Private Inputs: 132
+m: # of Public Inputs: 22
+m: # of Labels: 173111
+m: # of Outputs: 0
+#Constraints: 37107
+Powers needed: 16
+Ceremony updated
+PoT file: pot16_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/37107
+[console] processing constraints: 10000/37107
+[console] processing constraints: 20000/37107
+[console] processing constraints: 30000/37107
+[console] writing coeffs: 0/90653
+[console] Writing points start IC: 0/23
+[console] Configuring big array IC: 10000/16115
+Event added for ceremony d0eQ24D01KCNaAHd8nM8. Id: gca1qVp4QtioGWVKS5ez
+[console] Writing points end IC: 0/23
+[console] spliting buffer: 0/65536
+[console] spliting buffer: 10000/65536
+[console] spliting buffer: 20000/65536
+[console] spliting buffer: 30000/65536
+[console] spliting buffer: 40000/65536
+[console] spliting buffer: 50000/65536
+[console] spliting buffer: 60000/65536
+[console] HashingHPoints: 0/65536
+[console] HashingHPoints: 16384/65536
+[console] HashingHPoints: 32768/65536
+[console] HashingHPoints: 49152/65536
+[console] Writing points start C: 0/37178
+[console] Writing points start C: 4490/37178
+[console] Writing points start C: 10484/37178
+[console] Writing points start C: 13485/37178
+[console] Writing points end C: 0/37178
+[console] Writing points end C: 13485/37178
+[console] Writing points end C: 10484/37178
+[console] Writing points end C: 4490/37178
+[console] Writing points start C: 16443/37178
+[console] Writing points start C: 19427/37178
+[console] Writing points start C: 22461/37178
+[console] Writing points start C: 25428/37178
+[console] Writing points end C: 22461/37178
+[console] Writing points end C: 19427/37178
+[console] Writing points end C: 25428/37178
+[console] Writing points end C: 16443/37178
+[console] Writing points start C: 28375/37178
+[console] Writing points start C: 31421/37178
+[console] Writing points start C: 34405/37178
+[console] Writing points end C: 34405/37178
+[console] Writing points end C: 28375/37178
+[console] Writing points end C: 31421/37178
+[console] Writing points start A: 0/37201
+[console] Writing points start A: 29055/37201
+[console] Writing points end A: 29055/37201
+[console] Writing points end A: 0/37201
+[console] Writing points start B1: 0/37201
+[console] Writing points start B1: 24139/37201
+[console] Writing points end B1: 24139/37201
+[console] Writing points end B1: 0/37201
+[console] Writing points start B2: 0/37201
+[console] Writing points start B2: 24139/37201
+[console] Writing points end B2: 24139/37201
+[console] Writing points end B2: 0/37201
+[console] Circuit hash:
+                6a40bbd0 62822db0 305d5326 17f65974
+                f5518df8 8d0be00f 36615b50 5737bdd7
+                2c639ead 23576661 8d874bb3 980c2713
+                be9855b4 d157bc76 b82519dc 27347e14
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/d0eQ24D01KCNaAHd8nM8/ph2_0000.zkey
+[console] undefined: fft 16 mix start: 0/4
+[console] undefined: fft 16 mix start: 1/4
+[console] undefined: fft 16 mix start: 2/4
+[console] undefined: fft 16 mix start: 3/4
+Event added for ceremony d0eQ24D01KCNaAHd8nM8. Id: qB38RNKINTTj16e4H8GX
+[console] undefined: fft 16 mix end: 2/4
+[console] undefined: fft 16 mix end: 1/4
+[console] undefined: fft 16 mix end: 3/4
+[console] undefined: fft 16 mix end: 0/4
+[console] undefined: fft  16  join: 15/16
+[console] undefined: fft 16 join  15/16  2/2 0/1
+[console] undefined: fft 16 join  15/16  1/2 0/1
+[console] undefined: fft  16  join: 16/16
+[console] undefined: fft 16 join  16/16  1/1 0/2
+[console] undefined: fft 16 join  16/16  1/1 1/2
+Event added for ceremony d0eQ24D01KCNaAHd8nM8. Id: bgFYTJv1Ka7OT3WbEuQv
+Params uploaded to ceremony_data/d0eQ24D01KCNaAHd8nM8/ph2_0000.params.
+Time: 2021-03-25T04:40:28.890Z
+Event added for ceremony d0eQ24D01KCNaAHd8nM8. Id: r95XX4HitQIGben54xec
+
+// Circuit 7
+
+Ceremony events notified: 1
+Time: 2021-03-25T04:42:22.228Z
+changed doc: added
+Event: {"timestamp":{"_seconds":1616647342,"_nanoseconds":32000000},"message":"ceremony_data/SeQ8Sgvke9tPiHaOu8gN/zk_transaction_2_3.r1cs","acknowledged":false,"sender":"COORDINATOR","eventType":"CIRCUIT_FILE_UPLOAD"} ceremony Id: SeQ8Sgvke9tPiHaOu8gN
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit SeQ8Sgvke9tPiHaOu8gN
+Files: ceremony_data/SeQ8Sgvke9tPiHaOu8gN/
+found matching file ceremony_data/SeQ8Sgvke9tPiHaOu8gN/zk_transaction_2_3.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/SeQ8Sgvke9tPiHaOu8gN/ created
+Ceremony events notified: 1
+Time: 2021-03-25T04:42:22.704Z
+changed doc: removed
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/SeQ8Sgvke9tPiHaOu8gN/zk_transaction_2_3.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/SeQ8Sgvke9tPiHaOu8gN/zk_transaction_2_3.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 38333
+[catcher] # of Constraints: 38237
+[catcher] # of Private Inputs: 138
+[catcher] # of Public Inputs: 30
+[catcher] # of Labels: 177287
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 38333
+m: # of Constraints: 38237
+m: # of Private Inputs: 138
+m: # of Public Inputs: 30
+m: # of Labels: 177287
+m: # of Outputs: 0
+#Constraints: 38237
+Powers needed: 16
+Ceremony updated
+PoT file: pot16_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/38237
+[console] processing constraints: 10000/38237
+[console] processing constraints: 20000/38237
+[console] processing constraints: 30000/38237
+[console] writing coeffs: 0/94459
+[console] Writing points start IC: 0/31
+[console] Configuring big array IC: 10000/16838
+Event added for ceremony SeQ8Sgvke9tPiHaOu8gN. Id: 9R7IeZ9Xk8RXBNj3XQUK
+[console] Writing points end IC: 0/31
+[console] spliting buffer: 0/65536
+[console] spliting buffer: 10000/65536
+[console] spliting buffer: 20000/65536
+[console] spliting buffer: 30000/65536
+[console] spliting buffer: 40000/65536
+[console] spliting buffer: 50000/65536
+[console] spliting buffer: 60000/65536
+[console] HashingHPoints: 0/65536
+[console] HashingHPoints: 16384/65536
+[console] HashingHPoints: 32768/65536
+[console] HashingHPoints: 49152/65536
+[console] Writing points start C: 0/38302
+[console] Writing points start C: 4465/38302
+[console] Writing points start C: 10472/38302
+[console] Writing points start C: 13482/38302
+[console] Writing points end C: 0/38302
+[console] Writing points end C: 13482/38302
+[console] Writing points end C: 10472/38302
+[console] Writing points end C: 4465/38302
+[console] Writing points start C: 16443/38302
+[console] Writing points start C: 19400/38302
+[console] Writing points start C: 22458/38302
+[console] Writing points start C: 25428/38302
+[console] Writing points end C: 25428/38302
+[console] Writing points end C: 19400/38302
+[console] Writing points end C: 16443/38302
+[console] Writing points end C: 22458/38302
+[console] Writing points start C: 28377/38302
+[console] Writing points start C: 31415/38302
+[console] Writing points start C: 34401/38302
+[console] Writing points end C: 34401/38302
+[console] Writing points end C: 28377/38302
+[console] Writing points end C: 31415/38302
+[console] Writing points start A: 0/38333
+[console] Writing points start A: 28948/38333
+[console] Writing points end A: 28948/38333
+[console] Writing points end A: 0/38333
+[console] Writing points start B1: 0/38333
+[console] Writing points start B1: 23626/38333
+[console] Writing points end B1: 23626/38333
+[console] Writing points end B1: 0/38333
+[console] Writing points start B2: 0/38333
+[console] Writing points start B2: 23626/38333
+[console] Writing points end B2: 23626/38333
+[console] Writing points end B2: 0/38333
+[console] Circuit hash:
+                275f9ae8 4ebe5ccd 22fbaed6 f9ab2029
+                b394cf1d d870bdd6 4cd4cb79 468c19d9
+                5c56fb98 1aa6fb5c 23f6b56c 6dbb6cf5
+                badc9b71 0cfc6b9e 8df4d359 425b575b
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/SeQ8Sgvke9tPiHaOu8gN/ph2_0000.zkey
+[console] undefined: fft 16 mix start: 0/4
+[console] undefined: fft 16 mix start: 1/4
+[console] undefined: fft 16 mix start: 2/4
+[console] undefined: fft 16 mix start: 3/4
+Event added for ceremony SeQ8Sgvke9tPiHaOu8gN. Id: Z2G0KYQ2Lv9CKVMUKMmJ
+[console] undefined: fft 16 mix end: 0/4
+[console] undefined: fft 16 mix end: 3/4
+[console] undefined: fft 16 mix end: 1/4
+[console] undefined: fft 16 mix end: 2/4
+[console] undefined: fft  16  join: 15/16
+[console] undefined: fft 16 join  15/16  1/2 0/1
+[console] undefined: fft 16 join  15/16  2/2 0/1
+[console] undefined: fft  16  join: 16/16
+[console] undefined: fft 16 join  16/16  1/1 1/2
+[console] undefined: fft 16 join  16/16  1/1 0/2
+Event added for ceremony SeQ8Sgvke9tPiHaOu8gN. Id: TFmiZFNmowbYfQwtfW6i
+Params uploaded to ceremony_data/SeQ8Sgvke9tPiHaOu8gN/ph2_0000.params.
+Time: 2021-03-25T04:44:49.074Z
+Event added for ceremony SeQ8Sgvke9tPiHaOu8gN. Id: bprtoXMBEMitYCNbAbB9
+
+// Circuit 8
+
+Ceremony events notified: 1
+Time: 2021-03-25T04:47:19.225Z
+changed doc: added
+Event: {"acknowledged":false,"sender":"COORDINATOR","timestamp":{"_seconds":1616647639,"_nanoseconds":27000000},"eventType":"CIRCUIT_FILE_UPLOAD","message":"ceremony_data/NQtNx5fTyZX7gfTUjsre/zk_transaction_2_4.r1cs"} ceremony Id: NQtNx5fTyZX7gfTUjsre
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit NQtNx5fTyZX7gfTUjsre
+Ceremony events notified: 1
+Time: 2021-03-25T04:47:19.723Z
+changed doc: removed
+Files: ceremony_data/NQtNx5fTyZX7gfTUjsre/
+found matching file ceremony_data/NQtNx5fTyZX7gfTUjsre/zk_transaction_2_4.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/NQtNx5fTyZX7gfTUjsre/ created
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/NQtNx5fTyZX7gfTUjsre/zk_transaction_2_4.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/NQtNx5fTyZX7gfTUjsre/zk_transaction_2_4.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 39471
+[catcher] # of Constraints: 39373
+[catcher] # of Private Inputs: 144
+[catcher] # of Public Inputs: 38
+[catcher] # of Labels: 181511
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 39471
+m: # of Constraints: 39373
+m: # of Private Inputs: 144
+m: # of Public Inputs: 38
+m: # of Labels: 181511
+m: # of Outputs: 0
+#Constraints: 39373
+Powers needed: 16
+Ceremony updated
+PoT file: pot16_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/39373
+[console] processing constraints: 10000/39373
+[console] processing constraints: 20000/39373
+[console] processing constraints: 30000/39373
+[console] writing coeffs: 0/98281
+[console] Writing points start IC: 0/39
+[console] Configuring big array IC: 10000/17563
+Event added for ceremony NQtNx5fTyZX7gfTUjsre. Id: pS08UmSoRKUPaiS1OSaJ
+[console] Writing points end IC: 0/39
+[console] spliting buffer: 0/65536
+[console] spliting buffer: 10000/65536
+[console] spliting buffer: 20000/65536
+[console] spliting buffer: 30000/65536
+[console] spliting buffer: 40000/65536
+[console] spliting buffer: 50000/65536
+[console] spliting buffer: 60000/65536
+[console] HashingHPoints: 0/65536
+[console] HashingHPoints: 16384/65536
+[console] HashingHPoints: 32768/65536
+[console] HashingHPoints: 49152/65536
+[console] Writing points start C: 0/39432
+[console] Writing points start C: 4440/39432
+[console] Writing points start C: 10445/39432
+[console] Writing points start C: 13476/39432
+[console] Writing points end C: 0/39432
+[console] Writing points end C: 13476/39432
+[console] Writing points end C: 10445/39432
+[console] Writing points end C: 4440/39432
+[console] Writing points start C: 16443/39432
+[console] Writing points start C: 19388/39432
+[console] Writing points start C: 22449/39432
+[console] Writing points start C: 25428/39432
+[console] Writing points end C: 19388/39432
+[console] Writing points end C: 16443/39432
+[console] Writing points end C: 22449/39432
+[console] Writing points end C: 25428/39432
+[console] Writing points start C: 28380/39432
+[console] Writing points start C: 31415/39432
+[console] Writing points start C: 34401/39432
+[console] Writing points start C: 39424/39432
+[console] Writing points end C: 39424/39432
+[console] Writing points end C: 28380/39432
+[console] Writing points end C: 31415/39432
+[console] Writing points end C: 34401/39432
+[console] Writing points start A: 0/39471
+[console] Writing points start A: 28836/39471
+[console] Writing points end A: 28836/39471
+[console] Writing points end A: 0/39471
+[console] Writing points start B1: 0/39471
+[console] Writing points start B1: 23117/39471
+[console] Writing points end B1: 23117/39471
+[console] Writing points end B1: 0/39471
+[console] Writing points start B2: 0/39471
+[console] Writing points start B2: 23117/39471
+[console] Writing points end B2: 23117/39471
+[console] Writing points end B2: 0/39471
+[console] Circuit hash:
+                24316edd 30b1a636 baac3c43 f3ce6c7e
+                e46dff78 226a70f1 d2ad1641 f756b5b5
+                f1042c36 7aa283ac dfa34fa9 e7a17ee4
+                e94107a5 d4828883 df6abb75 726e6988
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/NQtNx5fTyZX7gfTUjsre/ph2_0000.zkey
+[console] undefined: fft 16 mix start: 0/4
+[console] undefined: fft 16 mix start: 1/4
+[console] undefined: fft 16 mix start: 2/4
+[console] undefined: fft 16 mix start: 3/4
+Event added for ceremony NQtNx5fTyZX7gfTUjsre. Id: STRdQKkvrj5PiKT5T3pU
+[console] undefined: fft 16 mix end: 3/4
+[console] undefined: fft 16 mix end: 0/4
+[console] undefined: fft 16 mix end: 2/4
+[console] undefined: fft 16 mix end: 1/4
+[console] undefined: fft  16  join: 15/16
+[console] undefined: fft 16 join  15/16  1/2 0/1
+[console] undefined: fft 16 join  15/16  2/2 0/1
+[console] undefined: fft  16  join: 16/16
+[console] undefined: fft 16 join  16/16  1/1 1/2
+[console] undefined: fft 16 join  16/16  1/1 0/2
+Event added for ceremony NQtNx5fTyZX7gfTUjsre. Id: GIFVnk1WvjV1wChHn8qT
+Params uploaded to ceremony_data/NQtNx5fTyZX7gfTUjsre/ph2_0000.params.
+Time: 2021-03-25T04:49:47.467Z
+Event added for ceremony NQtNx5fTyZX7gfTUjsre. Id: a9uEYCHAtDYqNpRTkKc5
+
+
+// Circuit 9
+
+Ceremony events notified: 1
+Time: 2021-03-25T04:50:33.390Z
+changed doc: added
+Event: {"eventType":"CIRCUIT_FILE_UPLOAD","acknowledged":false,"timestamp":{"_seconds":1616647833,"_nanoseconds":216000000},"message":"ceremony_data/zBuF4Gp0l7dC0x576qFF/zk_transaction_3_1.r1cs","sender":"COORDINATOR"} ceremony Id: zBuF4Gp0l7dC0x576qFF
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit zBuF4Gp0l7dC0x576qFF
+Files: ceremony_data/zBuF4Gp0l7dC0x576qFF/
+found matching file ceremony_data/zBuF4Gp0l7dC0x576qFF/zk_transaction_3_1.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/zBuF4Gp0l7dC0x576qFF/ created
+Ceremony events notified: 1
+Time: 2021-03-25T04:50:33.774Z
+changed doc: removed
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/zBuF4Gp0l7dC0x576qFF/zk_transaction_3_1.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/zBuF4Gp0l7dC0x576qFF/zk_transaction_3_1.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 53586
+[catcher] # of Constraints: 53450
+[catcher] # of Private Inputs: 186
+[catcher] # of Public Inputs: 16
+[catcher] # of Labels: 251643
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 53586
+m: # of Constraints: 53450
+m: # of Private Inputs: 186
+m: # of Public Inputs: 16
+m: # of Labels: 251643
+m: # of Outputs: 0
+#Constraints: 53450
+Powers needed: 16
+Ceremony updated
+PoT file: pot16_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/53450
+[console] processing constraints: 10000/53450
+[console] processing constraints: 20000/53450
+[console] processing constraints: 30000/53450
+[console] processing constraints: 40000/53450
+[console] processing constraints: 50000/53450
+[console] writing coeffs: 0/128494
+[console] writing coeffs: 100000/128494
+[console] Writing points start IC: 0/17
+[console] Configuring big array IC: 10000/22744
+[console] Configuring big array IC: 20000/22744
+Event added for ceremony zBuF4Gp0l7dC0x576qFF. Id: R89qYymOpKeSIPl8f0iR
+[console] Writing points end IC: 0/17
+[console] spliting buffer: 0/65536
+[console] spliting buffer: 10000/65536
+[console] spliting buffer: 20000/65536
+[console] spliting buffer: 30000/65536
+[console] spliting buffer: 40000/65536
+[console] spliting buffer: 50000/65536
+[console] spliting buffer: 60000/65536
+[console] HashingHPoints: 0/65536
+[console] HashingHPoints: 16384/65536
+[console] HashingHPoints: 32768/65536
+[console] HashingHPoints: 49152/65536
+[console] Writing points start C: 0/53569
+[console] Writing points start C: 3285/53569
+[console] Writing points start C: 9946/53569
+[console] Writing points start C: 15674/53569
+[console] Writing points end C: 0/53569
+[console] Writing points end C: 3285/53569
+[console] Writing points end C: 15674/53569
+[console] Writing points end C: 9946/53569
+[console] Writing points start C: 18643/53569
+[console] Writing points start C: 21698/53569
+[console] Writing points start C: 24659/53569
+[console] Writing points start C: 27630/53569
+[console] Writing points end C: 21698/53569
+[console] Writing points end C: 18643/53569
+[console] Writing points end C: 24659/53569
+[console] Writing points end C: 27630/53569
+[console] Writing points start C: 30675/53569
+[console] Writing points start C: 33644/53569
+[console] Writing points start C: 36593/53569
+[console] Writing points start C: 39640/53569
+[console] Writing points end C: 33644/53569
+[console] Writing points end C: 39640/53569
+[console] Writing points end C: 36593/53569
+[console] Writing points end C: 30675/53569
+[console] Writing points start C: 42626/53569
+[console] Writing points start C: 45579/53569
+[console] Writing points start C: 48607/53569
+[console] Writing points start C: 51629/53569
+[console] Writing points end C: 51629/53569
+[console] Writing points end C: 45579/53569
+[console] Writing points end C: 42626/53569
+[console] Writing points end C: 48607/53569
+[console] Writing points start A: 0/53586
+[console] Writing points start A: 27711/53586
+[console] Writing points end A: 0/53586
+[console] Writing points end A: 27711/53586
+[console] Writing points start B1: 0/53586
+[console] Writing points start B1: 21319/53586
+[console] Writing points start B1: 52576/53586
+[console] Writing points end B1: 52576/53586
+[console] Writing points end B1: 21319/53586
+[console] Writing points end B1: 0/53586
+[console] Writing points start B2: 0/53586
+[console] Writing points start B2: 21319/53586
+[console] Writing points start B2: 52576/53586
+[console] Writing points end B2: 52576/53586
+[console] Writing points end B2: 21319/53586
+[console] Writing points end B2: 0/53586
+[console] Circuit hash:
+                7a93e156 f2b61c49 99cb5863 1f35bf4f
+                8d85feb4 14834ec6 dec49db5 7e321122
+                9d385e0d 8905c87b cd793df0 ab1fdd57
+                9c5b27d6 c3ba3cc7 13963497 5a0ab604
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/zBuF4Gp0l7dC0x576qFF/ph2_0000.zkey
+[console] undefined: fft 16 mix start: 0/4
+[console] undefined: fft 16 mix start: 1/4
+[console] undefined: fft 16 mix start: 2/4
+[console] undefined: fft 16 mix start: 3/4
+Event added for ceremony zBuF4Gp0l7dC0x576qFF. Id: NGm4Xd4l64WOVngkDBNT
+[console] undefined: fft 16 mix end: 1/4
+[console] undefined: fft 16 mix end: 3/4
+[console] undefined: fft 16 mix end: 2/4
+[console] undefined: fft 16 mix end: 0/4
+[console] undefined: fft  16  join: 15/16
+[console] undefined: fft 16 join  15/16  2/2 0/1
+[console] undefined: fft 16 join  15/16  1/2 0/1
+[console] undefined: fft  16  join: 16/16
+[console] undefined: fft 16 join  16/16  1/1 1/2
+[console] undefined: fft 16 join  16/16  1/1 0/2
+Event added for ceremony zBuF4Gp0l7dC0x576qFF. Id: 3iOLXKlRFOE0I8V6aloi
+Params uploaded to ceremony_data/zBuF4Gp0l7dC0x576qFF/ph2_0000.params.
+Time: 2021-03-25T04:53:11.016Z
+Event added for ceremony zBuF4Gp0l7dC0x576qFF. Id: eQiuObs1VuHadGWdsCw1
+
+
+// Circuit 10
+
+Ceremony events notified: 1
+Time: 2021-03-25T04:55:21.036Z
+changed doc: added
+Event: {"eventType":"CIRCUIT_FILE_UPLOAD","timestamp":{"_seconds":1616648120,"_nanoseconds":839000000},"acknowledged":false,"message":"ceremony_data/EaxnounDmyQ0I7OZZDsW/zk_transaction_3_2.r1cs","sender":"COORDINATOR"} ceremony Id: EaxnounDmyQ0I7OZZDsW
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit EaxnounDmyQ0I7OZZDsW
+Files: ceremony_data/EaxnounDmyQ0I7OZZDsW/
+found matching file ceremony_data/EaxnounDmyQ0I7OZZDsW/zk_transaction_3_2.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/EaxnounDmyQ0I7OZZDsW/ created
+Ceremony events notified: 1
+Time: 2021-03-25T04:55:21.541Z
+changed doc: removed
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/EaxnounDmyQ0I7OZZDsW/zk_transaction_3_2.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/EaxnounDmyQ0I7OZZDsW/zk_transaction_3_2.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 54738
+[catcher] # of Constraints: 54600
+[catcher] # of Private Inputs: 192
+[catcher] # of Public Inputs: 24
+[catcher] # of Labels: 255909
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 54738
+m: # of Constraints: 54600
+m: # of Private Inputs: 192
+m: # of Public Inputs: 24
+m: # of Labels: 255909
+m: # of Outputs: 0
+#Constraints: 54600
+Powers needed: 16
+Ceremony updated
+PoT file: pot16_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/54600
+[console] processing constraints: 10000/54600
+[console] processing constraints: 20000/54600
+[console] processing constraints: 30000/54600
+[console] processing constraints: 40000/54600
+[console] processing constraints: 50000/54600
+[console] writing coeffs: 0/132348
+[console] writing coeffs: 100000/132348
+[console] Writing points start IC: 0/25
+[console] Configuring big array IC: 10000/23475
+[console] Configuring big array IC: 20000/23475
+Event added for ceremony EaxnounDmyQ0I7OZZDsW. Id: NdTolNLjd4u8PSGiqhg2
+[console] Writing points end IC: 0/25
+[console] spliting buffer: 0/65536
+[console] spliting buffer: 10000/65536
+[console] spliting buffer: 20000/65536
+[console] spliting buffer: 30000/65536
+[console] spliting buffer: 40000/65536
+[console] spliting buffer: 50000/65536
+[console] spliting buffer: 60000/65536
+[console] HashingHPoints: 0/65536
+[console] HashingHPoints: 16384/65536
+[console] HashingHPoints: 32768/65536
+[console] HashingHPoints: 49152/65536
+[console] Writing points start C: 0/54713
+[console] Writing points start C: 3264/54713
+[console] Writing points start C: 9918/54713
+[console] Writing points start C: 15674/54713
+[console] Writing points end C: 0/54713
+[console] Writing points end C: 15674/54713
+[console] Writing points end C: 3264/54713
+[console] Writing points end C: 9918/54713
+[console] Writing points start C: 18646/54713
+[console] Writing points start C: 21692/54713
+[console] Writing points start C: 24656/54713
+[console] Writing points start C: 27601/54713
+[console] Writing points end C: 27601/54713
+[console] Writing points end C: 21692/54713
+[console] Writing points end C: 18646/54713
+[console] Writing points end C: 24656/54713
+[console] Writing points start C: 30662/54713
+[console] Writing points start C: 33641/54713
+[console] Writing points start C: 36593/54713
+[console] Writing points start C: 39620/54713
+[console] Writing points end C: 33641/54713
+[console] Writing points end C: 30662/54713
+[console] Writing points end C: 36593/54713
+[console] Writing points end C: 39620/54713
+[console] Writing points start C: 42624/54713
+[console] Writing points start C: 45581/54713
+[console] Writing points start C: 48597/54713
+[console] Writing points start C: 51505/54713
+[console] Writing points end C: 51505/54713
+[console] Writing points end C: 48597/54713
+[console] Writing points end C: 42624/54713
+[console] Writing points end C: 45581/54713
+[console] Writing points start A: 0/54738
+[console] Writing points start A: 27631/54738
+[console] Writing points end A: 0/54738
+[console] Writing points end A: 27631/54738
+[console] Writing points start B1: 0/54738
+[console] Writing points start B1: 20809/54738
+[console] Writing points start B1: 52610/54738
+[console] Writing points end B1: 20809/54738
+[console] Writing points end B1: 52610/54738
+[console] Writing points end B1: 0/54738
+[console] Writing points start B2: 0/54738
+[console] Writing points start B2: 20809/54738
+[console] Writing points start B2: 52610/54738
+[console] Writing points end B2: 20809/54738
+[console] Writing points end B2: 52610/54738
+[console] Writing points end B2: 0/54738
+[console] Circuit hash:
+                3b24513a 59a84587 17f7986e 2f119e98
+                c7c8f57c 2a780371 1dd1a7c8 2699cfff
+                8fcf0a84 8e4a0421 1bd6cbe8 359098a2
+                a3ca3f74 9f8e7cc8 b1f4dd3c 5898acf4
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/EaxnounDmyQ0I7OZZDsW/ph2_0000.zkey
+[console] undefined: fft 16 mix start: 0/4
+[console] undefined: fft 16 mix start: 1/4
+[console] undefined: fft 16 mix start: 2/4
+[console] undefined: fft 16 mix start: 3/4
+Event added for ceremony EaxnounDmyQ0I7OZZDsW. Id: oaMDJTazjh6GduLrL0Pp
+[console] undefined: fft 16 mix end: 3/4
+[console] undefined: fft 16 mix end: 2/4
+[console] undefined: fft 16 mix end: 0/4
+[console] undefined: fft 16 mix end: 1/4
+[console] undefined: fft  16  join: 15/16
+[console] undefined: fft 16 join  15/16  1/2 0/1
+[console] undefined: fft 16 join  15/16  2/2 0/1
+[console] undefined: fft  16  join: 16/16
+[console] undefined: fft 16 join  16/16  1/1 0/2
+[console] undefined: fft 16 join  16/16  1/1 1/2
+Event added for ceremony EaxnounDmyQ0I7OZZDsW. Id: WzBWUtUzgIQY1qFwpT70
+Params uploaded to ceremony_data/EaxnounDmyQ0I7OZZDsW/ph2_0000.params.
+Time: 2021-03-25T04:58:01.483Z
+Event added for ceremony EaxnounDmyQ0I7OZZDsW. Id: gbOZDmzXNBDfG2I4pEYK
+
+
+// Circuit 11
+
+
+Ceremony events notified: 1
+Time: 2021-03-25T05:00:16.625Z
+changed doc: added
+Event: {"eventType":"CIRCUIT_FILE_UPLOAD","timestamp":{"_seconds":1616648416,"_nanoseconds":438000000},"message":"ceremony_data/iBaIoiGFfZvbxzDa7lZ0/zk_transaction_3_3.r1cs","acknowledged":false,"sender":"COORDINATOR"} ceremony Id: iBaIoiGFfZvbxzDa7lZ0
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit iBaIoiGFfZvbxzDa7lZ0
+Ceremony events notified: 1
+Time: 2021-03-25T05:00:17.102Z
+changed doc: removed
+Files: ceremony_data/iBaIoiGFfZvbxzDa7lZ0/
+found matching file ceremony_data/iBaIoiGFfZvbxzDa7lZ0/zk_transaction_3_3.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/iBaIoiGFfZvbxzDa7lZ0/ created
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/iBaIoiGFfZvbxzDa7lZ0/zk_transaction_3_3.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/iBaIoiGFfZvbxzDa7lZ0/zk_transaction_3_3.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 55896
+[catcher] # of Constraints: 55756
+[catcher] # of Private Inputs: 198
+[catcher] # of Public Inputs: 32
+[catcher] # of Labels: 260223
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 55896
+m: # of Constraints: 55756
+m: # of Private Inputs: 198
+m: # of Public Inputs: 32
+m: # of Labels: 260223
+m: # of Outputs: 0
+#Constraints: 55756
+Powers needed: 16
+Ceremony updated
+PoT file: pot16_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/55756
+[console] processing constraints: 10000/55756
+[console] processing constraints: 20000/55756
+[console] processing constraints: 30000/55756
+[console] processing constraints: 40000/55756
+[console] processing constraints: 50000/55756
+[console] writing coeffs: 0/136218
+[console] writing coeffs: 100000/136218
+[console] Writing points start IC: 0/33
+[console] Configuring big array IC: 10000/24208
+[console] Configuring big array IC: 20000/24208
+Event added for ceremony iBaIoiGFfZvbxzDa7lZ0. Id: bHdS1awzJBgYrmC680l4
+[console] Writing points end IC: 0/33
+[console] spliting buffer: 0/65536
+[console] spliting buffer: 10000/65536
+[console] spliting buffer: 20000/65536
+[console] spliting buffer: 30000/65536
+[console] spliting buffer: 40000/65536
+[console] spliting buffer: 50000/65536
+[console] spliting buffer: 60000/65536
+[console] HashingHPoints: 0/65536
+[console] HashingHPoints: 16384/65536
+[console] HashingHPoints: 32768/65536
+[console] HashingHPoints: 49152/65536
+[console] Writing points start C: 0/55863
+[console] Writing points start C: 3243/55863
+[console] Writing points start C: 9886/55863
+[console] Writing points start C: 15671/55863
+[console] Writing points end C: 0/55863
+[console] Writing points end C: 15671/55863
+[console] Writing points end C: 3243/55863
+[console] Writing points end C: 9886/55863
+[console] Writing points start C: 18645/55863
+[console] Writing points start C: 21680/55863
+[console] Writing points start C: 24653/55863
+[console] Writing points start C: 27602/55863
+[console] Writing points end C: 24653/55863
+[console] Writing points end C: 18645/55863
+[console] Writing points end C: 27602/55863
+[console] Writing points end C: 21680/55863
+[console] Writing points start C: 30641/55863
+[console] Writing points start C: 33635/55863
+[console] Writing points start C: 36590/55863
+[console] Writing points start C: 39573/55863
+[console] Writing points end C: 36590/55863
+[console] Writing points end C: 30641/55863
+[console] Writing points end C: 33635/55863
+[console] Writing points end C: 39573/55863
+[console] Writing points start C: 42617/55863
+[console] Writing points start C: 45578/55863
+[console] Writing points start C: 48562/55863
+[console] Writing points start C: 51497/55863
+[console] Writing points end C: 51497/55863
+[console] Writing points end C: 45578/55863
+[console] Writing points end C: 42617/55863
+[console] Writing points end C: 48562/55863
+[console] Writing points start A: 0/55896
+[console] Writing points start A: 27494/55896
+[console] Writing points end A: 0/55896
+[console] Writing points end A: 27494/55896
+[console] Writing points start B1: 0/55896
+[console] Writing points start B1: 20297/55896
+[console] Writing points start B1: 52593/55896
+[console] Writing points end B1: 20297/55896
+[console] Writing points end B1: 52593/55896
+[console] Writing points end B1: 0/55896
+[console] Writing points start B2: 0/55896
+[console] Writing points start B2: 20297/55896
+[console] Writing points start B2: 52593/55896
+[console] Writing points end B2: 20297/55896
+[console] Writing points end B2: 52593/55896
+[console] Writing points end B2: 0/55896
+[console] Circuit hash:
+                b150fd7f 5fe0d9f1 f90bc74d ee791673
+                8456b382 5cbd8d83 fce9ca26 6fc6e8c7
+                bd80c590 38537381 beac02b5 002d4476
+                25517274 94ba88df cb2e178d c40a2771
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/iBaIoiGFfZvbxzDa7lZ0/ph2_0000.zkey
+[console] undefined: fft 16 mix start: 0/4
+[console] undefined: fft 16 mix start: 1/4
+[console] undefined: fft 16 mix start: 2/4
+[console] undefined: fft 16 mix start: 3/4
+Event added for ceremony iBaIoiGFfZvbxzDa7lZ0. Id: 7aE2CXGsXtCvh1Jknc9J
+[console] undefined: fft 16 mix end: 1/4
+[console] undefined: fft 16 mix end: 3/4
+[console] undefined: fft 16 mix end: 2/4
+[console] undefined: fft 16 mix end: 0/4
+[console] undefined: fft  16  join: 15/16
+[console] undefined: fft 16 join  15/16  1/2 0/1
+[console] undefined: fft 16 join  15/16  2/2 0/1
+[console] undefined: fft  16  join: 16/16
+[console] undefined: fft 16 join  16/16  1/1 0/2
+[console] undefined: fft 16 join  16/16  1/1 1/2
+Event added for ceremony iBaIoiGFfZvbxzDa7lZ0. Id: wwzNaJUMEwvDQp3xkleE
+Params uploaded to ceremony_data/iBaIoiGFfZvbxzDa7lZ0/ph2_0000.params.
+Time: 2021-03-25T05:02:58.967Z
+Event added for ceremony iBaIoiGFfZvbxzDa7lZ0. Id: pPjSQVoeJ4pDEzulTm63
+GET / 404 5.653 ms - 139
+
+
+// Circuit 12
+
+Ceremony events notified: 1
+Time: 2021-03-25T05:05:06.278Z
+changed doc: added
+Event: {"timestamp":{"_seconds":1616648706,"_nanoseconds":98000000},"sender":"COORDINATOR","message":"ceremony_data/mV2D9sLAiQ1GQqfz7Bvg/zk_transaction_3_4.r1cs","acknowledged":false,"eventType":"CIRCUIT_FILE_UPLOAD"} ceremony Id: mV2D9sLAiQ1GQqfz7Bvg
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit mV2D9sLAiQ1GQqfz7Bvg
+Files: ceremony_data/mV2D9sLAiQ1GQqfz7Bvg/
+found matching file ceremony_data/mV2D9sLAiQ1GQqfz7Bvg/zk_transaction_3_4.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/mV2D9sLAiQ1GQqfz7Bvg/ created
+Ceremony events notified: 1
+Time: 2021-03-25T05:05:06.785Z
+changed doc: removed
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/mV2D9sLAiQ1GQqfz7Bvg/zk_transaction_3_4.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/mV2D9sLAiQ1GQqfz7Bvg/zk_transaction_3_4.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 57060
+[catcher] # of Constraints: 56918
+[catcher] # of Private Inputs: 204
+[catcher] # of Public Inputs: 40
+[catcher] # of Labels: 264585
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 57060
+m: # of Constraints: 56918
+m: # of Private Inputs: 204
+m: # of Public Inputs: 40
+m: # of Labels: 264585
+m: # of Outputs: 0
+#Constraints: 56918
+Powers needed: 16
+Ceremony updated
+PoT file: pot16_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/56918
+[console] processing constraints: 10000/56918
+[console] processing constraints: 20000/56918
+[console] processing constraints: 30000/56918
+[console] processing constraints: 40000/56918
+[console] processing constraints: 50000/56918
+[console] writing coeffs: 0/140104
+[console] writing coeffs: 100000/140104
+[console] Writing points start IC: 0/41
+[console] Configuring big array IC: 10000/24943
+[console] Configuring big array IC: 20000/24943
+Event added for ceremony mV2D9sLAiQ1GQqfz7Bvg. Id: JXkaOBjdnkhCeNqx96Gn
+[console] Writing points end IC: 0/41
+[console] spliting buffer: 0/65536
+[console] spliting buffer: 10000/65536
+[console] spliting buffer: 20000/65536
+[console] spliting buffer: 30000/65536
+[console] spliting buffer: 40000/65536
+[console] spliting buffer: 50000/65536
+[console] spliting buffer: 60000/65536
+[console] HashingHPoints: 0/65536
+[console] HashingHPoints: 16384/65536
+[console] HashingHPoints: 32768/65536
+[console] HashingHPoints: 49152/65536
+[console] Writing points start C: 0/57019
+[console] Writing points start C: 3246/57019
+[console] Writing points start C: 9843/57019
+[console] Writing points start C: 15665/57019
+[console] Writing points end C: 0/57019
+[console] Writing points end C: 3246/57019
+[console] Writing points end C: 15665/57019
+[console] Writing points end C: 9843/57019
+[console] Writing points start C: 18642/57019
+[console] Writing points start C: 21665/57019
+[console] Writing points start C: 24647/57019
+[console] Writing points start C: 27599/57019
+[console] Writing points end C: 18642/57019
+[console] Writing points end C: 24647/57019
+[console] Writing points end C: 27599/57019
+[console] Writing points end C: 21665/57019
+[console] Writing points start C: 30594/57019
+[console] Writing points start C: 33627/57019
+[console] Writing points start C: 36587/57019
+[console] Writing points start C: 39561/57019
+[console] Writing points end C: 33627/57019
+[console] Writing points end C: 30594/57019
+[console] Writing points end C: 36587/57019
+[console] Writing points end C: 39561/57019
+[console] Writing points start C: 42603/57019
+[console] Writing points start C: 45572/57019
+[console] Writing points start C: 48517/57019
+[console] Writing points start C: 51498/57019
+[console] Writing points end C: 45572/57019
+[console] Writing points end C: 42603/57019
+[console] Writing points end C: 51498/57019
+[console] Writing points end C: 48517/57019
+[console] Writing points start C: 56917/57019
+[console] Writing points end C: 56917/57019
+[console] Writing points start A: 0/57060
+[console] Writing points start A: 27352/57060
+[console] Writing points start A: 56431/57060
+[console] Writing points end A: 56431/57060
+[console] Writing points end A: 0/57060
+[console] Writing points end A: 27352/57060
+[console] Writing points start B1: 0/57060
+[console] Writing points start B1: 19786/57060
+[console] Writing points start B1: 52083/57060
+[console] Writing points end B1: 19786/57060
+[console] Writing points end B1: 52083/57060
+[console] Writing points end B1: 0/57060
+[console] Writing points start B2: 0/57060
+[console] Writing points start B2: 19786/57060
+[console] Writing points start B2: 52083/57060
+[console] Writing points end B2: 19786/57060
+[console] Writing points end B2: 52083/57060
+[console] Writing points end B2: 0/57060
+[console] Circuit hash:
+                a4876e2e 3ec882ca c6215aa2 ee1fe1b5
+                2e9ad2b2 455ce85f d5687817 c89ebc28
+                353086ae d8ff9ca1 a9f4ea20 56715405
+                7a8b8de2 88d51e11 7fa6d978 e938ba55
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/mV2D9sLAiQ1GQqfz7Bvg/ph2_0000.zkey
+[console] undefined: fft 16 mix start: 0/4
+[console] undefined: fft 16 mix start: 1/4
+[console] undefined: fft 16 mix start: 2/4
+[console] undefined: fft 16 mix start: 3/4
+Event added for ceremony mV2D9sLAiQ1GQqfz7Bvg. Id: m2UVuQvzdyhqOONje1hz
+[console] undefined: fft 16 mix end: 1/4
+[console] undefined: fft 16 mix end: 0/4
+[console] undefined: fft 16 mix end: 2/4
+[console] undefined: fft 16 mix end: 3/4
+[console] undefined: fft  16  join: 15/16
+[console] undefined: fft 16 join  15/16  1/2 0/1
+[console] undefined: fft 16 join  15/16  2/2 0/1
+[console] undefined: fft  16  join: 16/16
+[console] undefined: fft 16 join  16/16  1/1 0/2
+[console] undefined: fft 16 join  16/16  1/1 1/2
+Event added for ceremony mV2D9sLAiQ1GQqfz7Bvg. Id: Sb2FTX1BBfXb3aay8dx4
+Params uploaded to ceremony_data/mV2D9sLAiQ1GQqfz7Bvg/ph2_0000.params.
+Time: 2021-03-25T05:07:51.868Z
+Event added for ceremony mV2D9sLAiQ1GQqfz7Bvg. Id: wI8wksNvUh1u2KiCDVVM
+
+
+// Circuit 13
+
+Ceremony events notified: 1
+Time: 2021-03-25T05:12:54.526Z
+changed doc: added
+Event: {"eventType":"CIRCUIT_FILE_UPLOAD","acknowledged":false,"timestamp":{"_seconds":1616649174,"_nanoseconds":325000000},"sender":"COORDINATOR","message":"ceremony_data/doQRCJe1WsgoamIs0LGJ/zk_transaction_4_1.r1cs"} ceremony Id: doQRCJe1WsgoamIs0LGJ
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit doQRCJe1WsgoamIs0LGJ
+Files: ceremony_data/doQRCJe1WsgoamIs0LGJ/
+found matching file ceremony_data/doQRCJe1WsgoamIs0LGJ/zk_transaction_4_1.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/doQRCJe1WsgoamIs0LGJ/ created
+Ceremony events notified: 1
+Time: 2021-03-25T05:12:55.178Z
+changed doc: removed
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/doQRCJe1WsgoamIs0LGJ/zk_transaction_4_1.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/doQRCJe1WsgoamIs0LGJ/zk_transaction_4_1.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 71103
+[catcher] # of Constraints: 70923
+[catcher] # of Private Inputs: 246
+[catcher] # of Public Inputs: 18
+[catcher] # of Labels: 334351
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 71103
+m: # of Constraints: 70923
+m: # of Private Inputs: 246
+m: # of Public Inputs: 18
+m: # of Labels: 334351
+m: # of Outputs: 0
+#Constraints: 70923
+Powers needed: 17
+Ceremony updated
+PoT file: pot17_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+Event added for ceremony doQRCJe1WsgoamIs0LGJ. Id: LNNBFGld6KUd4FO1jgyZ
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/70923
+[console] processing constraints: 10000/70923
+[console] processing constraints: 20000/70923
+[console] processing constraints: 30000/70923
+[console] processing constraints: 40000/70923
+[console] processing constraints: 50000/70923
+[console] processing constraints: 60000/70923
+[console] processing constraints: 70000/70923
+[console] writing coeffs: 0/170141
+[console] writing coeffs: 100000/170141
+[console] Writing points start IC: 0/19
+[console] Configuring big array IC: 10000/30096
+[console] Configuring big array IC: 20000/30096
+[console] Configuring big array IC: 30000/30096
+[console] Writing points end IC: 0/19
+[console] spliting buffer: 0/131072
+[console] spliting buffer: 10000/131072
+[console] spliting buffer: 20000/131072
+[console] spliting buffer: 30000/131072
+[console] spliting buffer: 40000/131072
+[console] spliting buffer: 50000/131072
+[console] spliting buffer: 60000/131072
+[console] spliting buffer: 70000/131072
+[console] spliting buffer: 80000/131072
+[console] spliting buffer: 90000/131072
+[console] spliting buffer: 100000/131072
+[console] spliting buffer: 110000/131072
+[console] spliting buffer: 120000/131072
+[console] spliting buffer: 130000/131072
+[console] HashingHPoints: 0/131072
+[console] HashingHPoints: 16384/131072
+[console] HashingHPoints: 32768/131072
+[console] HashingHPoints: 49152/131072
+[console] HashingHPoints: 65536/131072
+[console] HashingHPoints: 81920/131072
+[console] HashingHPoints: 98304/131072
+[console] HashingHPoints: 114688/131072
+[console] Writing points start C: 0/71084
+[console] Writing points start C: 3163/71084
+[console] Writing points start C: 8601/71084
+[console] Writing points start C: 15374/71084
+[console] Writing points end C: 3163/71084
+[console] Writing points end C: 0/71084
+[console] Writing points end C: 8601/71084
+[console] Writing points end C: 15374/71084
+[console] Writing points start C: 20929/71084
+[console] Writing points start C: 23912/71084
+[console] Writing points start C: 26861/71084
+[console] Writing points start C: 29899/71084
+[console] Writing points end C: 23912/71084
+[console] Writing points end C: 20929/71084
+[console] Writing points end C: 29899/71084
+[console] Writing points end C: 26861/71084
+[console] Writing points start C: 32869/71084
+[console] Writing points start C: 35846/71084
+[console] Writing points start C: 38862/71084
+[console] Writing points start C: 41851/71084
+[console] Writing points end C: 35846/71084
+[console] Writing points end C: 32869/71084
+[console] Writing points end C: 41851/71084
+[console] Writing points end C: 38862/71084
+[console] Writing points start C: 44831/71084
+[console] Writing points start C: 47788/71084
+[console] Writing points start C: 50830/71084
+[console] Writing points start C: 53791/71084
+[console] Writing points end C: 44831/71084
+[console] Writing points end C: 47788/71084
+[console] Writing points end C: 53791/71084
+[console] Writing points end C: 50830/71084
+[console] Writing points start C: 56766/71084
+[console] Writing points start C: 59809/71084
+[console] Writing points start C: 62776/71084
+[console] Writing points start C: 65723/71084
+[console] Writing points end C: 59809/71084
+[console] Writing points end C: 62776/71084
+[console] Writing points end C: 56766/71084
+[console] Writing points end C: 65723/71084
+[console] Writing points start C: 69128/71084
+[console] Writing points end C: 69128/71084
+[console] Writing points start A: 0/71103
+[console] Writing points start A: 26307/71103
+[console] Writing points start A: 58288/71103
+[console] Writing points end A: 58288/71103
+[console] Writing points end A: 0/71103
+[console] Writing points end A: 26307/71103
+[console] Writing points start B1: 0/71103
+[console] Writing points start B1: 18821/71103
+[console] Writing points start B1: 50048/71103
+[console] Writing points end B1: 18821/71103
+[console] Writing points end B1: 50048/71103
+[console] Writing points end B1: 0/71103
+[console] Writing points start B2: 0/71103
+[console] Writing points start B2: 18821/71103
+[console] Writing points start B2: 50048/71103
+[console] Writing points end B2: 18821/71103
+[console] Writing points end B2: 50048/71103
+[console] Writing points end B2: 0/71103
+[console] Circuit hash:
+                776d1d38 7a071704 739a50ec 8f91d301
+                120b1a7f 353c7f77 966b8086 a36ed865
+                150da683 14be3701 a3624537 3db76080
+                267ace8b 83dcaf25 c1249ac5 e2109518
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/doQRCJe1WsgoamIs0LGJ/ph2_0000.zkey
+[console] undefined: fft 17 mix start: 0/8
+[console] undefined: fft 17 mix start: 1/8
+[console] undefined: fft 17 mix start: 2/8
+[console] undefined: fft 17 mix start: 3/8
+[console] undefined: fft 17 mix start: 4/8
+[console] undefined: fft 17 mix start: 5/8
+[console] undefined: fft 17 mix start: 6/8
+[console] undefined: fft 17 mix start: 7/8
+Event added for ceremony doQRCJe1WsgoamIs0LGJ. Id: a8vSr4nnojCxV4cF1NA8
+[console] undefined: fft 17 mix end: 0/8
+[console] undefined: fft 17 mix end: 3/8
+[console] undefined: fft 17 mix end: 1/8
+[console] undefined: fft 17 mix end: 2/8
+[console] undefined: fft 17 mix end: 4/8
+[console] undefined: fft 17 mix end: 6/8
+[console] undefined: fft 17 mix end: 5/8
+[console] undefined: fft 17 mix end: 7/8
+[console] undefined: fft  17  join: 15/17
+[console] undefined: fft 17 join  15/17  4/4 0/1
+[console] undefined: fft 17 join  15/17  3/4 0/1
+[console] undefined: fft 17 join  15/17  2/4 0/1
+[console] undefined: fft 17 join  15/17  1/4 0/1
+[console] undefined: fft  17  join: 16/17
+[console] undefined: fft 17 join  16/17  2/2 1/2
+[console] undefined: fft 17 join  16/17  2/2 0/2
+[console] undefined: fft 17 join  16/17  1/2 0/2
+[console] undefined: fft 17 join  16/17  1/2 1/2
+[console] undefined: fft  17  join: 17/17
+[console] undefined: fft 17 join  17/17  1/1 2/4
+[console] undefined: fft 17 join  17/17  1/1 3/4
+[console] undefined: fft 17 join  17/17  1/1 0/4
+[console] undefined: fft 17 join  17/17  1/1 1/4
+Event added for ceremony doQRCJe1WsgoamIs0LGJ. Id: UCJHd8Tr8XN6tynpaE3E
+Params uploaded to ceremony_data/doQRCJe1WsgoamIs0LGJ/ph2_0000.params.
+Time: 2021-03-25T05:17:07.787Z
+Event added for ceremony doQRCJe1WsgoamIs0LGJ. Id: dYAjmo6DnZAlZ3d5kn9y
+
+
+// Circuit 14
+
+Ceremony events notified: 1
+Time: 2021-03-25T05:18:27.547Z
+changed doc: added
+Event: {"timestamp":{"_seconds":1616649507,"_nanoseconds":378000000},"message":"ceremony_data/NgqtzZuK1la2dU1LiFCN/zk_transaction_4_2.r1cs","sender":"COORDINATOR","eventType":"CIRCUIT_FILE_UPLOAD","acknowledged":false} ceremony Id: NgqtzZuK1la2dU1LiFCN
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit NgqtzZuK1la2dU1LiFCN
+Ceremony events notified: 1
+Time: 2021-03-25T05:18:28.040Z
+changed doc: removed
+Files: ceremony_data/NgqtzZuK1la2dU1LiFCN/
+found matching file ceremony_data/NgqtzZuK1la2dU1LiFCN/zk_transaction_4_2.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/NgqtzZuK1la2dU1LiFCN/ created
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/NgqtzZuK1la2dU1LiFCN/zk_transaction_4_2.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/NgqtzZuK1la2dU1LiFCN/zk_transaction_4_2.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 72281
+[catcher] # of Constraints: 72099
+[catcher] # of Private Inputs: 252
+[catcher] # of Public Inputs: 26
+[catcher] # of Labels: 338755
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 72281
+m: # of Constraints: 72099
+m: # of Private Inputs: 252
+m: # of Public Inputs: 26
+m: # of Labels: 338755
+m: # of Outputs: 0
+#Constraints: 72099
+Powers needed: 17
+Ceremony updated
+PoT file: pot17_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/72099
+[console] processing constraints: 10000/72099
+[console] processing constraints: 20000/72099
+[console] processing constraints: 30000/72099
+[console] processing constraints: 40000/72099
+[console] processing constraints: 50000/72099
+[console] processing constraints: 60000/72099
+[console] processing constraints: 70000/72099
+[console] writing coeffs: 0/174059
+[console] writing coeffs: 100000/174059
+[console] Writing points start IC: 0/27
+[console] Configuring big array IC: 10000/30837
+[console] Configuring big array IC: 20000/30837
+[console] Configuring big array IC: 30000/30837
+Event added for ceremony NgqtzZuK1la2dU1LiFCN. Id: m1PCWdLL0oDibbf6Glzs
+[console] Writing points end IC: 0/27
+[console] spliting buffer: 0/131072
+[console] spliting buffer: 10000/131072
+[console] spliting buffer: 20000/131072
+[console] spliting buffer: 30000/131072
+[console] spliting buffer: 40000/131072
+[console] spliting buffer: 50000/131072
+[console] spliting buffer: 60000/131072
+[console] spliting buffer: 70000/131072
+[console] spliting buffer: 80000/131072
+[console] spliting buffer: 90000/131072
+[console] spliting buffer: 100000/131072
+[console] spliting buffer: 110000/131072
+[console] spliting buffer: 120000/131072
+[console] spliting buffer: 130000/131072
+[console] HashingHPoints: 0/131072
+[console] HashingHPoints: 16384/131072
+[console] HashingHPoints: 32768/131072
+[console] HashingHPoints: 49152/131072
+[console] HashingHPoints: 65536/131072
+[console] HashingHPoints: 81920/131072
+[console] HashingHPoints: 98304/131072
+[console] HashingHPoints: 114688/131072
+[console] Writing points start C: 0/72254
+[console] Writing points start C: 3160/72254
+[console] Writing points start C: 8584/72254
+[console] Writing points start C: 15344/72254
+[console] Writing points end C: 0/72254
+[console] Writing points end C: 3160/72254
+[console] Writing points end C: 8584/72254
+[console] Writing points end C: 15344/72254
+[console] Writing points start C: 20923/72254
+[console] Writing points start C: 23909/72254
+[console] Writing points start C: 26861/72254
+[console] Writing points start C: 29893/72254
+[console] Writing points end C: 29893/72254
+[console] Writing points end C: 23909/72254
+[console] Writing points end C: 20923/72254
+[console] Writing points end C: 26861/72254
+[console] Writing points start C: 32869/72254
+[console] Writing points start C: 35849/72254
+[console] Writing points start C: 38857/72254
+[console] Writing points start C: 41854/72254
+[console] Writing points end C: 38857/72254
+[console] Writing points end C: 32869/72254
+[console] Writing points end C: 35849/72254
+[console] Writing points end C: 41854/72254
+[console] Writing points start C: 44837/72254
+[console] Writing points start C: 47794/72254
+[console] Writing points start C: 50836/72254
+[console] Writing points start C: 53797/72254
+[console] Writing points end C: 44837/72254
+[console] Writing points end C: 47794/72254
+[console] Writing points end C: 53797/72254
+[console] Writing points end C: 50836/72254
+[console] Writing points start C: 56772/72254
+[console] Writing points start C: 59815/72254
+[console] Writing points start C: 62782/72254
+[console] Writing points start C: 65729/72254
+[console] Writing points end C: 56772/72254
+[console] Writing points end C: 65729/72254
+[console] Writing points end C: 59815/72254
+[console] Writing points end C: 62782/72254
+[console] Writing points start C: 68725/72254
+[console] Writing points end C: 68725/72254
+[console] Writing points start A: 0/72281
+[console] Writing points start A: 26155/72281
+[console] Writing points start A: 58136/72281
+[console] Writing points end A: 58136/72281
+[console] Writing points end A: 0/72281
+[console] Writing points end A: 26155/72281
+[console] Writing points start B1: 0/72281
+[console] Writing points start B1: 18366/72281
+[console] Writing points start B1: 49540/72281
+[console] Writing points end B1: 18366/72281
+[console] Writing points end B1: 49540/72281
+[console] Writing points end B1: 0/72281
+[console] Writing points start B2: 0/72281
+[console] Writing points start B2: 18366/72281
+[console] Writing points start B2: 49540/72281
+[console] Writing points end B2: 18366/72281
+[console] Writing points end B2: 49540/72281
+[console] Writing points end B2: 0/72281
+[console] Circuit hash:
+                5bb4b1f7 209a4f5e 85122467 13a74237
+                d28be42e 75e642cc cbdcb174 1d491b7d
+                d632e334 dcb2dd90 bd431753 8a5d12e9
+                afbaaead e09180f5 8d74606c 85f2b9aa
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/NgqtzZuK1la2dU1LiFCN/ph2_0000.zkey
+[console] undefined: fft 17 mix start: 0/8
+[console] undefined: fft 17 mix start: 1/8
+[console] undefined: fft 17 mix start: 2/8
+[console] undefined: fft 17 mix start: 3/8
+[console] undefined: fft 17 mix start: 4/8
+[console] undefined: fft 17 mix start: 5/8
+[console] undefined: fft 17 mix start: 6/8
+[console] undefined: fft 17 mix start: 7/8
+Event added for ceremony NgqtzZuK1la2dU1LiFCN. Id: fv2bcyfjRS3mbPPXCuVz
+[console] undefined: fft 17 mix end: 3/8
+[console] undefined: fft 17 mix end: 1/8
+[console] undefined: fft 17 mix end: 2/8
+[console] undefined: fft 17 mix end: 0/8
+[console] undefined: fft 17 mix end: 4/8
+[console] undefined: fft 17 mix end: 5/8
+[console] undefined: fft 17 mix end: 6/8
+[console] undefined: fft 17 mix end: 7/8
+[console] undefined: fft  17  join: 15/17
+[console] undefined: fft 17 join  15/17  3/4 0/1
+[console] undefined: fft 17 join  15/17  2/4 0/1
+[console] undefined: fft 17 join  15/17  4/4 0/1
+[console] undefined: fft 17 join  15/17  1/4 0/1
+[console] undefined: fft  17  join: 16/17
+[console] undefined: fft 17 join  16/17  1/2 0/2
+[console] undefined: fft 17 join  16/17  1/2 1/2
+[console] undefined: fft 17 join  16/17  2/2 0/2
+[console] undefined: fft 17 join  16/17  2/2 1/2
+[console] undefined: fft  17  join: 17/17
+[console] undefined: fft 17 join  17/17  1/1 1/4
+[console] undefined: fft 17 join  17/17  1/1 0/4
+[console] undefined: fft 17 join  17/17  1/1 3/4
+[console] undefined: fft 17 join  17/17  1/1 2/4
+Event added for ceremony NgqtzZuK1la2dU1LiFCN. Id: TZfIfNXZtqgNYPj5tBRj
+Params uploaded to ceremony_data/NgqtzZuK1la2dU1LiFCN/ph2_0000.params.
+Time: 2021-03-25T05:22:44.131Z
+Event added for ceremony NgqtzZuK1la2dU1LiFCN. Id: lOYM5smEDbvmRPKOhPpY
+
+// Circuit 15
+
+Ceremony events notified: 1
+Time: 2021-03-25T05:25:10.108Z
+changed doc: added
+Event: {"timestamp":{"_seconds":1616649909,"_nanoseconds":949000000},"message":"ceremony_data/8i9TsuUmSnqh5cLIQoFd/zk_transaction_4_3.r1cs","sender":"COORDINATOR","eventType":"CIRCUIT_FILE_UPLOAD","acknowledged":false} ceremony Id: 8i9TsuUmSnqh5cLIQoFd
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit 8i9TsuUmSnqh5cLIQoFd
+Files: ceremony_data/8i9TsuUmSnqh5cLIQoFd/
+found matching file ceremony_data/8i9TsuUmSnqh5cLIQoFd/zk_transaction_4_3.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/8i9TsuUmSnqh5cLIQoFd/ created
+Ceremony events notified: 1
+Time: 2021-03-25T05:25:10.618Z
+changed doc: removed
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/8i9TsuUmSnqh5cLIQoFd/zk_transaction_4_3.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/8i9TsuUmSnqh5cLIQoFd/zk_transaction_4_3.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 73465
+[catcher] # of Constraints: 73281
+[catcher] # of Private Inputs: 258
+[catcher] # of Public Inputs: 34
+[catcher] # of Labels: 343207
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 73465
+m: # of Constraints: 73281
+m: # of Private Inputs: 258
+m: # of Public Inputs: 34
+m: # of Labels: 343207
+m: # of Outputs: 0
+#Constraints: 73281
+Powers needed: 17
+Ceremony updated
+PoT file: pot17_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/73281
+[console] processing constraints: 10000/73281
+[console] processing constraints: 20000/73281
+[console] processing constraints: 30000/73281
+[console] processing constraints: 40000/73281
+[console] processing constraints: 50000/73281
+[console] processing constraints: 60000/73281
+[console] processing constraints: 70000/73281
+[console] writing coeffs: 0/177993
+[console] writing coeffs: 100000/177993
+[console] Writing points start IC: 0/35
+[console] Configuring big array IC: 10000/31580
+[console] Configuring big array IC: 20000/31580
+[console] Configuring big array IC: 30000/31580
+Event added for ceremony 8i9TsuUmSnqh5cLIQoFd. Id: 46nUWzGqAONEkY2rZGSm
+[console] Writing points end IC: 0/35
+[console] spliting buffer: 0/131072
+[console] spliting buffer: 10000/131072
+[console] spliting buffer: 20000/131072
+[console] spliting buffer: 30000/131072
+[console] spliting buffer: 40000/131072
+[console] spliting buffer: 50000/131072
+[console] spliting buffer: 60000/131072
+[console] spliting buffer: 70000/131072
+[console] spliting buffer: 80000/131072
+[console] spliting buffer: 90000/131072
+[console] spliting buffer: 100000/131072
+[console] spliting buffer: 110000/131072
+[console] spliting buffer: 120000/131072
+[console] spliting buffer: 130000/131072
+[console] HashingHPoints: 0/131072
+[console] HashingHPoints: 16384/131072
+[console] HashingHPoints: 32768/131072
+[console] HashingHPoints: 49152/131072
+[console] HashingHPoints: 65536/131072
+[console] HashingHPoints: 81920/131072
+[console] HashingHPoints: 98304/131072
+[console] HashingHPoints: 114688/131072
+[console] Writing points start C: 0/73430
+[console] Writing points start C: 3154/73430
+[console] Writing points start C: 8561/73430
+[console] Writing points start C: 15305/73430
+[console] Writing points end C: 0/73430
+[console] Writing points end C: 3154/73430
+[console] Writing points end C: 8561/73430
+[console] Writing points end C: 15305/73430
+[console] Writing points start C: 20911/73430
+[console] Writing points start C: 23903/73430
+[console] Writing points start C: 26858/73430
+[console] Writing points start C: 29874/73430
+[console] Writing points end C: 26858/73430
+[console] Writing points end C: 23903/73430
+[console] Writing points end C: 20911/73430
+[console] Writing points end C: 29874/73430
+[console] Writing points start C: 32863/73430
+[console] Writing points start C: 35843/73430
+[console] Writing points start C: 38800/73430
+[console] Writing points start C: 41842/73430
+[console] Writing points end C: 32863/73430
+[console] Writing points end C: 35843/73430
+[console] Writing points end C: 41842/73430
+[console] Writing points end C: 38800/73430
+[console] Writing points start C: 44828/73430
+[console] Writing points start C: 47777/73430
+[console] Writing points start C: 50815/73430
+[console] Writing points start C: 53785/73430
+[console] Writing points end C: 47777/73430
+[console] Writing points end C: 50815/73430
+[console] Writing points end C: 44828/73430
+[console] Writing points end C: 53785/73430
+[console] Writing points start C: 56762/73430
+[console] Writing points start C: 59778/73430
+[console] Writing points start C: 62767/73430
+[console] Writing points start C: 65720/73430
+[console] Writing points end C: 56762/73430
+[console] Writing points end C: 59778/73430
+[console] Writing points end C: 65720/73430
+[console] Writing points end C: 62767/73430
+[console] Writing points start C: 68720/73430
+[console] Writing points end C: 68720/73430
+[console] Writing points start A: 0/73465
+[console] Writing points start A: 25989/73465
+[console] Writing points start A: 57974/73465
+[console] Writing points end A: 57974/73465
+[console] Writing points end A: 0/73465
+[console] Writing points end A: 25989/73465
+[console] Writing points start B1: 0/73465
+[console] Writing points start B1: 17906/73465
+[console] Writing points start B1: 49022/73465
+[console] Writing points end B1: 17906/73465
+[console] Writing points end B1: 49022/73465
+[console] Writing points end B1: 0/73465
+[console] Writing points start B2: 0/73465
+[console] Writing points start B2: 17906/73465
+[console] Writing points start B2: 49022/73465
+[console] Writing points end B2: 17906/73465
+[console] Writing points end B2: 49022/73465
+[console] Writing points end B2: 0/73465
+[console] Circuit hash:
+                2fa08320 eb89ad8e 02623d42 32861145
+                96786ea9 832e0cbc 4753aba8 1d351eab
+                91dde14e a9e8923f bff4f1ce 61e90b7a
+                587d6877 96430cf0 ba64edcd 21c076a2
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/8i9TsuUmSnqh5cLIQoFd/ph2_0000.zkey
+[console] undefined: fft 17 mix start: 0/8
+[console] undefined: fft 17 mix start: 1/8
+[console] undefined: fft 17 mix start: 2/8
+[console] undefined: fft 17 mix start: 3/8
+[console] undefined: fft 17 mix start: 4/8
+[console] undefined: fft 17 mix start: 5/8
+[console] undefined: fft 17 mix start: 6/8
+[console] undefined: fft 17 mix start: 7/8
+Event added for ceremony 8i9TsuUmSnqh5cLIQoFd. Id: Mf8hvB1ATgzrBjp4E4Rp
+[console] undefined: fft 17 mix end: 1/8
+[console] undefined: fft 17 mix end: 0/8
+[console] undefined: fft 17 mix end: 2/8
+[console] undefined: fft 17 mix end: 3/8
+[console] undefined: fft 17 mix end: 4/8
+[console] undefined: fft 17 mix end: 5/8
+[console] undefined: fft 17 mix end: 7/8
+[console] undefined: fft 17 mix end: 6/8
+[console] undefined: fft  17  join: 15/17
+[console] undefined: fft 17 join  15/17  4/4 0/1
+[console] undefined: fft 17 join  15/17  3/4 0/1
+[console] undefined: fft 17 join  15/17  1/4 0/1
+[console] undefined: fft 17 join  15/17  2/4 0/1
+[console] undefined: fft  17  join: 16/17
+[console] undefined: fft 17 join  16/17  1/2 1/2
+[console] undefined: fft 17 join  16/17  1/2 0/2
+[console] undefined: fft 17 join  16/17  2/2 0/2
+[console] undefined: fft 17 join  16/17  2/2 1/2
+[console] undefined: fft  17  join: 17/17
+[console] undefined: fft 17 join  17/17  1/1 2/4
+[console] undefined: fft 17 join  17/17  1/1 0/4
+[console] undefined: fft 17 join  17/17  1/1 3/4
+[console] undefined: fft 17 join  17/17  1/1 1/4
+Event added for ceremony 8i9TsuUmSnqh5cLIQoFd. Id: M6PZAsmYbWOGYpR5IMXp
+Params uploaded to ceremony_data/8i9TsuUmSnqh5cLIQoFd/ph2_0000.params.
+Time: 2021-03-25T05:29:30.159Z
+Event added for ceremony 8i9TsuUmSnqh5cLIQoFd. Id: ec8VlV2oiO98FJIa6bE1
+
+// Circuit 16
+
+Ceremony events notified: 1
+Time: 2021-03-25T05:31:09.466Z
+changed doc: added
+Event: {"timestamp":{"_seconds":1616650269,"_nanoseconds":321000000},"sender":"COORDINATOR","eventType":"CIRCUIT_FILE_UPLOAD","message":"ceremony_data/xN7193Ldf8i0L2SfG8X4/zk_transaction_4_4.r1cs","acknowledged":false} ceremony Id: xN7193Ldf8i0L2SfG8X4
+Have CIRCUIT_FILE_UPLOAD event
+prepareCircuit xN7193Ldf8i0L2SfG8X4
+Files: ceremony_data/xN7193Ldf8i0L2SfG8X4/
+found matching file ceremony_data/xN7193Ldf8i0L2SfG8X4/zk_transaction_4_4.r1cs
+/root/zkopru/setup-mpc-ui/server/data/ceremony_data/xN7193Ldf8i0L2SfG8X4/ created
+Ceremony events notified: 1
+Time: 2021-03-25T05:31:09.975Z
+changed doc: removed
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/xN7193Ldf8i0L2SfG8X4/zk_transaction_4_4.r1cs
+Downloaded /root/zkopru/setup-mpc-ui/server/data/ceremony_data/xN7193Ldf8i0L2SfG8X4/zk_transaction_4_4.r1cs
+[catcher] Curve: bn-128
+[catcher] # of Wires: 74655
+[catcher] # of Constraints: 74469
+[catcher] # of Private Inputs: 264
+[catcher] # of Public Inputs: 42
+[catcher] # of Labels: 347707
+[catcher] # of Outputs: 0
+m: Curve: bn-128
+m: # of Wires: 74655
+m: # of Constraints: 74469
+m: # of Private Inputs: 264
+m: # of Public Inputs: 42
+m: # of Labels: 347707
+m: # of Outputs: 0
+#Constraints: 74469
+Powers needed: 17
+Ceremony updated
+PoT file: pot17_final.ptau
+Already have PoT file
+[console] Reading r1cs
+[console] Reading tauG1
+[console] Reading tauG2
+[console] Reading alphatauG1
+[console] Reading betatauG1
+[console] processing constraints: 0/74469
+[console] processing constraints: 10000/74469
+[console] processing constraints: 20000/74469
+[console] processing constraints: 30000/74469
+[console] processing constraints: 40000/74469
+[console] processing constraints: 50000/74469
+[console] processing constraints: 60000/74469
+[console] processing constraints: 70000/74469
+[console] writing coeffs: 0/181943
+[console] writing coeffs: 100000/181943
+[console] Writing points start IC: 0/43
+[console] Configuring big array IC: 10000/32325
+[console] Configuring big array IC: 20000/32325
+[console] Configuring big array IC: 30000/32325
+Event added for ceremony xN7193Ldf8i0L2SfG8X4. Id: 1rH3AybYkeClafKzA0Nn
+[console] Writing points end IC: 0/43
+[console] spliting buffer: 0/131072
+[console] spliting buffer: 10000/131072
+[console] spliting buffer: 20000/131072
+[console] spliting buffer: 30000/131072
+[console] spliting buffer: 40000/131072
+[console] spliting buffer: 50000/131072
+[console] spliting buffer: 60000/131072
+[console] spliting buffer: 70000/131072
+[console] spliting buffer: 80000/131072
+[console] spliting buffer: 90000/131072
+[console] spliting buffer: 100000/131072
+[console] spliting buffer: 110000/131072
+[console] spliting buffer: 120000/131072
+[console] spliting buffer: 130000/131072
+[console] HashingHPoints: 0/131072
+[console] HashingHPoints: 16384/131072
+[console] HashingHPoints: 32768/131072
+[console] HashingHPoints: 49152/131072
+[console] HashingHPoints: 65536/131072
+[console] HashingHPoints: 81920/131072
+[console] HashingHPoints: 98304/131072
+[console] HashingHPoints: 114688/131072
+[console] Writing points start C: 0/74612
+[console] Writing points start C: 3145/74612
+[console] Writing points start C: 8535/74612
+[console] Writing points start C: 15261/74612
+[console] Writing points end C: 0/74612
+[console] Writing points end C: 8535/74612
+[console] Writing points end C: 3145/74612
+[console] Writing points end C: 15261/74612
+[console] Writing points start C: 20890/74612
+[console] Writing points start C: 23894/74612
+[console] Writing points start C: 26855/74612
+[console] Writing points start C: 29839/74612
+[console] Writing points end C: 29839/74612
+[console] Writing points end C: 23894/74612
+[console] Writing points end C: 20890/74612
+[console] Writing points end C: 26855/74612
+[console] Writing points start C: 32857/74612
+[console] Writing points start C: 35840/74612
+[console] Writing points start C: 38787/74612
+[console] Writing points start C: 41833/74612
+[console] Writing points end C: 35840/74612
+[console] Writing points end C: 32857/74612
+[console] Writing points end C: 41833/74612
+[console] Writing points end C: 38787/74612
+[console] Writing points start C: 44822/74612
+[console] Writing points start C: 47774/74612
+[console] Writing points start C: 50800/74612
+[console] Writing points start C: 53779/74612
+[console] Writing points end C: 44822/74612
+[console] Writing points end C: 47774/74612
+[console] Writing points end C: 53779/74612
+[console] Writing points end C: 50800/74612
+[console] Writing points start C: 56759/74612
+[console] Writing points start C: 59743/74612
+[console] Writing points start C: 62761/74612
+[console] Writing points start C: 65719/74612
+[console] Writing points end C: 62761/74612
+[console] Writing points end C: 65719/74612
+[console] Writing points end C: 56759/74612
+[console] Writing points end C: 59743/74612
+[console] Writing points start C: 68717/74612
+[console] Writing points start C: 74462/74612
+[console] Writing points end C: 74462/74612
+[console] Writing points end C: 68717/74612
+[console] Writing points start A: 0/74655
+[console] Writing points start A: 25816/74655
+[console] Writing points start A: 57802/74655
+[console] Writing points end A: 57802/74655
+[console] Writing points end A: 0/74655
+[console] Writing points end A: 25816/74655
+[console] Writing points start B1: 0/74655
+[console] Writing points start B1: 17449/74655
+[console] Writing points start B1: 48514/74655
+[console] Writing points end B1: 17449/74655
+[console] Writing points end B1: 0/74655
+[console] Writing points end B1: 48514/74655
+[console] Writing points start B2: 0/74655
+[console] Writing points start B2: 17449/74655
+[console] Writing points start B2: 48514/74655
+[console] Writing points end B2: 17449/74655
+[console] Writing points end B2: 48514/74655
+[console] Writing points end B2: 0/74655
+[console] Circuit hash:
+                ab5f23c8 e1c43bab 128195fc b5e8b6b8
+                dfc1a915 ffdf370a 7da4a722 32cb98e2
+                8cb9c193 64cd6763 a2ba2dd7 950bc128
+                6ee6f4f1 aa11ed9c 51a977ab 28fe34ca
+Zkey file generated: /root/zkopru/setup-mpc-ui/server/data/ceremony_data/xN7193Ldf8i0L2SfG8X4/ph2_0000.zkey
+[console] undefined: fft 17 mix start: 0/8
+[console] undefined: fft 17 mix start: 1/8
+[console] undefined: fft 17 mix start: 2/8
+[console] undefined: fft 17 mix start: 3/8
+[console] undefined: fft 17 mix start: 4/8
+[console] undefined: fft 17 mix start: 5/8
+[console] undefined: fft 17 mix start: 6/8
+[console] undefined: fft 17 mix start: 7/8
+Event added for ceremony xN7193Ldf8i0L2SfG8X4. Id: wTttWki1htRfIgflqLBv
+[console] undefined: fft 17 mix end: 2/8
+[console] undefined: fft 17 mix end: 0/8
+[console] undefined: fft 17 mix end: 1/8
+[console] undefined: fft 17 mix end: 3/8
+[console] undefined: fft 17 mix end: 5/8
+[console] undefined: fft 17 mix end: 4/8
+[console] undefined: fft 17 mix end: 7/8
+[console] undefined: fft 17 mix end: 6/8
+[console] undefined: fft  17  join: 15/17
+[console] undefined: fft 17 join  15/17  3/4 0/1
+[console] undefined: fft 17 join  15/17  2/4 0/1
+[console] undefined: fft 17 join  15/17  4/4 0/1
+[console] undefined: fft 17 join  15/17  1/4 0/1
+[console] undefined: fft  17  join: 16/17
+[console] undefined: fft 17 join  16/17  1/2 1/2
+[console] undefined: fft 17 join  16/17  2/2 1/2
+[console] undefined: fft 17 join  16/17  2/2 0/2
+[console] undefined: fft 17 join  16/17  1/2 0/2
+[console] undefined: fft  17  join: 17/17
+[console] undefined: fft 17 join  17/17  1/1 1/4
+[console] undefined: fft 17 join  17/17  1/1 2/4
+[console] undefined: fft 17 join  17/17  1/1 3/4
+[console] undefined: fft 17 join  17/17  1/1 0/4
+Event added for ceremony xN7193Ldf8i0L2SfG8X4. Id: pAwcBV2IguWUgEoAD229
+Params uploaded to ceremony_data/xN7193Ldf8i0L2SfG8X4/ph2_0000.params.
+Time: 2021-03-25T05:35:25.458Z
+Event added for ceremony xN7193Ldf8i0L2SfG8X4. Id: lVeo7lvSQXoUwvkDFPYA
+
+Initial files:
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data# ls -lR ceremony_data
+ceremony_data:
+total 267684
+drwxr-xr-x 2 root root     4096 Mar 25 04:20 3lHsQDxM4lQKxkwA0Oyj
+drwxr-xr-x 2 root root     4096 Mar 25 05:26 8i9TsuUmSnqh5cLIQoFd
+drwxr-xr-x 2 root root     4096 Mar 25 04:56 EaxnounDmyQ0I7OZZDsW
+drwxr-xr-x 2 root root     4096 Mar 25 04:48 NQtNx5fTyZX7gfTUjsre
+drwxr-xr-x 2 root root     4096 Mar 25 05:19 NgqtzZuK1la2dU1LiFCN
+drwxr-xr-x 2 root root     4096 Mar 25 04:43 SeQ8Sgvke9tPiHaOu8gN
+drwxr-xr-x 2 root root     4096 Mar 25 04:30 VgOEuoAjThuaDosXRroW
+drwxr-xr-x 2 root root     4096 Mar 25 04:34 btlNv8naLSHxVoZbjUJS
+drwxr-xr-x 2 root root     4096 Mar 25 04:38 d0eQ24D01KCNaAHd8nM8
+drwxr-xr-x 2 root root     4096 Mar 25 05:14 doQRCJe1WsgoamIs0LGJ
+drwxr-xr-x 2 root root     4096 Mar 25 04:13 hIfLWePJPn6ldES7OZjB
+drwxr-xr-x 2 root root     4096 Mar 25 05:01 iBaIoiGFfZvbxzDa7lZ0
+drwxr-xr-x 2 root root     4096 Mar 25 04:27 k9CJHwJoeSRMGtjHUiF6
+drwxr-xr-x 2 root root     4096 Mar 25 05:06 mV2D9sLAiQ1GQqfz7Bvg
+drwxr-xr-x 2 root root     4096 Mar 25 05:32 xN7193Ldf8i0L2SfG8X4
+drwxr-xr-x 2 root root     4096 Mar 25 04:51 zBuF4Gp0l7dC0x576qFF
+-rw-r--r-- 1 root root  6842116 Mar 25 03:35 zk_transaction_1_1.r1cs
+-rw-r--r-- 1 root root  7187048 Mar 25 03:35 zk_transaction_1_2.r1cs
+-rw-r--r-- 1 root root  7533180 Mar 25 03:35 zk_transaction_1_3.r1cs
+-rw-r--r-- 1 root root  7880440 Mar 25 03:35 zk_transaction_1_4.r1cs
+-rw-r--r-- 1 root root 13345132 Mar 25 03:35 zk_transaction_2_1.r1cs
+-rw-r--r-- 1 root root 13694112 Mar 25 03:35 zk_transaction_2_2.r1cs
+-rw-r--r-- 1 root root 14044292 Mar 25 03:35 zk_transaction_2_3.r1cs
+-rw-r--r-- 1 root root 14395600 Mar 25 03:35 zk_transaction_2_4.r1cs
+-rw-r--r-- 1 root root 19849348 Mar 25 03:35 zk_transaction_3_1.r1cs
+-rw-r--r-- 1 root root 20202376 Mar 25 03:35 zk_transaction_3_2.r1cs
+-rw-r--r-- 1 root root 20556604 Mar 25 03:35 zk_transaction_3_3.r1cs
+-rw-r--r-- 1 root root 20911960 Mar 25 03:35 zk_transaction_3_4.r1cs
+-rw-r--r-- 1 root root 26354692 Mar 25 03:35 zk_transaction_4_1.r1cs
+-rw-r--r-- 1 root root 26711768 Mar 25 03:35 zk_transaction_4_2.r1cs
+-rw-r--r-- 1 root root 27070044 Mar 25 03:35 zk_transaction_4_3.r1cs
+-rw-r--r-- 1 root root 27429448 Mar 25 03:35 zk_transaction_4_4.r1cs
+
+ceremony_data/3lHsQDxM4lQKxkwA0Oyj:
+total 25520
+-rw-r--r-- 1 root root  8392156 Mar 25 04:20 ph2_0000.params
+-rw-r--r-- 1 root root 10547276 Mar 25 04:20 ph2_0000.zkey
+-rw-r--r-- 1 root root  7187048 Mar 25 04:19 zk_transaction_1_2.r1cs
+
+ceremony_data/8i9TsuUmSnqh5cLIQoFd:
+total 96388
+-rw-r--r-- 1 root root 31898012 Mar 25 05:29 ph2_0000.params
+-rw-r--r-- 1 root root 39729968 Mar 25 05:26 ph2_0000.zkey
+-rw-r--r-- 1 root root 27070044 Mar 25 05:25 zk_transaction_4_3.r1cs
+
+ceremony_data/EaxnounDmyQ0I7OZZDsW:
+total 67828
+-rw-r--r-- 1 root root 21711068 Mar 25 04:57 ph2_0000.params
+-rw-r--r-- 1 root root 27534644 Mar 25 04:56 ph2_0000.zkey
+-rw-r--r-- 1 root root 20202376 Mar 25 04:55 zk_transaction_3_2.r1cs
+
+ceremony_data/NQtNx5fTyZX7gfTUjsre:
+total 51148
+-rw-r--r-- 1 root root 16825628 Mar 25 04:49 ph2_0000.params
+-rw-r--r-- 1 root root 21150256 Mar 25 04:48 ph2_0000.zkey
+-rw-r--r-- 1 root root 14395600 Mar 25 04:47 zk_transaction_2_4.r1cs
+
+ceremony_data/NgqtzZuK1la2dU1LiFCN:
+total 95132
+-rw-r--r-- 1 root root 31519132 Mar 25 05:22 ph2_0000.params
+-rw-r--r-- 1 root root 39177992 Mar 25 05:19 ph2_0000.zkey
+-rw-r--r-- 1 root root 26711768 Mar 25 05:18 zk_transaction_4_2.r1cs
+
+ceremony_data/SeQ8Sgvke9tPiHaOu8gN:
+total 49928
+-rw-r--r-- 1 root root 16461468 Mar 25 04:44 ph2_0000.params
+-rw-r--r-- 1 root root 20617928 Mar 25 04:43 ph2_0000.zkey
+-rw-r--r-- 1 root root 14044292 Mar 25 04:42 zk_transaction_2_3.r1cs
+
+ceremony_data/VgOEuoAjThuaDosXRroW:
+total 27904
+-rw-r--r-- 1 root root  9101916 Mar 25 04:31 ph2_0000.params
+-rw-r--r-- 1 root root 11587036 Mar 25 04:30 ph2_0000.zkey
+-rw-r--r-- 1 root root  7880440 Mar 25 04:30 zk_transaction_1_4.r1cs
+
+ceremony_data/btlNv8naLSHxVoZbjUJS:
+total 47512
+-rw-r--r-- 1 root root 15738908 Mar 25 04:36 ph2_0000.params
+-rw-r--r-- 1 root root 19561144 Mar 25 04:34 ph2_0000.zkey
+-rw-r--r-- 1 root root 13345132 Mar 25 04:33 zk_transaction_2_1.r1cs
+
+ceremony_data/d0eQ24D01KCNaAHd8nM8:
+total 48720
+-rw-r--r-- 1 root root 16099228 Mar 25 04:40 ph2_0000.params
+-rw-r--r-- 1 root root 20088224 Mar 25 04:38 ph2_0000.zkey
+-rw-r--r-- 1 root root 13694112 Mar 25 04:38 zk_transaction_2_2.r1cs
+
+ceremony_data/doQRCJe1WsgoamIs0LGJ:
+total 93880
+-rw-r--r-- 1 root root 31142172 Mar 25 05:17 ph2_0000.params
+-rw-r--r-- 1 root root 38628640 Mar 25 05:14 ph2_0000.zkey
+-rw-r--r-- 1 root root 26354692 Mar 25 05:13 zk_transaction_4_1.r1cs
+
+ceremony_data/hIfLWePJPn6ldES7OZjB:
+total 24336
+-rw-r--r-- 1 root root  8040156 Mar 25 04:13 ph2_0000.params
+-rw-r--r-- 1 root root 10031332 Mar 25 04:13 ph2_0000.zkey
+-rw-r--r-- 1 root root  6842116 Mar 25 04:12 zk_transaction_1_1.r1cs
+
+ceremony_data/iBaIoiGFfZvbxzDa7lZ0:
+total 69064
+-rw-r--r-- 1 root root 22081628 Mar 25 05:02 ph2_0000.params
+-rw-r--r-- 1 root root 28075484 Mar 25 05:01 ph2_0000.zkey
+-rw-r--r-- 1 root root 20556604 Mar 25 05:00 zk_transaction_3_3.r1cs
+
+ceremony_data/k9CJHwJoeSRMGtjHUiF6:
+total 26712
+-rw-r--r-- 1 root root  8746076 Mar 25 04:28 ph2_0000.params
+-rw-r--r-- 1 root root 11065844 Mar 25 04:27 ph2_0000.zkey
+-rw-r--r-- 1 root root  7533180 Mar 25 04:27 zk_transaction_1_3.r1cs
+
+ceremony_data/mV2D9sLAiQ1GQqfz7Bvg:
+total 70304
+-rw-r--r-- 1 root root 22454108 Mar 25 05:07 ph2_0000.params
+-rw-r--r-- 1 root root 28618948 Mar 25 05:06 ph2_0000.zkey
+-rw-r--r-- 1 root root 20911960 Mar 25 05:05 zk_transaction_3_4.r1cs
+
+ceremony_data/xN7193Ldf8i0L2SfG8X4:
+total 97656
+-rw-r--r-- 1 root root 32278812 Mar 25 05:35 ph2_0000.params
+-rw-r--r-- 1 root root 40284568 Mar 25 05:32 ph2_0000.zkey
+-rw-r--r-- 1 root root 27429448 Mar 25 05:31 zk_transaction_4_4.r1cs
+
+ceremony_data/zBuF4Gp0l7dC0x576qFF:
+total 66596
+-rw-r--r-- 1 root root 21342428 Mar 25 04:53 ph2_0000.params
+-rw-r--r-- 1 root root 26996428 Mar 25 04:51 ph2_0000.zkey
+-rw-r--r-- 1 root root 19849348 Mar 25 04:50 zk_transaction_3_1.r1cs
+root@zkopru-mpc:~/zkopru/setup-mpc-ui/server/data#
+
+
+
+
+
 
 
 

@@ -26,12 +26,6 @@ import CircuitsPanel from "../components/CircuitsPanel";
 export const LandingPage = () => {
     const [selection, dispatch] = useSelectionContext();
 
-    const changeTab = (event: React.ChangeEvent<{}> | null, newValue: string) => {
-      if (newValue === '3') {
-        dispatch({type: 'ADD_CEREMONY'});
-      }
-    };
-
     const closeModal = () => {dispatch({type: 'CLOSE_CEREMONY'});}
 
     return (
@@ -52,11 +46,12 @@ export const LandingPage = () => {
               aria-labelledby="simple-modal-title"
               aria-describedby="simple-modal-description"
             >
-              {(selection.circuitDetail) ?
-                (<CeremonyPage onClose={closeModal} />)
-                : (selection.newCircuit) ? 
+              {(selection.edit) ?
                 (<AddCeremonyPage />)
-                : (<></>)
+                :
+                (<CeremonyPage onClose={closeModal} />)
+              /* : (selection.newCircuit) ?
+                : (<></>)*/
               }
             </Modal>
           </div>

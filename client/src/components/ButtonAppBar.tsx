@@ -26,6 +26,7 @@ import Options from './Options';
 import { ComputeStateContext, Step } from '../state/ComputeStateManager';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import { CeremonyProgress } from './ProgressPanel';
+import { useSelectionContext } from '../state/SelectionContext';
 
 const allowReset = false; // if true, the 'Options' panel is available
 
@@ -101,6 +102,7 @@ interface MainMenuProps {
 
 const MainMenu = (props: MainMenuProps) => {
   const [openOptions, setOpenOptions] = useState(false);
+  const [selection, dispatch] = useSelectionContext();
   const auth = useContext(AuthStateContext);
 
   const enableLogout = (auth.isLoggedIn && auth.authUser);
@@ -118,6 +120,10 @@ const MainMenu = (props: MainMenuProps) => {
   //     return !open;
   //   });
   // }
+
+  const newCircuit = () => {
+    dispatch({ type: 'ADD_CEREMONY' });
+  }
 
   return (
     <span>
@@ -141,7 +147,7 @@ const MainMenu = (props: MainMenuProps) => {
         }
         {auth.isCoordinator ?
           (<StyledMenuItem>
-            <ListItemText primary="New Circuit" onClick={() => true} style={{ color: textColor }}/>
+            <ListItemText primary="New Circuit" onClick={newCircuit} style={{ color: textColor }}/>
           </StyledMenuItem>) 
           : (<></>)
         }
