@@ -29,36 +29,31 @@ export const LandingPage = () => {
     const closeModal = () => {dispatch({type: 'CLOSE_CEREMONY'});}
 
     return (
-      <Fragment>
+      <>
         <ButtonAppBar />
-        <PageContainer style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div>
-            <Box style={{ height: '608px' }} >
-              <ParticipantSection />
-            </Box>
-            <Box style={{ height: '486px' }} >
-              <AboutPanel />
-            </Box>
-            <CircuitsPanel  />
-            <Modal
-              open={selection.openModal}
-              onClose={closeModal}
-              aria-labelledby="simple-modal-title"
-              aria-describedby="simple-modal-description"
-            >
-              {(selection.edit) ?
-                (<AddCeremonyPage />)
-                :
-                (<CeremonyPage onClose={closeModal} />)
-              /* : (selection.newCircuit) ?
-                : (<></>)*/
-              }
-            </Modal>
-          </div>
+        <PageContainer>
+          <Box style={{ height: '608px' }} >
+            <ParticipantSection />
+          </Box>
+          <AboutPanel />
+          <div style={{ height: '140px' }} />
+          <CircuitsPanel  />
+          <Modal
+            open={selection.openModal}
+            onClose={closeModal}
+            aria-labelledby="simple-modal-title"
+            aria-describedby="simple-modal-description"
+          >
+            {(selection.edit) ?
+              (<AddCeremonyPage />)
+              :
+              (<CeremonyPage onClose={closeModal} />)
+            /* : (selection.newCircuit) ?
+              : (<></>)*/
+            }
+          </Modal>
         </PageContainer>
-        <Box style={{ height: '112px', backgroundColor: inverseText }} >
-          <Footer />
-        </Box>
-      </Fragment>
+        <Footer />
+      </>
   );
 };

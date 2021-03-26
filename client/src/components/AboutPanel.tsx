@@ -3,7 +3,7 @@ import { useContext, useState } from 'react';
 import { CalendarIcon, LightningIcon, PopOutIcon, ScaleIcon, SecureIcon, StarIcon, } from '../icons';
 import PoolIcon from '@material-ui/icons/Pool';
 import { AuthStateContext } from '../state/AuthContext';
-import { accentColor, darkerBackground, inverseText, lighterBackground, NormalBodyText, PanelTitle, StyledButton, SubtleBody, subtleText } from '../styles';
+import { accentColor, darkerBackground, inverseText, lighterBackground, NormalBodyText, PanelTitle, StyledButton, SubtleBody, subtleText, AuthButton } from '../styles';
 import About from './About';
 import ViewLog from './ViewLog';
 
@@ -21,7 +21,13 @@ export default function AboutPanel(props: any) {
   }
 
   const leftPanel = (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      marginLeft: '16px',
+      marginBottom: '50px',
+      marginRight: '8xp',
+    }}>
       <PanelTitle>{`about ${project}`}</PanelTitle>
       <SubtleBody>
         [zk-optimistic-rollup]
@@ -32,12 +38,19 @@ export default function AboutPanel(props: any) {
         supports private transfers and private atomic
         swaps between ETH, ERC20, ERC721 at a low cost.
       </NormalBodyText>
-      <StyledButton style={{ width: '217px', height: '53px', justifyContent: 'space-evenly' }}
-        onClick={openModal}
-      >
-        Read More
-        {PopOutIcon}
-      </StyledButton>
+      <div style={{ display: 'flex' }}>
+        <AuthButton style={{}}
+          onClick={openModal}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ fontFamily: 'Inconsolata', fontWeight: 'bold', fontSize: '24px', color: '#000' }}>
+              Read More
+            </div>
+            <div style={{ width: '24px' }} />
+            {PopOutIcon}
+          </div>
+        </AuthButton>
+      </div>
     </div>
   )
 
@@ -59,6 +72,9 @@ export default function AboutPanel(props: any) {
       paddingBottom: '0px',
       backgroundColor: '#0E2936',
       boxShadow: '3px 3px 0px #5D7078',
+      marginRight: '16px',
+      marginLeft: '8px',
+      marginBottom: '50px'
     }}>
       <div style={{ fontFamily: 'Inconsolata', fontSize: '24px', color: '#95A7AE', fontWeight: 'bold' }}>
         FEATURES
@@ -82,13 +98,11 @@ export default function AboutPanel(props: any) {
     (<></>);
 
   return (
-    <>
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {leftPanel}
-        <div style={{ flex: 1, height: '1px', maxWidth: '264px' }} />
-        {featuresPanel}
-      </div>
+    <div style={{ display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
+      {leftPanel}
+      <div style={{ flex: 1, height: '1px', minWidth: '0px', maxWidth: '264px' }} />
+      {featuresPanel}
       {aboutModal}
-    </>
+    </div>
   );
 }

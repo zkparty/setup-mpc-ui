@@ -16,8 +16,10 @@ export const subtleText = "#95a7ae";
 export const inverseText = "#000000";
 
 export const PageContainer = styled.div`
+  /* width: 100vw; */
+  max-width: 1600px;
+  margin: auto;
   display: flex;
-  width: 100vw;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -47,8 +49,13 @@ export const AuthButton = styled.button`
   border-radius: 4px;
   padding-top: 10px;
   padding-bottom: 10px;
-  min-width: 160px;
+  padding-left: 30px;
+  padding-right: 30px;
+  /* min-width: 160px; */
   border: 0px solid #000;
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 export const StyledButton = styled.button`
