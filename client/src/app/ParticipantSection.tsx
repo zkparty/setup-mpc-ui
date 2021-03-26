@@ -13,7 +13,7 @@ import { ContributionState } from "../types/ceremony";
 import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
-import { ceremonyContributionListener, 
+import { ceremonyContributionListener,
   ceremonyQueueListener, ceremonyQueueListenerUnsub, getParticipantContributions, getSiteSettings } from "../api/FirestoreApi";
 import Divider from "@material-ui/core/Divider";
 import { Box, IconButton } from "@material-ui/core";
@@ -38,9 +38,9 @@ export const ParticipantSection = () => {
   const getParticipant = async () => {
     console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
     if (dispatch) {
-      dispatch({ 
-        type: 'SET_PARTICIPANT', 
-        data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username), 
+      dispatch({
+        type: 'SET_PARTICIPANT',
+        data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username),
         accessToken: authState.accessToken });
       // Trigger contribution count for this user
       getContributions(authState.authUser.uid, dispatch);
@@ -60,7 +60,7 @@ export const ParticipantSection = () => {
     if (ceremonyListenerUnsub.current) ceremonyListenerUnsub.current();
 
     if (!cs) {
-      // Query is telling us that all circuits have been run. 
+      // Query is telling us that all circuits have been run.
       if (dispatch) dispatch({ type: 'END_OF_SERIES' });
     } else if (cs instanceof Object) {
       // New circuit to contribute to
@@ -84,16 +84,16 @@ export const ParticipantSection = () => {
       unsub: ceremonyQueueListenerUnsub,
     });
   }
-  
+
   const logState =  () => {
     const { running,  downloaded,  computed,  uploaded } = computeStatus;
-    console.log(`compute step: ${running? 'running' : '-' 
+    console.log(`compute step: ${running? 'running' : '-'
     } ${running && !downloaded  ? 'downloading' :
-        running && downloaded && !computed ? 'computing' : 
-        running && computed && !uploaded ? 'uploading' : 
+        running && downloaded && !computed ? 'computing' :
+        running && computed && !uploaded ? 'uploading' :
         'inactive'}`);
-  }; 
-  
+  };
+
   let content = (<></>);
   // Handle end of series
   if (state.seriesIsComplete && state.userContributions && state.userContributions.length>0 && !state.summaryGistUrl && !summaryStarted.current) {
@@ -127,7 +127,7 @@ export const ParticipantSection = () => {
             settings => {
               dispatch({ type: 'SET_SETTINGS', data: settings });
           });
-        
+
           if (!participant) {
             getParticipant().then(() => {
               console.debug('INITIALISED');
@@ -194,7 +194,7 @@ export const ParticipantSection = () => {
 
   return (
       <div>
-        {content}         
+        {content}
       </div>
   );
 };

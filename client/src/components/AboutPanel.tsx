@@ -3,7 +3,7 @@ import { useContext, useState } from 'react';
 import { CalendarIcon, LightningIcon, PopOutIcon, ScaleIcon, SecureIcon, StarIcon, } from '../icons';
 import PoolIcon from '@material-ui/icons/Pool';
 import { AuthStateContext } from '../state/AuthContext';
-import { accentColor, darkerBackground, inverseText, lighterBackground, NormalBodyText, PanelTitle, StyledButton, SubtleBody, subtleText, AuthButton } from '../styles';
+import { accentColor, darkerBackground, inverseText, lighterBackground, NormalBodyText, PanelTitle, StyledButton, SubtleBody, subtleText, AuthButton, AuthButtonText } from '../styles';
 import About from './About';
 import ViewLog from './ViewLog';
 
@@ -39,13 +39,13 @@ export default function AboutPanel(props: any) {
         swaps between ETH, ERC20, ERC721 at a low cost.
       </NormalBodyText>
       <div style={{ display: 'flex' }}>
-        <AuthButton style={{}}
+        <AuthButton
           onClick={openModal}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ fontFamily: 'Inconsolata', fontWeight: 'bold', fontSize: '24px', color: '#000' }}>
+            <AuthButtonText>
               Read More
-            </div>
+            </AuthButtonText>
             <div style={{ width: '24px' }} />
             {PopOutIcon}
           </div>

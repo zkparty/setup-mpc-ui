@@ -5,7 +5,7 @@ import firebase from "firebase";
 import { accentColor, lighterBackground } from "../styles";
 import { Button } from "@material-ui/core";
 import { getUserStatus } from "../api/FirestoreApi";
-import { AuthButton, StyledButton } from './../styles';
+import { AuthButton, AuthButtonText } from './../styles';
 
 const Login = () => {
   const [error, setErrors] = useState("");
@@ -61,7 +61,7 @@ const Login = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <GitHubIcon htmlColor="#000" />
         <div style={{ width: '24px' }} />
-        <div style={{ fontFamily: 'Inconsolata', fontWeight: 'bold', fontSize: '24px', color: '#000' }}>Login</div>
+        <AuthButtonText>Login</AuthButtonText>
       </div>
     </AuthButton>
   );

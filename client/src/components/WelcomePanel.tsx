@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import {
-  StyledButton,
+  AuthButton,
   WelcomeTitle,
   SubtleBody,
 } from "../styles";
@@ -10,9 +10,9 @@ import { ComputeDispatchContext } from '../state/ComputeStateManager';
 
 const Acknowledge = ({ contribute }: { contribute: () => void}) =>
   (<div style={{ display: 'grid', paddingTop: '20px' }}>
-    <StyledButton onClick={contribute} style={{ width: '220px' }} >
+    <AuthButton onClick={contribute} style={{ width: '220px' }} >
       Launch Ceremony
-    </StyledButton>
+    </AuthButton>
    </div>);
 
 export default function WelcomePanel(props: any) {

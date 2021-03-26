@@ -46,6 +46,10 @@ export const CeremonyTitle = styled.div`
 
 export const AuthButton = styled.button`
   background-color: ${accentColor};
+  font-family: Inconsolata;
+  font-weight: bold;
+  font-size: 24px;
+  color: #000;
   border-radius: 4px;
   padding-top: 10px;
   padding-bottom: 10px;
@@ -56,6 +60,13 @@ export const AuthButton = styled.button`
   &:hover {
     cursor: pointer;
   }
+`
+
+export const AuthButtonText = styled.div`
+  font-family: Inconsolata;
+  font-weight: bold;
+  font-size: 24px;
+  color: #000;
 `
 
 export const StyledButton = styled.button`
