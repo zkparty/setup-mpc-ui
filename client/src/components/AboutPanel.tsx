@@ -84,7 +84,7 @@ export default function AboutPanel(props: any) {
       <Feature icon={ScaleIcon}>Optimistic Rollup Scaling</Feature>
       <Feature icon={StarIcon}>Compliance Compatibility</Feature>
       <Feature icon={LightningIcon}>Instant Withdrawals</Feature>
-      <Feature icon={(<PoolIcon />)}>Privacy Pool for ERC20/NFTs</Feature>
+      <Feature icon={(<PoolIcon htmlColor="#D0FFF7" />)}>Privacy Pool for ERC20/NFTs</Feature>
     </div>
   )
 
