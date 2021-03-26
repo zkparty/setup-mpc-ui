@@ -9,8 +9,8 @@ import { ComputeDispatchContext } from '../state/ComputeStateManager';
 
 
 const Acknowledge = ({ contribute }: { contribute: () => void}) =>
-  (<div style={{ display: 'grid', paddingTop: '20px' }}>
-    <AuthButton onClick={contribute} style={{ width: '220px' }} >
+  (<div style={{ display: 'grid', marginTop: '78px' }}>
+    <AuthButton onClick={contribute}>
       Launch Ceremony
     </AuthButton>
    </div>);
