@@ -85,8 +85,14 @@ const stepText = (step: Step, computeStatus: ComputeStatus): string => {
 }
 
 const queueStatus = (contribState: ContributionState) => {
-  const queue = contribState.queueIndex - contribState.currentIndex; 
-  const dots = ' .'.repeat(queue);
+  let queue = 0;
+  let dots = '';
+  try {
+    queue = contribState.queueIndex - contribState.currentIndex; 
+    dots = ' .'.repeat(Math.max(queue, 0));
+  } catch (err) {
+    console.warn(`Wait queue error: ${err.message}`);
+  }
   return (
     <div>
       <NormalBodyText>{`No. ${queue} in line`}</NormalBodyText>

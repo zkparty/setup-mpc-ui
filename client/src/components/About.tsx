@@ -36,7 +36,8 @@ const verifySection = (
     used by the next participant once we upload the complete contribution 
     transcript to our <StyledLink href='https://zkopru.network' target='_blank'>website</StyledLink>.
     <br /><br />
-    Join us in <StyledLink href='https://t.me/zkopru' target='_blank'>Telegram</StyledLink> to be updated when
+    Follow @ZkopruNetwork on Twitter, and join us in 
+    <StyledLink href='https://t.me/zkopru' target='_blank'>Telegram</StyledLink> to be updated when
     that document becomes available. 
     </NormalBodyText>    
   </Section>
@@ -53,8 +54,8 @@ const howItWorksSection = (
     such as tornado.cash and Hermez. The second step is 
     called Phase 2 and is circuit-specific, so it is 
     done separately for each different SNARK circuit. Our 
-    phase 2 is based on the [!insertNumber!]th 
-    contribution [!insertLink!] to Perpetual Powers of Tau ceremony.
+    phase 2 is based on the 54th 
+    contribution to Perpetual Powers of Tau ceremony.
     </NormalBodyText>
   </Section>
 );
@@ -95,6 +96,9 @@ export default function About(props: any) {
           </HighlightBodyText>
           <SubtleBody>
             Do not lose your opportunity by accidentally leaving this page.
+            <br /><br />
+            You will be asked to grant authority to the app to write a gist. Your contribution hashes will
+            be saved in the gist as a public attestation, and you'll be given the opportunity to link to it in a tweet.
           </SubtleBody>
           <br /><br />
           <HighlightBodyText>

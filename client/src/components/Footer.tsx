@@ -11,9 +11,6 @@ const StyledBody = styled.div`
 export default function Footer(props: any) {
     const body = (
       <div style={{ marginLeft: '111px' }}>
-        <StyledBody>Conceived and built by:</StyledBody>
-        <StyledBody>Wanseob Lim, Barry Whitehat, and Chance Hudson</StyledBody>
-        <StyledBody>EF's Applied ZKP team.</StyledBody>
       </div>
     );
 
