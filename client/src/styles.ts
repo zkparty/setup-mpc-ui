@@ -16,8 +16,10 @@ export const subtleText = "#95a7ae";
 export const inverseText = "#000000";
 
 export const PageContainer = styled.div`
+  /* width: 100vw; */
+  max-width: 1600px;
+  margin: auto;
   display: flex;
-  width: 100vw;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -42,6 +44,31 @@ export const CeremonyTitle = styled.div`
   color: ${accentColor};
 `;
 
+export const AuthButton = styled.button`
+  background-color: ${accentColor};
+  font-family: Inconsolata;
+  font-weight: bold;
+  font-size: 24px;
+  color: #000;
+  border-radius: 4px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+  /* min-width: 160px; */
+  border: 0px solid #000;
+  &:hover {
+    cursor: pointer;
+  }
+`
+
+export const AuthButtonText = styled.div`
+  font-family: Inconsolata;
+  font-weight: bold;
+  font-size: 24px;
+  color: #000;
+`
+
 export const StyledButton = styled.button`
   background-color: ${accentColor};
   border-width: thin;
@@ -57,11 +84,11 @@ export const StyledButton = styled.button`
   font-size: 24px;
   line-height: 140%;
   /* identical to box height, or 34px */
-  
+
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-    
+
   color: ${inverseText};
 
   &:hover {
@@ -74,14 +101,10 @@ export const WelcomeTitle = styled.div`
   font-family: Shrikhand;
   font-size: 64px;
   font-weight: normal;
-  color: black;
-  text-align: center;
-  align-items: center;
+  color: rgba(0,0,0,0);
   letter-spacing: 0.12em;
   cursor: pointer;
   user-select: none;
-  flex: 1;
-  height: 110px;
   -webkit-text-stroke-width: 2px;
   -webkit-text-stroke-color: ${textColor};
 `;
@@ -92,7 +115,6 @@ const textBase = css`
   font-weight: normal;
   font-size: 18px;
   line-height: 140%;
-  /* or 34px */
 
   color: ${textColor};
 `;
@@ -100,7 +122,7 @@ const textBase = css`
 export const SubtleBody = styled.div`
   ${textBase}
   font-weight: bold;
-  font-size: 16px;
+  font-size: 24px;
 
   color: ${subtleText};
 `;

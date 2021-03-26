@@ -5,7 +5,7 @@ import firebase from "firebase";
 import { accentColor, lighterBackground } from "../styles";
 import { Button } from "@material-ui/core";
 import { getUserStatus } from "../api/FirestoreApi";
-import { StyledButton } from './../styles';
+import { AuthButton, AuthButtonText } from './../styles';
 
 const Login = () => {
   const [error, setErrors] = useState("");
@@ -13,10 +13,10 @@ const Login = () => {
   const authState = useContext(AuthStateContext);
 
   if (!dispatch) return (<></>);
-  
+
   const handleGithubLogin = () => {
     const provider = new firebase.auth.GithubAuthProvider();
-    
+
     provider.addScope('read:user');
     provider.addScope('gist');
 
@@ -49,7 +49,7 @@ const Login = () => {
       })
     } catch (err) {
       console.warn(err.message);
-    } 
+    }
   };
 
   const logOut = () => {
@@ -57,10 +57,13 @@ const Login = () => {
   };
 
   return (
-    <StyledButton onClick={handleGithubLogin} style={{ width: '163px', marginTop: '78px', }}>
-      <GitHubIcon />
-      Login
-    </StyledButton>
+    <AuthButton onClick={handleGithubLogin} style={{ marginTop: '78px', }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <GitHubIcon htmlColor="#000" />
+        <div style={{ width: '24px' }} />
+        <AuthButtonText>Login</AuthButtonText>
+      </div>
+    </AuthButton>
   );
 };
 

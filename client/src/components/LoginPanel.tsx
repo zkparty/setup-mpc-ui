@@ -12,18 +12,19 @@ const project = 'zkopru';
 export default function LoginPanel(props: any) {
 
   return (
-  <div style={{ 
+  <div style={{
     display: 'flex',
-    flexDirection: 'column', 
-    alignItems: 'center', 
-    paddingTop: '20px' 
+    flexDirection: 'column',
+    alignItems: 'center',
+    paddingTop: '20px'
     }} >
     <WelcomeTitle>{project}</WelcomeTitle>
+    <div style={{ height: '41px' }} />
     <SubtleBody>
-      {`Trusted Setup Ceremony March, 2021`} 
+      {`Trusted Setup Ceremony March, 2021`}
     </SubtleBody>
     <NormalBodyText style={{ marginTop: '8px' }}>
-      {`Participate using your GitHub account.`} 
+      {`Participate using your GitHub account.`}
     </NormalBodyText>
     <Login />
   </div>);
