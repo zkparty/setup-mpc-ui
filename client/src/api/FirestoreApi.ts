@@ -615,10 +615,17 @@ export const getParticipantContributions = async (participant: string): Promise<
       const ceremony = await cref
         .withConverter(ceremonyConverter)
         .get();
-      return {ceremony: ceremony.data(), ...cs.data()};
+      if (RUNNING === ceremony.get('ceremonyState')) {
+        return {ceremony: ceremony.data(), ...cs.data()};
+      } else {
+        return null;
+      }
     }
   });
-  return Promise.all(p);
+
+  return Promise.all(p).then(arr => {
+    return arr.filter(c => (c !== null));
+  });
 }
 
 export const countParticipantContributions = async (participant: string): Promise<number> => {
