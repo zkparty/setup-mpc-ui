@@ -42,6 +42,15 @@ export const CeremonyTitle = styled.div`
   color: ${accentColor};
 `;
 
+export const AuthButton = styled.button`
+  background-color: ${accentColor};
+  border-radius: 4px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  min-width: 160px;
+  border: 0px solid #000;
+`
+
 export const StyledButton = styled.button`
   background-color: ${accentColor};
   border-width: thin;
@@ -57,11 +66,11 @@ export const StyledButton = styled.button`
   font-size: 24px;
   line-height: 140%;
   /* identical to box height, or 34px */
-  
+
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-    
+
   color: ${inverseText};
 
   &:hover {
@@ -74,14 +83,10 @@ export const WelcomeTitle = styled.div`
   font-family: Shrikhand;
   font-size: 64px;
   font-weight: normal;
-  color: black;
-  text-align: center;
-  align-items: center;
+  color: rgba(0,0,0,0);
   letter-spacing: 0.12em;
   cursor: pointer;
   user-select: none;
-  flex: 1;
-  height: 110px;
   -webkit-text-stroke-width: 2px;
   -webkit-text-stroke-color: ${textColor};
 `;
@@ -92,7 +97,6 @@ const textBase = css`
   font-weight: normal;
   font-size: 18px;
   line-height: 140%;
-  /* or 34px */
 
   color: ${textColor};
 `;
@@ -100,7 +104,7 @@ const textBase = css`
 export const SubtleBody = styled.div`
   ${textBase}
   font-weight: bold;
-  font-size: 16px;
+  font-size: 24px;
 
   color: ${subtleText};
 `;
