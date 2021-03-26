@@ -36,8 +36,8 @@ const verifySection = (
     used by the next participant once we upload the complete contribution 
     transcript to our <StyledLink href='https://zkopru.network' target='_blank'>website</StyledLink>.
     <br /><br />
-    Follow @ZkopruNetwork on Twitter, and join us in 
-    <StyledLink href='https://t.me/zkopru' target='_blank'>Telegram</StyledLink> to be updated when
+    Follow @ZkopruNetwork on Twitter, and join us 
+    in <StyledLink href='https://t.me/zkopru' target='_blank'>Telegram</StyledLink> to be updated when
     that document becomes available. 
     </NormalBodyText>    
   </Section>
