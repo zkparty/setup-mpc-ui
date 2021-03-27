@@ -84,7 +84,7 @@ export default function CircuitsPanel() {
       </PanelTitle>
       <NormalBodyText
         style={{
-          maxWidth: viewWidth < 700 ? 'calc(100vw - 32px)' : '700px',
+          maxWidth: viewWidth < 800 ? 'calc(100vw - 32px)' : '800px',
           paddingBottom: '64px'
         }}>
         {tableText(isLoggedIn, circuits.length)}
