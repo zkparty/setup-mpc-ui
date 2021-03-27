@@ -28,15 +28,15 @@ const ceremonyProject = 'zkopru';
 const tableText = (isLoggedIn: boolean, circuitLength: number) => {
   return (
     isLoggedIn ?
-     (`Your participation in the ceremony involves contributing a computation 
-     to ${circuitLength} different circuits. More complex circuits take longer 
+     (`Your participation in the ceremony involves contributing a computation
+     to ${circuitLength} different circuits. More complex circuits take longer
      to run and you may have to wait if someone before you is completing a computation.
       Your hash is the signature of your contribution.`
      )
     :
      (`All participants will contribute a computation to ${circuitLength} different circuits. There is no limit
-     to the number of contributions each circuit can accept - The more the merrier! 
-     Participants receive a hash for each completed circuit, which acts as a signature of 
+     to the number of contributions each circuit can accept - The more the merrier!
+     Participants receive a hash for each completed circuit, which acts as a signature of
      their contribution`)
   );
 }
@@ -46,6 +46,7 @@ export default function CircuitsPanel() {
   const dispatch = useContext(ComputeDispatchContext);
   const authState = useContext(AuthStateContext);
   const [loaded, setLoaded] = useState(false);
+  const [viewWidth, setViewWidth] = useState(window.innerWidth)
   //console.debug(`render circuits table`);
 
   const { circuits } = state;
@@ -60,18 +61,35 @@ export default function CircuitsPanel() {
     }
   }, [loaded]);
 
+  useEffect(() => {
+    const handleResize = () => setViewWidth(window.innerWidth)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+
   return (
-    <TableContainer component='div' style={{ width: '778px', marginLeft: '80px' }}>
-      <PanelTitle style={{ 
-         height: '100px',
+    <div style={{
+      alignSelf: viewWidth < 500 ? 'flex-start' : 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      marginLeft: '16px',
+      marginRight: '16px',
+      minWidth: '500px'
+    }}>
+      <PanelTitle style={{
          paddingBottom: '6px',
       }}>
         {`${ceremonyProject} circuits`}
       </PanelTitle>
-      <NormalBodyText style={{ paddingBottom: '64px', }}>
+      <NormalBodyText
+        style={{
+          maxWidth: viewWidth < 700 ? 'calc(100vw - 32px)' : '700px',
+          paddingBottom: '64px'
+        }}>
         {tableText(isLoggedIn, circuits.length)}
       </NormalBodyText>
       <CircuitsTable isLoggedIn={isLoggedIn} circuits={circuits} />
-    </TableContainer>
-    )
-  };
+    </div>
+  )
+};

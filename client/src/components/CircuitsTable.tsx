@@ -26,6 +26,8 @@ import { CopyIcon } from '../icons';
 
 const HeaderCell = styled.div`
   display: flex;
+  flex: 1;
+  min-width: 10px;
   align-items: center;
   margin: 1px;
   font-family: Inconsolata;
@@ -78,12 +80,12 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
   return (
     <div style={{ display: 'flex', flexDirection: 'column'}}>
       <TableRow>
-        <HeaderCell style={{ width: cellWidths[0] }}>Circuit</HeaderCell>
-        <HeaderCell style={{ width: cellWidths[1] }}>Contributions</HeaderCell>
-        <HeaderCell style={{ width: cellWidths[2] }}>Average Time</HeaderCell>
-        <HeaderCell style={{ width: cellWidths[3] }}>Transcript</HeaderCell>
+        <HeaderCell style={{ maxWidth: cellWidths[0] }}>Circuit</HeaderCell>
+        <HeaderCell style={{ maxWidth: cellWidths[1] }}>Contributions</HeaderCell>
+        <HeaderCell style={{ maxWidth: cellWidths[2] }}>Average Time</HeaderCell>
+        <HeaderCell style={{ maxWidth: cellWidths[3] }}>Transcript</HeaderCell>
         {isLoggedIn ?
-          (<HeaderCell style={{ width: cellWidths[4] }}>My Hash</HeaderCell>)
+          (<HeaderCell style={{ maxWidth: cellWidths[4] }}>My Hash</HeaderCell>)
           : null
         }
       </TableRow>
@@ -179,14 +181,14 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
 
     return (
       <TableRow key={index}>
-        <HeaderCell style={{ width: cellWidths[0] }}>{index}</HeaderCell>
-        <HeaderCell style={{ width: cellWidths[1] }}>
+        <HeaderCell style={{ maxWidth: cellWidths[0] }}>{index}</HeaderCell>
+        <HeaderCell style={{ maxWidth: cellWidths[1] }}>
           {circuit.complete}
         </HeaderCell>
-        <HeaderCell style={{ width: cellWidths[2] }}>
+        <HeaderCell style={{ maxWidth: cellWidths[2] }}>
         {formatDuration(circuit.averageSecondsPerContribution)}
         </HeaderCell>
-        <HeaderCell style={{ width: cellWidths[3], textAlign: 'center' }}>
+        <HeaderCell style={{ maxWidth: cellWidths[3], textAlign: 'center' }}>
           <Button style={{
             color: 'inherit',
             font: 'Inconsolata 18px',
@@ -197,7 +199,7 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
           </Button>
         </HeaderCell>
         {isSignedIn ?
-          <HeaderCell style={{ width: cellWidths[4] }}>
+          <HeaderCell style={{ maxWidth: cellWidths[4] }}>
             {renderHash(circuit.hash)}
           </HeaderCell> :
           <></>
