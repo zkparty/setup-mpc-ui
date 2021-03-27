@@ -1,23 +1,16 @@
 import * as React from 'react';
-import { useState, useEffect, Fragment, useContext, useRef } from "react";
+import { useState } from "react";
 import {
     accentColor,
-    secondAccent,
     textColor,
-    PageContainer,
-    lighterBackground,
-    SectionContainer,
-    CeremonyTitle,
     darkBorder,
     NormalBodyText,
     darkerBackground,
-    gray1,
-    PanelTitle,
     H3Title,
   } from "../styles";
 //import './styles.css';
 import { Ceremony } from "../types/ceremony";
-import { Button, withStyles } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import styled from 'styled-components';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import ViewLog from './ViewLog';
@@ -32,31 +25,15 @@ const HeaderCell = styled.div`
   margin: 1px;
   font-family: Inconsolata;
   font-size: 16px;
-  color: white;
+  color: inherit;
   padding: 24px;
   background-color: #0E2936;
 `
 
 const TableRow = styled.div`
   display: flex;
+  color: ${(props: { completed?: boolean }) => props.completed ? accentColor: textColor};
 `
-
-const StyledTable = styled.table`
-  color: ${textColor};
-  background-color: ${darkerBackground};
-  padding-top: 0px;
-  padding-bottom: 0px;
-`;
-
-const StyledRow = styled.tr`
-  color: ${(props: { completed?: boolean; }) => props.completed ? accentColor : textColor};
-  height: 53px;
-  border: 1px solid ${darkBorder};
-
-  .head: {
-    color: ${textColor};
-  }
-`;
 
 export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ceremony[] }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -180,7 +157,7 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
     }
 
     return (
-      <TableRow key={index}>
+      <TableRow key={index} completed={circuit.completed}>
         <HeaderCell style={{ maxWidth: cellWidths[0] }}>{index}</HeaderCell>
         <HeaderCell style={{ maxWidth: cellWidths[1] }}>
           {circuit.complete}
