@@ -17,12 +17,6 @@ import {
   } from "../styles";
 //import './styles.css';
 import { Ceremony } from "../types/ceremony";
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 import { Button, withStyles } from '@material-ui/core';
 import styled from 'styled-components';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
@@ -30,13 +24,20 @@ import ViewLog from './ViewLog';
 import moment from 'moment';
 import { CopyIcon } from '../icons';
 
-const StyledCell = withStyles({
-  root: {
-    color: 'inherit',
-    height: '53px',
-    border: `1px solid ${darkBorder}`,
-  }
-})(TableCell);
+const HeaderCell = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 1px;
+  font-family: Inconsolata;
+  font-size: 16px;
+  color: white;
+  padding: 24px;
+  background-color: #0E2936;
+`
+
+const TableRow = styled.div`
+  display: flex;
+`
 
 const StyledTable = styled.table`
   color: ${textColor};
@@ -67,39 +68,45 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
     setModalContent({title, content});
     setModalOpen(true);
   }
-
+  const cellWidths = [
+    '105px',
+    '167px',
+    '156px',
+    '140px',
+    '193px',
+  ]
   return (
-      <TableContainer component='div'>
-        <StyledTable aria-label="circuits table" >
-          <TableHead>
-            <StyledRow>
-              <StyledCell style={{ width: '105px' }}>Circuit</StyledCell>
-              <StyledCell style={{ width: '167px' }} align="center">Contributions</StyledCell>
-              <StyledCell style={{ width: '156px' }} align="center">Average Time</StyledCell>
-              <StyledCell style={{ width: '140px' }} align="center">Transcript</StyledCell>
-              {isLoggedIn ? 
-                (<StyledCell style={{ width: '193px' }} align="center">My Hash</StyledCell>) :
-                (<></>)
-              }
-            </StyledRow>
-          </TableHead>
-          <TableBody>
-            {circuits.map((circuit, index) => 
-              renderRow(circuit, index+1, isLoggedIn, openTranscript)
-            )}
-          </TableBody>
-        </StyledTable>
-        <ViewLog 
-          open={modalOpen} 
-          close={closeTranscript} 
-          content={modalContent.content} 
-          title={modalContent.title} />
-      </TableContainer>
-    )
-  };
+    <div style={{ display: 'flex', flexDirection: 'column'}}>
+      <TableRow>
+        <HeaderCell style={{ width: cellWidths[0] }}>Circuit</HeaderCell>
+        <HeaderCell style={{ width: cellWidths[1] }}>Contributions</HeaderCell>
+        <HeaderCell style={{ width: cellWidths[2] }}>Average Time</HeaderCell>
+        <HeaderCell style={{ width: cellWidths[3] }}>Transcript</HeaderCell>
+        {isLoggedIn ?
+          (<HeaderCell style={{ width: cellWidths[4] }}>My Hash</HeaderCell>)
+          : null
+        }
+      </TableRow>
+      {circuits.map((circuit, index) =>
+        renderRow(circuit, index+1, isLoggedIn, openTranscript, cellWidths)
+      )}
+      <ViewLog
+        open={modalOpen}
+        close={closeTranscript}
+        content={modalContent.content}
+        title={modalContent.title}
+      />
+    </div>
+  )
+};
 
-  const renderRow = (circuit: any, index: number, 
-    isSignedIn: boolean, showTranscript: (title: JSX.Element, body: JSX.Element ) => void) => {
+  const renderRow = (
+    circuit: any,
+    index: number,
+    isSignedIn: boolean,
+    showTranscript: (title: JSX.Element, body: JSX.Element) => void,
+    cellWidths: string[]
+  ) => {
 
     const renderHash = (hash: string) => {
       let content = (<></>);
@@ -124,7 +131,7 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
 
     const formatTranscript = (circuit: Ceremony) => {
       const { transcript, sequence, numConstraints, circuitFileName } = circuit;
-      
+
       if (!transcript) return;
 
       const title = (
@@ -135,20 +142,20 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
           <NormalBodyText>{`Constraints: ${numConstraints}`}</NormalBodyText>
         </div>
       );
-      
-      const lineStyle = { 
-        marginBlockStart: '0em', 
-        marginBlockEnd: '0em' 
+
+      const lineStyle = {
+        marginBlockStart: '0em',
+        marginBlockEnd: '0em'
       };
       const linesToJsx = (content: string) => {
         const lines: string[] = content.split('\n');
-        const body= lines.map(v => 
+        const body= lines.map(v =>
           (<p style={lineStyle}>{v}</p>));
         return (<div>{body}</div>);
       };
 
-      const copyStyle = { 
-        display: 'flex', 
+      const copyStyle = {
+        display: 'flex',
         justifyContent: 'space-evenly',
         width: '245px',
         background: darkerBackground,
@@ -171,28 +178,30 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
     }
 
     return (
-      <StyledRow key={index} completed={circuit.completed} >
-        <StyledCell align='left' >{index}</StyledCell>
-        <StyledCell component="th" align='left' >
+      <TableRow key={index}>
+        <HeaderCell style={{ width: cellWidths[0] }}>{index}</HeaderCell>
+        <HeaderCell style={{ width: cellWidths[1] }}>
           {circuit.complete}
-        </StyledCell>
-        <StyledCell align="left">{formatDuration(circuit.averageSecondsPerContribution)}</StyledCell>
-        <StyledCell align="center">
-          <Button style={{ 
-            color: 'inherit', 
-            font: 'Inconsolata 18px', 
+        </HeaderCell>
+        <HeaderCell style={{ width: cellWidths[2] }}>
+        {formatDuration(circuit.averageSecondsPerContribution)}
+        </HeaderCell>
+        <HeaderCell style={{ width: cellWidths[3], textAlign: 'center' }}>
+          <Button style={{
+            color: 'inherit',
+            font: 'Inconsolata 18px',
             textTransform: 'none',
             textDecoration: 'underline', }}
            onClick={() => formatTranscript(circuit)}>
             View
           </Button>
-        </StyledCell>
-        {isSignedIn ? 
-          <StyledCell align="left">
+        </HeaderCell>
+        {isSignedIn ?
+          <HeaderCell style={{ width: cellWidths[4] }}>
             {renderHash(circuit.hash)}
-          </StyledCell> : 
+          </HeaderCell> :
           <></>
         }
-      </StyledRow>
+      </TableRow>
     );
   }
