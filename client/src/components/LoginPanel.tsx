@@ -20,7 +20,7 @@ export default function LoginPanel(props: any) {
     }} >
     <WelcomeTitle>{project}</WelcomeTitle>
     <div style={{ height: '41px' }} />
-    <SubtleBody>
+    <SubtleBody style={{ textAlign: 'center' }}>
       {`Trusted Setup Ceremony March, 2021`}
     </SubtleBody>
     <NormalBodyText style={{ marginTop: '8px' }}>

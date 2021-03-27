@@ -123,7 +123,6 @@ export const SubtleBody = styled.div`
   ${textBase}
   font-weight: bold;
   font-size: 24px;
-  text-align: center;
 
   color: ${subtleText};
 `;
