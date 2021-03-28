@@ -310,16 +310,16 @@ export const computeStateReducer = (state: any, action: any):any => {
                         `Contribution recorded at ${action.gistUrl}`,
                         queueIndex
                     ));
-                    msg = `Gist created at ${action.gistUrl}`;
-                    newState = addMessage(state, msg);
+                    //msg = `Gist created at ${action.gistUrl}`;
+                    //newState = addMessage(state, msg);
                 }
                 const contribution = newState.contributionSummary;
                 contribution.gistUrl = action.gistUrl;
                 addOrUpdateContribution(ceremony.id, contribution).then( () => {
                     endOfCircuit(state.participant.uid, action.dispatch);
                 });
-                msg = `Thank you for your contribution.`;
-                newState = addMessage(newState, msg);
+                //msg = `Thank you for your contribution.`;
+                //newState = addMessage(newState, msg);
 
                 // Mark it complete
                 const cct = getCurrentCircuit(newState);
@@ -355,9 +355,10 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'SET_CEREMONY': {
             newState.contributionState = action.data;
-            const msg = `You are in the queue for ceremony ${action.data.ceremony.title}`;
-            newState = addMessage(newState, msg);
+            //const msg = `You are in the queue for ceremony ${action.data.ceremony.title}`;
+            //newState = addMessage(newState, msg);
             if (newState.contributionState.queueIndex == 1) {
+                // There is no prior contributor to wait for
                 newState.step = Step.RUNNING;
                 newState.computeStatus.ready = true;
             } else {
@@ -424,8 +425,8 @@ export const computeStateReducer = (state: any, action: any):any => {
                     endOfCircuit(state.participant.uid, action.dispatch);
                 });
             });
-            const msg = `Error encountered. This circuit will be skipped.`;
-            newState = addMessage(newState, msg);
+            //const msg = `Error encountered. This circuit will be skipped.`;
+            //newState = addMessage(newState, msg);
             break;
         }
         case 'VISIBILITY': {
