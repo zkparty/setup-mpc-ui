@@ -32,6 +32,7 @@ const HeaderCell = styled.div`
 
 const TableRow = styled.div`
   display: flex;
+  width: 100%;
   color: ${(props: { completed?: boolean }) => props.completed ? accentColor: textColor};
 `
 
@@ -55,7 +56,7 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
     '193px',
   ]
   return (
-    <div style={{ display: 'flex', flexDirection: 'column'}}>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       <TableRow>
         <HeaderCell style={{ maxWidth: cellWidths[0] }}>Circuit</HeaderCell>
         <HeaderCell style={{ maxWidth: cellWidths[1] }}>Contributions</HeaderCell>
