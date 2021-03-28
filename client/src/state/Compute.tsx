@@ -103,22 +103,24 @@ export const startUpload = (ceremonyId: string, index: number, data: Uint8Array,
 
 export const startCreateGist = (ceremony: Ceremony, index: number, hash: string, accessToken: string, dispatch: Dispatch<any>) => {
     console.debug(`startCreateGist ${accessToken}`);
-    if (accessToken) {
-        createGist(ceremony.id, ceremony.title, index, hash, accessToken).then(
-            gistUrl => {
-                dispatch({
-                    type: 'GIST_CREATED',
-                    gistUrl,
-                    dispatch,
-                })
-        });
-    } else {
-        dispatch({
-            type: 'GIST_CREATED',
-            gistUrl: null,
-            dispatch,
-        })
-    }
+    // Disable individual gists - we create a summary at end of ceremony
+    // if (accessToken) {
+    //     createGist(ceremony.id, ceremony.title, index, hash, accessToken).then(
+    //         gistUrl => {
+    //             dispatch({
+    //                 type: 'GIST_CREATED',
+    //                 gistUrl,
+    //                 dispatch,
+    //             })
+    //     });
+    // } else {
+    
+    dispatch({
+        type: 'CREATE_SUMMARY',
+        gistUrl: null,
+        dispatch,
+    });
+    //}
 }
 
 // All processing for the circuit has completed. 

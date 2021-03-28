@@ -278,28 +278,30 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'UPLOADED': {
             const { queueIndex, ceremony, startTime } = state.contributionState;
-            addCeremonyEvent(ceremony.id, createCeremonyEvent(
-                "PARAMS_UPLOADED", 
-                `Parameters for participant ${queueIndex} uploaded to ${action.file}`,
-                queueIndex
-            ));
-            //let msg = `Parameters uploaded.`;
-            //newState = addMessage(state, msg);
-            const duration = (Date.now() - startTime) / 1000;
-            const contribution = createContributionSummary(
-                 state.participant ? state.participant.uid : '??',
-                 "COMPLETE", 
-                 action.file, 
-                 queueIndex, 
-                 state.hash,
-                 duration
-            );
-            newState.contributionSummary = contribution;
-            startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
-
+            // Avoid double invocation
+            if (!state.contributionSummary || state.contributionSummary.status !== 'COMPLETE') {
+                addCeremonyEvent(ceremony.id, createCeremonyEvent(
+                    "PARAMS_UPLOADED", 
+                    `Parameters for participant ${queueIndex} uploaded to ${action.file}`,
+                    queueIndex
+                ));
+                //let msg = `Parameters uploaded.`;
+                //newState = addMessage(state, msg);
+                const duration = (Date.now() - startTime) / 1000;
+                const contribution = createContributionSummary(
+                    state.participant ? state.participant.uid : '??',
+                    "COMPLETE", 
+                    action.file, 
+                    queueIndex, 
+                    state.hash,
+                    duration
+                );
+                newState.contributionSummary = contribution;
+                startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
+            }
             return newState;
         }
-        case 'GIST_CREATED': {
+        case 'CREATE_SUMMARY': {
             // End-of-circuit actions completed
             //let msg;
             if (state.contributionState) {
@@ -314,7 +316,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                     //newState = addMessage(state, msg);
                 }
                 const contribution = newState.contributionSummary;
-                contribution.gistUrl = action.gistUrl;
+                //contribution.gistUrl = action.gistUrl;
                 addOrUpdateContribution(ceremony.id, contribution).then( () => {
                     endOfCircuit(state.participant.uid, action.dispatch);
                 });
