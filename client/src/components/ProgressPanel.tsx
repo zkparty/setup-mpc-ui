@@ -117,14 +117,16 @@ interface ProgressProps {
 
 export const CeremonyProgress = (props: any) => {
   const state = useContext(ComputeStateContext);
-  const { circuits, contributionCount, step, computeStatus } = state;
+  const { circuits, contributionCount, step, computeStatus, contributionState } = state;
   const cctCount = circuits.length;
+  const ceremony = contributionState ? contributionState.ceremony : undefined;
+  const cctNum = ceremony ? ceremony.sequence || 0 : 0;
   const ceremonyPct = (cctCount>0) ? 100 * contributionCount / cctCount : 0;
   const { format } = props;
 
   const prefix = (format && format === 'bar') ?
     (<NormalBodyText style={{ paddingRight: '20px' }} >
-      {`C${contributionCount+1} ${stepText(step, computeStatus)}`}
+      {`C${cctNum} ${stepText(step, computeStatus)}`}
     </NormalBodyText>)
     :
     (<></>);
@@ -169,6 +171,8 @@ const Animation = () => {
 
 const status = (state: any, dispatch: React.Dispatch<any>) => {
   const { circuits, contributionCount, contributionState, step, computeStatus, progress } = state;
+  const ceremony = contributionState ? contributionState.ceremony : undefined;
+  const cctNum = ceremony ? ceremony.sequence || 0 : 0;
   const cctCount = circuits.length;
   let header = '';
   let body1 = (<></>);
@@ -230,7 +234,7 @@ const status = (state: any, dispatch: React.Dispatch<any>) => {
             </Grid>
             <Grid item>
               <NormalBodyText>
-                {contributionCount+1}/{cctCount}
+                {cctNum}/{cctCount}
               </NormalBodyText>
             </Grid>
           </Grid>

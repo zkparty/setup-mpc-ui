@@ -297,7 +297,18 @@ export const computeStateReducer = (state: any, action: any):any => {
                     duration
                 );
                 newState.contributionSummary = contribution;
-                startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
+                
+                addOrUpdateContribution(ceremony.id, contribution).then( () => {
+                    endOfCircuit(state.participant.uid, action.dispatch);
+                });
+                //msg = `Thank you for your contribution.`;
+                //newState = addMessage(newState, msg);
+
+                // Mark it complete
+                const cct = getCurrentCircuit(newState);
+                if (cct) { cct.completed = true; }
+    
+                //startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
             }
             return newState;
         }
