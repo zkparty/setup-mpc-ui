@@ -179,7 +179,7 @@ const status = (state: any) => {
   } else {
     let statusCell = (<></>);
     if (step === Step.QUEUED) {
-      header = 'Your are in line.';
+      header = 'You are in line.';
       statusCell = queueStatus(contributionState);
     } else {
       header = 'Contribution Active.';

@@ -23,7 +23,7 @@ const Login = () => {
     try {
     firebase
      .auth()
-     .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+     .setPersistence(firebase.auth.Auth.Persistence.NONE)
       .then(() => {
         firebase
         .auth()
