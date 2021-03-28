@@ -84,6 +84,16 @@ const stepText = (step: Step, computeStatus: ComputeStatus): string => {
   }
 }
 
+const queueText = (queue: number) => {
+  if (queue > 1) {
+    return `No. ${queue} in line`;
+  } else if (queue == 1) {
+    return 'Next in line';
+  } else {
+    return 'Your turn';
+  } 
+}
+
 const queueStatus = (contribState: ContributionState) => {
   let queue = 0;
   let dots = '';
@@ -95,7 +105,7 @@ const queueStatus = (contribState: ContributionState) => {
   }
   return (
     <div>
-      <NormalBodyText>{`No. ${queue} in line`}</NormalBodyText>
+      <NormalBodyText>{queueText(queue)}</NormalBodyText>
       <div style={{ color: accentColor, textAlign: 'right' }}>{dots}</div>
     </div>
   );
@@ -157,7 +167,7 @@ const Animation = () => {
   );
 }
 
-const status = (state: any) => {
+const status = (state: any, dispatch: React.Dispatch<any>) => {
   const { circuits, contributionCount, contributionState, step, computeStatus, progress } = state;
   const cctCount = circuits.length;
   let header = '';
@@ -179,6 +189,14 @@ const status = (state: any) => {
   } else {
     let statusCell = (<></>);
     if (step === Step.QUEUED) {
+      // Circuit breaker to avoid 'you are -1 in line'
+      if (!contributionState.queueIndex ||
+         !contributionState.currentIndex ||
+         contributionState.currentIndex > contributionState.queueIndex) {
+           // Trigger a restart of the circuit
+           dispatch({type: 'SET_STEP', data: Step.INITIALISED});
+      }
+
       header = 'You are in line.';
       statusCell = queueStatus(contributionState);
     } else {
@@ -235,7 +253,9 @@ export default function ProgressPanel() {
   const state = useContext(ComputeStateContext);
   const dispatch = useContext(ComputeDispatchContext);
 
-  const content = status(state);
+  if (!dispatch) return (<></>);
+
+  const content = status(state, dispatch);
 
   return (
     <div>
@@ -250,7 +270,7 @@ export default function ProgressPanel() {
               </StyledHeader>
             </Grid>
             <Grid item>
-              <VisibilitySensor onChange={isVisible => {if (dispatch) dispatch({type:'VISIBILITY', data: isVisible})}}>
+              <VisibilitySensor onChange={isVisible => {dispatch({type:'VISIBILITY', data: isVisible})}}>
                 {content.body1}
               </VisibilitySensor>
             </Grid>

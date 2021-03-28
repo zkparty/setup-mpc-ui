@@ -313,19 +313,6 @@ export const contributionUpdateListener = async (
 // Listens for updates to eligible ceremonies that a participant may contribute to.
 // The first such ceremony found will be returned in the callback
 export const ceremonyContributionListener = (participantId: string, isCoordinator: boolean, callback: (c: ContributionState | boolean) => void): () => void => {
-  console.debug(`listening for contributions for ${participantId}`);
-  const db = firebase.firestore();
-  // Get running ceremonies
-  // Coordinator can contribute to ceremonies even if they're not 
-  // past start time
-  let states = [RUNNING];
-  if (isCoordinator) states.push(PRESELECTION, WAITING);
-  const query = db.collection("ceremonies")
-    .withConverter(ceremonyConverter)
-    .where('ceremonyState', 'in', states)
-    .orderBy('sequence', 'asc');
-
-  let found = false;
 
   const setContribution = async (ceremony: Ceremony, contrib: Contribution): Promise<void> => {
     // Save the contribution record
@@ -381,6 +368,19 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
     return false;
   };
 
+  console.debug(`getting contributions for ${participantId}`);
+  const db = firebase.firestore();
+  // Get running ceremonies
+  // Coordinator can contribute to ceremonies even if they're not 
+  // past start time
+  let states = [RUNNING];
+  if (isCoordinator) states.push(PRESELECTION, WAITING);
+  const query = db.collection("ceremonies")
+    .withConverter(ceremonyConverter)
+    .where('ceremonyState', 'in', states)
+    .orderBy('sequence', 'asc');
+
+  let found = false;
   let promises: Promise<boolean>[] = [];
   // TODO - Review the need for onSnapshot. a get() would probably do the job. 
   // sub/unsub is overkill

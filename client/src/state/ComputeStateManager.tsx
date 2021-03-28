@@ -193,8 +193,8 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'START_COMPUTE': {
-            const msg = `It's your turn to contribute`;
-            newState = addMessage(state, msg);
+            //const msg = `It's your turn to contribute`;
+            //newState = addMessage(state, msg);
             // Create event in Firestore
             addCeremonyEvent(action.ceremonyId, createCeremonyEvent(
                 "START_CONTRIBUTION",
@@ -223,8 +223,8 @@ export const computeStateReducer = (state: any, action: any):any => {
                 state.contributionState.queueIndex
             ));
             newState.paramData = action.data;
-            const msg = `Parameters downloaded.`;
-            newState = addMessage(newState, msg);
+            //const msg = `Parameters downloaded.`;
+            //newState = addMessage(newState, msg);
             newState.computeStatus = {...state.computeStatus, downloaded: true, started: true};
             if (state.worker) startComputation(action.data, state.entropy, state.worker);
             console.debug('running computation......');
@@ -249,8 +249,8 @@ export const computeStateReducer = (state: any, action: any):any => {
                 separator = ' ';
                 
             }
-            const msg = `Hash: ${h}`;
-            newState = addMessage(state, msg);
+            //const msg = `Hash: ${h}`;
+            //newState = addMessage(state, msg);
             newState.hash = h;
             const cct = getCurrentCircuit(state);
             if (cct) { cct.hash = h; }
@@ -271,8 +271,8 @@ export const computeStateReducer = (state: any, action: any):any => {
             ));
             newState.entropy = new Uint8Array(); // Reset now that it has been used
             newState.paramData = new Uint8Array();
-            const msg = `Computation completed.`;
-            newState = addMessage(newState, msg);
+            //const msg = `Computation completed.`;
+            //newState = addMessage(newState, msg);
             startUpload(state.contributionState.ceremony.id, state.contributionState.queueIndex, action.newParams, action.dispatch);
             return newState;
         }
@@ -283,8 +283,8 @@ export const computeStateReducer = (state: any, action: any):any => {
                 `Parameters for participant ${queueIndex} uploaded to ${action.file}`,
                 queueIndex
             ));
-            let msg = `Parameters uploaded.`;
-            newState = addMessage(state, msg);
+            //let msg = `Parameters uploaded.`;
+            //newState = addMessage(state, msg);
             const duration = (Date.now() - startTime) / 1000;
             const contribution = createContributionSummary(
                  state.participant ? state.participant.uid : '??',
@@ -301,7 +301,7 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'GIST_CREATED': {
             // End-of-circuit actions completed
-            let msg;
+            //let msg;
             if (state.contributionState) {
                 const { queueIndex, ceremony } = state.contributionState;
                 if (action.gistUrl) {

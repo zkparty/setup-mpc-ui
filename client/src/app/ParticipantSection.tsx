@@ -153,7 +153,7 @@ export const ParticipantSection = () => {
           ceremonyListenerUnsub.current = ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
         }
         content = stepText('Starting listener...');
-        addMessage('Initialised.');
+        //addMessage('Initialised.');
         if (dispatch) dispatch({ type: 'WAIT' });
         break;
       }
