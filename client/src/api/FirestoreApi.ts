@@ -607,7 +607,7 @@ const  getParticipantContributionsSnapshot = async (participant: string): Promis
   } catch (e) { throw new Error(`Error getting contributions: ${e.message}`);}
 }
 
-export const getParticipantContributions = async (participant: string): Promise<any[]> => {
+export const getParticipantContributions = async (participant: string, isCoordinator: boolean = false): Promise<any[]> => {
   const snap = await getParticipantContributionsSnapshot(participant);
   const p = snap.docs.map(async (cs) => { 
     const cref = cs.ref.parent.parent;
@@ -615,7 +615,10 @@ export const getParticipantContributions = async (participant: string): Promise<
       const ceremony = await cref
         .withConverter(ceremonyConverter)
         .get();
-      if (RUNNING === ceremony.get('ceremonyState')) {
+      const cState = ceremony.get('ceremonyState');
+      let states = [RUNNING];
+      if (isCoordinator) states.push(PRESELECTION);
+      if (states.includes(cState)) {
         return {ceremony: ceremony.data(), ...cs.data()};
       } else {
         return null;

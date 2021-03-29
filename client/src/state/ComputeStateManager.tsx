@@ -184,7 +184,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'INCREMENT_COMPLETE_COUNT': {
-            // Circuit complete - increment the count
+            // Circuit verification advised by server - increment the count
             const cctId = action.data;
             const idx = findCircuitIndex(newState.circuits, cctId);
             if (idx >= 0) {
@@ -313,6 +313,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'CREATE_SUMMARY': {
+            // This action is not used!!
             // End-of-circuit actions completed
             //let msg;
             if (state.contributionState) {

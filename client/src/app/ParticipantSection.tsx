@@ -43,7 +43,7 @@ export const ParticipantSection = () => {
         data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username),
         accessToken: authState.accessToken });
       // Trigger contribution count for this user
-      getContributions(authState.authUser.uid, dispatch);
+      getContributions(authState.authUser.uid, dispatch, authState.isCoordinator);
     }
   };
 
