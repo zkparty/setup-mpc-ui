@@ -485,7 +485,7 @@ export const getNextQueueIndex = async (ceremonyId: string, participantId: strin
 export const getContributionState = async (ceremony: Ceremony, contribution: Contribution): Promise<ContributionState> => {
   let contState = {
     ceremony,
-    participantId: contribution.participantId,    
+    participantId: contribution.participantId,
     queueIndex: contribution.queueIndex ? contribution.queueIndex : 1,
   };
   // Get currently running contributor's index
@@ -568,7 +568,8 @@ export var ceremonyQueueListenerUnsub: () => void;
 // Listens for ceremony events, to track progress
 export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: any) => void) => {
   console.log(`listening for queue activity for ${ceremonyId}`);
-  let lastQueueIndex = -1;
+  let lastQueueIndex = -1; // Last finalised
+  let lastValidIndex = -1; // Last valid
   const db = firebase.firestore();
   // Get running ceremonies
   const query = db.collection("ceremonies")
@@ -576,12 +577,17 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
                 .collection("events")
                 .where("eventType", "in", [VERIFIED, VERIFY_FAILED, INVALIDATED, ABORTED]);
 
+  let cs: any = {};
   ceremonyQueueListenerUnsub = query.onSnapshot(querySnapshot => {
     //console.debug(`queue listener doc: ${querySnapshot.size}`);
     let found = false;
-    querySnapshot.docChanges().forEach(async docData => {
+    querySnapshot.docChanges().forEach(docData => {
       const event = docData.doc.data();
       //console.debug(`queue listener doc change index: ${cont.queueIndex}`);
+      if (event.index && event.index > lastValidIndex && event.eventType === VERIFIED) {
+        lastValidIndex = event.index;
+        cs.lastValidIndex = event.index;
+      }
 
       if (event.index && event.index > lastQueueIndex) {
         lastQueueIndex = event.index;
@@ -590,9 +596,7 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
     });
     if (found) {
       //console.debug(`new queue index ${lastQueueIndex+1}`);
-      let cs = {
-        currentIndex: lastQueueIndex + 1,
-      }
+      cs.currentIndex = lastQueueIndex + 1;
       callback(cs);
     }
   });

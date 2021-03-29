@@ -99,6 +99,7 @@ interface ComputeContextInterface {
     seriesIsComplete: boolean,
     summaryGistUrl?: string,
     isProgressPanelVisible: boolean,
+    joiningCircuit?: boolean,
 };
 
 export const initialState: ComputeContextInterface = {
@@ -114,6 +115,7 @@ export const initialState: ComputeContextInterface = {
     contributionCount: 0,
     seriesIsComplete: false,
     isProgressPanelVisible: true,
+    joiningCircuit: false,
 }
 
 const addMessage = (state: any, message: string) => {
@@ -350,6 +352,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.contributionSummary = null;
             newState.hash = '';
             newState.step = Step.INITIALISED;
+            newState.joiningCircuit = false;
             return newState;
         }
         case 'ADD_MESSAGE': {
@@ -367,7 +370,11 @@ export const computeStateReducer = (state: any, action: any):any => {
             console.debug(`step updated ${action.data}`);
             return {...state, step: action.data}
         }
+        case 'JOINING_CIRCUIT': {
+            return {...state, joiningCircuit: true }
+        }
         case 'SET_CEREMONY': {
+            newState.joiningCircuit = false;
             newState.contributionState = action.data;
             //const msg = `You are in the queue for ceremony ${action.data.ceremony.title}`;
             //newState = addMessage(newState, msg);
@@ -412,6 +419,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 contributionCount: action.data.count, 
                 userContributions: action.data.contributions,
                 step: newState.step,
+                joiningCircuit: false,
             };
         }
         case 'SET_SETTINGS': {
@@ -421,7 +429,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             return { ...state, worker: action.data };
         }
         case 'END_OF_SERIES': {
-            return { ...state, seriesIsComplete: true, step: Step.COMPLETE };
+            return { ...state, seriesIsComplete: true, joiningCircuit: false, step: Step.COMPLETE };
         }
         case 'SUMMARY_GIST_CREATED': {
             return { ...state, summaryGistUrl: action.data };

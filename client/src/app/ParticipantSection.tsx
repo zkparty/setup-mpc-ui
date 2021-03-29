@@ -33,7 +33,7 @@ export const ParticipantSection = () => {
   const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
   const summaryStarted = useRef<boolean>(false);
 
-  const { step, computeStatus, entropy, participant, contributionState, circuits } = state;
+  const { step, computeStatus, entropy, participant, contributionState, circuits, joiningCircuit } = state;
 
   const getParticipant = async () => {
     console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
@@ -155,29 +155,34 @@ export const ParticipantSection = () => {
             dispatch({ type: 'END_OF_SERIES' });
           } else if (participant) {
             // Else, get/make contribution record for new ceremony.
-            joinCircuit(newCircuit.id, participant.uid).then(cs => {              
-              if (!cs) {
-                // DB says user has already done this circuit - refresh
-                getContributions(authState.authUser.uid, dispatch, authState.isCoordinator);
-              } else {
-                // Have new contribution adn queue index
-                dispatch({
-                  type: 'SET_CEREMONY',
-                  data: cs,
-                });
-                ceremonyQueueListener(newCircuit.id, updateQueue);
-              }
-            });
+            if (!joiningCircuit) {
+              console.debug(`joining circuit`);
+              joinCircuit(newCircuit.id, participant.uid).then(cs => {
+                console.debug(`joined circuit. queue index ${cs ? cs.queueIndex : '-'}`);
+                if (!cs) {
+                  // DB says user has already done this circuit - refresh
+                  getContributions(authState.authUser.uid, dispatch, authState.isCoordinator);
+                } else {
+                  // Have new contribution and queue index
+                  dispatch({
+                    type: 'SET_CEREMONY',
+                    data: cs,
+                  });
+                  ceremonyQueueListener(newCircuit.id, updateQueue);
+                }
+              });
+              dispatch({ type: 'JOINING_CIRCUIT' });
+            }
           };
         }
         break;
       }
       case (Step.ENTROPY_COLLECTED): {
         // start looking for a ceremony to contribute to
-        if (participant) {
-          ceremonyListenerUnsub.current = ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
-        }
-        content = stepText('Starting listener...');
+        // if (participant) {
+        //   ceremonyListenerUnsub.current = ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
+        // }
+        //content = stepText('Starting listener...');
         //addMessage('Initialised.');
         if (dispatch) dispatch({ type: 'WAIT' });
         break;
