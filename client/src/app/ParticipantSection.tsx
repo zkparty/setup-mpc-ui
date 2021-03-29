@@ -14,7 +14,7 @@ import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
 import { ceremonyContributionListener,
-  ceremonyQueueListener, ceremonyQueueListenerUnsub, getParticipantContributions, getSiteSettings } from "../api/FirestoreApi";
+  ceremonyQueueListener, ceremonyQueueListenerUnsub, getContributionState, getParticipantContributions, getSiteSettings, joinCircuit } from "../api/FirestoreApi";
 import Divider from "@material-ui/core/Divider";
 import { Box, IconButton } from "@material-ui/core";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
@@ -33,7 +33,7 @@ export const ParticipantSection = () => {
   const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
   const summaryStarted = useRef<boolean>(false);
 
-  const { step, computeStatus, entropy, participant, contributionState } = state;
+  const { step, computeStatus, entropy, participant, contributionState, circuits } = state;
 
   const getParticipant = async () => {
     console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
@@ -75,6 +75,12 @@ export const ParticipantSection = () => {
         console.log(`Contribution candidate received while running another. ${step}`);
       }
     }
+  }
+
+  const advanceCircuit = () => {
+    // Get the next circuit to be completed.
+    // Return the ceremonyId, or null if they're all done
+    return circuits.find(cct => !cct.completed);
   }
 
   const updateQueue = (update: any) => {
@@ -141,10 +147,29 @@ export const ParticipantSection = () => {
         break;
       }
       case (Step.INITIALISED): {
-        // Collect entropy
-        if (entropy.length == 0) getEntropy();
-        content = stepText('Collecting entropy...');
-        if (dispatch) dispatch({type: 'SET_STEP', data: Step.ENTROPY_COLLECTED});
+        if (dispatch) {
+          // Advance to next circuit
+          const newCircuit = advanceCircuit();
+          // If no more, mark end of ceremony
+          if (!newCircuit) {
+            dispatch({ type: 'END_OF_SERIES' });
+          } else if (participant) {
+            // Else, get/make contribution record for new ceremony.
+            joinCircuit(newCircuit.id, participant.uid).then(cs => {              
+              if (!cs) {
+                // DB says user has already done this circuit - refresh
+                getContributions(authState.authUser.uid, dispatch, authState.isCoordinator);
+              } else {
+                // Have new contribution adn queue index
+                dispatch({
+                  type: 'SET_CEREMONY',
+                  data: cs,
+                });
+                ceremonyQueueListener(newCircuit.id, updateQueue);
+              }
+            });
+          };
+        }
         break;
       }
       case (Step.ENTROPY_COLLECTED): {

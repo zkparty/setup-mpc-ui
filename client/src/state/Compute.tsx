@@ -150,5 +150,12 @@ export const getContributions = (participantId: string, dispatch: Dispatch<any>,
         type: 'SET_CONTRIBUTIONS',
         data: {contributions: [], count: null},
     });
-
 }
+
+export const getEntropy = () => {
+    console.debug(`entropy set`);
+    return new Uint8Array(64).map(() => Math.random() * 256);
+};
+
+
+

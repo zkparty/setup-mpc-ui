@@ -3,7 +3,7 @@ import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionS
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
 import { createContext, Dispatch, useContext, useReducer } from "react";
-import { startWorkerThread, startDownload, startComputation, startUpload, endOfCircuit, startCreateGist } from './Compute';
+import { startDownload, startComputation, startUpload, endOfCircuit, getEntropy } from './Compute';
 
 export enum Step {
     NOT_ACKNOWLEDGED,
@@ -371,6 +371,10 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.contributionState = action.data;
             //const msg = `You are in the queue for ceremony ${action.data.ceremony.title}`;
             //newState = addMessage(newState, msg);
+            // Collect entropy
+            if (newState.entropy.length == 0) {
+                newState.entropy = getEntropy();
+            }
             if (newState.contributionState.queueIndex == 1) {
                 // There is no prior contributor to wait for
                 newState.step = Step.RUNNING;

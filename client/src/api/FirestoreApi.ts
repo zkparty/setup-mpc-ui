@@ -403,6 +403,68 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
   return unsub;
 };
 
+// Join this circuit. 
+export const joinCircuit = async (ceremonyId: string, participantId: string) => {
+  const db = firebase.firestore();
+
+  const ceremonySnapshot = await db.collection('ceremonies')
+      .doc(ceremonyId)
+      .withConverter(ceremonyConverter)
+      .get();
+
+  var ceremony = ceremonySnapshot.data();
+  if (!ceremony) {
+    console.error(`Ceremony ${ceremonyId} not found!`);
+    return undefined;
+  }
+
+  // Get any contributions for this participant
+  const contSnapshot = await ceremonySnapshot.ref.collection('contributions')
+    .withConverter(contributionConverter)
+    .where('participantId', '==', participantId)
+    .get();
+
+  if (contSnapshot.empty) {
+    // No prior entries for this participant
+    console.debug(`ceremony ${ceremonyId}: new participant`);
+    // We have a ceremony to contribute to
+    let contribution: Contribution = {
+      participantId,
+      status: WAITING,
+      lastSeen: new Date(),
+      timeAdded: new Date(),            
+    }
+    // Allocate a position in the queue
+    contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
+
+    return setContribution(ceremony, contribution);
+
+  } else {
+    const contrib = contSnapshot.docs[0].data();
+    if ((contrib.status === WAITING || contrib.status === RUNNING) ) {
+      // Re-use this
+      console.log(`Reusing contrib ${contrib.queueIndex}`);
+      contrib.lastSeen = new Date();
+      contrib.status = WAITING;
+      return setContribution(ceremony, contrib);
+    } else {
+      // Either COMPLETED or INVALIDATED - skip this circuit
+      console.log(`Participant has already attempted ${ceremonyId}`);
+      return undefined;
+    }
+  };
+};
+
+const setContribution = async (ceremony: Ceremony, contrib: Contribution): Promise<ContributionState> => {
+  // Save the contribution record
+  await addOrUpdateContribution(ceremony.id, contrib);
+
+  return getContributionState(
+    ceremony,
+    contrib
+  );
+};
+
 export const getNextQueueIndex = async (ceremonyId: string, participantId: string): Promise<number> => {
   const db = firebase.firestore();
   const query = db.collection("ceremonies")
@@ -416,11 +478,6 @@ export const getNextQueueIndex = async (ceremonyId: string, participantId: strin
     return 1;
   } else {
     const cont = snapshot.docs[0].data();
-    // If the last entry is for this participant, reuse it.
-    // TODO - should reuse earlier entries if they are still waiting
-    if (cont.participantId === participantId && cont.queueIndex) {
-      return cont.queueIndex;
-    }
     return cont.queueIndex ? cont.queueIndex + 1 : 1;
   }
 };
@@ -523,13 +580,13 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
     //console.debug(`queue listener doc: ${querySnapshot.size}`);
     let found = false;
     querySnapshot.docChanges().forEach(async docData => {
-      const cont = docData.doc.data();
+      const event = docData.doc.data();
       //console.debug(`queue listener doc change index: ${cont.queueIndex}`);
 
-      if (cont.index && cont.index > lastQueueIndex) {
-        lastQueueIndex = cont.index;
+      if (event.index && event.index > lastQueueIndex) {
+        lastQueueIndex = event.index;
         found = true;
-      } 
+      }
     });
     if (found) {
       //console.debug(`new queue index ${lastQueueIndex+1}`);
