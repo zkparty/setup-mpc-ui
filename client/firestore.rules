@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{path=**}/ceremonies/{ceremony} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    match /{path=**}/events/{event} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    
+    }
+    
+    match /{path=**}/contributions/{contrib} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    match /{path=**}/participants/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;    
+    }
+    
+    match /{path=**}/settings/{doc} {
+      allow read: if true;
+      allow write: if false;    
+    }
+    
+    match /{path=**}/coordinators/{doc} {
+    	allow read: if true;
+      allow write: if false;
+    }
+    
+    match /{document=**} {
+    	allow read, write: if false;
+    }
+  }
+}
