@@ -312,6 +312,7 @@ export const computeStateReducer = (state: any, action: any):any => {
     
                 //startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
             }
+            newState.progress = 0;
             return newState;
         }
         case 'CREATE_SUMMARY': {
@@ -353,6 +354,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.hash = '';
             newState.step = Step.INITIALISED;
             newState.joiningCircuit = false;
+            newState.progress = 0;
             return newState;
         }
         case 'ADD_MESSAGE': {

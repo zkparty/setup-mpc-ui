@@ -171,7 +171,7 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
     }
 
     return (
-      <StyledRow key={index} completed={circuit.completed} >
+      <StyledRow key={index} completed={circuit.isCompleted} >
         <StyledCell align='left' >{index}</StyledCell>
         <StyledCell component="th" align='left' >
           {circuit.complete}
