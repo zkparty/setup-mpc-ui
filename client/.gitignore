@@ -4,6 +4,6 @@ dist
 *.log
 *.cache
 build
-firebaseConfig.*
+firebaseConfig*
 .env*
 */**/*.params
