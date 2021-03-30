@@ -80,7 +80,7 @@ export const initialComputeStatus: ComputeStatus = {
     progress: {count: 0, total: 0},
 };
 
-interface ComputeContextInterface {
+export interface ComputeContextInterface {
     circuits: Ceremony[],
     computeStatus: ComputeStatus,
     messages: string [],
@@ -395,7 +395,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.contributionState = {...state.contributionState, ...action.data};
             if (newState.contributionState.queueIndex == newState.contributionState.currentIndex) {
                 console.debug(`we are go`);
-                action.unsub(); // unsubscribe from the queue listener
+                if (action.unsub) action.unsub(); // unsubscribe from the queue listener
                 newState.step = Step.RUNNING;
                 newState.computeStatus.ready = true;
             }

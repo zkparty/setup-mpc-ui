@@ -565,7 +565,7 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
 // A client may import this and use it to unsubscribe
 export var ceremonyQueueListenerUnsub: () => void;
 
-// Listens for ceremony events, to track progress
+// Listens for circuit events, to track progress
 export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: any) => void) => {
   console.log(`listening for queue activity for ${ceremonyId}`);
   let lastQueueIndex = -1; // Last finalised
