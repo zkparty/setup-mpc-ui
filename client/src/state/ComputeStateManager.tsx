@@ -160,7 +160,7 @@ const updateCompletedCircuits = (circuits: Ceremony[], contribs: any[]) => {
     contribs.map(contrib => {
         const idx = findCircuitIndex(circuits, contrib.ceremony?.id);
         if (idx >= 0) {
-            circuits[idx].completed = true;
+            circuits[idx].isCompleted = true;
             circuits[idx].hash = contrib.hash;
         }
     });
@@ -308,7 +308,7 @@ export const computeStateReducer = (state: any, action: any):any => {
 
                 // Mark it complete
                 const cct = getCurrentCircuit(newState);
-                if (cct) { cct.completed = true; }
+                if (cct) { cct.isCompleted = true; }
     
                 //startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
             }
@@ -339,7 +339,7 @@ export const computeStateReducer = (state: any, action: any):any => {
 
                 // Mark it complete
                 const cct = getCurrentCircuit(newState);
-                if (cct) { cct.completed = true; }
+                if (cct) { cct.isCompleted = true; }
             }
 
             return newState;
@@ -411,7 +411,9 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'SET_CONTRIBUTIONS': {
             // Participant's contributions, loaded from DB
-            if (action.data.count == state.circuits.size) {
+            if (newState.step === Step.ACKNOWLEDGED) {
+                newState.step = Step.INITIALISED;
+            } else if (action.data.count == state.circuits.size) {
                 newState.step = Step.COMPLETE;
             }
             updateCompletedCircuits(state.circuits, action.data.contributions);

@@ -10,13 +10,10 @@ import {
   lighterBackground,
 } from "../styles";
 import { ContributionState } from "../types/ceremony";
-import Paper from "@material-ui/core/Paper";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
-import { ceremonyContributionListener,
-  ceremonyQueueListener, ceremonyQueueListenerUnsub, getContributionState, getParticipantContributions, getSiteSettings, joinCircuit } from "../api/FirestoreApi";
-import Divider from "@material-ui/core/Divider";
-import { Box, IconButton } from "@material-ui/core";
+import { 
+  ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings, joinCircuit } from "../api/FirestoreApi";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
 import { getContributions, startWorkerThread } from "../state/Compute";
 import { createSummaryGist } from "../api/ZKPartyApi";
@@ -43,44 +40,14 @@ export const ParticipantSection = () => {
         data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username),
         accessToken: authState.accessToken });
       // Trigger contribution count for this user
-      getContributions(authState.authUser.uid, dispatch, authState.isCoordinator);
+      await getContributions(authState.authUser.uid, dispatch, authState.isCoordinator);
     }
   };
-
-  const getEntropy = () => {
-    if (dispatch) dispatch({type: 'SET_ENTROPY', data: new Uint8Array(64).map(() => Math.random() * 256)});
-    console.debug(`entropy set`);
-  };
-
-  const addMessage = (msg: string) => {
-    if (dispatch) dispatch({type: 'ADD_MESSAGE', message: msg});
-  }
-
-  const setContribution = (cs: ContributionState | boolean) => {
-    if (ceremonyListenerUnsub.current) ceremonyListenerUnsub.current();
-
-    if (!cs) {
-      // Query is telling us that all circuits have been run.
-      if (dispatch) dispatch({ type: 'END_OF_SERIES' });
-    } else if (cs instanceof Object) {
-      // New circuit to contribute to
-      // Only accept new tasks if we're waiting
-      if (step !== Step.RUNNING && step !== Step.QUEUED) {
-        if (dispatch) dispatch({
-          type: 'SET_CEREMONY',
-          data: cs,
-        });
-        ceremonyQueueListener(cs.ceremony.id, updateQueue);
-      } else {
-        console.log(`Contribution candidate received while running another. ${step}`);
-      }
-    }
-  }
 
   const advanceCircuit = () => {
     // Get the next circuit to be completed.
     // Return the ceremonyId, or null if they're all done
-    return circuits.find(cct => !cct.completed);
+    return circuits.find(cct => !cct.isCompleted);
   }
 
   const updateQueue = (update: any) => {
@@ -136,8 +103,8 @@ export const ParticipantSection = () => {
 
           if (!participant) {
             getParticipant().then(() => {
-              console.debug('INITIALISED');
-              dispatch({type: 'SET_STEP', data: Step.INITIALISED});
+              console.debug('participant set');
+              //dispatch({type: 'SET_STEP', data: Step.INITIALISED});
             });
             if (!state.worker) startWorkerThread(dispatch);
           }
@@ -150,6 +117,7 @@ export const ParticipantSection = () => {
         if (dispatch) {
           // Advance to next circuit
           const newCircuit = advanceCircuit();
+          console.debug(`new circuit is ${newCircuit?.id}`);
           // If no more, mark end of ceremony
           if (!newCircuit) {
             dispatch({ type: 'END_OF_SERIES' });

@@ -139,17 +139,18 @@ export const getContributions = (participantId: string, dispatch: Dispatch<any>,
     console.debug(`getContCount...`);
     getParticipantContributions(participantId, isCoordinator).then(
         contribs => {
+            console.debug(`contribs: ${contribs.length}`);
             dispatch({
                 type: 'SET_CONTRIBUTIONS',
                 data: {contributions: contribs, count: contribs.length},
             });
         }
     );
-    // Clear it first to avoid early summary 
-    dispatch({
-        type: 'SET_CONTRIBUTIONS',
-        data: {contributions: [], count: null},
-    });
+    // Clear it first to avoid early summary  (?????)
+    // dispatch({
+    //     type: 'SET_CONTRIBUTIONS',
+    //     data: {contributions: [], count: null},
+    // });
 }
 
 export const getEntropy = () => {

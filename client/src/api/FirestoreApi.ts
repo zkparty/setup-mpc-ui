@@ -448,7 +448,7 @@ export const joinCircuit = async (ceremonyId: string, participantId: string) => 
       contrib.status = WAITING;
       return setContribution(ceremony, contrib);
     } else {
-      // Either COMPLETED or INVALIDATED - skip this circuit
+      // Either COMPLETE or INVALIDATED - skip this circuit
       console.log(`Participant has already attempted ${ceremonyId}`);
       return undefined;
     }
@@ -650,7 +650,7 @@ export const addOrUpdateParticipant = async (participant: Participant) => {
     const doc = await db
         .doc(`participants/${participant.uid}`);
     await doc.set(participant);
-    console.log(`updated participant ${doc.id}`);
+    console.debug(`updated participant ${doc.id}`);
   } catch (e) {
      console.warn(`Error trying to update participant ${e.message}`);
   }
@@ -663,7 +663,7 @@ const  getParticipantContributionsSnapshot = async (participant: string): Promis
     const contribQuery = db.collectionGroup("contributions")
       .withConverter(contributionConverter)
       .where('participantId', '==', participant)
-      .where('status', '==', COMPLETE);
+      .where('status', 'in', [COMPLETE, INVALIDATED]);
     return contribQuery.get();
   } catch (e) { throw new Error(`Error getting contributions: ${e.message}`);}
 }
