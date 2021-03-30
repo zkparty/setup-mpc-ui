@@ -24,7 +24,7 @@ export default function AboutPanel(props: any) {
     <div style={{
       display: 'flex',
       flexDirection: 'column',
-      marginLeft: '16px',
+      marginLeft: '50px',
       marginBottom: '50px',
       marginRight: '8xp',
     }}>
@@ -72,7 +72,7 @@ export default function AboutPanel(props: any) {
       paddingBottom: '0px',
       backgroundColor: '#0E2936',
       boxShadow: '3px 3px 0px #5D7078',
-      marginRight: '16px',
+      marginRight: '50px',
       marginLeft: '8px',
       marginBottom: '50px'
     }}>

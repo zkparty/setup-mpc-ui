@@ -9,8 +9,8 @@ import { ComputeDispatchContext } from '../state/ComputeStateManager';
 
 
 const Acknowledge = ({ contribute }: { contribute: () => void}) =>
-  (<div style={{ display: 'grid', paddingTop: '20px' }}>
-    <AuthButton onClick={contribute} style={{ width: '220px' }} >
+  (<div style={{ display: 'grid', marginTop: '78px' }}>
+    <AuthButton onClick={contribute}>
       Launch Ceremony
     </AuthButton>
    </div>);
@@ -25,10 +25,10 @@ export default function WelcomePanel(props: any) {
   <div style={{ display: 'flex', flexFlow: 'column', alignItems: 'center' }}>
     <WelcomeTitle>Welcome.</WelcomeTitle>
     <div style={{ height: '41px' }} />
-    <SubtleBody>
+    <SubtleBody style={{ textAlign: 'center' }}>
       {`Thank you for joining us for our trusted setup ceremony!`}
     </SubtleBody>
-    <SubtleBody>
+    <SubtleBody style={{ textAlign: 'center' }}>
       {`Ready to make your contribution?`}
     </SubtleBody>
     <Acknowledge contribute={handleClick} />

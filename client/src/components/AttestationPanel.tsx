@@ -24,6 +24,7 @@ const StyledAccentButton = styled.a`
   height: 53px;
   display: flex;
   align-items: center;
+  justify-content: space-evenly;
   margin-right: 32px;
   text-decoration: none;
 `
