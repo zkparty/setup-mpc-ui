@@ -127,7 +127,7 @@ export const startCreateGist = (ceremony: Ceremony, index: number, hash: string,
 export const endOfCircuit = ( participantId: string, dispatch: Dispatch<any>, isCoordinator: boolean = false) => {
     console.debug(`endOfCircuit`);
     if (dispatch) {
-        getContributions(participantId, dispatch, isCoordinator);
+        //getContributions(participantId, dispatch, isCoordinator);
         dispatch({
             type: 'END_OF_CIRCUIT',
             dispatch,
