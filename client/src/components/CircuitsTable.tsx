@@ -158,7 +158,7 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
     }
 
     return (
-      <TableRow key={index} completed={circuit.completed}>
+      <TableRow key={index} completed={circuit.isCompleted}>
         <HeaderCell style={{ maxWidth: cellWidths[0] }}>{index}</HeaderCell>
         <HeaderCell style={{ maxWidth: cellWidths[1] }}>
           {circuit.complete}
