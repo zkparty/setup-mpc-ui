@@ -568,8 +568,8 @@ export var ceremonyQueueListenerUnsub: () => void;
 // Listens for circuit events, to track progress
 export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: any) => void) => {
   console.log(`listening for queue activity for ${ceremonyId}`);
-  let lastQueueIndex = -1; // Last finalised
-  let lastValidIndex = -1; // Last valid
+  let lastQueueIndex = 0; // Last finalised
+  let lastValidIndex = 0; // Last valid
   const db = firebase.firestore();
   // Get running ceremonies
   const query = db.collection("ceremonies")
@@ -580,25 +580,38 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
   let cs: any = {};
   ceremonyQueueListenerUnsub = query.onSnapshot(querySnapshot => {
     //console.debug(`queue listener doc: ${querySnapshot.size}`);
-    let found = false;
-    querySnapshot.docChanges().forEach(docData => {
-      const event = docData.doc.data();
-      //console.debug(`queue listener doc change index: ${cont.queueIndex}`);
-      if (event.index && event.index > lastValidIndex && event.eventType === VERIFIED) {
-        lastValidIndex = event.index;
-        cs.lastValidIndex = event.index;
-      }
+    //let found = false;
 
-      if (event.index && event.index > lastQueueIndex) {
-        lastQueueIndex = event.index;
-        found = true;
-      }
-    });
-    if (found) {
+    lastQueueIndex = querySnapshot.docs.reduce((last, snap) => {
+      //if (snap.type !== 'removed') {
+        const event = snap.data();
+        if (event.index && (event.index > last)) {
+          return event.index;
+        } else {
+          return last;
+        }
+      // } else {
+      //   return last;
+      //}
+    }, lastQueueIndex);
+
+    lastValidIndex = querySnapshot.docs.reduce((last, snap) => {
+      //if (snap.type !== 'removed') {
+        const event = snap.data();
+        if (event.index && (event.index > last) && event.eventType === VERIFIED) {
+          return event.index;
+        } else {
+          return last;
+        }
+      // } else {
+      //   return last;
+      // }
+    }, lastValidIndex);
+
+    //if (found) {
       //console.debug(`new queue index ${lastQueueIndex+1}`);
-      cs.currentIndex = lastQueueIndex + 1;
-      callback(cs);
-    }
+      callback({ currentIndex: lastQueueIndex + 1, lastValidIndex });
+    //}
   });
 };
 
