@@ -120,7 +120,7 @@ export const CeremonyProgress = (props: any) => {
   const { circuits, contributionCount, step, computeStatus, contributionState } = state;
   const cctCount = circuits.length;
   const ceremony = contributionState ? contributionState.ceremony : undefined;
-  const cctNum = ceremony ? ceremony.sequence || 0 : 0;
+  const cctNum = ceremony ? ceremony.sequence || contributionCount : contributionCount;
   const ceremonyPct = (cctCount>0) ? 100 * contributionCount / cctCount : 0;
   const { format } = props;
 

@@ -355,6 +355,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.step = Step.INITIALISED;
             newState.joiningCircuit = false;
             newState.progress = 0;
+            newState.contributionCount++;
             return newState;
         }
         case 'ADD_MESSAGE': {
