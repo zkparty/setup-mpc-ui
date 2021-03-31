@@ -1,6 +1,6 @@
-import React, { Dispatch, useContext, useReducer, useRef } from "react";
+import React, { Dispatch, useContext, useEffect, useReducer, useRef } from "react";
 import Typography from "@material-ui/core/Typography";
-import { AuthStateContext } from "../state/AuthContext";
+import { AuthContextInterface, AuthStateContext } from "../state/AuthContext";
 
 import {
   accentColor,
@@ -9,15 +9,12 @@ import {
   PageContainer,
   lighterBackground,
 } from "../styles";
-import { ContributionState } from "../types/ceremony";
-import Paper from "@material-ui/core/Paper";
+import { Ceremony, ContributionState, Participant } from "../types/ceremony";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
-import { ceremonyContributionListener,
-  ceremonyQueueListener, ceremonyQueueListenerUnsub, getParticipantContributions, getSiteSettings } from "../api/FirestoreApi";
-import Divider from "@material-ui/core/Divider";
-import { Box, IconButton } from "@material-ui/core";
-import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext } from '../state/ComputeStateManager';
+import { 
+  ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings, joinCircuit } from "../api/FirestoreApi";
+import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext, ComputeStatus, ComputeContextInterface } from '../state/ComputeStateManager';
 import { getContributions, startWorkerThread } from "../state/Compute";
 import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
@@ -26,64 +23,152 @@ import LoginPanel from "../components/LoginPanel";
 
 const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
 
-export const ParticipantSection = () => {
-  const state = useContext(ComputeStateContext);
-  const dispatch = useContext(ComputeDispatchContext);
-  const authState = useContext(AuthStateContext);
-  const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
-  const summaryStarted = useRef<boolean>(false);
+const handleStepChange = (state: ComputeContextInterface, 
+  dispatch: Dispatch<any> | undefined,
+  authState: AuthContextInterface
+  ) => {
 
-  const { step, computeStatus, entropy, participant, contributionState } = state;
+  const { step, computeStatus, participant, contributionState, circuits, joiningCircuit, worker } = state;
+  console.log(`handle step change ${step}`);
+  switch (step) {
+      case (Step.ACKNOWLEDGED): {
+        // After 'LAUNCH' clicked
+        // Display status messages for all remaining conditions
+        // Initialise - get participant ID, load wasm module
+        if (dispatch) {
+          getSiteSettings().then(
+            settings => {
+              dispatch({ type: 'SET_SETTINGS', data: settings });
+          });
 
-  const getParticipant = async () => {
-    console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
-    if (dispatch) {
-      dispatch({
-        type: 'SET_PARTICIPANT',
-        data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username),
-        accessToken: authState.accessToken });
-      // Trigger contribution count for this user
-      getContributions(authState.authUser.uid, dispatch);
-    }
-  };
-
-  const getEntropy = () => {
-    if (dispatch) dispatch({type: 'SET_ENTROPY', data: new Uint8Array(64).map(() => Math.random() * 256)});
-    console.debug(`entropy set`);
-  };
-
-  const addMessage = (msg: string) => {
-    if (dispatch) dispatch({type: 'ADD_MESSAGE', message: msg});
-  }
-
-  const setContribution = (cs: ContributionState | boolean) => {
-    if (ceremonyListenerUnsub.current) ceremonyListenerUnsub.current();
-
-    if (!cs) {
-      // Query is telling us that all circuits have been run.
-      if (dispatch) dispatch({ type: 'END_OF_SERIES' });
-    } else if (cs instanceof Object) {
-      // New circuit to contribute to
-      // Only accept new tasks if we're waiting
-      if (step !== Step.RUNNING && step !== Step.QUEUED) {
-        if (dispatch) dispatch({
-          type: 'SET_CEREMONY',
-          data: cs,
-        });
-        ceremonyQueueListener(cs.ceremony.id, updateQueue);
-      } else {
-        console.log(`Contribution candidate received while running another. ${step}`);
+          if (!participant && dispatch) {
+            getParticipant(dispatch, authState).then(() => {
+              console.debug('participant set');
+              //dispatch({type: 'SET_STEP', data: Step.INITIALISED});
+            });
+            if (!worker) startWorkerThread(dispatch);
+          }
+        }
+        break;
       }
-    }
-  }
+      case (Step.INITIALISED): {
+        if (dispatch) joinNewCircuit(dispatch, circuits, participant, joiningCircuit, authState);
+        break;
+      }
+      case (Step.ENTROPY_COLLECTED): {
+        if (dispatch) dispatch({ type: 'WAIT' });
+        break;
+      }
+      case (Step.RUNNING): {
+        if (computeStatus.ready && !computeStatus.running && dispatch) {
+          // TODO Is there a better place to raise this event?
+          // Start the computation
+          dispatch({
+            type: 'START_COMPUTE',
+            ceremonyId: contributionState?.ceremony.id,
+            index: contributionState?.queueIndex,
+            dispatch,
+          });
+        }
+        break;
+      }
+  };
+};
+
+const joinNewCircuit = (
+  dispatch: Dispatch<any>, 
+  circuits: Ceremony[],
+  participant: Participant | undefined,
+  joiningCircuit: boolean = false,
+  authState: AuthContextInterface,
+  ) => {
+
 
   const updateQueue = (update: any) => {
+    console.debug(`queue update ${JSON.stringify(update)} `);
     if (dispatch) dispatch({
       type: 'UPDATE_QUEUE',
       data: update,
       unsub: ceremonyQueueListenerUnsub,
     });
   }
+  
+  console.debug(`joinCircuit ${joiningCircuit}`);
+  const newCircuit = advanceCircuit(circuits);
+  console.debug(`new circuit is ${newCircuit?.id}`);
+  // If no more, mark end of ceremony
+  if (!newCircuit) {
+    dispatch({ type: 'END_OF_SERIES' });
+  } else if (participant) {
+    // Else, get/make contribution record for new ceremony.
+    // Must be called only once
+    if (!joiningCircuit) {
+      console.debug(`joining circuit`);
+      joinCircuit(newCircuit.id, participant.uid).then(cs => {
+        console.debug(`joined circuit. queue index ${cs ? cs.queueIndex : '-'}`);
+        if (!cs) {
+          // DB says user has already done this circuit - refresh
+          getContributions(authState.authUser.uid, dispatch, authState.isCoordinator);
+        } else {
+          // Have new contribution and queue index
+          dispatch({
+            type: 'SET_CEREMONY',
+            data: cs,
+          });
+          ceremonyQueueListener(newCircuit.id, updateQueue);
+        }
+      });
+      dispatch({ type: 'JOINING_CIRCUIT' });
+    }
+  };
+};
+
+const getParticipant = async (dispatch: Dispatch<any>, authState: AuthContextInterface) => {
+  console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
+  dispatch({
+    type: 'SET_PARTICIPANT',
+    data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username),
+    accessToken: authState.accessToken });
+  // Trigger contribution count for this user
+  await getContributions(authState.authUser.uid, dispatch, authState.isCoordinator);
+};
+
+const advanceCircuit = (circuits: Ceremony[]) => {
+  // Get the next circuit to be completed.
+  // Return the ceremonyId, or null if they're all done
+  return circuits.find(cct => !cct.isCompleted);
+}
+
+
+export const ParticipantSection = () => {
+  const state = useContext(ComputeStateContext);
+  const dispatch = useContext(ComputeDispatchContext);
+  const authState = useContext(AuthStateContext);
+  const summaryStarted = useRef<boolean>(false);
+
+  const { step, computeStatus, participant, contributionState, circuits, 
+    joiningCircuit, worker, seriesIsComplete, userContributions, summaryGistUrl, } = state;
+
+  useEffect(() => {
+    handleStepChange(state, dispatch, authState);
+  },[step, participant, computeStatus, contributionState, circuits, joiningCircuit, worker, authState, dispatch]);
+
+  useEffect(() => {
+    // Handle end of series
+    if (state.seriesIsComplete && state.userContributions && state.userContributions.length>0 && !state.summaryGistUrl && !summaryStarted.current) {
+      summaryStarted.current = true;
+      // Add a gist
+      const { userContributions, siteSettings, participant, accessToken } = state;
+      if (participant && participant.authId && accessToken) {
+        createSummaryGist(siteSettings, userContributions, participant.authId, accessToken).then(
+          url => {
+            if (dispatch) dispatch({ type: 'SUMMARY_GIST_CREATED', data: url });
+        })
+      }
+    }
+  },
+  [seriesIsComplete, userContributions, summaryGistUrl, summaryStarted.current, dispatch]
+  );
 
   const logState =  () => {
     const { running,  downloaded,  computed,  uploaded } = computeStatus;
@@ -95,19 +180,6 @@ export const ParticipantSection = () => {
   };
 
   let content = (<></>);
-  // Handle end of series
-  if (state.seriesIsComplete && state.userContributions && state.userContributions.length>0 && !state.summaryGistUrl && !summaryStarted.current) {
-      summaryStarted.current = true;
-      // Add a gist
-      const { userContributions, siteSettings, participant, accessToken } = state;
-      if (participant && participant.authId && accessToken) {
-        createSummaryGist(siteSettings, userContributions, participant.authId, accessToken).then(
-          url => {
-            if (dispatch) dispatch({ type: 'SUMMARY_GIST_CREATED', data: url });
-        })
-      }
-  }
-
   if (!authState.isLoggedIn) {
     content = (<LoginPanel />);
   } else {
@@ -120,72 +192,14 @@ export const ParticipantSection = () => {
       }
       case (Step.ACKNOWLEDGED): {
         // After 'LAUNCH' clicked
-        // Display status messages for all remaining conditions
-        // Initialise - get participant ID, load wasm module
-        if (dispatch) {
-          getSiteSettings().then(
-            settings => {
-              dispatch({ type: 'SET_SETTINGS', data: settings });
-          });
-
-          if (!participant) {
-            getParticipant().then(() => {
-              console.debug('INITIALISED');
-              dispatch({type: 'SET_STEP', data: Step.INITIALISED});
-            });
-            if (!state.worker) startWorkerThread(dispatch);
-          }
-        }
-
         content = stepText('Loading compute module...');
         break;
       }
-      case (Step.INITIALISED): {
-        // Collect entropy
-        if (entropy.length == 0) getEntropy();
-        content = stepText('Collecting entropy...');
-        if (dispatch) dispatch({type: 'SET_STEP', data: Step.ENTROPY_COLLECTED});
-        break;
-      }
-      case (Step.ENTROPY_COLLECTED): {
-        // start looking for a ceremony to contribute to
-        if (participant) {
-          ceremonyListenerUnsub.current = ceremonyContributionListener(participant.uid, authState.isCoordinator, setContribution);
-        }
-        content = stepText('Starting listener...');
-        //addMessage('Initialised.');
-        if (dispatch) dispatch({ type: 'WAIT' });
-        break;
-      }
-      case (Step.WAITING): {
-        // Waiting for a ceremony
-        content = (<ProgressPanel />);
-        break;
-      }
-      case (Step.QUEUED): {
-        // Waiting for a circuit
-        //if (contributionState) {
-        //  console.debug(`contribution state: ${JSON.stringify(contributionState)}`);
-        //}
-        content = (<ProgressPanel />);
-        break;
-      }
-      case (Step.RUNNING): {
-
-        if (computeStatus.ready && !computeStatus.running && dispatch) {
-          // TODO Is there a better place to raise this event?
-          // Start the computation
-          dispatch({
-            type: 'START_COMPUTE',
-            ceremonyId: contributionState?.ceremony.id,
-            index: contributionState?.queueIndex,
-            dispatch,
-          });
-        }
-
-        content = (<ProgressPanel />);
-        break;
-      }
+      case (Step.INITIALISED):
+      case (Step.ENTROPY_COLLECTED): 
+      case (Step.WAITING): 
+      case (Step.QUEUED): 
+      case (Step.RUNNING): 
       case (Step.COMPLETE): {
         content = (<ProgressPanel />);
         break;

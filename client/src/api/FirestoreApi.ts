@@ -403,6 +403,68 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
   return unsub;
 };
 
+// Join this circuit. 
+export const joinCircuit = async (ceremonyId: string, participantId: string) => {
+  const db = firebase.firestore();
+
+  const ceremonySnapshot = await db.collection('ceremonies')
+      .doc(ceremonyId)
+      .withConverter(ceremonyConverter)
+      .get();
+
+  var ceremony = ceremonySnapshot.data();
+  if (!ceremony) {
+    console.error(`Ceremony ${ceremonyId} not found!`);
+    return undefined;
+  }
+
+  // Get any contributions for this participant
+  const contSnapshot = await ceremonySnapshot.ref.collection('contributions')
+    .withConverter(contributionConverter)
+    .where('participantId', '==', participantId)
+    .get();
+
+  if (contSnapshot.empty) {
+    // No prior entries for this participant
+    console.debug(`ceremony ${ceremonyId}: new participant`);
+    // We have a ceremony to contribute to
+    let contribution: Contribution = {
+      participantId,
+      status: WAITING,
+      lastSeen: new Date(),
+      timeAdded: new Date(),            
+    }
+    // Allocate a position in the queue
+    contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
+
+    return setContribution(ceremony, contribution);
+
+  } else {
+    const contrib = contSnapshot.docs[0].data();
+    if ((contrib.status === WAITING || contrib.status === RUNNING) ) {
+      // Re-use this
+      console.log(`Reusing contrib ${contrib.queueIndex}`);
+      contrib.lastSeen = new Date();
+      contrib.status = WAITING;
+      return setContribution(ceremony, contrib);
+    } else {
+      // Either COMPLETE or INVALIDATED - skip this circuit
+      console.log(`Participant has already attempted ${ceremonyId}`);
+      return undefined;
+    }
+  };
+};
+
+const setContribution = async (ceremony: Ceremony, contrib: Contribution): Promise<ContributionState> => {
+  // Save the contribution record
+  await addOrUpdateContribution(ceremony.id, contrib);
+
+  return getContributionState(
+    ceremony,
+    contrib
+  );
+};
+
 export const getNextQueueIndex = async (ceremonyId: string, participantId: string): Promise<number> => {
   const db = firebase.firestore();
   const query = db.collection("ceremonies")
@@ -416,11 +478,6 @@ export const getNextQueueIndex = async (ceremonyId: string, participantId: strin
     return 1;
   } else {
     const cont = snapshot.docs[0].data();
-    // If the last entry is for this participant, reuse it.
-    // TODO - should reuse earlier entries if they are still waiting
-    if (cont.participantId === participantId && cont.queueIndex) {
-      return cont.queueIndex;
-    }
     return cont.queueIndex ? cont.queueIndex + 1 : 1;
   }
 };
@@ -428,7 +485,7 @@ export const getNextQueueIndex = async (ceremonyId: string, participantId: strin
 export const getContributionState = async (ceremony: Ceremony, contribution: Contribution): Promise<ContributionState> => {
   let contState = {
     ceremony,
-    participantId: contribution.participantId,    
+    participantId: contribution.participantId,
     queueIndex: contribution.queueIndex ? contribution.queueIndex : 1,
   };
   // Get currently running contributor's index
@@ -508,10 +565,11 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
 // A client may import this and use it to unsubscribe
 export var ceremonyQueueListenerUnsub: () => void;
 
-// Listens for ceremony events, to track progress
+// Listens for circuit events, to track progress
 export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: any) => void) => {
   console.log(`listening for queue activity for ${ceremonyId}`);
-  let lastQueueIndex = -1;
+  let lastQueueIndex = -1; // Last finalised
+  let lastValidIndex = -1; // Last valid
   const db = firebase.firestore();
   // Get running ceremonies
   const query = db.collection("ceremonies")
@@ -519,23 +577,26 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
                 .collection("events")
                 .where("eventType", "in", [VERIFIED, VERIFY_FAILED, INVALIDATED, ABORTED]);
 
+  let cs: any = {};
   ceremonyQueueListenerUnsub = query.onSnapshot(querySnapshot => {
     //console.debug(`queue listener doc: ${querySnapshot.size}`);
     let found = false;
-    querySnapshot.docChanges().forEach(async docData => {
-      const cont = docData.doc.data();
+    querySnapshot.docChanges().forEach(docData => {
+      const event = docData.doc.data();
       //console.debug(`queue listener doc change index: ${cont.queueIndex}`);
+      if (event.index && event.index > lastValidIndex && event.eventType === VERIFIED) {
+        lastValidIndex = event.index;
+        cs.lastValidIndex = event.index;
+      }
 
-      if (cont.index && cont.index > lastQueueIndex) {
-        lastQueueIndex = cont.index;
+      if (event.index && event.index > lastQueueIndex) {
+        lastQueueIndex = event.index;
         found = true;
-      } 
+      }
     });
     if (found) {
       //console.debug(`new queue index ${lastQueueIndex+1}`);
-      let cs = {
-        currentIndex: lastQueueIndex + 1,
-      }
+      cs.currentIndex = lastQueueIndex + 1;
       callback(cs);
     }
   });
@@ -589,7 +650,7 @@ export const addOrUpdateParticipant = async (participant: Participant) => {
     const doc = await db
         .doc(`participants/${participant.uid}`);
     await doc.set(participant);
-    console.log(`updated participant ${doc.id}`);
+    console.debug(`updated participant ${doc.id}`);
   } catch (e) {
      console.warn(`Error trying to update participant ${e.message}`);
   }
@@ -602,12 +663,12 @@ const  getParticipantContributionsSnapshot = async (participant: string): Promis
     const contribQuery = db.collectionGroup("contributions")
       .withConverter(contributionConverter)
       .where('participantId', '==', participant)
-      .where('status', '==', COMPLETE);
+      .where('status', 'in', [COMPLETE, INVALIDATED]);
     return contribQuery.get();
   } catch (e) { throw new Error(`Error getting contributions: ${e.message}`);}
 }
 
-export const getParticipantContributions = async (participant: string): Promise<any[]> => {
+export const getParticipantContributions = async (participant: string, isCoordinator: boolean = false): Promise<any[]> => {
   const snap = await getParticipantContributionsSnapshot(participant);
   const p = snap.docs.map(async (cs) => { 
     const cref = cs.ref.parent.parent;
@@ -615,7 +676,10 @@ export const getParticipantContributions = async (participant: string): Promise<
       const ceremony = await cref
         .withConverter(ceremonyConverter)
         .get();
-      if (RUNNING === ceremony.get('ceremonyState')) {
+      const cState = ceremony.get('ceremonyState');
+      let states = [RUNNING];
+      if (isCoordinator) states.push(PRESELECTION);
+      if (states.includes(cState)) {
         return {ceremony: ceremony.data(), ...cs.data()};
       } else {
         return null;

@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { useReducer } from "react";
 import { createGlobalStyle } from "styled-components";
 import { background, textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
-import { AuthContextProvider, authStateReducer, defaultAuth } from "../state/AuthContext";
+import { AuthContextProvider } from "../state/AuthContext";
 import { SelectionContextProvider } from '../state/SelectionContext';
 import firebase from "firebase/app";
 import firebaseConfig from "./firebaseConfig";

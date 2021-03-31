@@ -1,42 +1,42 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const app = express();
-const port = process.env.PORT || 80;
+//const express = require("express");
+//const bodyParser = require("body-parser");
+//const app = express();
+//const port = process.env.PORT || 80;
 const path = require("path");
-const morgan = require("morgan");
-const {
-  getCachedSummaries,
-  getAndUpdateStaleSummaries,
-  getCachedCeremony,
-  getAndUpdateStaleCeremony,
-  addCeremony,
-  getUserStatus,
-} = require("./ZKPartyServer");
+//const morgan = require("morgan");
+// const {
+//   getCachedSummaries,
+//   getAndUpdateStaleSummaries,
+//   getCachedCeremony,
+//   getAndUpdateStaleCeremony,
+//   addCeremony,
+//   getUserStatus,
+// } = require("./ZKPartyServer");
 const { prepareCircuit, verifyContribution } = require("./CircuitHandler");
 const { ceremonyEventListener } = require("./FirebaseApi");
 
 require("dotenv").config();
 
-if (process.env.NODE_ENV !== "production") {
-  app.use((req, res, next) => {
-    res.set({
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "*",
-    });
+// if (process.env.NODE_ENV !== "production") {
+//   app.use((req, res, next) => {
+//     res.set({
+//       "Access-Control-Allow-Origin": "*",
+//       "Access-Control-Allow-Headers": "*",
+//     });
 
-    next();
-  });
-}
+//     next();
+//   });
+// }
 
-app.use(bodyParser.json());
-app.use(morgan("dev"));
+// app.use(bodyParser.json());
+// app.use(morgan("dev"));
 
-app.use("/", express.static(path.join(__dirname, "../client/dist")));
+// app.use("/", express.static(path.join(__dirname, "../client/dist")));
 
-app.post("/api/get-user-status", async (req, res) => {
-  const userId = req.body;
-  res.send(getUserStatus(userId)); 
-});
+// app.post("/api/get-user-status", async (req, res) => {
+//   const userId = req.body;
+//   res.send(getUserStatus(userId)); 
+// });
 
 // app.post("/api/add-ceremony", async (req, res) => {
 //   const addCeremonyData = req.body;
@@ -105,6 +105,6 @@ app.post("/api/get-user-status", async (req, res) => {
 //   }
 // });
 
-app.listen(port, () => console.log(`App listening on port ${port}!`));
+//app.listen(port, () => console.log(`App listening on port ${port}!`));
 
 ceremonyEventListener(prepareCircuit, verifyContribution);

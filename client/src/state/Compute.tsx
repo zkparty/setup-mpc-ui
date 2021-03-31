@@ -124,10 +124,10 @@ export const startCreateGist = (ceremony: Ceremony, index: number, hash: string,
 }
 
 // All processing for the circuit has completed. 
-export const endOfCircuit = ( participantId: string, dispatch: Dispatch<any>) => {
+export const endOfCircuit = ( participantId: string, dispatch: Dispatch<any>, isCoordinator: boolean = false) => {
     console.debug(`endOfCircuit`);
     if (dispatch) {
-        getContributions(participantId, dispatch);
+        //getContributions(participantId, dispatch, isCoordinator);
         dispatch({
             type: 'END_OF_CIRCUIT',
             dispatch,
@@ -135,20 +135,28 @@ export const endOfCircuit = ( participantId: string, dispatch: Dispatch<any>) =>
     }
 }
 
-export const getContributions = (participantId: string, dispatch: Dispatch<any>) => {
+export const getContributions = (participantId: string, dispatch: Dispatch<any>, isCoordinator: boolean = false) => {
     console.debug(`getContCount...`);
-    getParticipantContributions(participantId).then(
+    getParticipantContributions(participantId, isCoordinator).then(
         contribs => {
+            console.debug(`contribs: ${contribs.length}`);
             dispatch({
                 type: 'SET_CONTRIBUTIONS',
                 data: {contributions: contribs, count: contribs.length},
             });
         }
     );
-    // Clear it first to avoid early summary 
-    dispatch({
-        type: 'SET_CONTRIBUTIONS',
-        data: {contributions: [], count: null},
-    });
-
+    // Clear it first to avoid early summary  (?????)
+    // dispatch({
+    //     type: 'SET_CONTRIBUTIONS',
+    //     data: {contributions: [], count: null},
+    // });
 }
+
+export const getEntropy = () => {
+    console.debug(`entropy set`);
+    return new Uint8Array(64).map(() => Math.random() * 256);
+};
+
+
+

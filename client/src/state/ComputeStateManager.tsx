@@ -3,7 +3,7 @@ import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionS
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
 import { createContext, Dispatch, useContext, useReducer } from "react";
-import { startWorkerThread, startDownload, startComputation, startUpload, endOfCircuit, startCreateGist } from './Compute';
+import { startDownload, startComputation, startUpload, endOfCircuit, getEntropy } from './Compute';
 
 export enum Step {
     NOT_ACKNOWLEDGED,
@@ -80,7 +80,7 @@ export const initialComputeStatus: ComputeStatus = {
     progress: {count: 0, total: 0},
 };
 
-interface ComputeContextInterface {
+export interface ComputeContextInterface {
     circuits: Ceremony[],
     computeStatus: ComputeStatus,
     messages: string [],
@@ -99,6 +99,7 @@ interface ComputeContextInterface {
     seriesIsComplete: boolean,
     summaryGistUrl?: string,
     isProgressPanelVisible: boolean,
+    joiningCircuit?: boolean,
 };
 
 export const initialState: ComputeContextInterface = {
@@ -114,6 +115,7 @@ export const initialState: ComputeContextInterface = {
     contributionCount: 0,
     seriesIsComplete: false,
     isProgressPanelVisible: true,
+    joiningCircuit: false,
 }
 
 const addMessage = (state: any, message: string) => {
@@ -158,7 +160,7 @@ const updateCompletedCircuits = (circuits: Ceremony[], contribs: any[]) => {
     contribs.map(contrib => {
         const idx = findCircuitIndex(circuits, contrib.ceremony?.id);
         if (idx >= 0) {
-            circuits[idx].completed = true;
+            circuits[idx].isCompleted = true;
             circuits[idx].hash = contrib.hash;
         }
     });
@@ -184,7 +186,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'INCREMENT_COMPLETE_COUNT': {
-            // Circuit complete - increment the count
+            // Circuit verification advised by server - increment the count
             const cctId = action.data;
             const idx = findCircuitIndex(newState.circuits, cctId);
             if (idx >= 0) {
@@ -306,13 +308,15 @@ export const computeStateReducer = (state: any, action: any):any => {
 
                 // Mark it complete
                 const cct = getCurrentCircuit(newState);
-                if (cct) { cct.completed = true; }
+                if (cct) { cct.isCompleted = true; }
     
                 //startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
             }
+            newState.progress = 0;
             return newState;
         }
         case 'CREATE_SUMMARY': {
+            // This action is not used!!
             // End-of-circuit actions completed
             //let msg;
             if (state.contributionState) {
@@ -336,7 +340,7 @@ export const computeStateReducer = (state: any, action: any):any => {
 
                 // Mark it complete
                 const cct = getCurrentCircuit(newState);
-                if (cct) { cct.completed = true; }
+                if (cct) { cct.isCompleted = true; }
             }
 
             return newState;
@@ -349,6 +353,8 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.contributionSummary = null;
             newState.hash = '';
             newState.step = Step.INITIALISED;
+            newState.joiningCircuit = false;
+            newState.progress = 0;
             return newState;
         }
         case 'ADD_MESSAGE': {
@@ -366,10 +372,18 @@ export const computeStateReducer = (state: any, action: any):any => {
             console.debug(`step updated ${action.data}`);
             return {...state, step: action.data}
         }
+        case 'JOINING_CIRCUIT': {
+            return {...state, joiningCircuit: true }
+        }
         case 'SET_CEREMONY': {
+            newState.joiningCircuit = false;
             newState.contributionState = action.data;
             //const msg = `You are in the queue for ceremony ${action.data.ceremony.title}`;
             //newState = addMessage(newState, msg);
+            // Collect entropy
+            if (newState.entropy.length == 0) {
+                newState.entropy = getEntropy();
+            }
             if (newState.contributionState.queueIndex == 1) {
                 // There is no prior contributor to wait for
                 newState.step = Step.RUNNING;
@@ -383,7 +397,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.contributionState = {...state.contributionState, ...action.data};
             if (newState.contributionState.queueIndex == newState.contributionState.currentIndex) {
                 console.debug(`we are go`);
-                action.unsub(); // unsubscribe from the queue listener
+                if (action.unsub) action.unsub(); // unsubscribe from the queue listener
                 newState.step = Step.RUNNING;
                 newState.computeStatus.ready = true;
             }
@@ -399,7 +413,9 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'SET_CONTRIBUTIONS': {
             // Participant's contributions, loaded from DB
-            if (action.data.count == state.circuits.size) {
+            if (newState.step === Step.ACKNOWLEDGED) {
+                newState.step = Step.INITIALISED;
+            } else if (action.data.count == state.circuits.size) {
                 newState.step = Step.COMPLETE;
             }
             updateCompletedCircuits(state.circuits, action.data.contributions);
@@ -407,6 +423,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 contributionCount: action.data.count, 
                 userContributions: action.data.contributions,
                 step: newState.step,
+                joiningCircuit: false,
             };
         }
         case 'SET_SETTINGS': {
@@ -416,7 +433,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             return { ...state, worker: action.data };
         }
         case 'END_OF_SERIES': {
-            return { ...state, seriesIsComplete: true, step: Step.COMPLETE };
+            return { ...state, seriesIsComplete: true, joiningCircuit: false, step: Step.COMPLETE };
         }
         case 'SUMMARY_GIST_CREATED': {
             return { ...state, summaryGistUrl: action.data };
