@@ -32,5 +32,9 @@ export default function WelcomePanel(props: any) {
       {`Ready to make your contribution?`}
     </SubtleBody>
     <Acknowledge contribute={handleClick} />
+    <div style={{ height: '41px' }} />
+    <SubtleBody style={{ textAlign: 'center', color: '#aa0000' }}>
+      {`Please note: Zkopru has no token and there won't be an airdrop to trusted setup participants`}
+    </SubtleBody>
   </div>);
 }
