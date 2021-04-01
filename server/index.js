@@ -17,6 +17,6 @@ const { ceremonyEventListener } = require("./FirebaseApi");
 
 require("dotenv").config();
 
-const circuitList = JSON.parse('./circuits.json')
+const circuitList = require('./circuits.json');
 
 ceremonyEventListener(prepareCircuit, verifyContribution, circuitList);
