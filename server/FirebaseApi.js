@@ -344,7 +344,7 @@ function firebaseParticipantJsonToParticipant(json) {
   return json;
 }
 
-const ceremonyEventListener = async (circuitFileUpdateHandler, verifyContribution) => {
+const ceremonyEventListener = async (circuitFileUpdateHandler, verifyContribution, circuitsList) => {
   console.log(`starting events listener...`);
   try {
     const eventsCollection = db.collectionGroup("events");
@@ -363,25 +363,27 @@ const ceremonyEventListener = async (circuitFileUpdateHandler, verifyContributio
           var event = docSnapshot.doc.data();
           const ceremony = docSnapshot.doc.ref.parent.parent;
           console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony.id}`);
-          switch (event.eventType) {
-            case 'CIRCUIT_FILE_UPLOAD': {
-              // Coordinator advises that r1cs file has been uploaded
-              // Handle the r1cs file
-              console.debug(`Have CIRCUIT_FILE_UPLOAD event`)
-              circuitFileUpdateHandler(ceremony.id); // This happens asynchronously
-              docSnapshot.doc.ref.update({acknowledged: true});
-              break;
+          if (circuitsList.includes(ceremony.id)) {
+            switch (event.eventType) {
+              case 'CIRCUIT_FILE_UPLOAD': {
+                // Coordinator advises that r1cs file has been uploaded
+                // Handle the r1cs file
+                console.debug(`Have CIRCUIT_FILE_UPLOAD event`)
+                circuitFileUpdateHandler(ceremony.id); // This happens asynchronously
+                docSnapshot.doc.ref.update({acknowledged: true});
+                break;
+              }
+              case 'PARAMS_UPLOADED': {
+                // Participant advises that contrib file has been uploaded
+                // DO the steps to verify it
+                console.debug(`Have PARAMS_UPLOADED event`);
+                verifyContribution(ceremony.id, event.index);
+                docSnapshot.doc.ref.update({acknowledged: true});
+                break;
+              }
+              case 'PREPARED': { break; }
+              case 'CREATE': { break; }
             }
-            case 'PARAMS_UPLOADED': {
-              // Participant advises that contrib file has been uploaded
-              // DO the steps to verify it
-              console.debug(`Have PARAMS_UPLOADED event`);
-              verifyContribution(ceremony.id, event.index);
-              docSnapshot.doc.ref.update({acknowledged: true});
-              break;
-            }
-            case 'PREPARED': { break; }
-            case 'CREATE': { break; }
           }
       }});
     }, err => {
