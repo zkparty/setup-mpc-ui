@@ -1,6 +1,6 @@
 [Service]
-ExecStart=/usr/bin/node /root/setup-mpc-ui/server/index.js
-WorkingDirectory=/root/setup-mpc-ui/server
+ExecStart=/usr/bin/node /home/ubuntu/setup-mpc-ui/server/index.js
+WorkingDirectory=/home/ubuntu/setup-mpc-ui/server
 Restart=always
 StandardOutput=syslog
 SyslogIdentifier=mpcserver
