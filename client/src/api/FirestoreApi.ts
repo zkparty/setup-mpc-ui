@@ -767,3 +767,12 @@ export const getSiteSettings = async (): Promise<any> => {
     console.warn(`Error getting site settings: ${err.message}`);
   }
 }
+
+export const extractContribs = async (): Promise<any[]> => {
+  const db = firebase.firestore();
+  const snap = await db.collectionGroup('contributions')
+    .withConverter(contributionConverter)
+    .get();
+
+  return snap.docs;
+}
