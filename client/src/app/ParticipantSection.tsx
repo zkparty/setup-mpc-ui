@@ -86,11 +86,17 @@ const joinNewCircuit = (
 
   const updateQueue = (update: any) => {
     console.debug(`queue update ${JSON.stringify(update)} `);
-    if (dispatch) dispatch({
-      type: 'UPDATE_QUEUE',
-      data: update,
-      unsub: ceremonyQueueListenerUnsub,
-    });
+    // Sanity check - only continue if lastValidIndex > 0
+    // Coordinator excepted
+    if (update.lastValidIndex > 0 || authState.isCoordinator) {
+      if (dispatch) dispatch({
+        type: 'UPDATE_QUEUE',
+        data: update,
+        unsub: ceremonyQueueListenerUnsub,
+      });
+    } else {
+      console.warn(`lastValidIndex is 0. Queue update not accepted`);
+    }
   }
   
   console.debug(`joinCircuit ${joiningCircuit}`);
@@ -105,6 +111,7 @@ const joinNewCircuit = (
     if (!joiningCircuit) {
       console.debug(`joining circuit`);
       joinCircuit(newCircuit.id, participant.uid).then(cs => {
+        // Coordinator excepted
         console.debug(`joined circuit. queue index ${cs ? cs.queueIndex : '-'}`);
         if (!cs) {
           // DB says user has already done this circuit - refresh

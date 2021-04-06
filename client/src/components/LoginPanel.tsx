@@ -21,7 +21,7 @@ export default function LoginPanel(props: any) {
     <WelcomeTitle>{project}</WelcomeTitle>
     <div style={{ height: '41px' }} />
     <SubtleBody style={{ textAlign: 'center' }}>
-      {`Trusted Setup Ceremony March, 2021`}
+      {`Trusted Setup Ceremony March/April, 2021`}
     </SubtleBody>
     <NormalBodyText style={{ marginTop: '8px' }}>
       {`Participate using your GitHub account.`}
