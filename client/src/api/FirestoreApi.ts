@@ -768,7 +768,7 @@ export const getSiteSettings = async (): Promise<any> => {
   }
 }
 
-export const extractContribs = async (): Promise<any[]> => {
+export const extractContribs = async (): Promise<firebase.firestore.QueryDocumentSnapshot<ContributionSummary>[]> => {
   const db = firebase.firestore();
   const snap = await db.collectionGroup('contributions')
     .withConverter(contributionConverter)
