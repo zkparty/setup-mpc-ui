@@ -394,6 +394,38 @@ const ceremonyEventListener = async (circuitFileUpdateHandler, verifyContributio
   }
 };
 
+const resetContrib = async (circuitId, participantId, idx) => {
+  //console.debug(`p: ${participantId} c: ${circuitId} `);
+  const contrib = await db.collection('ceremonies')
+        .doc(circuitId)
+        .collection('contributions')
+        .withConverter(ceremonyConverter)
+        .where('participantId', '==', participantId)
+        //.where('status', '!=', 'WAITING')
+        .get();
+  
+  
+  
+  if (contrib.empty) {
+    console.log(`Contrib for ${participantId} not found in ${circuitId}`);
+  } else {
+    const complete = contrib.docs.filter(doc => {return (doc.get('status') == 'COMPLETE') || (doc.get('status') == 'INVALIDATED')});
+    if (complete.length > 1) {
+      console.log(`Duplicate Contrib for ${participantId} found in ${circuitId}`);
+    } else if (complete.length > 0) {
+      if (complete[0].get('queueIndex') !== idx) {
+        console.warn(`index mismatch for ${participantId} not found in ${circuitId} ${contrib.docs[0].get('queueIndex')} expected ${idx} `);
+      } else {
+        complete[0].ref.update({participantId: `RESET_${participantId} `, status: 'INVALIDATED'});
+        console.log(`updated ${circuitId}, p: ${participantId} i: ${idx}`);
+      }
+    } else {
+      console.log(`No final contrib ${circuitId}, p: ${participantId} i: ${idx}`);
+    }
+  }
+}
+
+
 module.exports = {
   getFBSummaries,
   getFBSummary,
@@ -409,4 +441,5 @@ module.exports = {
   addContributionEvent,
   addVerificationToContribution,
   updateContribution,
+  resetContrib,
 };
