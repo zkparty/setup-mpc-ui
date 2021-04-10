@@ -518,6 +518,7 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   // For average time calcs
   let totalSecs = 0;
   let numContribs = 0;
+  let durationContribs = 0;
 
   const db = firebase.firestore();
   const ceremony = db.collection("ceremonies")
@@ -542,9 +543,12 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
         }
       }
 
-      if (cont.status === COMPLETE && cont.duration) {
+      if (cont.status === COMPLETE) {
         numContribs++;
-        totalSecs += cont.duration;
+        if (cont.duration) {
+          durationContribs++;
+          totalSecs += cont.duration;
+        }
       }
     } else if (cont.status === WAITING) {
       contributionStats.waiting ++;
@@ -552,8 +556,8 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   });
 
   contributionStats.averageSecondsPerContribution = 
-      (numContribs > 0) ? 
-        Math.floor(totalSecs / numContribs) 
+      (durationContribs > 0) ? 
+        Math.floor(totalSecs / durationContribs) 
       : ceremonySnap.get('numConstraints') * 5 / 1000; // calc sensible default based on circuit size
 
   contributionStats.complete = numContribs;
