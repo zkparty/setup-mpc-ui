@@ -3,7 +3,7 @@ const { resetContrib } = require('./FirebaseApi');
 
 const run = () => {
 
-    fs.readFile('//mnt/c/temp/zkopru/reset_list.csv', 'utf8', (err, data) => {
+    fs.readFile('//mnt/c/temp/zkopru/reset_waiting.csv', 'utf8', (err, data) => {
         if (err) {
             console.warn(err.message);
             return;

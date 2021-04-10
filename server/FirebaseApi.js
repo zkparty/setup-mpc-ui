@@ -401,7 +401,6 @@ const resetContrib = async (circuitId, participantId, idx) => {
         .collection('contributions')
         .withConverter(ceremonyConverter)
         .where('participantId', '==', participantId)
-        //.where('status', '!=', 'WAITING')
         .get();
   
   
@@ -409,18 +408,18 @@ const resetContrib = async (circuitId, participantId, idx) => {
   if (contrib.empty) {
     console.log(`Contrib for ${participantId} not found in ${circuitId}`);
   } else {
-    const complete = contrib.docs.filter(doc => {return (doc.get('status') == 'COMPLETE') || (doc.get('status') == 'INVALIDATED')});
+    const complete = contrib.docs.filter(doc => {return (doc.get('status') == 'WAITING') });
     if (complete.length > 1) {
       console.log(`Duplicate Contrib for ${participantId} found in ${circuitId}`);
     } else if (complete.length > 0) {
       if (complete[0].get('queueIndex') !== idx) {
         console.warn(`index mismatch for ${participantId} not found in ${circuitId} ${contrib.docs[0].get('queueIndex')} expected ${idx} `);
       } else {
-        complete[0].ref.update({participantId: `RESET_${participantId} `, status: 'INVALIDATED'});
-        console.log(`updated ${circuitId}, p: ${participantId} i: ${idx}`);
+        complete[0].ref.delete();
+        console.log(`deleted ${circuitId}, p: ${participantId} i: ${idx}`);
       }
     } else {
-      console.log(`No final contrib ${circuitId}, p: ${participantId} i: ${idx}`);
+      console.log(`No waiting contrib ${circuitId}, p: ${participantId} i: ${idx}`);
     }
   }
 }
