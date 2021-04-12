@@ -1,24 +1,10 @@
 import * as React from 'react';
-import { useState, useEffect, Fragment, useContext, useRef } from "react";
+import { useState, useEffect, useContext, } from "react";
 import {
-    accentColor,
-    secondAccent,
-    textColor,
-    PageContainer,
-    lighterBackground,
-    SectionContainer,
-    CeremonyTitle,
-    darkBorder,
     NormalBodyText,
-    darkerBackground,
-    gray1,
     PanelTitle,
   } from "../styles";
-//import './styles.css';
-import TableContainer from '@material-ui/core/TableContainer';
-import { Button, withStyles } from '@material-ui/core';
 import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
-import styled from 'styled-components';
 import { startCircuitEventListener, startCircuitListener } from '../state/Circuits';
 import { AuthStateContext } from '../state/AuthContext';
 import CircuitsTable from './CircuitsTable';

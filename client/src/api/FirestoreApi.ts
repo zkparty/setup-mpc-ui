@@ -119,8 +119,8 @@ export const getCeremonies = async (): Promise<Ceremony[]> => {
 
   const ceremonies = await Promise.all(
     ceremonySnapshot.docs.map(async doc => {
-      const count = await getCeremonyStats(doc.ref.id);
-      const c: Ceremony = {...doc.data(), ...count};
+      //const count = await getCeremonyStats(doc.ref.id);
+      const c: Ceremony = doc.data();
       return c;
     }));
   return ceremonies;
