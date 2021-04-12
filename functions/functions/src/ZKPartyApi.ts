@@ -1,4 +1,4 @@
-import { Ceremony } from "./types/ceremony";
+import { Ceremony, Contribution } from "./types/ceremony";
 
 
 export function jsonToCeremony(json: any): Ceremony {
@@ -24,8 +24,14 @@ export function jsonToCeremony(json: any): Ceremony {
   };
 }
 
-// export const jsonToContribution = (json: any): Contribution => {
-//   return {
-//     ...json
-//   }
-// }
+export const jsonToContribution = (json: any): Contribution => {
+  try {
+    return {
+      ...json,
+    }
+  } catch (err) {
+    console.error(`Error converting contrib: ${err.message}`);
+    throw err;
+  }
+}
+

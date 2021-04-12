@@ -1,3 +1,5 @@
+import { Timestamp }  from '@firebase/firestore-types';
+
 export type CeremonyState =
   | "PRESELECTION"
   | "SELECTED"
@@ -106,3 +108,33 @@ export interface Message {
 //declare global {
 //  interface Window { wasmPhase2: any; }
 //}
+
+export interface Contribution {
+  participantId: string; // Firebase ID
+  participantAuthId?: string; // Authorising platform ID
+  queueIndex?: number;
+  lastSeen?: Timestamp;
+  timeAdded?: Timestamp;
+  status: ParticipantState;
+  index?: number;
+  priorIndex?: number;
+  verification?: string;
+}
+
+export interface ContributionSummary extends Contribution {
+  paramsFile?: string;
+  timeCompleted?: Timestamp;
+  hash?: string;
+  duration?: number;
+}
+
+export interface ContributionState {
+  ceremony: Ceremony;
+  queueIndex: number;
+  currentIndex: number;
+  lastValidIndex: number;
+  averageSecondsPerContribution: number;
+  expectedStartTime?: Timestamp;
+  status: ParticipantState;
+  startTime?: Timestamp;
+}
