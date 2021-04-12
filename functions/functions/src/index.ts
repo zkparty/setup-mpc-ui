@@ -257,9 +257,9 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
     .withConverter(contributionConverter)
     .orderBy('queueIndex', 'asc');
   
-  //const ceremonySnap = await ceremony.get();
+  const ceremonySnap = await ceremony.get();
   const snapshot = await contribQuery.get();
-  functions.logger.info(`contribs: ${snapshot.size}`);
+  //functions.logger.info(`contribs: ${snapshot.size}`);
   snapshot.forEach( (docSnapshot:firebase.firestore.QueryDocumentSnapshot<ContributionSummary>) => {
     const cont = docSnapshot.data();
     if (cont.status === COMPLETE
@@ -288,8 +288,7 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
   contributionStats.averageSecondsPerContribution = 
       (durationContribs > 0) ? 
         Math.floor(totalSecs / durationContribs) 
-        : 200;
-      //: ceremonySnap.get('numConstraints') * 5 / 1000; // calc sensible default based on circuit size
+      : ceremonySnap.get('numConstraints') * 5 / 1000; // calc sensible default based on circuit size
 
   contributionStats.complete = numContribs;
 
