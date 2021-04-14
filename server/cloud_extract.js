@@ -26,6 +26,25 @@ const run = () => {
                 })
                 fs.close(fd, err => {if (err) console.warn(err.message)});
             });
+            fs.open(`c${cctNum}_index.html`,'w', (err, fd) => {
+                if (err) {
+                    console.warn(err.message);
+                    return;
+                }
+                //fs.write(fd, '<tr>\n', err => {if (err) console.warn(err.message)});
+
+                let i = 1;
+                cct.contributions.forEach(cont => {
+                    const contNum = ('0000' + cont.contributor).substr(-4);
+                    fs.writeSync(fd, `<tr>\n<td>${i++}</td>\n` +
+                        `<td>${cont.username}</td>\n` +
+                        `<td><a href="./c${cctNum}_${contNum}_${cont.username}.zkey">download</a></td>\n` +
+                        `<td><a href="./c${cctNum}_transcript_${contNum}.txt">link</a></td>\n` +
+                        `</tr>\n`,
+                        err => {if (err) console.warn(err.message)});
+                })
+                fs.close(fd, err => {if (err) console.warn(err.message)});
+            });
         });
     });
 }
