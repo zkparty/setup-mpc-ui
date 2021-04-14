@@ -424,6 +424,48 @@ const resetContrib = async (circuitId, participantId, idx) => {
   }
 }
 
+const getVerifiedContribs = async () => {
+  //const db = firebase.firestore();
+
+  const cctQuery = await db.collection('ceremonies')
+    .withConverter(ceremonyConverter)
+    .where('ceremonyState', '==', 'RUNNING')
+    .get();
+  console.debug(`circuits ${cctQuery.size}`);
+
+  let circuits = [];
+  const cctDocs = cctQuery.docs;
+  for (let cctDoc of cctDocs) {
+    console.log(`cctDoc is ${cctDoc.get('sequence')}`);
+    circuits.push(new Promise(async (resolve, reject) => {
+      let contribs = [];
+      //const cct = cctDoc.data();
+      const cctNo = cctDoc.get('sequence');
+      const cctId = cctDoc.id;
+      const contribQuery = await cctDoc.ref.collection('contributions')
+        .withConverter(contributionConverter)
+        .where('status', '==', 'COMPLETE')
+        .orderBy('queueIndex')
+        .get();
+      
+      console.debug(`contribs ${contribQuery.size}`);
+      contribQuery.forEach(doc => {
+        contribs.push({
+          contributor: doc.get('queueIndex'),
+          prior: doc.get('priorIndex'),
+          username: doc.get('participantAuthId'),
+        });
+      });
+      resolve({
+        id: cctId,
+        number: cctNo,
+        contributions: contribs,
+      });
+    }));
+  }
+  
+  return Promise.all(circuits);  
+}
 
 module.exports = {
   getFBSummaries,
@@ -441,4 +483,5 @@ module.exports = {
   addVerificationToContribution,
   updateContribution,
   resetContrib,
+  getVerifiedContribs,
 };
