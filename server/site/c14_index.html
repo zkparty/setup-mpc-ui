@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Circuit 14</h1>
+<h2>Circuit file</h2>
+<a href="./zk_transaction_4_2.r1cs">zk_transaction_4_2.r1cs</a>
+<p>To verify:</p>
+<p><pre>snarkjs zkv zk_transaction_4_2.r1cs pot17_final.ptau [c14_xxxx.zkey]</pre></p>
+<p>or</p>
+<p><pre>snarkjs zkvi c14_0000.zkey pot17_final.ptau [c14_xxxx.zkey]</pre></p>
+<br />
+<h2>Contributions</h2>
+<table>
+    <tr>
+        <th>No.</th>
+        <th>Username</th>
+        <th>Contribution .zkey File</th>
+        <th>Transcript</th>
+    </tr>
+    <tr>
+        <td>0</td>
+        <td> </td>
+        <td><a href="./c14_0000.zkey">download</a></td>
+        <td> </td>
+    </tr>
+<tr>
+<td>1</td>
+<td>glamperd</td>
+<td><a href="./c14_0001_glamperd.zkey">download</a></td>
+<td><a href="./c14_transcript_0001.txt">link</a></td>
+</tr>
+<tr>
+<td>2</td>
+<td>stonebell-au</td>
+<td><a href="./c14_0002_stonebell-au.zkey">download</a></td>
+<td><a href="./c14_transcript_0002.txt">link</a></td>
+</tr>
+<tr>
+<td>3</td>
+<td>anonymous</td>
+<td><a href="./c14_0003_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0003.txt">link</a></td>
+</tr>
+<tr>
+<td>4</td>
+<td>kobigurk</td>
+<td><a href="./c14_0004_kobigurk.zkey">download</a></td>
+<td><a href="./c14_transcript_0004.txt">link</a></td>
+</tr>
+<tr>
+<td>5</td>
+<td>anonymous</td>
+<td><a href="./c14_0005_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0005.txt">link</a></td>
+</tr>
+<tr>
+<td>6</td>
+<td>anonymous</td>
+<td><a href="./c14_0006_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0006.txt">link</a></td>
+</tr>
+<tr>
+<td>7</td>
+<td>romasolo</td>
+<td><a href="./c14_0007_romasolo.zkey">download</a></td>
+<td><a href="./c14_transcript_0007.txt">link</a></td>
+</tr>
+<tr>
+<td>8</td>
+<td>alexstolr</td>
+<td><a href="./c14_0008_alexstolr.zkey">download</a></td>
+<td><a href="./c14_transcript_0008.txt">link</a></td>
+</tr>
+<tr>
+<td>9</td>
+<td>umetaku33</td>
+<td><a href="./c14_0009_umetaku33.zkey">download</a></td>
+<td><a href="./c14_transcript_0009.txt">link</a></td>
+</tr>
+<tr>
+<td>10</td>
+<td>anonymous</td>
+<td><a href="./c14_0010_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0010.txt">link</a></td>
+</tr>
+<tr>
+<td>11</td>
+<td>DecentrilizedMan</td>
+<td><a href="./c14_0011_DecentrilizedMan.zkey">download</a></td>
+<td><a href="./c14_transcript_0011.txt">link</a></td>
+</tr>
+<tr>
+<td>12</td>
+<td>anonymous</td>
+<td><a href="./c14_0013_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0013.txt">link</a></td>
+</tr>
+<tr>
+<td>13</td>
+<td>anonymous</td>
+<td><a href="./c14_0014_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0014.txt">link</a></td>
+</tr>
+<tr>
+<td>14</td>
+<td>StarLI-Trapdoor</td>
+<td><a href="./c14_0015_StarLI-Trapdoor.zkey">download</a></td>
+<td><a href="./c14_transcript_0015.txt">link</a></td>
+</tr>
+<tr>
+<td>15</td>
+<td>anonymous</td>
+<td><a href="./c14_0016_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0016.txt">link</a></td>
+</tr>
+<tr>
+<td>16</td>
+<td>anonymous</td>
+<td><a href="./c14_0017_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0017.txt">link</a></td>
+</tr>
+<tr>
+<td>17</td>
+<td>anonymous</td>
+<td><a href="./c14_0018_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0018.txt">link</a></td>
+</tr>
+<tr>
+<td>18</td>
+<td>anonymous</td>
+<td><a href="./c14_0019_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0019.txt">link</a></td>
+</tr>
+<tr>
+<td>19</td>
+<td>anonymous</td>
+<td><a href="./c14_0020_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0020.txt">link</a></td>
+</tr>
+<tr>
+<td>20</td>
+<td>anonymous</td>
+<td><a href="./c14_0023_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0023.txt">link</a></td>
+</tr>
+<tr>
+<td>21</td>
+<td>anonymous</td>
+<td><a href="./c14_0026_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0026.txt">link</a></td>
+</tr>
+<tr>
+<td>22</td>
+<td>anonymous</td>
+<td><a href="./c14_0028_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0028.txt">link</a></td>
+</tr>
+<tr>
+<td>23</td>
+<td>praneethmendu</td>
+<td><a href="./c14_0029_praneethmendu.zkey">download</a></td>
+<td><a href="./c14_transcript_0029.txt">link</a></td>
+</tr>
+<tr>
+<td>24</td>
+<td>anonymous</td>
+<td><a href="./c14_0031_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0031.txt">link</a></td>
+</tr>
+<tr>
+<td>25</td>
+<td>anonymous</td>
+<td><a href="./c14_0032_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0032.txt">link</a></td>
+</tr>
+<tr>
+<td>26</td>
+<td>anonymous</td>
+<td><a href="./c14_0033_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0033.txt">link</a></td>
+</tr>
+<tr>
+<td>27</td>
+<td>Namsaayin</td>
+<td><a href="./c14_0034_Namsaayin.zkey">download</a></td>
+<td><a href="./c14_transcript_0034.txt">link</a></td>
+</tr>
+<tr>
+<td>28</td>
+<td>MoonBuubbles</td>
+<td><a href="./c14_0035_MoonBuubbles.zkey">download</a></td>
+<td><a href="./c14_transcript_0035.txt">link</a></td>
+</tr>
+<tr>
+<td>29</td>
+<td>luckyx17</td>
+<td><a href="./c14_0036_luckyx17.zkey">download</a></td>
+<td><a href="./c14_transcript_0036.txt">link</a></td>
+</tr>
+<tr>
+<td>30</td>
+<td>0xScarface</td>
+<td><a href="./c14_0038_0xScarface.zkey">download</a></td>
+<td><a href="./c14_transcript_0038.txt">link</a></td>
+</tr>
+<tr>
+<td>31</td>
+<td>DrCrypt0o</td>
+<td><a href="./c14_0040_DrCrypt0o.zkey">download</a></td>
+<td><a href="./c14_transcript_0040.txt">link</a></td>
+</tr>
+<tr>
+<td>32</td>
+<td>anonymous</td>
+<td><a href="./c14_0041_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0041.txt">link</a></td>
+</tr>
+<tr>
+<td>33</td>
+<td>anonymous</td>
+<td><a href="./c14_0042_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0042.txt">link</a></td>
+</tr>
+<tr>
+<td>34</td>
+<td>anonymous</td>
+<td><a href="./c14_0043_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0043.txt">link</a></td>
+</tr>
+<tr>
+<td>35</td>
+<td>joelahmed89</td>
+<td><a href="./c14_0044_joelahmed89.zkey">download</a></td>
+<td><a href="./c14_transcript_0044.txt">link</a></td>
+</tr>
+<tr>
+<td>36</td>
+<td>techieanant</td>
+<td><a href="./c14_0045_techieanant.zkey">download</a></td>
+<td><a href="./c14_transcript_0045.txt">link</a></td>
+</tr>
+<tr>
+<td>37</td>
+<td>leafan</td>
+<td><a href="./c14_0047_leafan.zkey">download</a></td>
+<td><a href="./c14_transcript_0047.txt">link</a></td>
+</tr>
+<tr>
+<td>38</td>
+<td>anonymous</td>
+<td><a href="./c14_0048_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0048.txt">link</a></td>
+</tr>
+<tr>
+<td>39</td>
+<td>sonicblend</td>
+<td><a href="./c14_0052_sonicblend.zkey">download</a></td>
+<td><a href="./c14_transcript_0052.txt">link</a></td>
+</tr>
+<tr>
+<td>40</td>
+<td>cryptino25</td>
+<td><a href="./c14_0053_cryptino25.zkey">download</a></td>
+<td><a href="./c14_transcript_0053.txt">link</a></td>
+</tr>
+<tr>
+<td>41</td>
+<td>anonymous</td>
+<td><a href="./c14_0054_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0054.txt">link</a></td>
+</tr>
+<tr>
+<td>42</td>
+<td>anonymous</td>
+<td><a href="./c14_0055_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0055.txt">link</a></td>
+</tr>
+<tr>
+<td>43</td>
+<td>anonymous</td>
+<td><a href="./c14_0056_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0056.txt">link</a></td>
+</tr>
+<tr>
+<td>44</td>
+<td>anonymous</td>
+<td><a href="./c14_0057_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0057.txt">link</a></td>
+</tr>
+<tr>
+<td>45</td>
+<td>caballeroscapital</td>
+<td><a href="./c14_0064_caballeroscapital.zkey">download</a></td>
+<td><a href="./c14_transcript_0064.txt">link</a></td>
+</tr>
+<tr>
+<td>46</td>
+<td>kyzooghost</td>
+<td><a href="./c14_0066_kyzooghost.zkey">download</a></td>
+<td><a href="./c14_transcript_0066.txt">link</a></td>
+</tr>
+<tr>
+<td>47</td>
+<td>ddn12345</td>
+<td><a href="./c14_0070_ddn12345.zkey">download</a></td>
+<td><a href="./c14_transcript_0070.txt">link</a></td>
+</tr>
+<tr>
+<td>48</td>
+<td>gy001</td>
+<td><a href="./c14_0071_gy001.zkey">download</a></td>
+<td><a href="./c14_transcript_0071.txt">link</a></td>
+</tr>
+<tr>
+<td>49</td>
+<td>sifnoc</td>
+<td><a href="./c14_0072_sifnoc.zkey">download</a></td>
+<td><a href="./c14_transcript_0072.txt">link</a></td>
+</tr>
+<tr>
+<td>50</td>
+<td>creatcao</td>
+<td><a href="./c14_0073_creatcao.zkey">download</a></td>
+<td><a href="./c14_transcript_0073.txt">link</a></td>
+</tr>
+<tr>
+<td>51</td>
+<td>anonymous</td>
+<td><a href="./c14_0074_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0074.txt">link</a></td>
+</tr>
+<tr>
+<td>52</td>
+<td>Mikoow</td>
+<td><a href="./c14_0075_Mikoow.zkey">download</a></td>
+<td><a href="./c14_transcript_0075.txt">link</a></td>
+</tr>
+<tr>
+<td>53</td>
+<td>Roybitsir</td>
+<td><a href="./c14_0077_Roybitsir.zkey">download</a></td>
+<td><a href="./c14_transcript_0077.txt">link</a></td>
+</tr>
+<tr>
+<td>54</td>
+<td>yezzai</td>
+<td><a href="./c14_0078_yezzai.zkey">download</a></td>
+<td><a href="./c14_transcript_0078.txt">link</a></td>
+</tr>
+<tr>
+<td>55</td>
+<td>sjdasjda</td>
+<td><a href="./c14_0079_sjdasjda.zkey">download</a></td>
+<td><a href="./c14_transcript_0079.txt">link</a></td>
+</tr>
+<tr>
+<td>56</td>
+<td>yezzai123</td>
+<td><a href="./c14_0080_yezzai123.zkey">download</a></td>
+<td><a href="./c14_transcript_0080.txt">link</a></td>
+</tr>
+<tr>
+<td>57</td>
+<td>anonymous</td>
+<td><a href="./c14_0081_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0081.txt">link</a></td>
+</tr>
+<tr>
+<td>58</td>
+<td>Lyn-Galui</td>
+<td><a href="./c14_0082_Lyn-Galui.zkey">download</a></td>
+<td><a href="./c14_transcript_0082.txt">link</a></td>
+</tr>
+<tr>
+<td>59</td>
+<td>ethereumkev</td>
+<td><a href="./c14_0084_ethereumkev.zkey">download</a></td>
+<td><a href="./c14_transcript_0084.txt">link</a></td>
+</tr>
+<tr>
+<td>60</td>
+<td>GoneUp</td>
+<td><a href="./c14_0085_GoneUp.zkey">download</a></td>
+<td><a href="./c14_transcript_0085.txt">link</a></td>
+</tr>
+<tr>
+<td>61</td>
+<td>lalaland-88</td>
+<td><a href="./c14_0086_lalaland-88.zkey">download</a></td>
+<td><a href="./c14_transcript_0086.txt">link</a></td>
+</tr>
+<tr>
+<td>62</td>
+<td>TechnologyAS</td>
+<td><a href="./c14_0087_TechnologyAS.zkey">download</a></td>
+<td><a href="./c14_transcript_0087.txt">link</a></td>
+</tr>
+<tr>
+<td>63</td>
+<td>zeem71</td>
+<td><a href="./c14_0088_zeem71.zkey">download</a></td>
+<td><a href="./c14_transcript_0088.txt">link</a></td>
+</tr>
+<tr>
+<td>64</td>
+<td>khalids100</td>
+<td><a href="./c14_0089_khalids100.zkey">download</a></td>
+<td><a href="./c14_transcript_0089.txt">link</a></td>
+</tr>
+<tr>
+<td>65</td>
+<td>azzimusa225</td>
+<td><a href="./c14_0090_azzimusa225.zkey">download</a></td>
+<td><a href="./c14_transcript_0090.txt">link</a></td>
+</tr>
+<tr>
+<td>66</td>
+<td>khalidss100</td>
+<td><a href="./c14_0093_khalidss100.zkey">download</a></td>
+<td><a href="./c14_transcript_0093.txt">link</a></td>
+</tr>
+<tr>
+<td>67</td>
+<td>delamin596</td>
+<td><a href="./c14_0095_delamin596.zkey">download</a></td>
+<td><a href="./c14_transcript_0095.txt">link</a></td>
+</tr>
+<tr>
+<td>68</td>
+<td>azzimusa2256</td>
+<td><a href="./c14_0096_azzimusa2256.zkey">download</a></td>
+<td><a href="./c14_transcript_0096.txt">link</a></td>
+</tr>
+<tr>
+<td>69</td>
+<td>Nipol</td>
+<td><a href="./c14_0097_Nipol.zkey">download</a></td>
+<td><a href="./c14_transcript_0097.txt">link</a></td>
+</tr>
+<tr>
+<td>70</td>
+<td>anonymous</td>
+<td><a href="./c14_0098_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0098.txt">link</a></td>
+</tr>
+<tr>
+<td>71</td>
+<td>guess-release</td>
+<td><a href="./c14_0100_guess-release.zkey">download</a></td>
+<td><a href="./c14_transcript_0100.txt">link</a></td>
+</tr>
+<tr>
+<td>72</td>
+<td>yonine</td>
+<td><a href="./c14_0101_yonine.zkey">download</a></td>
+<td><a href="./c14_transcript_0101.txt">link</a></td>
+</tr>
+<tr>
+<td>73</td>
+<td>itzoskitzo</td>
+<td><a href="./c14_0102_itzoskitzo.zkey">download</a></td>
+<td><a href="./c14_transcript_0102.txt">link</a></td>
+</tr>
+<tr>
+<td>74</td>
+<td>cryptomalek</td>
+<td><a href="./c14_0103_cryptomalek.zkey">download</a></td>
+<td><a href="./c14_transcript_0103.txt">link</a></td>
+</tr>
+<tr>
+<td>75</td>
+<td>aufgehtszummond</td>
+<td><a href="./c14_0104_aufgehtszummond.zkey">download</a></td>
+<td><a href="./c14_transcript_0104.txt">link</a></td>
+</tr>
+<tr>
+<td>76</td>
+<td>evvvritt</td>
+<td><a href="./c14_0105_evvvritt.zkey">download</a></td>
+<td><a href="./c14_transcript_0105.txt">link</a></td>
+</tr>
+<tr>
+<td>77</td>
+<td>blackwolv22</td>
+<td><a href="./c14_0106_blackwolv22.zkey">download</a></td>
+<td><a href="./c14_transcript_0106.txt">link</a></td>
+</tr>
+<tr>
+<td>78</td>
+<td>anonymous</td>
+<td><a href="./c14_0107_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0107.txt">link</a></td>
+</tr>
+<tr>
+<td>79</td>
+<td>vladistol</td>
+<td><a href="./c14_0108_vladistol.zkey">download</a></td>
+<td><a href="./c14_transcript_0108.txt">link</a></td>
+</tr>
+<tr>
+<td>80</td>
+<td>Nettaela</td>
+<td><a href="./c14_0109_Nettaela.zkey">download</a></td>
+<td><a href="./c14_transcript_0109.txt">link</a></td>
+</tr>
+<tr>
+<td>81</td>
+<td>cryptinoshort</td>
+<td><a href="./c14_0110_cryptinoshort.zkey">download</a></td>
+<td><a href="./c14_transcript_0110.txt">link</a></td>
+</tr>
+<tr>
+<td>82</td>
+<td>anonymous</td>
+<td><a href="./c14_0111_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0111.txt">link</a></td>
+</tr>
+<tr>
+<td>83</td>
+<td>rockenTim</td>
+<td><a href="./c14_0112_rockenTim.zkey">download</a></td>
+<td><a href="./c14_transcript_0112.txt">link</a></td>
+</tr>
+<tr>
+<td>84</td>
+<td>anonymous</td>
+<td><a href="./c14_0113_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0113.txt">link</a></td>
+</tr>
+<tr>
+<td>85</td>
+<td>woodstock-xkx</td>
+<td><a href="./c14_0115_woodstock-xkx.zkey">download</a></td>
+<td><a href="./c14_transcript_0115.txt">link</a></td>
+</tr>
+<tr>
+<td>86</td>
+<td>simbro</td>
+<td><a href="./c14_0116_simbro.zkey">download</a></td>
+<td><a href="./c14_transcript_0116.txt">link</a></td>
+</tr>
+<tr>
+<td>87</td>
+<td>anonymous</td>
+<td><a href="./c14_0117_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0117.txt">link</a></td>
+</tr>
+<tr>
+<td>88</td>
+<td>corydickson</td>
+<td><a href="./c14_0119_corydickson.zkey">download</a></td>
+<td><a href="./c14_transcript_0119.txt">link</a></td>
+</tr>
+<tr>
+<td>89</td>
+<td>ONXL</td>
+<td><a href="./c14_0120_ONXL.zkey">download</a></td>
+<td><a href="./c14_transcript_0120.txt">link</a></td>
+</tr>
+<tr>
+<td>90</td>
+<td>mstephen5</td>
+<td><a href="./c14_0121_mstephen5.zkey">download</a></td>
+<td><a href="./c14_transcript_0121.txt">link</a></td>
+</tr>
+<tr>
+<td>91</td>
+<td>Monaco007</td>
+<td><a href="./c14_0123_Monaco007.zkey">download</a></td>
+<td><a href="./c14_transcript_0123.txt">link</a></td>
+</tr>
+<tr>
+<td>92</td>
+<td>Akneesh07</td>
+<td><a href="./c14_0124_Akneesh07.zkey">download</a></td>
+<td><a href="./c14_transcript_0124.txt">link</a></td>
+</tr>
+<tr>
+<td>93</td>
+<td>d10r</td>
+<td><a href="./c14_0125_d10r.zkey">download</a></td>
+<td><a href="./c14_transcript_0125.txt">link</a></td>
+</tr>
+<tr>
+<td>94</td>
+<td>MichaelStephen24</td>
+<td><a href="./c14_0126_MichaelStephen24.zkey">download</a></td>
+<td><a href="./c14_transcript_0126.txt">link</a></td>
+</tr>
+<tr>
+<td>95</td>
+<td>kirbyong</td>
+<td><a href="./c14_0127_kirbyong.zkey">download</a></td>
+<td><a href="./c14_transcript_0127.txt">link</a></td>
+</tr>
+<tr>
+<td>96</td>
+<td>sardorml</td>
+<td><a href="./c14_0128_sardorml.zkey">download</a></td>
+<td><a href="./c14_transcript_0128.txt">link</a></td>
+</tr>
+<tr>
+<td>97</td>
+<td>anonymous</td>
+<td><a href="./c14_0129_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0129.txt">link</a></td>
+</tr>
+<tr>
+<td>98</td>
+<td>latticegold</td>
+<td><a href="./c14_0130_latticegold.zkey">download</a></td>
+<td><a href="./c14_transcript_0130.txt">link</a></td>
+</tr>
+<tr>
+<td>99</td>
+<td>Schaeff</td>
+<td><a href="./c14_0131_Schaeff.zkey">download</a></td>
+<td><a href="./c14_transcript_0131.txt">link</a></td>
+</tr>
+<tr>
+<td>100</td>
+<td>leonardoalt</td>
+<td><a href="./c14_0132_leonardoalt.zkey">download</a></td>
+<td><a href="./c14_transcript_0132.txt">link</a></td>
+</tr>
+<tr>
+<td>101</td>
+<td>franzihei</td>
+<td><a href="./c14_0133_franzihei.zkey">download</a></td>
+<td><a href="./c14_transcript_0133.txt">link</a></td>
+</tr>
+<tr>
+<td>102</td>
+<td>dark64</td>
+<td><a href="./c14_0134_dark64.zkey">download</a></td>
+<td><a href="./c14_transcript_0134.txt">link</a></td>
+</tr>
+<tr>
+<td>103</td>
+<td>andfletcher</td>
+<td><a href="./c14_0135_andfletcher.zkey">download</a></td>
+<td><a href="./c14_transcript_0135.txt">link</a></td>
+</tr>
+<tr>
+<td>104</td>
+<td>seialkali</td>
+<td><a href="./c14_0136_seialkali.zkey">download</a></td>
+<td><a href="./c14_transcript_0136.txt">link</a></td>
+</tr>
+<tr>
+<td>105</td>
+<td>anonymous</td>
+<td><a href="./c14_0137_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0137.txt">link</a></td>
+</tr>
+<tr>
+<td>106</td>
+<td>webstop76</td>
+<td><a href="./c14_0139_webstop76.zkey">download</a></td>
+<td><a href="./c14_transcript_0139.txt">link</a></td>
+</tr>
+<tr>
+<td>107</td>
+<td>yodelingtyrolean</td>
+<td><a href="./c14_0140_yodelingtyrolean.zkey">download</a></td>
+<td><a href="./c14_transcript_0140.txt">link</a></td>
+</tr>
+<tr>
+<td>108</td>
+<td>jep-code</td>
+<td><a href="./c14_0141_jep-code.zkey">download</a></td>
+<td><a href="./c14_transcript_0141.txt">link</a></td>
+</tr>
+<tr>
+<td>109</td>
+<td>LHerskind</td>
+<td><a href="./c14_0143_LHerskind.zkey">download</a></td>
+<td><a href="./c14_transcript_0143.txt">link</a></td>
+</tr>
+<tr>
+<td>110</td>
+<td>DarioPavlic</td>
+<td><a href="./c14_0146_DarioPavlic.zkey">download</a></td>
+<td><a href="./c14_transcript_0146.txt">link</a></td>
+</tr>
+<tr>
+<td>111</td>
+<td>Expres154</td>
+<td><a href="./c14_0148_Expres154.zkey">download</a></td>
+<td><a href="./c14_transcript_0148.txt">link</a></td>
+</tr>
+<tr>
+<td>112</td>
+<td>dirksma</td>
+<td><a href="./c14_0155_dirksma.zkey">download</a></td>
+<td><a href="./c14_transcript_0155.txt">link</a></td>
+</tr>
+<tr>
+<td>113</td>
+<td>Opsjenar</td>
+<td><a href="./c14_0160_Opsjenar.zkey">download</a></td>
+<td><a href="./c14_transcript_0160.txt">link</a></td>
+</tr>
+<tr>
+<td>114</td>
+<td>trkraus</td>
+<td><a href="./c14_0164_trkraus.zkey">download</a></td>
+<td><a href="./c14_transcript_0164.txt">link</a></td>
+</tr>
+<tr>
+<td>115</td>
+<td>superlegitcrypto</td>
+<td><a href="./c14_0167_superlegitcrypto.zkey">download</a></td>
+<td><a href="./c14_transcript_0167.txt">link</a></td>
+</tr>
+<tr>
+<td>116</td>
+<td>Dereek69</td>
+<td><a href="./c14_0168_Dereek69.zkey">download</a></td>
+<td><a href="./c14_transcript_0168.txt">link</a></td>
+</tr>
+<tr>
+<td>117</td>
+<td>adshao</td>
+<td><a href="./c14_0169_adshao.zkey">download</a></td>
+<td><a href="./c14_transcript_0169.txt">link</a></td>
+</tr>
+<tr>
+<td>118</td>
+<td>Niggolo</td>
+<td><a href="./c14_0170_Niggolo.zkey">download</a></td>
+<td><a href="./c14_transcript_0170.txt">link</a></td>
+</tr>
+<tr>
+<td>119</td>
+<td>Dennahz</td>
+<td><a href="./c14_0172_Dennahz.zkey">download</a></td>
+<td><a href="./c14_transcript_0172.txt">link</a></td>
+</tr>
+<tr>
+<td>120</td>
+<td>dwi</td>
+<td><a href="./c14_0173_dwi.zkey">download</a></td>
+<td><a href="./c14_transcript_0173.txt">link</a></td>
+</tr>
+<tr>
+<td>121</td>
+<td>sali0</td>
+<td><a href="./c14_0174_sali0.zkey">download</a></td>
+<td><a href="./c14_transcript_0174.txt">link</a></td>
+</tr>
+<tr>
+<td>122</td>
+<td>Gish0</td>
+<td><a href="./c14_0176_Gish0.zkey">download</a></td>
+<td><a href="./c14_transcript_0176.txt">link</a></td>
+</tr>
+<tr>
+<td>123</td>
+<td>ri0t123</td>
+<td><a href="./c14_0177_ri0t123.zkey">download</a></td>
+<td><a href="./c14_transcript_0177.txt">link</a></td>
+</tr>
+<tr>
+<td>124</td>
+<td>0xGenesis</td>
+<td><a href="./c14_0178_0xGenesis.zkey">download</a></td>
+<td><a href="./c14_transcript_0178.txt">link</a></td>
+</tr>
+<tr>
+<td>125</td>
+<td>cryptozer0sumgame</td>
+<td><a href="./c14_0179_cryptozer0sumgame.zkey">download</a></td>
+<td><a href="./c14_transcript_0179.txt">link</a></td>
+</tr>
+<tr>
+<td>126</td>
+<td>krishislegend</td>
+<td><a href="./c14_0180_krishislegend.zkey">download</a></td>
+<td><a href="./c14_transcript_0180.txt">link</a></td>
+</tr>
+<tr>
+<td>127</td>
+<td>cryptofunkz</td>
+<td><a href="./c14_0181_cryptofunkz.zkey">download</a></td>
+<td><a href="./c14_transcript_0181.txt">link</a></td>
+</tr>
+<tr>
+<td>128</td>
+<td>cryptodingle</td>
+<td><a href="./c14_0182_cryptodingle.zkey">download</a></td>
+<td><a href="./c14_transcript_0182.txt">link</a></td>
+</tr>
+<tr>
+<td>129</td>
+<td>brvx</td>
+<td><a href="./c14_0184_brvx.zkey">download</a></td>
+<td><a href="./c14_transcript_0184.txt">link</a></td>
+</tr>
+<tr>
+<td>130</td>
+<td>mspacey4415</td>
+<td><a href="./c14_0186_mspacey4415.zkey">download</a></td>
+<td><a href="./c14_transcript_0186.txt">link</a></td>
+</tr>
+<tr>
+<td>131</td>
+<td>Lufo95</td>
+<td><a href="./c14_0188_Lufo95.zkey">download</a></td>
+<td><a href="./c14_transcript_0188.txt">link</a></td>
+</tr>
+<tr>
+<td>132</td>
+<td>vietmazze</td>
+<td><a href="./c14_0193_vietmazze.zkey">download</a></td>
+<td><a href="./c14_transcript_0193.txt">link</a></td>
+</tr>
+<tr>
+<td>133</td>
+<td>roothasher</td>
+<td><a href="./c14_0197_roothasher.zkey">download</a></td>
+<td><a href="./c14_transcript_0197.txt">link</a></td>
+</tr>
+<tr>
+<td>134</td>
+<td>nordcrypt</td>
+<td><a href="./c14_0198_nordcrypt.zkey">download</a></td>
+<td><a href="./c14_transcript_0198.txt">link</a></td>
+</tr>
+<tr>
+<td>135</td>
+<td>showpwny</td>
+<td><a href="./c14_0199_showpwny.zkey">download</a></td>
+<td><a href="./c14_transcript_0199.txt">link</a></td>
+</tr>
+<tr>
+<td>136</td>
+<td>cryptonominally</td>
+<td><a href="./c14_0200_cryptonominally.zkey">download</a></td>
+<td><a href="./c14_transcript_0200.txt">link</a></td>
+</tr>
+<tr>
+<td>137</td>
+<td>lixuejiang</td>
+<td><a href="./c14_0201_lixuejiang.zkey">download</a></td>
+<td><a href="./c14_transcript_0201.txt">link</a></td>
+</tr>
+<tr>
+<td>138</td>
+<td>gish6</td>
+<td><a href="./c14_0202_gish6.zkey">download</a></td>
+<td><a href="./c14_transcript_0202.txt">link</a></td>
+</tr>
+<tr>
+<td>139</td>
+<td>cheechnchan</td>
+<td><a href="./c14_0204_cheechnchan.zkey">download</a></td>
+<td><a href="./c14_transcript_0204.txt">link</a></td>
+</tr>
+<tr>
+<td>140</td>
+<td>gguardia7</td>
+<td><a href="./c14_0207_gguardia7.zkey">download</a></td>
+<td><a href="./c14_transcript_0207.txt">link</a></td>
+</tr>
+<tr>
+<td>141</td>
+<td>jamiethemorris</td>
+<td><a href="./c14_0210_jamiethemorris.zkey">download</a></td>
+<td><a href="./c14_transcript_0210.txt">link</a></td>
+</tr>
+<tr>
+<td>142</td>
+<td>Probono369</td>
+<td><a href="./c14_0216_Probono369.zkey">download</a></td>
+<td><a href="./c14_transcript_0216.txt">link</a></td>
+</tr>
+<tr>
+<td>143</td>
+<td>ray-sg</td>
+<td><a href="./c14_0217_ray-sg.zkey">download</a></td>
+<td><a href="./c14_transcript_0217.txt">link</a></td>
+</tr>
+<tr>
+<td>144</td>
+<td>sparrowrow</td>
+<td><a href="./c14_0219_sparrowrow.zkey">download</a></td>
+<td><a href="./c14_transcript_0219.txt">link</a></td>
+</tr>
+<tr>
+<td>145</td>
+<td>ShowTime93</td>
+<td><a href="./c14_0220_ShowTime93.zkey">download</a></td>
+<td><a href="./c14_transcript_0220.txt">link</a></td>
+</tr>
+<tr>
+<td>146</td>
+<td>mister-chuckles</td>
+<td><a href="./c14_0221_mister-chuckles.zkey">download</a></td>
+<td><a href="./c14_transcript_0221.txt">link</a></td>
+</tr>
+<tr>
+<td>147</td>
+<td>Macymx</td>
+<td><a href="./c14_0222_Macymx.zkey">download</a></td>
+<td><a href="./c14_transcript_0222.txt">link</a></td>
+</tr>
+<tr>
+<td>148</td>
+<td>lostasch</td>
+<td><a href="./c14_0223_lostasch.zkey">download</a></td>
+<td><a href="./c14_transcript_0223.txt">link</a></td>
+</tr>
+<tr>
+<td>149</td>
+<td>Jothamteo</td>
+<td><a href="./c14_0224_Jothamteo.zkey">download</a></td>
+<td><a href="./c14_transcript_0224.txt">link</a></td>
+</tr>
+<tr>
+<td>150</td>
+<td>Pink-P</td>
+<td><a href="./c14_0225_Pink-P.zkey">download</a></td>
+<td><a href="./c14_transcript_0225.txt">link</a></td>
+</tr>
+<tr>
+<td>151</td>
+<td>leongjuns</td>
+<td><a href="./c14_0226_leongjuns.zkey">download</a></td>
+<td><a href="./c14_transcript_0226.txt">link</a></td>
+</tr>
+<tr>
+<td>152</td>
+<td>wakeful156</td>
+<td><a href="./c14_0227_wakeful156.zkey">download</a></td>
+<td><a href="./c14_transcript_0227.txt">link</a></td>
+</tr>
+<tr>
+<td>153</td>
+<td>strong-code</td>
+<td><a href="./c14_0228_strong-code.zkey">download</a></td>
+<td><a href="./c14_transcript_0228.txt">link</a></td>
+</tr>
+<tr>
+<td>154</td>
+<td>ai2490</td>
+<td><a href="./c14_0230_ai2490.zkey">download</a></td>
+<td><a href="./c14_transcript_0230.txt">link</a></td>
+</tr>
+<tr>
+<td>155</td>
+<td>cryiacorn</td>
+<td><a href="./c14_0231_cryiacorn.zkey">download</a></td>
+<td><a href="./c14_transcript_0231.txt">link</a></td>
+</tr>
+<tr>
+<td>156</td>
+<td>hitbtc4nd3r50n</td>
+<td><a href="./c14_0232_hitbtc4nd3r50n.zkey">download</a></td>
+<td><a href="./c14_transcript_0232.txt">link</a></td>
+</tr>
+<tr>
+<td>157</td>
+<td>deranzxc</td>
+<td><a href="./c14_0233_deranzxc.zkey">download</a></td>
+<td><a href="./c14_transcript_0233.txt">link</a></td>
+</tr>
+<tr>
+<td>158</td>
+<td>enc0d3</td>
+<td><a href="./c14_0234_enc0d3.zkey">download</a></td>
+<td><a href="./c14_transcript_0234.txt">link</a></td>
+</tr>
+<tr>
+<td>159</td>
+<td>suspended</td>
+<td><a href="./c14_0237_suspended.zkey">download</a></td>
+<td><a href="./c14_transcript_0237.txt">link</a></td>
+</tr>
+<tr>
+<td>160</td>
+<td>chunyuen93</td>
+<td><a href="./c14_0238_chunyuen93.zkey">download</a></td>
+<td><a href="./c14_transcript_0238.txt">link</a></td>
+</tr>
+<tr>
+<td>161</td>
+<td>chunkiat1</td>
+<td><a href="./c14_0239_chunkiat1.zkey">download</a></td>
+<td><a href="./c14_transcript_0239.txt">link</a></td>
+</tr>
+<tr>
+<td>162</td>
+<td>CryptoElon</td>
+<td><a href="./c14_0240_CryptoElon.zkey">download</a></td>
+<td><a href="./c14_transcript_0240.txt">link</a></td>
+</tr>
+<tr>
+<td>163</td>
+<td>BryanKhoowewe</td>
+<td><a href="./c14_0242_BryanKhoowewe.zkey">download</a></td>
+<td><a href="./c14_transcript_0242.txt">link</a></td>
+</tr>
+<tr>
+<td>164</td>
+<td>darrenlimweiyang</td>
+<td><a href="./c14_0243_darrenlimweiyang.zkey">download</a></td>
+<td><a href="./c14_transcript_0243.txt">link</a></td>
+</tr>
+<tr>
+<td>165</td>
+<td>superfur</td>
+<td><a href="./c14_0244_superfur.zkey">download</a></td>
+<td><a href="./c14_transcript_0244.txt">link</a></td>
+</tr>
+<tr>
+<td>166</td>
+<td>linnaMao</td>
+<td><a href="./c14_0245_linnaMao.zkey">download</a></td>
+<td><a href="./c14_transcript_0245.txt">link</a></td>
+</tr>
+<tr>
+<td>167</td>
+<td>dekutree1314</td>
+<td><a href="./c14_0248_dekutree1314.zkey">download</a></td>
+<td><a href="./c14_transcript_0248.txt">link</a></td>
+</tr>
+<tr>
+<td>168</td>
+<td>biondit</td>
+<td><a href="./c14_0249_biondit.zkey">download</a></td>
+<td><a href="./c14_transcript_0249.txt">link</a></td>
+</tr>
+<tr>
+<td>169</td>
+<td>zombiehobbes</td>
+<td><a href="./c14_0252_zombiehobbes.zkey">download</a></td>
+<td><a href="./c14_transcript_0252.txt">link</a></td>
+</tr>
+<tr>
+<td>170</td>
+<td>cryptude</td>
+<td><a href="./c14_0253_cryptude.zkey">download</a></td>
+<td><a href="./c14_transcript_0253.txt">link</a></td>
+</tr>
+<tr>
+<td>171</td>
+<td>Tayboonsiang90</td>
+<td><a href="./c14_0254_Tayboonsiang90.zkey">download</a></td>
+<td><a href="./c14_transcript_0254.txt">link</a></td>
+</tr>
+<tr>
+<td>172</td>
+<td>megazord88</td>
+<td><a href="./c14_0255_megazord88.zkey">download</a></td>
+<td><a href="./c14_transcript_0255.txt">link</a></td>
+</tr>
+<tr>
+<td>173</td>
+<td>edmund8888</td>
+<td><a href="./c14_0256_edmund8888.zkey">download</a></td>
+<td><a href="./c14_transcript_0256.txt">link</a></td>
+</tr>
+<tr>
+<td>174</td>
+<td>kiryu57</td>
+<td><a href="./c14_0257_kiryu57.zkey">download</a></td>
+<td><a href="./c14_transcript_0257.txt">link</a></td>
+</tr>
+<tr>
+<td>175</td>
+<td>H4ldrz</td>
+<td><a href="./c14_0258_H4ldrz.zkey">download</a></td>
+<td><a href="./c14_transcript_0258.txt">link</a></td>
+</tr>
+<tr>
+<td>176</td>
+<td>block256</td>
+<td><a href="./c14_0260_block256.zkey">download</a></td>
+<td><a href="./c14_transcript_0260.txt">link</a></td>
+</tr>
+<tr>
+<td>177</td>
+<td>tkchen1219</td>
+<td><a href="./c14_0261_tkchen1219.zkey">download</a></td>
+<td><a href="./c14_transcript_0261.txt">link</a></td>
+</tr>
+<tr>
+<td>178</td>
+<td>IIIJohnIIII</td>
+<td><a href="./c14_0264_IIIJohnIIII.zkey">download</a></td>
+<td><a href="./c14_transcript_0264.txt">link</a></td>
+</tr>
+<tr>
+<td>179</td>
+<td>CeeePea</td>
+<td><a href="./c14_0265_CeeePea.zkey">download</a></td>
+<td><a href="./c14_transcript_0265.txt">link</a></td>
+</tr>
+<tr>
+<td>180</td>
+<td>andrewlee-lab</td>
+<td><a href="./c14_0266_andrewlee-lab.zkey">download</a></td>
+<td><a href="./c14_transcript_0266.txt">link</a></td>
+</tr>
+<tr>
+<td>181</td>
+<td>scaletechnology</td>
+<td><a href="./c14_0267_scaletechnology.zkey">download</a></td>
+<td><a href="./c14_transcript_0267.txt">link</a></td>
+</tr>
+<tr>
+<td>182</td>
+<td>tigermumu</td>
+<td><a href="./c14_0268_tigermumu.zkey">download</a></td>
+<td><a href="./c14_transcript_0268.txt">link</a></td>
+</tr>
+<tr>
+<td>183</td>
+<td>4-1-3-X</td>
+<td><a href="./c14_0269_4-1-3-X.zkey">download</a></td>
+<td><a href="./c14_transcript_0269.txt">link</a></td>
+</tr>
+<tr>
+<td>184</td>
+<td>MoonieMama</td>
+<td><a href="./c14_0271_MoonieMama.zkey">download</a></td>
+<td><a href="./c14_transcript_0271.txt">link</a></td>
+</tr>
+<tr>
+<td>185</td>
+<td>Ethan4869</td>
+<td><a href="./c14_0272_Ethan4869.zkey">download</a></td>
+<td><a href="./c14_transcript_0272.txt">link</a></td>
+</tr>
+<tr>
+<td>186</td>
+<td>Dani3lo</td>
+<td><a href="./c14_0273_Dani3lo.zkey">download</a></td>
+<td><a href="./c14_transcript_0273.txt">link</a></td>
+</tr>
+<tr>
+<td>187</td>
+<td>step21</td>
+<td><a href="./c14_0274_step21.zkey">download</a></td>
+<td><a href="./c14_transcript_0274.txt">link</a></td>
+</tr>
+<tr>
+<td>188</td>
+<td>xy-cypher</td>
+<td><a href="./c14_0275_xy-cypher.zkey">download</a></td>
+<td><a href="./c14_transcript_0275.txt">link</a></td>
+</tr>
+<tr>
+<td>189</td>
+<td>Jindevilfruits</td>
+<td><a href="./c14_0276_Jindevilfruits.zkey">download</a></td>
+<td><a href="./c14_transcript_0276.txt">link</a></td>
+</tr>
+<tr>
+<td>190</td>
+<td>davejot</td>
+<td><a href="./c14_0277_davejot.zkey">download</a></td>
+<td><a href="./c14_transcript_0277.txt">link</a></td>
+</tr>
+<tr>
+<td>191</td>
+<td>qvzl</td>
+<td><a href="./c14_0278_qvzl.zkey">download</a></td>
+<td><a href="./c14_transcript_0278.txt">link</a></td>
+</tr>
+<tr>
+<td>192</td>
+<td>wujiefeng</td>
+<td><a href="./c14_0279_wujiefeng.zkey">download</a></td>
+<td><a href="./c14_transcript_0279.txt">link</a></td>
+</tr>
+<tr>
+<td>193</td>
+<td>nardboy</td>
+<td><a href="./c14_0280_nardboy.zkey">download</a></td>
+<td><a href="./c14_transcript_0280.txt">link</a></td>
+</tr>
+<tr>
+<td>194</td>
+<td>Woodchipstar</td>
+<td><a href="./c14_0281_Woodchipstar.zkey">download</a></td>
+<td><a href="./c14_transcript_0281.txt">link</a></td>
+</tr>
+<tr>
+<td>195</td>
+<td>kiryunishi</td>
+<td><a href="./c14_0282_kiryunishi.zkey">download</a></td>
+<td><a href="./c14_transcript_0282.txt">link</a></td>
+</tr>
+<tr>
+<td>196</td>
+<td>abashd</td>
+<td><a href="./c14_0283_abashd.zkey">download</a></td>
+<td><a href="./c14_transcript_0283.txt">link</a></td>
+</tr>
+<tr>
+<td>197</td>
+<td>alicrypto2121</td>
+<td><a href="./c14_0284_alicrypto2121.zkey">download</a></td>
+<td><a href="./c14_transcript_0284.txt">link</a></td>
+</tr>
+<tr>
+<td>198</td>
+<td>CryptoBean</td>
+<td><a href="./c14_0285_CryptoBean.zkey">download</a></td>
+<td><a href="./c14_transcript_0285.txt">link</a></td>
+</tr>
+<tr>
+<td>199</td>
+<td>ZonedOutDad</td>
+<td><a href="./c14_0286_ZonedOutDad.zkey">download</a></td>
+<td><a href="./c14_transcript_0286.txt">link</a></td>
+</tr>
+<tr>
+<td>200</td>
+<td>Boggerst</td>
+<td><a href="./c14_0287_Boggerst.zkey">download</a></td>
+<td><a href="./c14_transcript_0287.txt">link</a></td>
+</tr>
+<tr>
+<td>201</td>
+<td>kazuakiishiguro</td>
+<td><a href="./c14_0288_kazuakiishiguro.zkey">download</a></td>
+<td><a href="./c14_transcript_0288.txt">link</a></td>
+</tr>
+<tr>
+<td>202</td>
+<td>rainanav</td>
+<td><a href="./c14_0289_rainanav.zkey">download</a></td>
+<td><a href="./c14_transcript_0289.txt">link</a></td>
+</tr>
+<tr>
+<td>203</td>
+<td>kevinbiju</td>
+<td><a href="./c14_0290_kevinbiju.zkey">download</a></td>
+<td><a href="./c14_transcript_0290.txt">link</a></td>
+</tr>
+<tr>
+<td>204</td>
+<td>Ashrith333</td>
+<td><a href="./c14_0291_Ashrith333.zkey">download</a></td>
+<td><a href="./c14_transcript_0291.txt">link</a></td>
+</tr>
+<tr>
+<td>205</td>
+<td>msatkar</td>
+<td><a href="./c14_0292_msatkar.zkey">download</a></td>
+<td><a href="./c14_transcript_0292.txt">link</a></td>
+</tr>
+<tr>
+<td>206</td>
+<td>lordvegetaeth</td>
+<td><a href="./c14_0293_lordvegetaeth.zkey">download</a></td>
+<td><a href="./c14_transcript_0293.txt">link</a></td>
+</tr>
+<tr>
+<td>207</td>
+<td>shalsa6373</td>
+<td><a href="./c14_0294_shalsa6373.zkey">download</a></td>
+<td><a href="./c14_transcript_0294.txt">link</a></td>
+</tr>
+<tr>
+<td>208</td>
+<td>shub2610</td>
+<td><a href="./c14_0295_shub2610.zkey">download</a></td>
+<td><a href="./c14_transcript_0295.txt">link</a></td>
+</tr>
+<tr>
+<td>209</td>
+<td>CryptoSingh86</td>
+<td><a href="./c14_0296_CryptoSingh86.zkey">download</a></td>
+<td><a href="./c14_transcript_0296.txt">link</a></td>
+</tr>
+<tr>
+<td>210</td>
+<td>thahsisin</td>
+<td><a href="./c14_0297_thahsisin.zkey">download</a></td>
+<td><a href="./c14_transcript_0297.txt">link</a></td>
+</tr>
+<tr>
+<td>211</td>
+<td>Mohank1012</td>
+<td><a href="./c14_0298_Mohank1012.zkey">download</a></td>
+<td><a href="./c14_transcript_0298.txt">link</a></td>
+</tr>
+<tr>
+<td>212</td>
+<td>coolsamey786</td>
+<td><a href="./c14_0299_coolsamey786.zkey">download</a></td>
+<td><a href="./c14_transcript_0299.txt">link</a></td>
+</tr>
+<tr>
+<td>213</td>
+<td>dkeh</td>
+<td><a href="./c14_0300_dkeh.zkey">download</a></td>
+<td><a href="./c14_transcript_0300.txt">link</a></td>
+</tr>
+<tr>
+<td>214</td>
+<td>HarmeetSidhuBrar</td>
+<td><a href="./c14_0301_HarmeetSidhuBrar.zkey">download</a></td>
+<td><a href="./c14_transcript_0301.txt">link</a></td>
+</tr>
+<tr>
+<td>215</td>
+<td>shailesh549</td>
+<td><a href="./c14_0302_shailesh549.zkey">download</a></td>
+<td><a href="./c14_transcript_0302.txt">link</a></td>
+</tr>
+<tr>
+<td>216</td>
+<td>bhartikhatwani24</td>
+<td><a href="./c14_0303_bhartikhatwani24.zkey">download</a></td>
+<td><a href="./c14_transcript_0303.txt">link</a></td>
+</tr>
+<tr>
+<td>217</td>
+<td>matrainier</td>
+<td><a href="./c14_0304_matrainier.zkey">download</a></td>
+<td><a href="./c14_transcript_0304.txt">link</a></td>
+</tr>
+<tr>
+<td>218</td>
+<td>zadan129</td>
+<td><a href="./c14_0305_zadan129.zkey">download</a></td>
+<td><a href="./c14_transcript_0305.txt">link</a></td>
+</tr>
+<tr>
+<td>219</td>
+<td>awnyrvan</td>
+<td><a href="./c14_0306_awnyrvan.zkey">download</a></td>
+<td><a href="./c14_transcript_0306.txt">link</a></td>
+</tr>
+<tr>
+<td>220</td>
+<td>michaelyu300</td>
+<td><a href="./c14_0307_michaelyu300.zkey">download</a></td>
+<td><a href="./c14_transcript_0307.txt">link</a></td>
+</tr>
+<tr>
+<td>221</td>
+<td>snip07</td>
+<td><a href="./c14_0308_snip07.zkey">download</a></td>
+<td><a href="./c14_transcript_0308.txt">link</a></td>
+</tr>
+<tr>
+<td>222</td>
+<td>bokswagen777</td>
+<td><a href="./c14_0309_bokswagen777.zkey">download</a></td>
+<td><a href="./c14_transcript_0309.txt">link</a></td>
+</tr>
+<tr>
+<td>223</td>
+<td>manojaum</td>
+<td><a href="./c14_0310_manojaum.zkey">download</a></td>
+<td><a href="./c14_transcript_0310.txt">link</a></td>
+</tr>
+<tr>
+<td>224</td>
+<td>ScottP5</td>
+<td><a href="./c14_0311_ScottP5.zkey">download</a></td>
+<td><a href="./c14_transcript_0311.txt">link</a></td>
+</tr>
+<tr>
+<td>225</td>
+<td>danlipert</td>
+<td><a href="./c14_0312_danlipert.zkey">download</a></td>
+<td><a href="./c14_transcript_0312.txt">link</a></td>
+</tr>
+<tr>
+<td>226</td>
+<td>missus-chuckles</td>
+<td><a href="./c14_0334_missus-chuckles.zkey">download</a></td>
+<td><a href="./c14_transcript_0334.txt">link</a></td>
+</tr>
+<tr>
+<td>227</td>
+<td>Glopem</td>
+<td><a href="./c14_0335_Glopem.zkey">download</a></td>
+<td><a href="./c14_transcript_0335.txt">link</a></td>
+</tr>
+<tr>
+<td>228</td>
+<td>RKeelan</td>
+<td><a href="./c14_0336_RKeelan.zkey">download</a></td>
+<td><a href="./c14_transcript_0336.txt">link</a></td>
+</tr>
+<tr>
+<td>229</td>
+<td>aliatiia</td>
+<td><a href="./c14_0337_aliatiia.zkey">download</a></td>
+<td><a href="./c14_transcript_0337.txt">link</a></td>
+</tr>
+<tr>
+<td>230</td>
+<td>lcmn4u</td>
+<td><a href="./c14_0338_lcmn4u.zkey">download</a></td>
+<td><a href="./c14_transcript_0338.txt">link</a></td>
+</tr>
+<tr>
+<td>231</td>
+<td>ashkhr-crypto</td>
+<td><a href="./c14_0339_ashkhr-crypto.zkey">download</a></td>
+<td><a href="./c14_transcript_0339.txt">link</a></td>
+</tr>
+<tr>
+<td>232</td>
+<td>lab7arum</td>
+<td><a href="./c14_0340_lab7arum.zkey">download</a></td>
+<td><a href="./c14_transcript_0340.txt">link</a></td>
+</tr>
+<tr>
+<td>233</td>
+<td>defiretard</td>
+<td><a href="./c14_0341_defiretard.zkey">download</a></td>
+<td><a href="./c14_transcript_0341.txt">link</a></td>
+</tr>
+<tr>
+<td>234</td>
+<td>Bryanqs</td>
+<td><a href="./c14_0342_Bryanqs.zkey">download</a></td>
+<td><a href="./c14_transcript_0342.txt">link</a></td>
+</tr>
+<tr>
+<td>235</td>
+<td>walidmujahid</td>
+<td><a href="./c14_0343_walidmujahid.zkey">download</a></td>
+<td><a href="./c14_transcript_0343.txt">link</a></td>
+</tr>
+<tr>
+<td>236</td>
+<td>YYSimi</td>
+<td><a href="./c14_0344_YYSimi.zkey">download</a></td>
+<td><a href="./c14_transcript_0344.txt">link</a></td>
+</tr>
+<tr>
+<td>237</td>
+<td>zerogwei</td>
+<td><a href="./c14_0345_zerogwei.zkey">download</a></td>
+<td><a href="./c14_transcript_0345.txt">link</a></td>
+</tr>
+<tr>
+<td>238</td>
+<td>tructrandhkt</td>
+<td><a href="./c14_0346_tructrandhkt.zkey">download</a></td>
+<td><a href="./c14_transcript_0346.txt">link</a></td>
+</tr>
+<tr>
+<td>239</td>
+<td>ethisscam</td>
+<td><a href="./c14_0347_ethisscam.zkey">download</a></td>
+<td><a href="./c14_transcript_0347.txt">link</a></td>
+</tr>
+<tr>
+<td>240</td>
+<td>ryanberckmans</td>
+<td><a href="./c14_0348_ryanberckmans.zkey">download</a></td>
+<td><a href="./c14_transcript_0348.txt">link</a></td>
+</tr>
+<tr>
+<td>241</td>
+<td>LJQZZZ123</td>
+<td><a href="./c14_0349_LJQZZZ123.zkey">download</a></td>
+<td><a href="./c14_transcript_0349.txt">link</a></td>
+</tr>
+<tr>
+<td>242</td>
+<td>Roelie885</td>
+<td><a href="./c14_0350_Roelie885.zkey">download</a></td>
+<td><a href="./c14_transcript_0350.txt">link</a></td>
+</tr>
+<tr>
+<td>243</td>
+<td>phungtrandhkt</td>
+<td><a href="./c14_0352_phungtrandhkt.zkey">download</a></td>
+<td><a href="./c14_transcript_0352.txt">link</a></td>
+</tr>
+<tr>
+<td>244</td>
+<td>pk27734</td>
+<td><a href="./c14_0353_pk27734.zkey">download</a></td>
+<td><a href="./c14_transcript_0353.txt">link</a></td>
+</tr>
+<tr>
+<td>245</td>
+<td>prospercrypto</td>
+<td><a href="./c14_0354_prospercrypto.zkey">download</a></td>
+<td><a href="./c14_transcript_0354.txt">link</a></td>
+</tr>
+<tr>
+<td>246</td>
+<td>thanhnguyenvt</td>
+<td><a href="./c14_0355_thanhnguyenvt.zkey">download</a></td>
+<td><a href="./c14_transcript_0355.txt">link</a></td>
+</tr>
+<tr>
+<td>247</td>
+<td>fredlacs</td>
+<td><a href="./c14_0356_fredlacs.zkey">download</a></td>
+<td><a href="./c14_transcript_0356.txt">link</a></td>
+</tr>
+<tr>
+<td>248</td>
+<td>czarly</td>
+<td><a href="./c14_0357_czarly.zkey">download</a></td>
+<td><a href="./c14_transcript_0357.txt">link</a></td>
+</tr>
+<tr>
+<td>249</td>
+<td>PierrickGT</td>
+<td><a href="./c14_0358_PierrickGT.zkey">download</a></td>
+<td><a href="./c14_transcript_0358.txt">link</a></td>
+</tr>
+<tr>
+<td>250</td>
+<td>Dooo-ge</td>
+<td><a href="./c14_0359_Dooo-ge.zkey">download</a></td>
+<td><a href="./c14_transcript_0359.txt">link</a></td>
+</tr>
+<tr>
+<td>251</td>
+<td>achiko</td>
+<td><a href="./c14_0360_achiko.zkey">download</a></td>
+<td><a href="./c14_transcript_0360.txt">link</a></td>
+</tr>
+<tr>
+<td>252</td>
+<td>spamtest1b</td>
+<td><a href="./c14_0361_spamtest1b.zkey">download</a></td>
+<td><a href="./c14_transcript_0361.txt">link</a></td>
+</tr>
+<tr>
+<td>253</td>
+<td>moxeve</td>
+<td><a href="./c14_0362_moxeve.zkey">download</a></td>
+<td><a href="./c14_transcript_0362.txt">link</a></td>
+</tr>
+<tr>
+<td>254</td>
+<td>shoptest1</td>
+<td><a href="./c14_0363_shoptest1.zkey">download</a></td>
+<td><a href="./c14_transcript_0363.txt">link</a></td>
+</tr>
+<tr>
+<td>255</td>
+<td>illogicalcodes</td>
+<td><a href="./c14_0364_illogicalcodes.zkey">download</a></td>
+<td><a href="./c14_transcript_0364.txt">link</a></td>
+</tr>
+<tr>
+<td>256</td>
+<td>Ktl-XV</td>
+<td><a href="./c14_0365_Ktl-XV.zkey">download</a></td>
+<td><a href="./c14_transcript_0365.txt">link</a></td>
+</tr>
+<tr>
+<td>257</td>
+<td>nguyenthinhdhqg</td>
+<td><a href="./c14_0366_nguyenthinhdhqg.zkey">download</a></td>
+<td><a href="./c14_transcript_0366.txt">link</a></td>
+</tr>
+<tr>
+<td>258</td>
+<td>anonymous</td>
+<td><a href="./c14_0367_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0367.txt">link</a></td>
+</tr>
+<tr>
+<td>259</td>
+<td>kaas</td>
+<td><a href="./c14_0368_kaas.zkey">download</a></td>
+<td><a href="./c14_transcript_0368.txt">link</a></td>
+</tr>
+<tr>
+<td>260</td>
+<td>dimre</td>
+<td><a href="./c14_0369_dimre.zkey">download</a></td>
+<td><a href="./c14_transcript_0369.txt">link</a></td>
+</tr>
+<tr>
+<td>261</td>
+<td>positive-approach</td>
+<td><a href="./c14_0370_positive-approach.zkey">download</a></td>
+<td><a href="./c14_transcript_0370.txt">link</a></td>
+</tr>
+<tr>
+<td>262</td>
+<td>azunymous</td>
+<td><a href="./c14_0371_azunymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0371.txt">link</a></td>
+</tr>
+<tr>
+<td>263</td>
+<td>seichris</td>
+<td><a href="./c14_0372_seichris.zkey">download</a></td>
+<td><a href="./c14_transcript_0372.txt">link</a></td>
+</tr>
+<tr>
+<td>264</td>
+<td>cyberstrat</td>
+<td><a href="./c14_0373_cyberstrat.zkey">download</a></td>
+<td><a href="./c14_transcript_0373.txt">link</a></td>
+</tr>
+<tr>
+<td>265</td>
+<td>vuphamdhhb</td>
+<td><a href="./c14_0374_vuphamdhhb.zkey">download</a></td>
+<td><a href="./c14_transcript_0374.txt">link</a></td>
+</tr>
+<tr>
+<td>266</td>
+<td>killercomet</td>
+<td><a href="./c14_0375_killercomet.zkey">download</a></td>
+<td><a href="./c14_transcript_0375.txt">link</a></td>
+</tr>
+<tr>
+<td>267</td>
+<td>hoangnguyendhsp</td>
+<td><a href="./c14_0376_hoangnguyendhsp.zkey">download</a></td>
+<td><a href="./c14_transcript_0376.txt">link</a></td>
+</tr>
+<tr>
+<td>268</td>
+<td>aquanatos</td>
+<td><a href="./c14_0377_aquanatos.zkey">download</a></td>
+<td><a href="./c14_transcript_0377.txt">link</a></td>
+</tr>
+<tr>
+<td>269</td>
+<td>Shillfood</td>
+<td><a href="./c14_0378_Shillfood.zkey">download</a></td>
+<td><a href="./c14_transcript_0378.txt">link</a></td>
+</tr>
+<tr>
+<td>270</td>
+<td>Kirol54</td>
+<td><a href="./c14_0379_Kirol54.zkey">download</a></td>
+<td><a href="./c14_transcript_0379.txt">link</a></td>
+</tr>
+<tr>
+<td>271</td>
+<td>Jbmanllr</td>
+<td><a href="./c14_0380_Jbmanllr.zkey">download</a></td>
+<td><a href="./c14_transcript_0380.txt">link</a></td>
+</tr>
+<tr>
+<td>272</td>
+<td>gislik</td>
+<td><a href="./c14_0381_gislik.zkey">download</a></td>
+<td><a href="./c14_transcript_0381.txt">link</a></td>
+</tr>
+<tr>
+<td>273</td>
+<td>milica1</td>
+<td><a href="./c14_0382_milica1.zkey">download</a></td>
+<td><a href="./c14_transcript_0382.txt">link</a></td>
+</tr>
+<tr>
+<td>274</td>
+<td>ChainLinkGod</td>
+<td><a href="./c14_0383_ChainLinkGod.zkey">download</a></td>
+<td><a href="./c14_transcript_0383.txt">link</a></td>
+</tr>
+<tr>
+<td>275</td>
+<td>ThomasRandolph</td>
+<td><a href="./c14_0384_ThomasRandolph.zkey">download</a></td>
+<td><a href="./c14_transcript_0384.txt">link</a></td>
+</tr>
+<tr>
+<td>276</td>
+<td>degentralized</td>
+<td><a href="./c14_0385_degentralized.zkey">download</a></td>
+<td><a href="./c14_transcript_0385.txt">link</a></td>
+</tr>
+<tr>
+<td>277</td>
+<td>demetrecio</td>
+<td><a href="./c14_0386_demetrecio.zkey">download</a></td>
+<td><a href="./c14_transcript_0386.txt">link</a></td>
+</tr>
+<tr>
+<td>278</td>
+<td>aantthony</td>
+<td><a href="./c14_0387_aantthony.zkey">download</a></td>
+<td><a href="./c14_transcript_0387.txt">link</a></td>
+</tr>
+<tr>
+<td>279</td>
+<td>zzztf</td>
+<td><a href="./c14_0388_zzztf.zkey">download</a></td>
+<td><a href="./c14_transcript_0388.txt">link</a></td>
+</tr>
+<tr>
+<td>280</td>
+<td>tasdienes</td>
+<td><a href="./c14_0389_tasdienes.zkey">download</a></td>
+<td><a href="./c14_transcript_0389.txt">link</a></td>
+</tr>
+<tr>
+<td>281</td>
+<td>puranjaysingh</td>
+<td><a href="./c14_0390_puranjaysingh.zkey">download</a></td>
+<td><a href="./c14_transcript_0390.txt">link</a></td>
+</tr>
+<tr>
+<td>282</td>
+<td>anonymous</td>
+<td><a href="./c14_0391_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0391.txt">link</a></td>
+</tr>
+<tr>
+<td>283</td>
+<td>linhnhidhkt</td>
+<td><a href="./c14_0392_linhnhidhkt.zkey">download</a></td>
+<td><a href="./c14_transcript_0392.txt">link</a></td>
+</tr>
+<tr>
+<td>284</td>
+<td>Braveheart19</td>
+<td><a href="./c14_0393_Braveheart19.zkey">download</a></td>
+<td><a href="./c14_transcript_0393.txt">link</a></td>
+</tr>
+<tr>
+<td>285</td>
+<td>anonymous</td>
+<td><a href="./c14_0394_anonymous.zkey">download</a></td>
+<td><a href="./c14_transcript_0394.txt">link</a></td>
+</tr>
+<tr>
+<td>286</td>
+<td>phucphamdhhb</td>
+<td><a href="./c14_0395_phucphamdhhb.zkey">download</a></td>
+<td><a href="./c14_transcript_0395.txt">link</a></td>
+</tr>
+<tr>
+<td>287</td>
+<td>saidakil</td>
+<td><a href="./c14_0396_saidakil.zkey">download</a></td>
+<td><a href="./c14_transcript_0396.txt">link</a></td>
+</tr>
+<tr>
+<td>288</td>
+<td>chrisjgf</td>
+<td><a href="./c14_0397_chrisjgf.zkey">download</a></td>
+<td><a href="./c14_transcript_0397.txt">link</a></td>
+</tr>
+<tr>
+<td>289</td>
+<td>Mrbin228</td>
+<td><a href="./c14_0398_Mrbin228.zkey">download</a></td>
+<td><a href="./c14_transcript_0398.txt">link</a></td>
+</tr>
+<tr>
+<td>290</td>
+<td>largebuoy</td>
+<td><a href="./c14_0399_largebuoy.zkey">download</a></td>
+<td><a href="./c14_transcript_0399.txt">link</a></td>
+</tr>
+</table>
+</body>
+</html>

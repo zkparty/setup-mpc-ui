@@ -82,10 +82,13 @@ using a command line instruction to run the verification</p>
 <li>Download the contribution zkey file you wish to verify</li>
 <p>then</p>
 <li>Download the circuit's .r1cs file</li>
-<li>Run the verification command: <pre>snarkjs zkey verify r1cs [.r1cs] [.ptau] [.zkey]</pre></li>
+<li>Run the verification command: <pre>snarkjs zkv [.r1cs] [.ptau] [.zkey]</pre></li>
 <p>or</p>
 <li>Download the initial zkey file (contribution 0)</li>
-<li>Run the verification command: <pre>snarkjs zkey verify init [cxx_0000.zkey] [.ptau] [.zkey]</pre></li>
+<li>Run the verification command: <pre>snarkjs zkvi [cxx_0000.zkey] [.ptau] [.zkey]</pre></li>
 </ul>
+<p>A successful verification will end with:
+    <pre>[INFO]  snarkJS: ZKey Ok!</pre>
+</p>
 </body>
 </html>
