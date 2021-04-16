@@ -454,6 +454,9 @@ const getVerifiedContribs = async () => {
           contributor: doc.get('queueIndex'),
           prior: doc.get('priorIndex'),
           username: doc.get('participantAuthId'),
+          userId: doc.get('participantId'),
+          duration: doc.get('duration'),
+          timeCompleted: doc.get('timeCompleted'),
         });
       });
       resolve({
