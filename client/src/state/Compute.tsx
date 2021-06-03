@@ -2,13 +2,11 @@ import * as React from 'react';
 import { getParamsFile, uploadParams } from "../api/FileApi";
 import { Ceremony } from "../types/ceremony";
 
-import { createGist } from "../api/ZKPartyApi";
-import { Dispatch, useContext } from "react";
-import { ComputeDispatchContext } from './ComputeStateManager';
+import { Dispatch } from "react";
 import { getParticipantContributions } from '../api/FirestoreApi';
+import { zKey } from 'snarkjs';
 
 export const startWorkerThread = (dispatch: React.Dispatch<any>) => {
-    //const dispatch = useContext(ComputeDispatchContext);
 
     if (!dispatch) return;
 
@@ -72,17 +70,29 @@ export const startDownload = (ceremonyId: string, index: number, dispatch: Dispa
 
 export const startComputation = (params: Uint8Array, entropy: Uint8Array, worker: Worker) => {
     //const newParams = wasm.contribute(params, entropy, reportProgress, setHash);
-    console.log(`params ${params.buffer.byteLength} ${entropy.buffer.byteLength}`);
-    const message = {
-        type: 'COMPUTE', 
-        params: params.buffer,
-        entropy: entropy.buffer,
-    };
-    worker.postMessage(message,
-    [
-        params.buffer,
-        entropy.buffer
-    ]);
+    console.debug(`params ${params.buffer.byteLength} ${entropy.buffer.byteLength}`);
+    // const message = {
+    //     type: 'COMPUTE', 
+    //     params: params.buffer,
+    //     entropy: entropy.buffer,
+    // };
+    // worker.postMessage(message,
+    // [
+    //     params.buffer,
+    //     entropy.buffer
+    // ]);
+
+    const progressOptions = {
+        progressCallback: (val: number, total: number) => console.debug(`compute progress = ${val} of ${total}`)
+    }
+    const inputFd = { type: 'mem', data: params.buffer };
+    let outFd =  { type: 'mem' };
+
+    zKey.contribute( inputFd, outFd, 
+            "contributor #2", entropy.buffer, console, progressOptions).then(
+                  (hash: any) => console.log(`contribution hash: ${JSON.stringify(hash)}`)
+    );
+    
 };
 
 export const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispatch: Dispatch<any>) => {
@@ -103,17 +113,6 @@ export const startUpload = (ceremonyId: string, index: number, data: Uint8Array,
 
 export const startCreateGist = (ceremony: Ceremony, index: number, hash: string, accessToken: string, dispatch: Dispatch<any>) => {
     console.debug(`startCreateGist ${accessToken}`);
-    // Disable individual gists - we create a summary at end of ceremony
-    // if (accessToken) {
-    //     createGist(ceremony.id, ceremony.title, index, hash, accessToken).then(
-    //         gistUrl => {
-    //             dispatch({
-    //                 type: 'GIST_CREATED',
-    //                 gistUrl,
-    //                 dispatch,
-    //             })
-    //     });
-    // } else {
     
     dispatch({
         type: 'CREATE_SUMMARY',
@@ -146,11 +145,6 @@ export const getContributions = (participantId: string, dispatch: Dispatch<any>,
             });
         }
     );
-    // Clear it first to avoid early summary  (?????)
-    // dispatch({
-    //     type: 'SET_CONTRIBUTIONS',
-    //     data: {contributions: [], count: null},
-    // });
 }
 
 export const getEntropy = () => {

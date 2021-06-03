@@ -1,20 +1,12 @@
-import React, { Dispatch, useContext, useEffect, useReducer, useRef } from "react";
+import React, { Dispatch, useContext, useEffect, useRef } from "react";
 import Typography from "@material-ui/core/Typography";
 import { AuthContextInterface, AuthStateContext } from "../state/AuthContext";
 
-import {
-  accentColor,
-  secondAccent,
-  textColor,
-  PageContainer,
-  lighterBackground,
-} from "../styles";
-import { Ceremony, ContributionState, Participant } from "../types/ceremony";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { Ceremony, Participant } from "../types/ceremony";
 
 import { 
   ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings, joinCircuit } from "../api/FirestoreApi";
-import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext, ComputeStatus, ComputeContextInterface } from '../state/ComputeStateManager';
+import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext, ComputeContextInterface } from '../state/ComputeStateManager';
 import { getContributions, startWorkerThread } from "../state/Compute";
 import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
@@ -24,12 +16,12 @@ import LoginPanel from "../components/LoginPanel";
 const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
 
 const handleStepChange = (state: ComputeContextInterface, 
-  dispatch: Dispatch<any> | undefined,
-  authState: AuthContextInterface
+    dispatch: Dispatch<any> | undefined,
+    authState: AuthContextInterface
   ) => {
 
   const { step, computeStatus, participant, contributionState, circuits, joiningCircuit, worker } = state;
-  console.log(`handle step change ${step}`);
+  console.debug(`handle step change ${step}`);
   switch (step) {
       case (Step.ACKNOWLEDGED): {
         // After 'LAUNCH' clicked
@@ -46,6 +38,7 @@ const handleStepChange = (state: ComputeContextInterface,
               console.debug('participant set');
               //dispatch({type: 'SET_STEP', data: Step.INITIALISED});
             });
+            // TODO - snarkjs - no load required ??
             if (!worker) startWorkerThread(dispatch);
           }
         }
