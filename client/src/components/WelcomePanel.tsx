@@ -21,7 +21,7 @@ export default function WelcomePanel(props: any) {
     if (dispatch) dispatch({type: 'ACKNOWLEDGE' });
   }
 
-  const isRunning = false;
+  const isRunning = true;
 
   return (
   <div style={{ display: 'flex', flexFlow: 'column', alignItems: 'center' }}>

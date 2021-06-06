@@ -228,7 +228,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             //const msg = `Parameters downloaded.`;
             //newState = addMessage(newState, msg);
             newState.computeStatus = {...state.computeStatus, downloaded: true, started: true};
-            if (state.worker) startComputation(action.data, state.entropy, state.worker);
+            startComputation(action.data, state.entropy, action.dispatch);
             console.debug('running computation......');
             newState.progress={ data: 0 };
             return newState;
