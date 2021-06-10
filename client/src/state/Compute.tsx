@@ -156,7 +156,7 @@ export const getContributions = (participantId: string, dispatch: Dispatch<any>,
             console.debug(`contribs: ${contribs.length}`);
             dispatch({
                 type: 'SET_CONTRIBUTIONS',
-                data: {contributions: contribs, count: contribs.length},
+                data: { contributions: contribs, count: contribs.length },
             });
         }
     );

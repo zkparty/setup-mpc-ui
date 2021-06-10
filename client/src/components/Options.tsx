@@ -9,7 +9,7 @@ import { accentColor } from '../styles';
 
 require('dotenv').config();
 
-const allowReset = true; // process.env.ALLOW_RESET || true;
+const allowReset = process.env.ALLOW_RESET || true;
 
 function getModalStyle() {
     const top = 50;

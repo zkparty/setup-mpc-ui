@@ -5,7 +5,7 @@ import { resolve } from 'path';
 const formatParamsFileName = (index: number): string => {
     var tmp = "000" + index.toString();
     var padIndex = tmp.substr(tmp.length-4);
-    return `ph2_${padIndex}.params`;
+    return `ph2_${padIndex}.zkey`;
 };
 
 export const getParamsFile = async (ceremonyId: string, index: number): Promise<Uint8Array> => {
@@ -21,10 +21,16 @@ export const getParamsFile = async (ceremonyId: string, index: number): Promise<
     const url = await fileRef.getDownloadURL();
     console.log(`Fetching ${url}  ${metadata.size} `);
 
-    const paramsFile = await fetch(url, {mode: 'cors'});
+    try {
+        const paramsFile = await fetch(url, {mode: 'cors'});
+        return new Uint8Array(await paramsFile.arrayBuffer());
+    } catch (err) {
+        console.error(`${err}`);
+        throw err;
+    }
+
 
     //let paramData = await paramsFile.arrayBuffer();
-    return new Uint8Array(await paramsFile.arrayBuffer());
 
     // Using streamed read:
     //const buffer = await new Response(await paramsFile.blob()).arrayBuffer();

@@ -39,7 +39,7 @@ const handleStepChange = (state: ComputeContextInterface,
               //dispatch({type: 'SET_STEP', data: Step.INITIALISED});
             });
             // TODO - snarkjs - no load required ??
-            if (!worker) startWorkerThread(dispatch);
+            //if (!worker) startWorkerThread(dispatch);
           }
         }
         break;

@@ -28,7 +28,7 @@ import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import { CeremonyProgress } from './ProgressPanel';
 import { useSelectionContext } from '../state/SelectionContext';
 
-const allowReset = false; // if true, the 'Options' panel is available
+const allowReset = true; // if true, the 'Options' panel is available
 
 interface ScrollProps {
   children: React.ReactElement;

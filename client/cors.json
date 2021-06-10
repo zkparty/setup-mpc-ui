@@ -1,6 +1,6 @@
 [
     {
-      "origin": ["https://trustedsetup-a86f4.web.app", "https://trustedsetuptest.web.app", "http://localhost:5000", "https://mpc.zkopru.network"],
+      "origin": ["https://trustedsetup-a86f4.web.app", "https://trustedsetuptest.web.app", "https://localhost:5000", "https://mpc.zkopru.network"],
       "method": ["GET"],
       "maxAgeSeconds": 3600
     }
