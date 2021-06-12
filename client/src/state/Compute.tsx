@@ -92,22 +92,24 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, dispat
             })
         }
     }
-    const inputFd = { type: 'mem', data: params.buffer };
-    let outFd =  { type: 'mem' };
+    const inputFd = "/circuit_0001.zkey"; //{ type: 'mem', data: params };
+    let outFd =  { type: 'zkey' }; // "/circuit_0002.zkey"; //
 
     // TODO - get contributor ID
-    zKey.contribute( inputFd, outFd, 
-            "contributor #2", entropy.buffer, console, progressOptions).then(
-                  (hash: any) => {
-                      console.log(`contribution hash: ${JSON.stringify(hash)}`)
-                      dispatch({type: 'SET_HASH', hash});
-    //         const result = new Uint8Array(data.result);
-    //         console.debug(`COMPLETE ${result.length}`);
-    //         dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
+    try {
+        zKey.contribute( inputFd, outFd, 
+                "contributor #2", "010a020b030d040f0r050g0tkalasdkasd", console, progressOptions).then(
+                    (hash: any) => {
+                        console.log(`contribution hash: ${JSON.stringify(hash)}`)
+                        dispatch({type: 'SET_HASH', hash});
+        //         const result = new Uint8Array(data.result);
+        //         console.debug(`COMPLETE ${result.length}`);
+        //         dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
+        });
+    } catch (err) {
+        console.error(`Error in contribute: ${err}`);
+    }
 
-                    }
-    );
-    
 };
 
 export const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispatch: Dispatch<any>) => {
