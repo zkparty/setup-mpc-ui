@@ -1,10 +1,10 @@
 {
   "name": "trusted-setup-frontend",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Trusted Setup multi-party computation user interface",
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "react-scripts build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "link": "npm link phase2"
@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/runtime": "^7.14.6",
     "@lottiefiles/react-lottie-player": "^3.0.1",
     "@material-ui/core": "^4.11.0",
     "@material-ui/data-grid": "^4.0.0-alpha.11",
@@ -49,6 +50,7 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.14.5",
     "@types/color": "^3.0.1",
     "@types/react-router-dom": "^5.1.3",
     "comlink-loader": "^2.0.0",

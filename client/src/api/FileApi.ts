@@ -23,7 +23,8 @@ export const getParamsFile = async (ceremonyId: string, index: number): Promise<
 
     try {
         const paramsFile = await fetch(url, {mode: 'cors'});
-        return new Uint8Array(await paramsFile.arrayBuffer());
+        const ab = await paramsFile.arrayBuffer();
+        return new Uint8Array(ab);
     } catch (err) {
         console.error(`${err}`);
         throw err;
