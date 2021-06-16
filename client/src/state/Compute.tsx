@@ -54,21 +54,21 @@ export const startWorkerThread = (dispatch: React.Dispatch<any>) => {
 export const startDownload = (ceremonyId: string, index: number, dispatch: Dispatch<any>) => {
     // DATA DOWNLOAD
     console.debug(`getting data ${ceremonyId} ${index}`);
-     //getParamsFile(ceremonyId, index).then( paramData => {
-        setTimeout(() => {
-            //console.debug(`downloaded ${paramData?.length}`);
+     getParamsFile(ceremonyId, index).then( paramData => {
+        //setTimeout(() => {
+            console.debug(`downloaded ${paramData?.length}`);
             dispatch({
                 type: 'DOWNLOADED',
                 ceremonyId,
-                //data: paramData,
+                data: paramData,
                 dispatch,
             });
-        }, 500);
-    // }).catch(err => {
-    //     console.error(`Error: ${err.message}. Skipping circuit`);
-    //     // Failed download - abort and invalidate the contribution
-    //     dispatch({type: 'ABORT_CIRCUIT', data: err.message, dispatch});
-    // });
+        //}, 500);
+     }).catch(err => {
+         console.error(`Error: ${err.message}. Skipping circuit`);
+         // Failed download - abort and invalidate the contribution
+         dispatch({type: 'ABORT_CIRCUIT', data: err.message, dispatch});
+     });
 };
 
 export const startComputation = (params: Uint8Array, entropy: Uint8Array, dispatch: Dispatch<any>) => {
@@ -94,17 +94,17 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, dispat
             })
         }
     }
-    fetch("/circuit_0001.zkey").then( function(res) {
-        return res.arrayBuffer();
-    }).then(function (ab) {
-        const buff = new Uint8Array(ab);
-        const inputFd = { type: 'mem', data: buff }; //params; // //
+    //fetch("/circuit_0001.zkey").then( function(res) {
+    //    return res.arrayBuffer();
+    //}).then(function (ab) {
+    //    const buff = new Uint8Array(ab);
+        const inputFd = { type: 'mem', data: params }; //params; // //
         let outFd =  { type: 'mem' }; //new Uint8Array(); // "/circuit_0002.zkey"; //
 
         // TODO - get contributor ID
         try {
             zKey.contribute( inputFd, outFd, 
-                    "contributor #2", "010a020b030d040f0r050g0tkalasdkasd", console, progressOptions).then(
+                    "contributor #2", entropy.buffer, console, progressOptions).then(
                         (hash: any) => {
                             console.log(`contribution hash: ${JSON.stringify(hash)}`);
                             dispatch({type: 'SET_HASH', hash});
@@ -115,7 +115,7 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, dispat
         } catch (err) {
             console.error(`Error in contribute: ${err}`);
         }
-        });
+        //});
     };
 
 export const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispatch: Dispatch<any>) => {

@@ -237,20 +237,22 @@ export const computeStateReducer = (state: any, action: any):any => {
             return {...state, progress: action.data};
         }
         case 'SET_HASH': {
+            // snarkjs returns Uint8Arr
+            const hash = Array.prototype.map.call(action.hash, x => ('00' + x.toString(16)).slice(-2)).join('');
             let h = '';
-            let oldHash = action.hash.replace('0x', '');
+            //let oldHash = action.hash.replace('0x', '');
             let separator = '';
             let j = 0;
-            for (let i = 0; i<oldHash.length; i+=8) {
-                const s = oldHash.slice(i, i+8);
+            for (let i = 0; i<hash.length; i+=8) {
+                const s = hash.slice(i, i+8);
                 h = h.concat(separator, s);
                 if (j++ >= 3) {
                     h = h.concat('\n');
                     j = 0;
                 }
-                separator = ' ';
-                
+                separator = ' ';                
             }
+            console.debug(`Hash: ${h}`);
             //const msg = `Hash: ${h}`;
             //newState = addMessage(state, msg);
             newState.hash = h;
