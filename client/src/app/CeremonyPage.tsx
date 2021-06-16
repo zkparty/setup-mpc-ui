@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useContext } from "react";
 import * as React from "react";
 import styled from "styled-components";
 import { ReactNode } from "react";
-import { DataGrid, ColDef, ValueGetterParams, CellParams } from '@material-ui/data-grid';
+import { DataGrid, GridColDef, GridCellParams } from '@material-ui/data-grid';
 import {
   textColor,
   lighterBackground,
@@ -317,7 +317,7 @@ const CeremonyDetails = (props: {
   );
 };
 
-const getColumns = (openViewer: (s: string, n: any)=>void): ColDef[] => {
+const getColumns = (openViewer: (s: string, n: any)=>void): GridColDef[] => {
 //  const cols = 
   return (
   [
@@ -336,7 +336,7 @@ const getColumns = (openViewer: (s: string, n: any)=>void): ColDef[] => {
       description: 'Link to the attestation',
       sortable: false,
       width: 80,
-      renderCell: (params: CellParams) => {
+      renderCell: (params: GridCellParams) => {
         const v = params.value?.toString();
         return (
           v ? 
@@ -349,13 +349,14 @@ const getColumns = (openViewer: (s: string, n: any)=>void): ColDef[] => {
       description: 'The verification log',
       sortable: false,
       width: 80,
-      renderCell: (params: CellParams) => {
+      renderCell: (params: GridCellParams) => {
         const v = params.value;
+        const r = params.row;
         return (
           v ? 
             <button 
               onClick={() => {
-                openViewer(v?.toString(), params.getValue('queueIndex'))
+                openViewer(v?.toString(), params.getValue(1, 'queueIndex'))
               }}
               style={{ backgroundColor: lighterBackground, color: textColor, borderStyle: 'none' }}
             >view</button>
@@ -368,7 +369,7 @@ const getColumns = (openViewer: (s: string, n: any)=>void): ColDef[] => {
 
 const ContributionsGrid = (props: { contributions: any[], openViewer: (s: string, i:any)=> void }): JSX.Element => {
   //const classes = useStyles();
-  const cols: ColDef[] = getColumns(props.openViewer);
+  const cols: GridColDef[] = getColumns(props.openViewer);
   return (
     <div style={{ height: 450, width: 800 }}>
       <Typography variant="h5" style={{ color: accentColor, background: lighterBackground }}>Contributions</Typography>
