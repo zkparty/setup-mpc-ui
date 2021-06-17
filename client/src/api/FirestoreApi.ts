@@ -534,7 +534,8 @@ const getCeremonyStats = async (ceremonyId: string): Promise<any> => {
     const cont = docSnapshot.data();
     if (cont.status === COMPLETE
         || cont.status === INVALIDATED
-        || cont.status === RUNNING) {
+        || cont.status === RUNNING
+      ) {
       if (cont.queueIndex) {
         contributionStats.currentIndex = cont.queueIndex;
         if (cont.status === COMPLETE && cont.verification) {
