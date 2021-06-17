@@ -99,7 +99,7 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, dispat
     //}).then(function (ab) {
     //    const buff = new Uint8Array(ab);
         const inputFd = { type: 'mem', data: params }; //params; // //
-        let outFd =  { type: 'mem' }; //new Uint8Array(); // "/circuit_0002.zkey"; //
+        let outFd =  { type: 'mem', data: new Uint8Array() }; //new Uint8Array(); // "/circuit_0002.zkey"; //
 
         // TODO - get contributor ID
         try {
@@ -108,10 +108,10 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, dispat
                         (hash: any) => {
                             console.log(`contribution hash: ${JSON.stringify(hash)}`);
                             dispatch({type: 'SET_HASH', hash});
-            //         const result = new Uint8Array(data.result);
-            //         console.debug(`COMPLETE ${result.length}`);
-            //         dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
-            });
+                            const result = outFd.data;
+                            console.debug(`COMPLETE ${result.length}`);
+                            dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
+                    });
         } catch (err) {
             console.error(`Error in contribute: ${err}`);
         }
