@@ -9,7 +9,8 @@ import { zKey } from 'snarkjs';
 export const startDownload = (ceremonyId: string, index: number, dispatch: Dispatch<any>) => {
     // DATA DOWNLOAD
     console.debug(`getting data ${ceremonyId} ${index}`);
-     getParamsFile(ceremonyId, index).then( paramData => {
+    const progressCb = (progress: number) => dispatch({type: 'PROGRESS_UPDATE', data: progress})
+    getParamsFile(ceremonyId, index, progressCb).then( paramData => {
         //setTimeout(() => {
             console.debug(`downloaded ${paramData?.length}`);
             dispatch({
@@ -19,11 +20,11 @@ export const startDownload = (ceremonyId: string, index: number, dispatch: Dispa
                 dispatch,
             });
         //}, 500);
-     }).catch(err => {
+    }).catch(err => {
          console.error(`Error: ${err.message}. Skipping circuit`);
          // Failed download - abort and invalidate the contribution
          dispatch({type: 'ABORT_CIRCUIT', data: err.message, dispatch});
-     });
+    });
 };
 
 export const startComputation = (params: Uint8Array, entropy: Uint8Array, participant: string, dispatch: Dispatch<any>) => {

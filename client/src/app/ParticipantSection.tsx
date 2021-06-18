@@ -20,7 +20,7 @@ const handleStepChange = (state: ComputeContextInterface,
     authState: AuthContextInterface
   ) => {
 
-  const { step, computeStatus, participant, contributionState, circuits, joiningCircuit, worker } = state;
+  const { step, computeStatus, participant, contributionState, circuits, joiningCircuit } = state;
   console.debug(`handle step change ${step}`);
   switch (step) {
       case (Step.ACKNOWLEDGED): {
@@ -38,8 +38,6 @@ const handleStepChange = (state: ComputeContextInterface,
               console.debug('participant set');
               //dispatch({type: 'SET_STEP', data: Step.INITIALISED});
             });
-            // TODO - snarkjs - no load required ??
-            //if (!worker) startWorkerThread(dispatch);
           }
         }
         break;

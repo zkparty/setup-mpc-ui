@@ -28,6 +28,7 @@
     "@types/webfontloader": "^1.6.32",
     "color": "^3.1.2",
     "dotenv": "^8.2.0",
+    "fetch-readablestream": "^0.2.0",
     "firebase": "^8.0.1",
     "firebase-admin": "^9.9.0",
     "import-from-worker": "^1.0.1",

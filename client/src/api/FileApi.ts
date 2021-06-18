@@ -1,6 +1,7 @@
 import firebase from 'firebase/app';
 import "firebase/storage";
 import { resolve } from 'path';
+import fetchStream from 'fetch-readablestream';
 
 const formatParamsFileName = (index: number): string => {
     var tmp = "000" + index.toString();
@@ -8,7 +9,7 @@ const formatParamsFileName = (index: number): string => {
     return `ph2_${padIndex}.zkey`;
 };
 
-export const getParamsFile = async (ceremonyId: string, index: number): Promise<Uint8Array> => {
+export const getParamsFile = async (ceremonyId: string, index: number, progressCallback: (p: number) => void): Promise<Uint8Array> => {
     const storage = firebase.storage();
 
     const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
@@ -19,16 +20,45 @@ export const getParamsFile = async (ceremonyId: string, index: number): Promise<
     });
     
     const url = await fileRef.getDownloadURL();
-    console.log(`Fetching ${url}  ${metadata.size} `);
+    const totBytes = metadata.size;
+    console.log(`Fetching ${url}  ${totBytes} `);
 
-    try {
-        const paramsFile = await fetch(url, {mode: 'cors'});
-        const ab = await paramsFile.arrayBuffer();
-        return new Uint8Array(ab);
-    } catch (err) {
-        console.error(`${err}`);
-        throw err;
+    // try {
+    //     const paramsFile = await fetch(url, {mode: 'cors'});
+    //     const ab = await paramsFile.arrayBuffer();
+    //     return new Uint8Array(ab);
+    // } catch (err) {
+    //     console.error(`${err}`);
+    //     throw err;
+    // }
+
+    const readAllChunks = async (readableStream: any): Promise<Uint8Array> => {
+        const reader = readableStream.getReader();
+        let chunks: Uint8Array = new Uint8Array();
+
+        let done: boolean = false;
+        do {
+            const resp = await reader.read();
+            const { value } : { value:Uint8Array } = resp;
+
+            //console.debug(`chunk ${JSON.stringify(resp)}`);
+
+            done = resp.done;
+            if (!done) {
+                const totLen = chunks.length + value.length;
+                let newChunks = new Uint8Array(totLen);
+                newChunks.set(chunks, 0);
+                newChunks.set(value, chunks.length);
+                chunks = newChunks;
+                if (totBytes > 0) progressCallback(100 * totLen / totBytes);
+            }
+        } while(!done);
+        return chunks;
     }
+
+    const response = await fetchStream(url);
+    const chunks = await readAllChunks(response.body);
+    return chunks;
 
 
     //let paramData = await paramsFile.arrayBuffer();
