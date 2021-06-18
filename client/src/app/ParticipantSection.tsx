@@ -7,7 +7,7 @@ import { Ceremony, Participant } from "../types/ceremony";
 import { 
   ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings, joinCircuit } from "../api/FirestoreApi";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext, ComputeContextInterface } from '../state/ComputeStateManager';
-import { getContributions, startWorkerThread } from "../state/Compute";
+import { getContributions } from "../state/Compute";
 import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
 import ProgressPanel from "../components/ProgressPanel";
