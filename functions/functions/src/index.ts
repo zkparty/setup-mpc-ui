@@ -221,12 +221,12 @@ const DoCircuitSummary = async (i: number) => {
     //snap.docs.forEach(async (doc: { data: () => any; }, i: number) => {
       //if (i>1) return;
       const cDoc = snap.docs[i];
-      const circit = cDoc.data();
+      const circuit = cDoc.data();
       
       //snap.forEach(async (circuit: DocumentSnapshot) => {
-      functions.logger.debug(`summarising circuit ${circit.id}`);
+      functions.logger.debug(`summarising circuit ${circuit.id}`);
       // Get stats
-      const stats = await getCeremonyStats(circit.id);
+      const stats = await getCeremonyStats(circuit.id);
   
       // update circuit record
       await cDoc.ref.update({...stats});
