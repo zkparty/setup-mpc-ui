@@ -39,9 +39,9 @@ export default function CircuitsPanel() {
   const { isLoggedIn, } = authState;
 
   useEffect(() => {
-    if (!loaded && dispatch) {
+    if (!loaded && state.project && dispatch) {
       // Get circuits. Listen for updates
-      startCircuitListener(dispatch);
+      startCircuitListener(state.project, dispatch);
       startCircuitEventListener(dispatch);
       setLoaded(true);
     }

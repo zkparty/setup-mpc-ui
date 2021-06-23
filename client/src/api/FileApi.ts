@@ -23,15 +23,6 @@ export const getParamsFile = async (ceremonyId: string, index: number, progressC
     const totBytes = metadata.size;
     console.log(`Fetching ${url}  ${totBytes} `);
 
-    // try {
-    //     const paramsFile = await fetch(url, {mode: 'cors'});
-    //     const ab = await paramsFile.arrayBuffer();
-    //     return new Uint8Array(ab);
-    // } catch (err) {
-    //     console.error(`${err}`);
-    //     throw err;
-    // }
-
     const readAllChunks = async (readableStream: any): Promise<Uint8Array> => {
         const reader = readableStream.getReader();
         let chunks: Uint8Array = new Uint8Array();
@@ -59,43 +50,6 @@ export const getParamsFile = async (ceremonyId: string, index: number, progressC
     const response = await fetchStream(url);
     const chunks = await readAllChunks(response.body);
     return chunks;
-
-
-    //let paramData = await paramsFile.arrayBuffer();
-
-    // Using streamed read:
-    //const buffer = await new Response(await paramsFile.blob()).arrayBuffer();
-
-    // const body = paramsFile.body;
-    // console.log(`body? ${body}`);
-    // let arr: Uint8Array = new Uint8Array(metadata.size);
-    // let i = 0;
-    // const fr = body?.getReader();
-   
-    // let p = new Promise<any>((resolve, reject) => {
-    //     let isDone: boolean = false;
-    //     const readChunk = (res: ReadableStreamReadResult<Uint8Array>) => {
-    //         console.log(`result: ${res?.done ? 'done' : 'chunk...'}`);
-    //         if (!res.done) {arr.set(res.value, i);
-    //             i += res.value.length;
-    //             fr?.read().then(res => readChunk(res));
-    //         } else {
-    //             isDone = true;
-    //             resolve(arr);
-    //         }
-    //     };
-    //     console.log(`read 1st chunk: ${fr ? 'have fileReader': 'no fileReader!'}`);
-    //     fr?.read().then(res => readChunk(res));
-    // });
-
-        
-    //  return p;
-    // //fr.result
-    // fr.readAsBinaryString(blob);
-
-    //const buffer = await blob.arrayBuffer();
-    //console.log(`paramsFile length ${buffer.byteLength}`);
-    //return new Uint8Array(blob);
 };
 
 export const uploadParams = async (ceremonyId: string, index: number, params: Uint8Array, progressCallback: (p: number) => void): Promise<string> => {

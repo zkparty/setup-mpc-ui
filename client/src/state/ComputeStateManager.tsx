@@ -81,6 +81,7 @@ export const initialComputeStatus: ComputeStatus = {
 };
 
 export interface ComputeContextInterface {
+    project?: string,
     circuits: Ceremony[],
     computeStatus: ComputeStatus,
     messages: string [],
@@ -103,6 +104,7 @@ export interface ComputeContextInterface {
 };
 
 export const initialState: ComputeContextInterface = {
+    project: undefined,
     circuits: [],
     computeStatus: initialComputeStatus,
     messages: [],
@@ -466,6 +468,9 @@ export const computeStateReducer = (state: any, action: any):any => {
         case 'VISIBILITY': {
             // Progress panel visibililty
             return {...state, isProgressPanelVisible: action.data};
+        }
+        case 'SET_PROJECT': {
+            return {...state, project: action.data};
         }
     }
     console.debug(`state after reducer ${newState.step}`);

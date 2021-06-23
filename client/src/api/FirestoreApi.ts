@@ -64,29 +64,29 @@ const contributionConverter: firebase.firestore.FirestoreDataConverter<Contribut
 
 //=====================================================================================
 
-export async function addCeremony(ceremony: Ceremony): Promise<string> {
+export async function addCeremony(circuit: Ceremony): Promise<string> {
     const db = firebase.firestore();
     try {
       const doc = await db.collection("ceremonies")
         .withConverter(ceremonyConverter)
-        .add(ceremony);
+        .add(circuit);
   
-      console.log(`new ceremony added with id ${doc.id}`);
+      console.log(`new circuit added with id ${doc.id}`);
       return doc.id;
     } catch (e) {
-      throw new Error(`error adding ceremony data to firebase: ${e}`);
+      throw new Error(`error adding circuit data to firebase: ${e}`);
     }
 };
 
-export async function updateCeremony(ceremony: Ceremony): Promise<void> {
+export async function updateCeremony(circuit: Ceremony): Promise<void> {
   const db = firebase.firestore();
   try {
     await db.collection("ceremonies")
       .withConverter(ceremonyConverter)
-      .doc(ceremony.id)
-      .set(ceremony, { merge: true });
+      .doc(circuit.id)
+      .set(circuit, { merge: true });
 
-    console.debug(`ceremony ${ceremony.id} updated`);
+    console.debug(`ceremony ${circuit.id} updated`);
   } catch (e) {
     console.error(`ceremony update failed: ${e.message}`);
     throw new Error(`error updating ceremony data: ${e}`);
@@ -101,29 +101,36 @@ export async function getCeremony(id: string): Promise<Ceremony | undefined> {
     .doc(id)
     .get();
   if (doc === undefined) {
-    throw new Error("ceremony not found");
+    throw new Error("circuit not found");
   }
   console.log(`getCeremony ${doc.exists}`);
   return doc.data();
 }
 
-// Return all circuits, with summary contrib counts for each
-export const getCeremonies = async (): Promise<Ceremony[]> => {
+// Return all circuits for a project
+export const getCeremonies = async (project: string): Promise<Ceremony[]> => {
   const db = firebase.firestore();
-  const ceremonySnapshot = await db
-      .collection("ceremonies")
-      .withConverter(ceremonyConverter)
-      .orderBy('sequence')
-      .where('ceremonyState', '==', RUNNING)
+  const circuitsSnap = await db.collection('projects')
+      .doc(project)
+      .collection('circuits')
       .get();
 
-  const ceremonies = await Promise.all(
-    ceremonySnapshot.docs.map(async doc => {
-      //const count = await getCeremonyStats(doc.ref.id);
-      const c: Ceremony = doc.data();
-      return c;
+  const circuits = await Promise.all(
+    circuitsSnap.docs.map(async doc => {
+      const cctSnap = await db
+        .collection("ceremonies")
+        .doc(doc.id)
+        .withConverter(ceremonyConverter)
+        .get();
+      const c: Ceremony | undefined = cctSnap.data();
+      if (c && c.ceremonyState === RUNNING) {
+        return c;
+      } else {
+        return null;
+      }
     }));
-  return ceremonies;
+  
+  return circuits.filter(v => { return (v !== null) }) as Ceremony[];
 }
 
 // Counts the waiting and complete contributions for a circuit
@@ -210,7 +217,7 @@ export const ceremonyEventListener = async (ceremonyId: string | undefined, call
         }
       });
     }, err => {
-      console.warn(`Error while listening for ceremony events ${err}`);
+      console.warn(`Error while listening for circuit events ${err}`);
     });
     return unsub;
 };
@@ -232,14 +239,15 @@ export const circuitEventListener = async (callback: (e: any) => void): Promise<
       }
     });
   }, err => {
-    console.warn(`Error while listening for ceremony events ${err}`);
+    console.warn(`Error while listening for circuit events ${err}`);
   });
   return unsub;
 };
 
-
 // Listens for updates to circuit data. Running circuits only.
-export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
+export const ceremonyListener = async (project: string, callback: (c: Ceremony) => void) => {
+    const projectCircuits = await getCeremonies(project);
+
     const db = firebase.firestore();
     const query = db.collectionGroup("ceremonies")
         .withConverter(ceremonyConverter)
@@ -249,15 +257,18 @@ export const ceremonyListener = async (callback: (c: Ceremony) => void) => {
       //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
       querySnapshot.docChanges().forEach(async docSnapshot => {
         if (docSnapshot.type === 'modified' || docSnapshot.type === 'added') {
-          console.debug(`Circuit: ${docSnapshot.doc.id}`);
-          getCeremonyStats(docSnapshot.doc.ref.id).then(stats => {
-            const ceremony = {...docSnapshot.doc.data(), ...stats};
-            callback(ceremony);
-          });
+          // Only proceed if the circuit is in this project
+          if (projectCircuits.find(v => (v.id = docSnapshot.doc.id))) {
+            console.debug(`Circuit: ${docSnapshot.doc.id}`);
+            getCeremonyStats(docSnapshot.doc.ref.id).then(stats => {
+              const ceremony = {...docSnapshot.doc.data(), ...stats};
+              callback(ceremony);
+            });
+          }
         }
       });
     }, err => {
-      console.log(`Error while listening for ceremony changes ${err}`);
+      console.log(`Error while listening for circuit changes ${err}`);
     });
 };
 

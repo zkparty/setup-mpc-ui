@@ -3,9 +3,9 @@ import { Ceremony } from "../types/ceremony";
 import { Dispatch, useContext } from "react";
 import { circuitEventListener, getCeremonies } from '../api/FirestoreApi';
 
-export const startCircuitListener = (dispatch: Dispatch<any>) => {
+export const startCircuitListener = (project: string, dispatch: Dispatch<any>) => {
 
-  getCeremonies().then(circuits => {
+  getCeremonies(project).then(circuits => {
     if (dispatch) {
       dispatch({
         type: 'SET_CIRCUITS',
