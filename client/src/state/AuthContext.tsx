@@ -9,6 +9,7 @@ export interface AuthContextInterface {
   isCoordinator: boolean,
   accessToken: string | null,
   loaded: boolean,
+  manualAttestation: boolean,
 };
 
 export const defaultAuth: AuthContextInterface = {
@@ -17,6 +18,7 @@ export const defaultAuth: AuthContextInterface = {
   isCoordinator: false,
   accessToken: null,
   loaded: false,
+  manualAttestation: false,
 };
 
 export const AuthStateContext = React.createContext<AuthContextInterface>(defaultAuth);
@@ -83,6 +85,9 @@ export const authStateReducer = (state: any, action: any):any => {
     }
     case 'SET_COORDINATOR': {
       return {...newState, isCoordinator: true };
+    }
+    case 'MANUAL_ATTESTATION': {
+      return {...newState, manualAttestation: action.option};
     }
   }
   console.log(`unknown action type ${action.type}`);
