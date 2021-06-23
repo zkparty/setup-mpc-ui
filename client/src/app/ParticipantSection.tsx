@@ -12,6 +12,7 @@ import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
 import ProgressPanel from "../components/ProgressPanel";
 import LoginPanel from "../components/LoginPanel";
+import { auth } from "firebase-admin";
 
 const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
 
@@ -158,9 +159,10 @@ export const ParticipantSection = () => {
       // Add a gist
       const { userContributions, siteSettings, participant, accessToken } = state;
       if (participant && participant.authId && accessToken) {
-        createSummaryGist(siteSettings, userContributions, participant.authId, accessToken).then(
+        const token = authState.manualAttestation ? null : accessToken;
+        createSummaryGist(siteSettings, userContributions, participant.authId, token).then(
           url => {
-            if (dispatch) dispatch({ type: 'SUMMARY_GIST_CREATED', data: url });
+            if (dispatch && url) dispatch({ type: 'SUMMARY_GIST_CREATED', data: url });
         })
       }
     }

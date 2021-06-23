@@ -178,17 +178,18 @@ const addGist = async (summary: string, description: string, authToken: string):
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `bearer ${authToken}`,
+      'Accept': 'application/vnd.github.v3+json',
     }
 
   })
-  .catch(err => console.warn(`Error creating gist. ${err.message}`));
+  .catch(err => console.warn(`Error creating gist. ${err}`));
   
-  console.debug(`${res ? 'ok' : 'error'}`);
-  if (res) return (await res.json()).html_url;
+  console.debug(`${res && res.ok ? 'ok' : 'error'}`);
+  if (res && res.ok) return (await res.json()).html_url;
   return '';
 }
 
-export const createSummaryGist = async (settings: any, userContributions: any[], username: string, authToken: string): Promise<string> => {
+export const createSummaryGist = async (settings: any, userContributions: any[], username: string, authToken: string | null): Promise<string | null> => {
   const EOL = '\n';
   const template = settings.gistTemplate.replaceAll('{EOL}', EOL);
   let body = '';
@@ -209,5 +210,11 @@ export const createSummaryGist = async (settings: any, userContributions: any[],
 
   const description = settings.gistSummaryDescription;
 
-  return addGist(content, description, authToken);
+  if (authToken) {
+    return addGist(content, description, authToken);
+  } else {
+    navigator.clipboard.writeText(content);
+    window.open('https://gist.github.com', '_blank');
+  }
+  return null;
 }
