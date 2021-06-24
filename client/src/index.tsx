@@ -5,9 +5,12 @@ import queryString from 'query-string';
 //import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 
+const qsProj: string | string[] | null = queryString.parse(location.search).project;
+const project: string = qsProj == null ? '' : typeof qsProj === 'string' ? qsProj : qsProj[0];
+
 ReactDOM.render(
     <React.StrictMode>
-      <App project={queryString.parse(location.search).project as string | null}/>
+      <App project={project}/>
     </React.StrictMode>,
     document.getElementById('root')
   );

@@ -9,7 +9,6 @@ import firebaseConfig from "./firebaseConfig";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
-import { SnackbarProvider } from "notistack";
 import { ComputeContextProvider } from '../state/ComputeStateManager';
 import { getSiteSettings } from '../api/FirestoreApi';
 
@@ -41,11 +40,9 @@ const App = (props: AppProps) => {
   return (
     <AuthContextProvider project={project}>
       <SelectionContextProvider>
-        <ComputeContextProvider>
-          <SnackbarProvider maxSnack={4}>
-              <GlobalStyle />
-              <LandingPage />
-          </SnackbarProvider>
+        <ComputeContextProvider settings={settings} project={project}>
+            <GlobalStyle />
+            <LandingPage />
         </ComputeContextProvider>
       </SelectionContextProvider>
     </AuthContextProvider>

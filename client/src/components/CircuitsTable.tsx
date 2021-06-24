@@ -47,7 +47,7 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
   const openTranscript = (title: JSX.Element, content: JSX.Element) => {
     setModalContent({title, content});
     setModalOpen(true);
-  }
+  };
   const cellWidths = [
     '105px',
     '167px',

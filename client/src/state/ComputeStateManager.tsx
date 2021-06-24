@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState } from "../types/ceremony";
+import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState, Project } from "../types/ceremony";
 
-import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, countParticipantContributions } from "../api/FirestoreApi";
-import { createContext, Dispatch, useContext, useReducer } from "react";
+import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, getProject } from "../api/FirestoreApi";
+import { createContext, Dispatch, PropsWithChildren, useContext, useReducer } from "react";
 import { startDownload, startComputation, startUpload, endOfCircuit, getEntropy } from './Compute';
 
 export enum Step {
@@ -81,43 +81,49 @@ export const initialComputeStatus: ComputeStatus = {
 };
 
 export interface ComputeContextInterface {
-    project?: string,
-    circuits: Ceremony[],
-    computeStatus: ComputeStatus,
-    messages: string [],
-    contributionState?: ContributionState,
-    step: Step,
-    participant?: Participant,
-    accessToken?: string,
-    paramData?: Uint8Array,
-    entropy: Uint8Array,
-    progress: number, // { count: number, total: number},
-    hash: string,
-    contributionCount: number,
-    userContributions?: any[],
-    worker?: Worker,
-    siteSettings?: any,
-    seriesIsComplete: boolean,
-    summaryGistUrl?: string,
-    isProgressPanelVisible: boolean,
-    joiningCircuit?: boolean,
+    projectId?: string;
+    project?: Project;
+    circuits: Ceremony[];
+    computeStatus: ComputeStatus;
+    messages: string [];
+    contributionState?: ContributionState;
+    step: Step;
+    participant?: Participant;
+    accessToken?: string;
+    paramData?: Uint8Array;
+    entropy: Uint8Array;
+    progress: number; // { count: number, total: number},
+    hash: string;
+    contributionCount: number;
+    userContributions?: any[];
+    worker?: Worker;
+    siteSettings?: any;
+    projectSettingsDone: boolean;
+    seriesIsComplete: boolean;
+    summaryGistUrl?: string;
+    isProgressPanelVisible: boolean;
+    joiningCircuit?: boolean;
 };
 
-export const initialState: ComputeContextInterface = {
-    project: undefined,
-    circuits: [],
-    computeStatus: initialComputeStatus,
-    messages: [],
-    contributionState: undefined,
-    step: Step.NOT_ACKNOWLEDGED,
-    paramData: new Uint8Array(0),
-    entropy: new Uint8Array(0),
-    progress: 0, //{count: 0, total: 0},
-    hash: '',
-    contributionCount: 0,
-    seriesIsComplete: false,
-    isProgressPanelVisible: true,
-    joiningCircuit: false,
+export const initialState = (props?: ComputeContextProps): ComputeContextInterface => {
+    return {
+        projectId: props? props.project : undefined,
+        circuits: [],
+        computeStatus: initialComputeStatus,
+        messages: [],
+        contributionState: undefined,
+        step: Step.NOT_ACKNOWLEDGED,
+        paramData: new Uint8Array(0),
+        entropy: new Uint8Array(0),
+        progress: 0, //{count: 0, total: 0},
+        hash: '',
+        contributionCount: 0,
+        seriesIsComplete: false,
+        isProgressPanelVisible: true,
+        joiningCircuit: false,
+        siteSettings: props ? props.settings : undefined,
+        projectSettingsDone: false,
+    }
 }
 
 const addMessage = (state: any, message: string) => {
@@ -125,18 +131,31 @@ const addMessage = (state: any, message: string) => {
     return {...state, messages: [...state.messages, msg]};
 }
 
-export const ComputeStateContext = createContext<ComputeContextInterface>(initialState);
+export const ComputeStateContext = createContext<ComputeContextInterface>(initialState());
 export const ComputeDispatchContext = createContext<Dispatch<any> | undefined>(undefined);
 
-export const ComputeContextProvider = ({ children }:any) => {
-    const [state, dispatch] = useReducer(computeStateReducer, initialState);
+type ComputeContextProps = PropsWithChildren<{
+    settings?: any,
+    project?: string,
+}>
 
-    //console.debug(`ComputeContextProvider ${!!dispatch}`);
+export const ComputeContextProvider = (props: ComputeContextProps) => {
+    const [state, dispatch] = useReducer(computeStateReducer, initialState(props));
+
+    if (state.projectId !== state.project?.id) {        
+        dispatch({ type: 'PROJECT_SETTINGS_DONE', data: false });
+    }
+    if (!state.projectSettingsDone) {
+        getProject(state.projectId).then(p => {
+            dispatch({ type: 'PROJECT_SETTINGS', data: p });
+        });
+        dispatch({ type: 'PROJECT_SETTINGS_DONE', data: true });
+    }
 
     return (
         <ComputeStateContext.Provider value={ state }>
           <ComputeDispatchContext.Provider value={ dispatch }>
-            {children}
+            {props.children}
           </ComputeDispatchContext.Provider>
         </ComputeStateContext.Provider>
       )    
@@ -469,8 +488,14 @@ export const computeStateReducer = (state: any, action: any):any => {
             // Progress panel visibililty
             return {...state, isProgressPanelVisible: action.data};
         }
-        case 'SET_PROJECT': {
+        case 'SET_PROJECT_ID': {
+            return {...state, projectId: action.data};
+        }
+        case 'PROJECT_SETTINGS': {
             return {...state, project: action.data};
+        }
+        case 'PROJECT_SETTINGS_DONE': {
+            return {...state, projectSettingsDone: action.data};
         }
     }
     console.debug(`state after reducer ${newState.step}`);

@@ -1,6 +1,6 @@
 import { Ceremony, CeremonyEvent, CeremonyState, 
   Contribution, ContributionState, ContributionSummary, 
-  Participant, ParticipantState } from '../types/ceremony';
+  Participant, ParticipantState, Project } from '../types/ceremony';
 import firebase from 'firebase/app';
 import "firebase/firestore";
 import { jsonToCeremony, jsonToContribution } from './ZKPartyApi';
@@ -61,6 +61,30 @@ const contributionConverter: firebase.firestore.FirestoreDataConverter<Contribut
     return jsonToContribution(snapshot.data(options));
   }
 }
+
+const projectConverter: firebase.firestore.FirestoreDataConverter<Project> = {
+  toFirestore: (p: Partial<Project>) => {
+    return {
+      ...p,
+    };
+  },
+  fromFirestore: (
+    snapshot: firebase.firestore.QueryDocumentSnapshot,
+    options: firebase.firestore.SnapshotOptions): Project => {
+      const snap = snapshot.data(options);
+      const proj: Project = {
+        id: snapshot.id,
+        name: snap.name,
+        shortName: snap.shortName,
+        gistSummaryDescription: snap.gistSummaryDescription,
+        gistBodyTemplate: snap.gitBodyTemplate,
+        tweetTemplate: snap.tweetTemplate,
+        circuits: [],
+        coordinators: [],
+      };
+      return proj;
+  }
+};
 
 //=====================================================================================
 
@@ -129,8 +153,12 @@ export const getCeremonies = async (project: string): Promise<Ceremony[]> => {
         return null;
       }
     }));
-  
-  return circuits.filter(v => { return (v !== null) }) as Ceremony[];
+
+  const initCcts: Ceremony[] = [];
+  const ccts: Ceremony[] = circuits.reduce((arr, curr) => {
+       if (curr != null) arr.push(curr); return arr; 
+     }, initCcts);
+  return ccts;
 }
 
 // Counts the waiting and complete contributions for a circuit
@@ -686,20 +714,29 @@ export const addOrUpdateParticipant = async (participant: Participant) => {
 
 };
 
-const  getParticipantContributionsSnapshot = async (participant: string): Promise<firebase.firestore.QuerySnapshot<ContributionSummary>> => {
+const  getParticipantContributionsSnapshot = async (project: Project, participant: string): Promise<firebase.firestore.QueryDocumentSnapshot<ContributionSummary>[]> => {
   const db = firebase.firestore();
   try {
     const contribQuery = db.collectionGroup("contributions")
       .withConverter(contributionConverter)
       .where('participantId', '==', participant)
       .where('status', 'in', [COMPLETE, INVALIDATED]);
-    return contribQuery.get();
+    // Filter these docs for the project
+    const projectContribs = (await contribQuery.get())
+      .docs
+      .filter(c => {
+        const cctId = c.ref.parent.parent?.id;
+        if (!cctId) return false;
+        return (project.circuits.includes(cctId));
+      });
+    // Return the filtered set
+    return projectContribs;
   } catch (e) { throw new Error(`Error getting contributions: ${e.message}`);}
 }
 
-export const getParticipantContributions = async (participant: string, isCoordinator: boolean = false): Promise<any[]> => {
-  const snap = await getParticipantContributionsSnapshot(participant);
-  const p = snap.docs.map(async (cs) => { 
+export const getParticipantContributions = async (project: Project, participant: string, isCoordinator: boolean = false): Promise<any[]> => {
+  const snap = await getParticipantContributionsSnapshot(project, participant);
+  const p = snap.map(async (cs) => { 
     const cref = cs.ref.parent.parent;
     if (cref) {
       const ceremony = await cref
@@ -721,10 +758,10 @@ export const getParticipantContributions = async (participant: string, isCoordin
   });
 }
 
-export const countParticipantContributions = async (participant: string): Promise<number> => {
-  const snap = await getParticipantContributionsSnapshot(participant);
-  console.debug(`count for ${participant}: ${snap.size}`);
-  return snap.size;
+export const countParticipantContributions = async (project: Project, participant: string): Promise<number> => {
+  const snap = await getParticipantContributionsSnapshot(project, participant);
+  console.debug(`count for ${participant}: ${snap.length}`);
+  return snap.length;
 }
 
 export const resetContributions = async (participant: string): Promise<void> => {
@@ -745,16 +782,15 @@ export const resetContributions = async (participant: string): Promise<void> => 
   } catch (e) { throw new Error(`Error resetting contribution: ${e.message}`);}
 }
 
-export const getUserStatus = async (userId: string): Promise<string> => {
+export const getUserStatus = async (userId: string, project: string): Promise<string> => {
   // userId will contain user Id (e.g. github email) // TODO: , or a signature)
-  // If userId is an entry in the coordinators collection, they have coord privs.
-  console.log(userId);
+  // If userId is an entry in the project's coordinators collection, they have coord privs.
   var status = 'USER';
-  console.debug(`status for ${userId}`);
+  console.debug(`status for ${userId} ${project}`);
 
   const db = firebase.firestore();
   try {
-    const userSnapshot = await db.doc(`coordinators/${userId}`)
+    const userSnapshot = await db.doc(`projects/${project}/coordinators/${userId}`)
       .get();
     
     if (userSnapshot.exists) {
@@ -781,6 +817,34 @@ export const getSiteSettings = async (): Promise<firebase.firestore.DocumentData
     return snapshot.data();
   } catch (err) {
     console.warn(`Error getting site settings: ${err.message}`);
+  }
+}
+
+export const getProject = async (project: string): Promise<Project | undefined> => {
+  const db = firebase.firestore();
+  try {
+    const snapshot = await db.doc(`projects/${project}`)
+      .withConverter(projectConverter)
+      .get();
+    
+    const proj = snapshot.data();
+    if (proj) {
+      proj.circuits = (await snapshot.ref
+        .collection('circuits')
+        .get())
+        .docs
+        .map(c => c.id);
+      proj.coordinators = (await snapshot.ref
+          .collection('coordinators')
+          .get())
+          .docs
+          .map(c => c.id);
+    }
+
+    return proj;
+
+  } catch (err) {
+    console.warn(`Error getting project settings: ${err.message}`);
   }
 }
 

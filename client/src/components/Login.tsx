@@ -20,6 +20,8 @@ const Login = () => {
     provider.addScope('read:user');
     if (!authState.manualAttestation) provider.addScope('gist');
 
+    const project = authState.project ? authState.project : 'unknown';
+
     try {
       firebase
         .auth()
@@ -31,7 +33,7 @@ const Login = () => {
           .then((result: any) => {
             console.log(result);
             // Get user privileges
-            getUserStatus(result.user.email)
+            getUserStatus(result.user.email, project)
               .then((resp: string) => {
                 console.log(`privs: ${resp}`);
                 if (resp === 'COORDINATOR') {

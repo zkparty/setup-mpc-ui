@@ -2,7 +2,7 @@ import React, { Dispatch, useContext, useEffect, useRef } from "react";
 import Typography from "@material-ui/core/Typography";
 import { AuthContextInterface, AuthStateContext } from "../state/AuthContext";
 
-import { Ceremony, Participant } from "../types/ceremony";
+import { Ceremony, Participant, Project } from "../types/ceremony";
 
 import { 
   ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings, joinCircuit } from "../api/FirestoreApi";
@@ -21,21 +21,21 @@ const handleStepChange = (state: ComputeContextInterface,
     authState: AuthContextInterface
   ) => {
 
-  const { step, computeStatus, participant, contributionState, circuits, joiningCircuit } = state;
+  const { step, computeStatus, participant, contributionState, circuits, joiningCircuit, project } = state;
   console.debug(`handle step change ${step}`);
   switch (step) {
       case (Step.ACKNOWLEDGED): {
         // After 'LAUNCH' clicked
         // Display status messages for all remaining conditions
-        // Initialise - get participant ID, load wasm module
+        // Initialise - get participant ID
         if (dispatch) {
-          getSiteSettings().then(
-            settings => {
-              dispatch({ type: 'SET_SETTINGS', data: settings });
-          });
+          // getSiteSettings().then(
+          //   settings => {
+          //     dispatch({ type: 'SET_SETTINGS', data: settings });
+          // });
 
-          if (!participant && dispatch) {
-            getParticipant(dispatch, authState).then(() => {
+          if (!participant && dispatch && project) {
+            getParticipant(dispatch, authState, project).then(() => {
               console.debug('participant set');
               //dispatch({type: 'SET_STEP', data: Step.INITIALISED});
             });
@@ -44,7 +44,7 @@ const handleStepChange = (state: ComputeContextInterface,
         break;
       }
       case (Step.INITIALISED): {
-        if (dispatch) joinNewCircuit(dispatch, circuits, participant, joiningCircuit, authState);
+        if (dispatch && project) joinNewCircuit(dispatch, circuits, participant, joiningCircuit, authState, project);
         break;
       }
       case (Step.ENTROPY_COLLECTED): {
@@ -73,6 +73,7 @@ const joinNewCircuit = (
   participant: Participant | undefined,
   joiningCircuit: boolean = false,
   authState: AuthContextInterface,
+  project: Project,
   ) => {
 
 
@@ -107,7 +108,7 @@ const joinNewCircuit = (
         console.debug(`joined circuit. queue index ${cs ? cs.queueIndex : '-'}`);
         if (!cs) {
           // DB says user has already done this circuit - refresh
-          getContributions(authState.authUser.uid, dispatch, authState.isCoordinator);
+          getContributions(project, authState.authUser.uid, dispatch, authState.isCoordinator);
         } else {
           // Have new contribution and queue index
           dispatch({
@@ -122,14 +123,14 @@ const joinNewCircuit = (
   };
 };
 
-const getParticipant = async (dispatch: Dispatch<any>, authState: AuthContextInterface) => {
+const getParticipant = async (dispatch: Dispatch<any>, authState: AuthContextInterface, project: Project) => {
   console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
   dispatch({
     type: 'SET_PARTICIPANT',
     data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username),
     accessToken: authState.accessToken });
   // Trigger contribution count for this user
-  await getContributions(authState.authUser.uid, dispatch, authState.isCoordinator);
+  await getContributions(project, authState.authUser.uid, dispatch, authState.isCoordinator);
 };
 
 const advanceCircuit = (circuits: Ceremony[]) => {
@@ -146,11 +147,11 @@ export const ParticipantSection = () => {
   const summaryStarted = useRef<boolean>(false);
 
   const { step, computeStatus, participant, contributionState, circuits, 
-    joiningCircuit, worker, seriesIsComplete, userContributions, summaryGistUrl, } = state;
+    joiningCircuit, worker, seriesIsComplete, userContributions, summaryGistUrl, project, } = state;
 
   useEffect(() => {
     handleStepChange(state, dispatch, authState);
-  },[step, participant, computeStatus, contributionState, circuits, joiningCircuit, worker, authState, dispatch]);
+  },[step, participant, computeStatus, contributionState, circuits, joiningCircuit, worker, authState, project, dispatch]);
 
   useEffect(() => {
     // Handle end of series
@@ -183,7 +184,6 @@ export const ParticipantSection = () => {
   if (!authState.isLoggedIn) {
     content = (<LoginPanel />);
   } else {
-    //console.debug(`step ${step.toString()}`);
     switch (step) {
       case (Step.NOT_ACKNOWLEDGED): {
         // Display welcome text until the 'go ahead' button is clicked.

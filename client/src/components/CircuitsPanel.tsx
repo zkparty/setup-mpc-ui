@@ -32,16 +32,16 @@ export default function CircuitsPanel() {
   const dispatch = useContext(ComputeDispatchContext);
   const authState = useContext(AuthStateContext);
   const [loaded, setLoaded] = useState(false);
-  const [viewWidth, setViewWidth] = useState(window.innerWidth)
+  const [viewWidth, setViewWidth] = useState(window.innerWidth);
   //console.debug(`render circuits table`);
 
   const { circuits } = state;
   const { isLoggedIn, } = authState;
 
   useEffect(() => {
-    if (!loaded && state.project && dispatch) {
+    if (!loaded && state.projectId && dispatch) {
       // Get circuits. Listen for updates
-      startCircuitListener(state.project, dispatch);
+      startCircuitListener(state.projectId, dispatch);
       startCircuitEventListener(dispatch);
       setLoaded(true);
     }

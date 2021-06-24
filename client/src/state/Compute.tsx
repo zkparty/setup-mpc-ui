@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { getParamsFile, uploadParams } from "../api/FileApi";
-import { Ceremony } from "../types/ceremony";
+import { Ceremony, Project } from "../types/ceremony";
 
 import { Dispatch } from "react";
 import { getParticipantContributions } from '../api/FirestoreApi';
@@ -95,9 +95,9 @@ export const endOfCircuit = ( participantId: string, dispatch: Dispatch<any>, is
     }
 }
 
-export const getContributions = (participantId: string, dispatch: Dispatch<any>, isCoordinator: boolean = false) => {
+export const getContributions = (project: Project, participantId: string, dispatch: Dispatch<any>, isCoordinator: boolean = false) => {
     console.debug(`getContCount...`);
-    getParticipantContributions(participantId, isCoordinator).then(
+    getParticipantContributions(project, participantId, isCoordinator).then(
         contribs => {
             console.debug(`contribs: ${contribs.length}`);
             dispatch({

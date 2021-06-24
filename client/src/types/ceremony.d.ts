@@ -151,3 +151,14 @@ export interface ContributionState {
   status: ParticipantState;
   startTime?: date;
 }
+
+export interface Project {
+  id: string;  // Firebase document ID
+  name: string;
+  shortName: string;
+  gistSummaryDescription: string;
+  gistBodyTemplate: string;
+  tweetTemplate: string;
+  circuits: string[];
+  coordinators: string[];
+}

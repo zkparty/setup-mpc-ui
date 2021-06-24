@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dispatch, useEffect, useReducer, useState } from "react";
+import { Dispatch, PropsWithChildren, useEffect, useReducer, useState } from "react";
 import firebase from "firebase";
 import { getUserStatus } from "../api/FirestoreApi";
 
@@ -10,6 +10,7 @@ export interface AuthContextInterface {
   accessToken: string | null,
   loaded: boolean,
   manualAttestation: boolean,
+  project?: string,
 };
 
 export const defaultAuth: AuthContextInterface = {
@@ -24,8 +25,10 @@ export const defaultAuth: AuthContextInterface = {
 export const AuthStateContext = React.createContext<AuthContextInterface>(defaultAuth);
 export const AuthDispatchContext = React.createContext<Dispatch<any> | undefined>(undefined);
 
-export const AuthContextProvider = (props: any, { children }:any) => {
-  const [state, dispatch] = useReducer(authStateReducer, defaultAuth);
+type AuthProps = PropsWithChildren<{ project?: string }>;
+
+export const AuthContextProvider = (props:AuthProps) => {
+  const [state, dispatch] = useReducer(authStateReducer, { ...defaultAuth, project: props.project });
 
   console.debug(`init auth context`);
 
@@ -35,12 +38,11 @@ export const AuthContextProvider = (props: any, { children }:any) => {
         console.debug(`auth state changed: ${user?.displayName}`);
         if (user) {
           // Get user privileges
-          if (user.email) {
-            getUserStatus(user.email)
+          if (user.email && props.project) {
+            getUserStatus(user.email, props.project)
               .then((resp: string) => {
-                console.log(`privs: ${resp}`);
+                console.debug(`privs: ${resp}`);
                 if ("COORDINATOR" === resp) {
-                  // TODO - revert to correct test. temporary for testing
                   dispatch({type: 'SET_COORDINATOR'});
                 }
               });
@@ -65,7 +67,7 @@ export const AuthContextProvider = (props: any, { children }:any) => {
   return (
     <AuthStateContext.Provider value={ state }>
       <AuthDispatchContext.Provider value={ dispatch }>
-        {children}
+        {props.children}
       </AuthDispatchContext.Provider>
     </AuthStateContext.Provider>
   )
