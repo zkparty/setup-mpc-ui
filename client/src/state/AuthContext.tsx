@@ -24,7 +24,7 @@ export const defaultAuth: AuthContextInterface = {
 export const AuthStateContext = React.createContext<AuthContextInterface>(defaultAuth);
 export const AuthDispatchContext = React.createContext<Dispatch<any> | undefined>(undefined);
 
-export const AuthContextProvider = ({ children }:any) => {
+export const AuthContextProvider = (props: any, { children }:any) => {
   const [state, dispatch] = useReducer(authStateReducer, defaultAuth);
 
   console.debug(`init auth context`);
@@ -32,7 +32,7 @@ export const AuthContextProvider = ({ children }:any) => {
   useEffect(() => {
     if (!state.loaded) {
       firebase.auth().onAuthStateChanged(user => {
-        console.log(`auth state changed: ${user?.displayName}`);
+        console.debug(`auth state changed: ${user?.displayName}`);
         if (user) {
           // Get user privileges
           if (user.email) {

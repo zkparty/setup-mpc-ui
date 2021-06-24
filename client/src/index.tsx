@@ -1,12 +1,13 @@
 import * as ReactDOM from "react-dom";
 import App from "./app/App";
 import * as React from "react";
+import queryString from 'query-string';
 //import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
     <React.StrictMode>
-      <App />
+      <App project={queryString.parse(location.search).project as string | null}/>
     </React.StrictMode>,
     document.getElementById('root')
   );

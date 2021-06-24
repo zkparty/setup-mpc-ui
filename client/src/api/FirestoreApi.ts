@@ -772,7 +772,7 @@ export const getUserStatus = async (userId: string): Promise<string> => {
   return status;
 };
 
-export const getSiteSettings = async (): Promise<any> => {
+export const getSiteSettings = async (): Promise<firebase.firestore.DocumentData | undefined> => {
   const db = firebase.firestore();
   try {
     const snapshot = await db.doc(`settings/site`)
