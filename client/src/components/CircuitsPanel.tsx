@@ -45,7 +45,7 @@ export default function CircuitsPanel() {
       startCircuitEventListener(dispatch);
       setLoaded(true);
     }
-  }, [loaded]);
+  }, [loaded, state.projectId]);
 
   useEffect(() => {
     const handleResize = () => setViewWidth(window.innerWidth)
