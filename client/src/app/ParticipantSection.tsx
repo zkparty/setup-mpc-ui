@@ -158,10 +158,11 @@ export const ParticipantSection = () => {
     if (state.seriesIsComplete && state.userContributions && state.userContributions.length>0 && !state.summaryGistUrl && !summaryStarted.current) {
       summaryStarted.current = true;
       // Add a gist
-      const { userContributions, siteSettings, participant, accessToken } = state;
+      const { userContributions, participant, accessToken, project } = state;
+      const { manualAttestation } = authState;
       if (participant && participant.authId && accessToken) {
-        const token = authState.manualAttestation ? null : accessToken;
-        createSummaryGist(siteSettings, userContributions, participant.authId, token).then(
+        const token = manualAttestation ? null : accessToken;
+        createSummaryGist(project, userContributions, participant.authId, token).then(
           url => {
             if (dispatch && url) dispatch({ type: 'SUMMARY_GIST_CREATED', data: url });
         })

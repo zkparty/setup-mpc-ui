@@ -191,7 +191,8 @@ const addGist = async (summary: string, description: string, authToken: string):
 
 export const createSummaryGist = async (settings: any, userContributions: any[], username: string, authToken: string | null): Promise<string | null> => {
   const EOL = '\n';
-  const template = settings.gistTemplate.replaceAll('{EOL}', EOL);
+  const { gistTemplate, gistSummaryDescription } = settings;
+  const template = gistTemplate.replaceAll('{EOL}', EOL);
   let body = '';
   userContributions.map(c => {
     body += 
@@ -208,10 +209,8 @@ export const createSummaryGist = async (settings: any, userContributions: any[],
     .replace('{TIMESTAMP}', ts)
     .replace('{USERID}', username);
 
-  const description = settings.gistSummaryDescription;
-
   if (authToken) {
-    return addGist(content, description, authToken);
+    return addGist(content, gistSummaryDescription, authToken);
   } else {
     navigator.clipboard.writeText(content);
     window.open('https://gist.github.com', '_blank');

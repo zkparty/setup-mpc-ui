@@ -44,10 +44,9 @@ const StyledButton = styled.a`
   text-decoration: none;
 `
 
-const tweetText = (siteSettings: any, url: string): string => {
-  //const siteSettings = await getSiteSettings();
+const tweetText = (settings: any, url: string): string => {
   const EOL = '\n';
-  const body = encodeURIComponent(siteSettings.tweetTemplate.replace('{URL}', url).replaceAll('{EOL}', EOL));
+  const body = encodeURIComponent(settings.tweetTemplate.replace('{URL}', url).replaceAll('{EOL}', EOL));
 
   return `https://twitter.com/intent/tweet?text=${body}`;
 }
@@ -56,13 +55,13 @@ const tweetText = (siteSettings: any, url: string): string => {
 export default function AttestationPanel(props: any) {
   const state = useContext(ComputeStateContext);
 
-  const { siteSettings, summaryGistUrl } = state;
+  const { project, summaryGistUrl } = state;
   let text=(<></>);
-  if (summaryGistUrl && siteSettings) {
+  if (summaryGistUrl && project) {
     text = (
       <div style={{ display: 'flex' }}>
         <StyledAccentButton
-           href={tweetText(siteSettings, summaryGistUrl)} target='_blank' >
+           href={tweetText(project, summaryGistUrl)} target='_blank' >
               <TwitterIcon fontSize='large' />
               Share your attestation
         </StyledAccentButton>

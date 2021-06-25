@@ -4,6 +4,7 @@ import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionS
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, getProject } from "../api/FirestoreApi";
 import { createContext, Dispatch, PropsWithChildren, useContext, useReducer } from "react";
 import { startDownload, startComputation, startUpload, endOfCircuit, getEntropy } from './Compute';
+import { AuthStateContext } from './AuthContext';
 
 export enum Step {
     NOT_ACKNOWLEDGED,
@@ -97,7 +98,6 @@ export interface ComputeContextInterface {
     contributionCount: number;
     userContributions?: any[];
     worker?: Worker;
-    siteSettings?: any;
     projectSettingsDone: boolean;
     seriesIsComplete: boolean;
     summaryGistUrl?: string;
@@ -105,9 +105,8 @@ export interface ComputeContextInterface {
     joiningCircuit?: boolean;
 };
 
-export const initialState = (props?: ComputeContextProps): ComputeContextInterface => {
+export const initialState = (): ComputeContextInterface => {
     return {
-        projectId: props? props.project : undefined,
         circuits: [],
         computeStatus: initialComputeStatus,
         messages: [],
@@ -121,7 +120,6 @@ export const initialState = (props?: ComputeContextProps): ComputeContextInterfa
         seriesIsComplete: false,
         isProgressPanelVisible: true,
         joiningCircuit: false,
-        siteSettings: props ? props.settings : undefined,
         projectSettingsDone: false,
     }
 }
@@ -135,21 +133,28 @@ export const ComputeStateContext = createContext<ComputeContextInterface>(initia
 export const ComputeDispatchContext = createContext<Dispatch<any> | undefined>(undefined);
 
 type ComputeContextProps = PropsWithChildren<{
-    settings?: any,
     project?: string,
 }>
 
 export const ComputeContextProvider = (props: ComputeContextProps) => {
-    const [state, dispatch] = useReducer(computeStateReducer, initialState(props));
+    const authState = useContext(AuthStateContext);
+    const [state, dispatch] = useReducer(computeStateReducer, initialState());
 
-    if (state.projectId !== state.project?.id) {        
-        dispatch({ type: 'PROJECT_SETTINGS_DONE', data: false });
-    }
-    if (!state.projectSettingsDone) {
-        getProject(state.projectId).then(p => {
-            dispatch({ type: 'PROJECT_SETTINGS', data: p });
-        });
-        dispatch({ type: 'PROJECT_SETTINGS_DONE', data: true });
+    if (state.projectId == undefined) {
+        if (authState.project) {
+            dispatch({ type: 'SET_PROJECT_ID', data: authState.project });
+            console.debug(`project ID is ${authState.project}`);
+        }
+    } else {
+        //if (state.projectId !== state.project?.id) {
+        //    dispatch({ type: 'PROJECT_SETTINGS_DONE', data: false });
+        //}
+        if (authState.isLoggedIn && !state.projectSettingsDone) {
+            getProject(state.projectId).then(p => {
+                dispatch({ type: 'PROJECT_SETTINGS', data: p });
+            });
+            dispatch({ type: 'PROJECT_SETTINGS_DONE', data: true });
+        }
     }
 
     return (
@@ -158,7 +163,7 @@ export const ComputeContextProvider = (props: ComputeContextProps) => {
             {props.children}
           </ComputeDispatchContext.Provider>
         </ComputeStateContext.Provider>
-      )    
+    );
 };
 
 const findCircuitIndex = (circuits: Ceremony[], id: string): number => {

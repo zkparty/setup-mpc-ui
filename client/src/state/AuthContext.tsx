@@ -1,16 +1,17 @@
 import * as React from "react";
 import { Dispatch, PropsWithChildren, useEffect, useReducer, useState } from "react";
 import firebase from "firebase";
-import { getUserStatus } from "../api/FirestoreApi";
+import { getSiteSettings, getUserStatus } from "../api/FirestoreApi";
 
 export interface AuthContextInterface {
-  isLoggedIn: boolean,
-  authUser: any,
-  isCoordinator: boolean,
-  accessToken: string | null,
-  loaded: boolean,
-  manualAttestation: boolean,
-  project?: string,
+  isLoggedIn: boolean;
+  authUser: any;
+  isCoordinator: boolean;
+  accessToken: string | null;
+  loaded: boolean;
+  manualAttestation: boolean;
+  project?: string;
+  defaultProject?: string;
 };
 
 export const defaultAuth: AuthContextInterface = {
@@ -37,32 +38,48 @@ export const AuthContextProvider = (props:AuthProps) => {
       firebase.auth().onAuthStateChanged(user => {
         console.debug(`auth state changed: ${user?.displayName}`);
         if (user) {
-          // Get user privileges
-          if (user.email && props.project) {
-            getUserStatus(user.email, props.project)
-              .then((resp: string) => {
-                console.debug(`privs: ${resp}`);
-                if ("COORDINATOR" === resp) {
-                  dispatch({type: 'SET_COORDINATOR'});
-                }
-              });
-          } else {
-            console.warn(`user email not available`);
-          }
+          // Get site-wide settings
+          getSiteSettings()
+            .then(data => {if (data) dispatch({ type: 'SITE_SETTINGS', data })})
+            .catch(err => console.error(`Error getting site settings: ${err.message}`));
+        
+        
           //console.debug(`dispatch login ${JSON.stringify(user)}`);
           dispatch({
             type: 'LOGIN',
             user: user,
             //accessToken: (user as any).stsTokenManager?.accessToken,
           });
-      } else {
+          if (!user?.email) {
+            console.warn(`user email not available`);
+          }
+        } else {
           dispatch(
             {type: 'LOGOUT'}
           );
         }
       });
     }
-  }, [state.loaded]);
+
+    // Resolve project
+    const project = props.project || state.defaultProject;
+    if (project && !state.project) {
+      dispatch({ type: 'SET_PROJECT_ID', data: project });
+    }
+    // Get project settings??
+
+    // Get user privileges
+    if (state.authUser?.email && state.project) {
+      getUserStatus(state.authUser?.email, state.project)
+        .then((resp: string) => {
+          console.debug(`privs: ${resp}`);
+          if ("COORDINATOR" === resp) {
+            dispatch({type: 'SET_COORDINATOR'});
+          }
+        });
+    }
+    
+  }, [state.loaded,state.authUser, state.project, state.defaultProject]);
 
   return (
     <AuthStateContext.Provider value={ state }>
@@ -90,6 +107,12 @@ export const authStateReducer = (state: any, action: any):any => {
     }
     case 'MANUAL_ATTESTATION': {
       return {...newState, manualAttestation: action.option};
+    }
+    case 'SITE_SETTINGS': {
+      return {...newState, defaultProject: action.data.defaultProject};
+    }
+    case 'SET_PROJECT_ID': {
+      return {...newState, project: action.data};
     }
   }
   console.log(`unknown action type ${action.type}`);
