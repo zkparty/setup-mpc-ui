@@ -121,6 +121,18 @@ async function getFBSummary(id) {
   return {id: doc.id, ...doc.data()};
 }
 
+async function getFBProject(id) {
+  const doc = await db
+    .collection("projects")
+    .doc(id)
+    .get();
+  if (!doc.exists) {
+    throw new Error("project not found");
+  }
+  console.debug(`getFBProject ${doc.exists}`);
+  return doc.data();
+}
+
 async function getFBCeremony(id) {
   const doc = await db
     .collection("ceremonies")

@@ -94,6 +94,29 @@ const uploadParams = async (ceremonyId, paramsFileName, paramsFile) => {
     return fileRef[0];
 };
 
+const getCircuitSettings = async (projectId, circuitId) => {
+    const projectData = await getFBProject(projectId);
+    const circuitData = await getFBCeremony(circuitId);
+
+    return { project, circuit };
+}
+
+// Upload a file to the public web site
+const uploadToSite = async (projectId, circuitId, fileName) => {
+    const settings = await getCircuitSettings(projectId, circuitId);
+
+    //const storage = firebase.storage();
+    const pubSiteUrl = `${fbSkey.project_id}.appspot.com`;
+    const fileRef = await storage.bucket(pubSiteUrl).upload(paramsFile,{
+        destination: `ceremony_data/${ceremonyId}/${paramsFileName}`
+    });
+    //const snapshot = await fileRef.put(paramsFile);
+    console.log(`Params uploaded to ${fileRef[0].name}.`);
+    console.log(`Time: ${(new Date()).toISOString()}`);
+    return fileRef[0];
+};
+
+
 
 async function prepareCircuit(ceremonyId) {
     console.log(`prepareCircuit ${ceremonyId}`);
@@ -226,7 +249,12 @@ async function verifyContribution(ceremonyId, index) {
                     index,
                     'VERIFIED',
                     `Contribution verified. Log saved to ${verifFile}`
-                );            
+                );
+                // Send zkey file to cloud site
+                
+                // Send verification log to cloud site
+                // update circuit's index.html and upload it
+
             }
         }
     } catch (err) {
