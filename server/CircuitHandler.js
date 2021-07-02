@@ -334,7 +334,7 @@ const contribHtml = (contribNo, user, zkey, verification) => {
     ${PLACEHOLDER}`
 }
 
-const updateAndUploadIndex = (circuit, contrib, projectId, siteFile, verificationFile) => {
+const updateAndUploadIndex = async (circuit, contrib, projectId, siteFile, verificationFile) => {
     // Get local index.html
     const indexFile = localFilePath('index.html', true, circuit.id);
     // Add html for new file
