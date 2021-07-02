@@ -257,6 +257,7 @@ async function verifyContribution(ceremonyId, index) {
                 );
                 
                 const project = getProjectForCircuit(ceremonyId);
+                console.debug(`project: ${JSON.stringify(project)}`);
                 const { zkeyPrefix } = ceremony;
                 const { participantAuthId } = contrib;
                 const userName = participantAuthId || 'anonymous';
