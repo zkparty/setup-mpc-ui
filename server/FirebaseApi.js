@@ -141,8 +141,18 @@ async function getFBCeremony(id) {
   if (!doc.exists) {
     throw new Error("ceremony not found");
   }
-  console.log(`getFBCeremony ${doc.exists}`);
+  console.debug(`getFBCeremony ${doc.exists}`);
   return doc.data();
+}
+
+async function getProjectForCircuit(circuitId) {
+  const doc = await db
+    .collection('/projects/**/circuits/')
+    .doc(circuitId)
+    .parent
+    .parent
+    .get();
+  return {id: doc.id, ...doc};
 }
 
 async function updateFBSummary(newCeremonySummary) {
@@ -499,4 +509,5 @@ module.exports = {
   updateContribution,
   resetContrib,
   getVerifiedContribs,
+  getProjectForCircuit,
 };

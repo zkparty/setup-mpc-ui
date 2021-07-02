@@ -56,6 +56,9 @@ const storage = new Storage({keyFilename: `${process.cwd()}/firebase_skey.json`,
 
 const POT_FILE_PATTERN='pot%EXP%_final.ptau';
 
+let settings = {};
+
+
 const checkAndDownloadFromStorage = async (prefix, fileNameFilter, deriveLocalPath) => {
     //console.log(`project id ${fbSkey.project_id}`);
     const [files] = await storage.bucket(`${fbSkey.project_id}.appspot.com`).getFiles({
@@ -102,16 +105,18 @@ const getCircuitSettings = async (projectId, circuitId) => {
 }
 
 // Upload a file to the public web site
-const uploadToSite = async (projectId, circuitId, fileName) => {
+const uploadToSite = async (projectId, circuitId, localFile, fileName) => {
     const settings = await getCircuitSettings(projectId, circuitId);
+    const { siteBucketName } = settings.project;
+    const { zkeyPrefix, siteFolder } = settings.circuit;
 
     //const storage = firebase.storage();
     const pubSiteUrl = `${fbSkey.project_id}.appspot.com`;
-    const fileRef = await storage.bucket(pubSiteUrl).upload(paramsFile,{
-        destination: `ceremony_data/${ceremonyId}/${paramsFileName}`
+    const fileRef = await storage.bucket(pubSiteUrl).upload(localFile,{
+        destination: `${siteBucketName}/${siteFolder}/${fileName}`
     });
     //const snapshot = await fileRef.put(paramsFile);
-    console.log(`Params uploaded to ${fileRef[0].name}.`);
+    console.log(`File uploaded to ${fileRef[0].name}.`);
     console.log(`Time: ${(new Date()).toISOString()}`);
     return fileRef[0];
 };
@@ -250,11 +255,19 @@ async function verifyContribution(ceremonyId, index) {
                     'VERIFIED',
                     `Contribution verified. Log saved to ${verifFile}`
                 );
-                // Send zkey file to cloud site
                 
+                const project = getProjectForCircuit(ceremonyId);
+                const { zkeyPrefix } = ceremony;
+                const { participantAuthId } = contrib;
+                const userName = participantAuthId || 'anonymous';
+                // Send zkey file to cloud site
+                const siteFile = siteFileName(zkeyPrefix, index, userName);
+                const verifFileName = `${zkeyPrefix}_${index}_${user}_verification.log`;
+                await uploadToSite(project.id, ceremonyId, newZkeyFile, siteFile);
                 // Send verification log to cloud site
+                await uploadToSite(project.id, ceremonyId, newZkeyFile, verifFileName);
                 // update circuit's index.html and upload it
-
+                await updateAndUploadIndex(ceremony, contrib, siteFile, siteVerifFileName);
             }
         }
     } catch (err) {
@@ -304,6 +317,37 @@ const paramsFileNameFromIndex = (index) => {
 
 const zkeyFileNameFromIndex = (index) => {
     return `ph2_${('0000' + index).slice(-4)}.zkey`;
+}
+
+const siteFileName = (cctPrefix, index, user) => {
+    return `${cctPrefix}_${('0000' + index).slice(-4)}_${user}.zkey`;
+}
+
+const PLACEHOLDER = '<!--REPLACE-->'
+const contribHtml = (contribNo, user, zkey, verification) => {
+    return `<td>${contribNo}</td>
+    <td>${user}</td>
+    <td><a href="./${zkey}">download</a></td>
+    <td><a href="./${verification}">link</a></td>
+    </tr>
+    ${PLACEHOLDER}`
+}
+
+const updateAndUploadIndex = (circuit, contrib, projectId, siteFile, verificationFile) => {
+    // Get local index.html
+    const indexFile = localFilePath('index.html', true, circuit.id);
+    // Add html for new file
+    fs.readFile(
+        indexFile,
+        'utf-8',
+        (err, file) => fs.writeFile(
+            indexFile,
+            file.replace(PLACEHOLDER, contribHtml(contrib.queueIndex, contrib.participantAuthId || 'anonymous', siteFile, verificationFile)),
+            (err) => {}
+        )
+    );
+    // Upload
+    await uploadToSite(projectId, ceremonyId, indexFile, 'index.html');
 }
 
 const localFilePath = (filename, includePrefix=false, ceremonyId='') => {
