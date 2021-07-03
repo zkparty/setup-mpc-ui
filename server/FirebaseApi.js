@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
 const serviceAccount = require("./firebase_skey.json");
+const firestore = require('firebase');
 
 // TODO - put in .env
 const DB_URL = "https://trustedsetup-a86f4.firebaseio.com";
@@ -134,25 +135,44 @@ async function getFBProject(id) {
 }
 
 async function getFBCeremony(id) {
-  const doc = await db
-    .collection("ceremonies")
-    .doc(id)
-    .get();
-  if (!doc.exists) {
-    throw new Error("ceremony not found");
+  try {
+    const doc = await db
+      .collection("ceremonies")
+      .doc(id)
+      .get();
+    if (!doc.exists) {
+      throw new Error("ceremony not found");
+    }
+    console.debug(`getFBCeremony ${doc.exists}`);
+    return doc.data();
+  } catch(err) { 
+    console.error(`error getting cct: ${err.message}`);
   }
-  console.debug(`getFBCeremony ${doc.exists}`);
-  return doc.data();
 }
 
 async function getProjectForCircuit(circuitId) {
-  const doc = await db
-    .collection('/projects/**/circuits/')
-    .doc(circuitId)
-    .parent
-    .parent
-    .get();
-  return {id: doc.id, ...doc};
+  try {
+    const projCircuits = db.collectionGroup('circuits');
+    const docs = await projCircuits
+      //.where(db.__proto__.constructor.FieldPath.documentId(), '==', `circuits/${circuitId}`)
+      .get();
+    let doc;
+    docs.forEach(cct => {
+      // If ever a circuit is added to > 1 project, this will get the last
+      if (cct.id === circuitId) {
+        doc = cct
+          .ref
+          .parent
+          .parent
+          .withConverter({ fromFirestore: (proj) => { return {...proj}} });
+      }
+      //console.debug(cct.id)
+    });
+    const project = await doc.get();
+    return {id: doc.id, ...project.data()};
+  } catch (err) {
+    console.error(`error getting project for cct: ${err.message}`);
+  }
 }
 
 async function updateFBSummary(newCeremonySummary) {
@@ -510,4 +530,5 @@ module.exports = {
   resetContrib,
   getVerifiedContribs,
   getProjectForCircuit,
+  getFBProject,
 };

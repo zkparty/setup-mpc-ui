@@ -10,7 +10,8 @@ const fbSkey = require("./firebase_skey.json");
 const { updateFBCeremony, addStatusUpdateEvent, 
     getFBCeremony, addContributionEvent, 
     addVerificationToContribution,
-    getContribution, updateContribution } = require("./FirebaseApi");
+    getContribution, updateContribution, getProjectForCircuit,
+    getFBProject } = require("./FirebaseApi");
 
 const mkdirAsync = util.promisify(fs.mkdir);
 
@@ -101,14 +102,14 @@ const getCircuitSettings = async (projectId, circuitId) => {
     const projectData = await getFBProject(projectId);
     const circuitData = await getFBCeremony(circuitId);
 
-    return { project, circuit };
+    return { projectData, circuitData };
 }
 
 // Upload a file to the public web site
-const uploadToSite = async (projectId, circuitId, localFile, fileName) => {
-    const settings = await getCircuitSettings(projectId, circuitId);
-    const { siteBucketName } = settings.project;
-    const { zkeyPrefix, siteFolder } = settings.circuit;
+const uploadToSite = async (project, circuit, localFile, fileName) => {
+    //const settings = await getCircuitSettings(project.id, circuitId);
+    const { siteBucketName } = project;
+    const { zkeyPrefix, siteFolder } = circuit;
 
     //const storage = firebase.storage();
     const pubSiteUrl = `${fbSkey.project_id}.appspot.com`;
@@ -256,22 +257,23 @@ async function verifyContribution(ceremonyId, index) {
                     `Contribution verified. Log saved to ${verifFile}`
                 );
                 
-                const project = getProjectForCircuit(ceremonyId);
+                const project = await getProjectForCircuit(ceremonyId);
                 console.debug(`project: ${JSON.stringify(project)}`);
                 const { zkeyPrefix } = ceremony;
                 const { participantAuthId } = contrib;
                 const userName = participantAuthId || 'anonymous';
                 // Send zkey file to cloud site
                 const siteFile = siteFileName(zkeyPrefix, index, userName);
-                const verifFileName = `${zkeyPrefix}_${index}_${user}_verification.log`;
-                await uploadToSite(project.id, ceremonyId, newZkeyFile, siteFile);
+                const verifFileName = `${zkeyPrefix}_${index}_${userName}_verification.log`;
+                await uploadToSite(project, ceremony, newZkeyFile, siteFile);
                 // Send verification log to cloud site
-                await uploadToSite(project.id, ceremonyId, newZkeyFile, verifFileName);
+                await uploadToSite(project, ceremony, verifFile, verifFileName);
                 // update circuit's index.html and upload it
-                await updateAndUploadIndex(ceremony, contrib, siteFile, siteVerifFileName);
+                await updateAndUploadIndex(ceremony, contrib, siteFile, verifFileName);
             }
         }
     } catch (err) {
+        console.warn(`Error while verifying: ${err.message}`);
         addContributionEvent(
             ceremonyId, 
             index,
@@ -334,7 +336,7 @@ const contribHtml = (contribNo, user, zkey, verification) => {
     ${PLACEHOLDER}`
 }
 
-const updateAndUploadIndex = async (circuit, contrib, projectId, siteFile, verificationFile) => {
+const updateAndUploadIndex = async (circuit, contrib, project, siteFile, verificationFile) => {
     // Get local index.html
     const indexFile = localFilePath('index.html', true, circuit.id);
     // Add html for new file
@@ -348,7 +350,7 @@ const updateAndUploadIndex = async (circuit, contrib, projectId, siteFile, verif
         )
     );
     // Upload
-    await uploadToSite(projectId, ceremonyId, indexFile, 'index.html');
+    await uploadToSite(project, circuit, indexFile, 'index.html');
 }
 
 const localFilePath = (filename, includePrefix=false, ceremonyId='') => {
@@ -360,7 +362,7 @@ const localFilePath = (filename, includePrefix=false, ceremonyId='') => {
 }
 
 async function downloadFile(ceremonyId, index, isParams) {
-    console.debug(`downloadFIle ${index}`);
+    console.debug(`downloadFile ${index}`);
     const p = isParams ? paramsFileNameFromIndex(index) : zkeyFileNameFromIndex(index);
     console.log(`file is ${p}`);
 
