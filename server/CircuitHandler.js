@@ -269,7 +269,7 @@ async function verifyContribution(ceremonyId, index) {
                 // Send verification log to cloud site
                 await uploadToSite(project, ceremony, verifFile, verifFileName);
                 // update circuit's index.html and upload it
-                await updateAndUploadIndex(ceremony, contrib, siteFile, verifFileName);
+                await updateAndUploadIndex(ceremony, contrib, project, siteFile, verifFileName);
             }
         }
     } catch (err) {
@@ -346,7 +346,7 @@ const updateAndUploadIndex = async (circuit, contrib, project, siteFile, verific
         (err, file) => fs.writeFile(
             indexFile,
             file.replace(PLACEHOLDER, contribHtml(contrib.queueIndex, contrib.participantAuthId || 'anonymous', siteFile, verificationFile)),
-            (err) => {}
+            (err) => {if (err) console.error(`error writing index ${err.message}`);}
         )
     );
     // Upload
