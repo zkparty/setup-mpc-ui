@@ -352,14 +352,16 @@ const updateAndUploadIndex = async (circuit, contrib, project, siteFile, verific
                 fs.writeFile(
                     indexFile,
                     file.replace(PLACEHOLDER, contribHtml(contrib.queueIndex, contrib.participantAuthId || 'anonymous', siteFile, verificationFile)),
-                    (err) => { if (err) console.error(`error writing index ${err.message}`); }
+                    (err) => { if (err) {
+                            console.error(`error writing index ${err.message}`);
+                        } else {    // Upload
+                            uploadToSite(project, circuit, indexFile, 'index.html');
+                        } }
                 )
             } else {
                 console.warn(`Looks like index.html is not present for ${circuit.id}. Site update was not done.`);
             }
     });
-    // Upload
-    await uploadToSite(project, circuit, indexFile, 'index.html');
 }
 
 const localFilePath = (filename, includePrefix=false, ceremonyId='') => {
