@@ -264,7 +264,7 @@ async function verifyContribution(ceremonyId, index) {
                 const userName = participantAuthId || 'anonymous';
                 // Send zkey file to cloud site
                 const siteFile = siteFileName(zkeyPrefix, index, userName);
-                const verifFileName = `${zkeyPrefix}_${index}_${userName}_verification.log`;
+                const verifFileName = siteFileName(zkeyPrefix, index, userName, true);
                 await uploadToSite(project, ceremony, newZkeyFile, siteFile);
                 // Send verification log to cloud site
                 await uploadToSite(project, ceremony, verifFile, verifFileName);
@@ -315,15 +315,19 @@ const getPoTPath = async (powers) => {
 };
 
 const paramsFileNameFromIndex = (index) => {
-    return `ph2_${('0000' + index).slice(-4)}.params`;
+    return `ph2_${formatIndex(index)}.params`;
 }
 
 const zkeyFileNameFromIndex = (index) => {
-    return `ph2_${('0000' + index).slice(-4)}.zkey`;
+    return `ph2_${formatIndex(index)}.zkey`;
 }
 
-const siteFileName = (cctPrefix, index, user) => {
-    return `${cctPrefix}_${('0000' + index).slice(-4)}_${user}.zkey`;
+const siteFileName = (cctPrefix, index, user, isVerification = false) => {
+    return `${cctPrefix}_${formatIndex(index)}_${user}${isVerification ? '_verification.log' : '.zkey'}`;
+}
+
+const formatIndex = (index) => {
+    return ('0000' + index).slice(-4);
 }
 
 const PLACEHOLDER = '<!--REPLACE-->'
