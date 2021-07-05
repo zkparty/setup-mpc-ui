@@ -356,7 +356,7 @@ const updateAndUploadIndex = async (circuit, contrib, project, siteFile, verific
                             console.error(`error writing index ${err.message}`);
                         } else {    // Upload
                             uploadToSite(project, circuit, indexFile, 'index.html');
-                        } }
+                        }}
                 )
             } else {
                 console.warn(`Looks like index.html is not present for ${circuit.id}. Site update was not done.`);
