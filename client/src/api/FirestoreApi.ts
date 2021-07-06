@@ -153,11 +153,16 @@ export const getCeremonies = async (project: string): Promise<Ceremony[]> => {
         return null;
       }
     }));
-
+  
   const initCcts: Ceremony[] = [];
-  const ccts: Ceremony[] = circuits.reduce((arr, curr) => {
+  let ccts: Ceremony[] = circuits.reduce((arr, curr) => {
        if (curr != null) arr.push(curr); return arr; 
      }, initCcts);
+  
+  // Sort by sequence
+  ccts = ccts.sort((a,b) => {
+    return ((a.sequence || 0) - (b.sequence || 0));
+  });
   return ccts;
 }
 
