@@ -79,7 +79,7 @@ export const AuthContextProvider = (props:AuthProps) => {
         });
     }
     
-  }, [state.loaded,state.authUser, state.project, state.defaultProject]);
+  }, [state.loaded, state.authUser, state.project, state.defaultProject]);
 
   return (
     <AuthStateContext.Provider value={ state }>

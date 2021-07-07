@@ -75,6 +75,7 @@ export class ZKTitle extends React.Component<TitleProps> {
   }
 
   render() {
+    console.debug(`title text = ${this.titleText}`);
     return (
         <LandingPageTitle onClick={this.onClick}>
           {this.state.actualText}

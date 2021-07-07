@@ -72,8 +72,11 @@ export default function AttestationPanel(props: any) {
         </div>
       );
     } else {
-      // Copy attestation to clipboard
-
+      // 
+      text = (<div style={{ textAlign: 'left' }}>
+          Your attestation details have been copied to the clipboard. Please
+          paste them to a public gist. 
+        </div>);
     }
   }
 
