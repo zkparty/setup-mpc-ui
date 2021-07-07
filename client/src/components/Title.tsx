@@ -34,6 +34,7 @@ export class ZKTitle extends React.Component<TitleProps> {
     this.secondsOfLit = 0.5;
     this.interval = undefined;
     this.titleText = props.title || TITLE_TEXT;
+    console.debug(`title text = ${props.title}`);
     this.setState({ actualText: this.titleText });
   }
 
@@ -75,7 +76,6 @@ export class ZKTitle extends React.Component<TitleProps> {
   }
 
   render() {
-    console.debug(`title text = ${this.titleText}`);
     return (
         <LandingPageTitle onClick={this.onClick}>
           {this.state.actualText}
