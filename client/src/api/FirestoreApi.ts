@@ -77,7 +77,7 @@ const projectConverter: firebase.firestore.FirestoreDataConverter<Project> = {
         name: snap.name,
         shortName: snap.shortName,
         gistSummaryDescription: snap.gistSummaryDescription,
-        gistBodyTemplate: snap.gitBodyTemplate,
+        gistBodyTemplate: snap.gistBodyTemplate,
         tweetTemplate: snap.tweetTemplate,
         circuits: [],
         coordinators: [],

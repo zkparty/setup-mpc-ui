@@ -124,7 +124,7 @@ const joinNewCircuit = (
 };
 
 const getParticipant = async (dispatch: Dispatch<any>, authState: AuthContextInterface, project: Project) => {
-  console.log(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
+  console.debug(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
   dispatch({
     type: 'SET_PARTICIPANT',
     data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username),

@@ -191,8 +191,8 @@ const addGist = async (summary: string, description: string, authToken: string):
 
 export const createSummaryGist = async (settings: any, userContributions: any[], username: string, authToken: string | null): Promise<string | null> => {
   const EOL = '\n';
-  const { gistTemplate, gistSummaryDescription } = settings;
-  const template = gistTemplate.replaceAll('{EOL}', EOL);
+  const { gistBodyTemplate, gistSummaryDescription } = settings;
+  const template = gistBodyTemplate ? gistBodyTemplate.replaceAll('{EOL}', EOL) : '{BODY}';
   let body = '';
   userContributions.map(c => {
     body += 
