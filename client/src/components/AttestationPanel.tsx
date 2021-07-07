@@ -57,19 +57,24 @@ export default function AttestationPanel(props: any) {
 
   const { project, summaryGistUrl } = state;
   let text=(<></>);
-  if (summaryGistUrl && project) {
-    text = (
-      <div style={{ display: 'flex' }}>
-        <StyledAccentButton
-           href={tweetText(project, summaryGistUrl)} target='_blank' >
-              <TwitterIcon fontSize='large' />
-              Share your attestation
-        </StyledAccentButton>
-        <StyledButton href={summaryGistUrl} target='_blank' >
-          View your summary
-        </StyledButton>
-      </div>
-    );
+  if (project) {
+    if (summaryGistUrl) {
+      text = (
+        <div style={{ display: 'flex' }}>
+          <StyledAccentButton
+            href={tweetText(project, summaryGistUrl)} target='_blank' >
+                <TwitterIcon fontSize='large' />
+                Share your attestation
+          </StyledAccentButton>
+          <StyledButton href={summaryGistUrl} target='_blank' >
+            View your summary
+          </StyledButton>
+        </div>
+      );
+    } else {
+      // Copy attestation to clipboard
+
+    }
   }
 
   return (

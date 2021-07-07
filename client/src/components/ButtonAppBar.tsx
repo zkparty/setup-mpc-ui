@@ -211,7 +211,7 @@ export default function ButtonAppBar() {
               {menuIcon}
             </IconButton>
             <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} logout={handleLogout} />
-            <ZKTitle />
+            <ZKTitle title={state.project?.shortName} />
             {displayProgress ? 
               <div style={{ display: 'flex' }}>
                 {/*<NormalBodyText>Your contribution: </NormalBodyText>*/}

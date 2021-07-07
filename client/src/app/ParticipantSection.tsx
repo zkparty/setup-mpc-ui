@@ -147,7 +147,7 @@ export const ParticipantSection = () => {
   const summaryStarted = useRef<boolean>(false);
 
   const { step, computeStatus, participant, contributionState, circuits, 
-    joiningCircuit, worker, seriesIsComplete, userContributions, summaryGistUrl, project, } = state;
+    joiningCircuit, worker, seriesIsComplete, userContributions, summaryGistUrl, project, accessToken } = state;
 
   useEffect(() => {
     handleStepChange(state, dispatch, authState);
@@ -155,21 +155,21 @@ export const ParticipantSection = () => {
 
   useEffect(() => {
     // Handle end of series
-    if (state.seriesIsComplete && state.userContributions && state.userContributions.length>0 && !state.summaryGistUrl && !summaryStarted.current) {
+    if (seriesIsComplete && userContributions && userContributions.length>0 && !summaryGistUrl && !summaryStarted.current) {
       summaryStarted.current = true;
       // Add a gist
-      const { userContributions, participant, accessToken, project } = state;
+      //const { userContributions, participant, accessToken, project } = state;
       const { manualAttestation } = authState;
       if (participant && participant.authId && accessToken) {
         const token = manualAttestation ? null : accessToken;
         createSummaryGist(project, userContributions, participant.authId, token).then(
           url => {
             if (dispatch && url) dispatch({ type: 'SUMMARY_GIST_CREATED', data: url });
-        })
+        });
       }
     }
   },
-  [seriesIsComplete, userContributions, summaryGistUrl, summaryStarted.current, dispatch]
+  [seriesIsComplete, userContributions?.length, summaryGistUrl, summaryStarted.current, accessToken, dispatch]
   );
 
   const logState =  () => {
