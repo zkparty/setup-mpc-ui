@@ -212,8 +212,9 @@ export const createSummaryGist = async (settings: any, userContributions: any[],
   if (authToken) {
     return addGist(content, gistSummaryDescription, authToken);
   } else {
-    navigator.clipboard.writeText(content);
-    window.open('https://gist.github.com', '_blank');
+    try {
+      await navigator.clipboard.writeText(content);
+    } catch (err) {console.warn(`Error copying to clipboard ${err.message}`)}
   }
   return null;
 }

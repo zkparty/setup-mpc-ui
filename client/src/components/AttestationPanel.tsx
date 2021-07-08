@@ -76,6 +76,7 @@ export default function AttestationPanel(props: any) {
       text = (<div style={{ textAlign: 'left' }}>
           Your attestation details have been copied to the clipboard. Please
           paste them to a public gist. 
+          <a href='https://gist.github.com' target='_blank' style={{ color: 'lightseagreen' }} > Click here</a> to create your gist (opens a new tab).
         </div>);
     }
   }
