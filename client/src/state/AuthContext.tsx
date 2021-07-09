@@ -43,7 +43,6 @@ export const AuthContextProvider = (props:AuthProps) => {
             .then(data => {if (data) dispatch({ type: 'SITE_SETTINGS', data })})
             .catch(err => console.error(`Error getting site settings: ${err.message}`));
         
-        
           //console.debug(`dispatch login ${JSON.stringify(user)}`);
           dispatch({
             type: 'LOGIN',

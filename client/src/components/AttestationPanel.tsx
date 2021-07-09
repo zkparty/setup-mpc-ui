@@ -62,21 +62,23 @@ export default function AttestationPanel(props: any) {
       text = (
         <div style={{ display: 'flex' }}>
           <StyledAccentButton
-            href={tweetText(project, summaryGistUrl)} target='_blank' >
+            href={tweetText(project, summaryGistUrl)} target='twitter' >
                 <TwitterIcon fontSize='large' />
                 Share your attestation
           </StyledAccentButton>
-          <StyledButton href={summaryGistUrl} target='_blank' >
+          <StyledButton href={summaryGistUrl} target='attestation' >
             View your summary
           </StyledButton>
         </div>
       );
     } else {
-      // 
       text = (<div style={{ textAlign: 'left' }}>
           Your attestation details have been copied to the clipboard. Please
-          paste them to a public gist. 
-          <a href='https://gist.github.com' target='_blank' style={{ color: 'lightseagreen' }} > Click here</a> to create your gist (opens a new tab).
+          paste them to a public gist. &nbsp;
+          <a href='https://gist.github.com' 
+            target='attestation' 
+            style={{ color: 'lightseagreen' }} 
+          >Click here</a> to create your gist (opens a new tab).
         </div>);
     }
   }

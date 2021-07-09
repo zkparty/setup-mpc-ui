@@ -31,7 +31,7 @@ const Login = () => {
           .auth()
           .signInWithPopup(provider)
           .then((result: any) => {
-            console.log(result);
+            //console.debug(result);
             // Get user privileges
             getUserStatus(result.user.email, project)
               .then((resp: string) => {
@@ -40,7 +40,7 @@ const Login = () => {
                   dispatch({type: 'SET_COORDINATOR'})
                 }
             });
-            console.debug(`dispatch LOGIN`);
+            //console.debug(`dispatch LOGIN`);
             dispatch({
               type: 'LOGIN',
               user: { ...result.user, additionalUserInfo: result.additionalUserInfo },
@@ -71,7 +71,7 @@ const Login = () => {
           <AuthButtonText>Login</AuthButtonText>
         </div>
       </AuthButton>
-      <FormGroup row>
+      {/* <FormGroup row>
         <FormControlLabel
           control={
             <Checkbox
@@ -84,7 +84,7 @@ const Login = () => {
           label="Manual attestation"
           style={{ display: 'flex', alignItems: 'center', marginTop: '30px' }}
         />
-      </FormGroup>
+      </FormGroup> */}
     </div>
   );
 };
