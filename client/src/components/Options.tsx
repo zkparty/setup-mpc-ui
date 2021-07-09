@@ -1,5 +1,6 @@
 import { Button, Checkbox, FormControlLabel, FormGroup, Modal, Typography } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { composeClasses } from '@material-ui/data-grid';
 import * as React from 'react';
 import { Dispatch, useContext } from 'react';
 import { resetContributions } from '../api/FirestoreApi';
@@ -32,6 +33,9 @@ const useStyles = makeStyles((theme: Theme) =>
             boxShadow: theme.shadows[5],
             padding: theme.spacing(2, 4, 3),
         },
+        checkbox: {
+            color: 'white',
+        }
     }),
 );
 
@@ -53,7 +57,7 @@ const resetButton = (participantId: string, close: ()=>void, dispatch: React.Dis
         >Reset Contributions
             </Button>);
     } else {
-        button = (<h2>no reset!</h2>);
+        button = (<></>);
     }
 
     return button;
@@ -77,16 +81,18 @@ export default function Options(props: any) {
         <div>
             <FormGroup row>
                 <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={manualAttestation}
-                        onChange={handleOptionChange}
-                        name="attest"
-                        color={"primary"}
-                    />
-                }
-                label="Manual attestation"
-                style={{ display: 'flex', alignItems: 'center', marginTop: '30px' }}
+                    control={
+                        <Checkbox
+                            checked={manualAttestation}
+                            onChange={handleOptionChange}
+                            name="attest"
+                            //color={"primary"}
+                            disabled={authState.isLoggedIn}
+                            className={classes.checkbox}
+                        />
+                    }
+                    label="Manual attestation"
+                    style={{ display: 'flex', alignItems: 'center', marginTop: '30px' }}
                 />
             </FormGroup>
         </div>
