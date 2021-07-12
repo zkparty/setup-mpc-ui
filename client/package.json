@@ -1,6 +1,6 @@
 {
   "name": "trusted-setup-frontend",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Trusted Setup multi-party computation user interface",
   "scripts": {
     "start": "react-app-rewired start",

@@ -1,12 +1,13 @@
 import { Button, Checkbox, FormControlLabel, FormGroup, Modal, Typography } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { composeClasses } from '@material-ui/data-grid';
+import { PlayCircleFilledWhite } from '@material-ui/icons';
 import * as React from 'react';
 import { Dispatch, useContext } from 'react';
 import { resetContributions } from '../api/FirestoreApi';
 import { AuthContextInterface, AuthDispatchContext, AuthStateContext } from '../state/AuthContext';
 import { ComputeDispatchContext, Step } from '../state/ComputeStateManager';
-import { accentColor } from '../styles';
+import { accentColor, subtleText } from '../styles';
 
 require('dotenv').config();
 
@@ -35,6 +36,10 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         checkbox: {
             color: 'white',
+        },
+        'checkbox:disabled': {
+            color: 'white',
+            opacity: 0.5,
         }
     }),
 );
@@ -86,12 +91,15 @@ export default function Options(props: any) {
                             checked={manualAttestation}
                             onChange={handleOptionChange}
                             name="attest"
-                            //color={"primary"}
                             disabled={authState.isLoggedIn}
                             className={classes.checkbox}
                         />
                     }
                     label="Manual attestation"
+                    classes={{
+                        root: classes.checkbox,
+                        disabled: classes['checkbox:disabled'],
+                    }}
                     style={{ display: 'flex', alignItems: 'center', marginTop: '30px' }}
                 />
             </FormGroup>
