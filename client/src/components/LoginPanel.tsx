@@ -6,8 +6,7 @@ import {
   NormalBodyText,
 } from "../styles";
 import Login from './Login';
-
-const project = 'zkopru';
+import env from '../env';
 
 export default function LoginPanel(props: any) {
 
@@ -18,10 +17,10 @@ export default function LoginPanel(props: any) {
     alignItems: 'center',
     paddingTop: '20px'
     }} >
-    <WelcomeTitle>{project}</WelcomeTitle>
+    <WelcomeTitle>{env.projectName}</WelcomeTitle>
     <div style={{ height: '41px' }} />
     <SubtleBody style={{ textAlign: 'center' }}>
-      {`Trusted Setup Ceremony March/April, 2021`}
+      {`Trusted Setup Ceremony`}
     </SubtleBody>
     <NormalBodyText style={{ marginTop: '8px' }}>
       {`Participate using your GitHub account.`}

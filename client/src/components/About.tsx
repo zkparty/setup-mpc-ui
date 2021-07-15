@@ -1,4 +1,3 @@
-import { Typography } from '@material-ui/core';
 import styled from 'styled-components';
 import * as React from 'react';
 import { accentColor, H3Title, HighlightBodyText, NormalBodyText, SubtleBody, subtleText } from '../styles';
@@ -18,11 +17,15 @@ const StyledLink = styled.a`
 const expectSection = (
   <NormalBodyText>
   Each circuit can only have one contributor at any given time.
-  You may or may not be placed in a queue to contribute to any of the 16 circuits. 
+  If a contribution is in progress when you join, you will be placed in a queue. 
   <br /><br />
   You will be notified when you are actively contributing or waiting. 
-  Once you have contributed to all 16 circuits you will see a link
+  Once you have contributed to all circuits you will see a link(*)
   to a gist showing your contributions and their hashes.
+
+  * For users who opt out of automatic gists, the attestation details will
+  be copied to the clipboard, the GitHub gist page will open in a new tab, and 
+  the gist can be created by pasting from the clipboard. 
   </NormalBodyText>
 );
 
@@ -34,14 +37,11 @@ const verifySection = (
     hash. Please copy and paste it to a document you save on your computer.
     You will be able to use it to verify that your contribution was
     used by the next participant once we upload the complete contribution 
-    transcript to our <StyledLink href='https://zkopru.network' target='_blank'>website</StyledLink>.
-    <br /><br />
-    Follow @ZkopruNetwork on Twitter, and join us 
-    in <StyledLink href='https://t.me/zkopru' target='_blank'>Telegram</StyledLink> to be updated when
-    that document becomes available. 
+    transcript to the <StyledLink href='https://storage.googleapis.com/trustedsetuptest.appspot.com/project-z/index.html' target='_blank'>website</StyledLink>.
     </NormalBodyText>    
   </Section>
 );
+// TODO ^^^ Can the link be determined from the project's URL?
 
 const howItWorksSection = (
   <Section>
@@ -64,7 +64,7 @@ const whySection = (
   <Section>
     <H3Title>Why a trusted setup?</H3Title>
     <NormalBodyText>
-      Zkopru relies on a number of different zk-SNARKs
+      ZK-SNARK applications rely on a number of different circuits
       and each requires a trusted setup which ensures that
       no one is able to fake proofs and steal user funds or
       compromise privacy. The setup is performed in such a way
@@ -92,13 +92,20 @@ export default function About(props: any) {
           </SubtleBody>
           <br /><br />
           <HighlightBodyText>
-          You can only participate once with your Github account.
+          You can only participate once with your GitHub account.
           </HighlightBodyText>
           <SubtleBody>
             Do not lose your opportunity by accidentally leaving this page.
             <br /><br />
             You will be asked to grant authority to the app to write a gist. Your contribution hashes will
             be saved in the gist as a public attestation, and you'll be given the opportunity to link to it in a tweet.
+            <br /><br />
+            Should you prefer not to grant this permission, we would ask that you create the gist under your 
+            own GitHub login. This option can be selected from the menu, then <b>Options</b>, then check <b>Manual Attestation</b>.
+            Do this before logging in to the application.
+            Provided you're signed in to your GitHub account on the browser, a tab will be opened ready for you to create the gist 
+            after you contribute. Just paste to the body, give it a file name (say, <code>attestation.txt</code>), change to <b>Public</b>, 
+            and click <b>Save</b>.
           </SubtleBody>
           <br /><br />
           <HighlightBodyText>
@@ -106,7 +113,7 @@ export default function About(props: any) {
           </HighlightBodyText>
           <SubtleBody>
             When your ceremony is complete, use our twitter link to 
-            spread the word and help make Zkopru even more secure!
+            spread the word and help make te application even more secure!
           </SubtleBody>
         </Section>
         <Section>
@@ -127,9 +134,9 @@ export default function About(props: any) {
         <Section>
           <H3Title>How to contribute</H3Title>
           <NormalBodyText>
-          Simply log in with your Github account and launch a ceremony. 
+          Simply log in with your GitHub account and launch a ceremony. 
           When your ceremony is complete, tweet about your participation! 
-          Spread the word and help make Zkopru even more secure.
+          Spread the word and help make the application even more secure.
           </NormalBodyText>
           <br />
           <br />
@@ -142,7 +149,7 @@ export default function About(props: any) {
           </SubtleBody>
           <br /><br />
           <HighlightBodyText>
-          You can only participate once with your Github account.
+          You can only participate once with your GitHub account.
           </HighlightBodyText>
         </Section>
         <Section>

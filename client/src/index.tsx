@@ -2,7 +2,6 @@ import * as ReactDOM from "react-dom";
 import App from "./app/App";
 import * as React from "react";
 import queryString from 'query-string';
-//import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 
 const qsProj: string | string[] | null = queryString.parse(location.search).project;

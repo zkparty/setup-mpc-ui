@@ -8,8 +8,9 @@ import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeSta
 import { startCircuitEventListener, startCircuitListener } from '../state/Circuits';
 import { AuthStateContext } from '../state/AuthContext';
 import CircuitsTable from './CircuitsTable';
+import env from '../env';
 
-const ceremonyProject = 'zkopru';
+const projectName = env.projectName;
 
 const tableText = (isLoggedIn: boolean, circuitLength: number) => {
   return (
@@ -35,22 +36,22 @@ export default function CircuitsPanel() {
   const [viewWidth, setViewWidth] = useState(window.innerWidth);
   //console.debug(`render circuits table`);
 
-  const { circuits } = state;
+  const { circuits, project, projectId } = state;
   const { isLoggedIn, } = authState;
 
   useEffect(() => {
-    if (!loaded && state.projectId && dispatch) {
+    if (!loaded && projectId && dispatch) {
       // Get circuits. Listen for updates
-      startCircuitListener(state.projectId, dispatch);
+      startCircuitListener(projectId, dispatch);
       startCircuitEventListener(dispatch);
       setLoaded(true);
     }
-  }, [loaded, state.projectId]);
+  }, [loaded, projectId]);
 
   useEffect(() => {
-    const handleResize = () => setViewWidth(window.innerWidth)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    const handleResize = () => setViewWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [])
 
 
@@ -66,7 +67,7 @@ export default function CircuitsPanel() {
       <PanelTitle style={{
          paddingBottom: '6px',
       }}>
-        {`${ceremonyProject} circuits`}
+        {`${projectName} circuits`}
       </PanelTitle>
       <NormalBodyText
         style={{

@@ -8,10 +8,9 @@ import { resetContributions } from '../api/FirestoreApi';
 import { AuthContextInterface, AuthDispatchContext, AuthStateContext } from '../state/AuthContext';
 import { ComputeDispatchContext, Step } from '../state/ComputeStateManager';
 import { accentColor, subtleText } from '../styles';
+import env from '../env';
 
-require('dotenv').config();
-
-const allowReset = process.env.ALLOW_RESET || true;
+const allowReset = env.allowReset || true;
 
 function getModalStyle() {
     const top = 50;
@@ -22,7 +21,7 @@ function getModalStyle() {
       left: `${left}%`,
       transform: `translate(-${top}%, -${left}%)`,
     };
-}
+};
   
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
