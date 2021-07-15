@@ -8,9 +8,6 @@ import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeSta
 import { startCircuitEventListener, startCircuitListener } from '../state/Circuits';
 import { AuthStateContext } from '../state/AuthContext';
 import CircuitsTable from './CircuitsTable';
-import env from '../env';
-
-const projectName = env.projectName;
 
 const tableText = (isLoggedIn: boolean, circuitLength: number) => {
   return (
@@ -67,7 +64,7 @@ export default function CircuitsPanel() {
       <PanelTitle style={{
          paddingBottom: '6px',
       }}>
-        {`${projectName} circuits`}
+        {`Circuits`}
       </PanelTitle>
       <NormalBodyText
         style={{

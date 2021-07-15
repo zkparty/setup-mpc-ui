@@ -98,7 +98,7 @@ export const StyledButton = styled.button`
 `
 
 export const WelcomeTitle = styled.div`
-  font-family: Shrikhand;
+  font-family: Luckiest Guy;
   font-size: 64px;
   font-weight: normal;
   color: rgba(0,0,0,0);
@@ -182,6 +182,6 @@ export const H3Title = styled.div`
 
 WebFont.load({
   google: {
-    families: ['Shrikhand', 'Inconsolata', 'Avenir Next']
+    families: ['Shrikhand', 'Inconsolata', 'Avenir Next', 'Luckiest Guy' ]
   }
 });

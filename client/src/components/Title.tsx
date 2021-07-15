@@ -7,7 +7,7 @@ import {
 import env from '../env';
 
 const LandingPageTitle = styled.div`
-  font-family: Shrikhand;
+  font-family: Luckiest Guy;
   font-size: 24px;
   font-weight: normal;
   text-transform: lowercase;
