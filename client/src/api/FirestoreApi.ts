@@ -147,7 +147,7 @@ export const getCeremonies = async (project: string): Promise<Ceremony[]> => {
         .withConverter(ceremonyConverter)
         .get();
       const c: Ceremony | undefined = cctSnap.data();
-      if (c && c.ceremonyState === RUNNING) {
+      if (c && (c.ceremonyState in {RUNNING, PRESELECTION})) {
         return c;
       } else {
         return null;

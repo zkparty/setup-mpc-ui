@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "trustedsetup-a86f4",
     "public": "build",
     "ignore": [
       "firebase.json",
