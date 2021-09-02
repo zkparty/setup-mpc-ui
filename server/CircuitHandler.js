@@ -109,7 +109,7 @@ const getCircuitSettings = async (projectId, circuitId) => {
 const uploadToSite = async (project, circuit, localFile, fileName) => {
     //const settings = await getCircuitSettings(project.id, circuitId);
     const { siteBucketName } = project;
-    const { zkeyPrefix, siteFolder } = circuit;
+    const { siteFolder } = circuit;
 
     //const storage = firebase.storage();
     const pubSiteUrl = `${fbSkey.project_id}.appspot.com`;
@@ -332,7 +332,8 @@ const formatIndex = (index) => {
 
 const PLACEHOLDER = '<!--REPLACE-->'
 const contribHtml = (contribNo, user, zkey, verification) => {
-    return `<td>${contribNo}</td>
+    return `<tr>
+    <td>${contribNo}</td>
     <td>${user}</td>
     <td><a href="./${zkey}">download</a></td>
     <td><a href="./${verification}">link</a></td>

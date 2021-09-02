@@ -221,6 +221,10 @@ const DoCircuitSummary = async (i: number) => {
     //snap.docs.forEach(async (doc: { data: () => any; }, i: number) => {
       //if (i>1) return;
       const cDoc = snap.docs[i];
+      if (!cDoc) {
+        functions.logger.info(`No circuit found for index ${i}`);
+        return;
+      }
       const circuit = cDoc.data();
       
       //snap.forEach(async (circuit: DocumentSnapshot) => {

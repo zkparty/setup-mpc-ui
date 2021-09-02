@@ -156,7 +156,7 @@ export const getCeremonies = async (project: string): Promise<Ceremony[]> => {
   
   const initCcts: Ceremony[] = [];
   let ccts: Ceremony[] = circuits.reduce((arr, curr) => {
-       if (curr != null) arr.push(curr); return arr; 
+       if (curr != null) arr.push({...curr, isCompleted: false}); return arr; 
      }, initCcts);
   
   // Sort by sequence
