@@ -110,7 +110,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRu
       // Expire after 10 minutes or calculated expected duration, whichever is greater
       const numConstraints: number | undefined = ceremony.get('numConstraints');
       if (numConstraints) {
-        expectedDur = numConstraints * 10 / 1000;
+        expectedDur = numConstraints / 300;
       }
       expectedDur = Math.max(expectedDur, DEFAULT_MAX_RUNNING_DURATION);
       expire = (age > expectedDur && laterContribsFound);

@@ -10,7 +10,7 @@ import { ComputeDispatchContext, Step } from '../state/ComputeStateManager';
 import { accentColor, subtleText } from '../styles';
 import env from '../env';
 
-const allowReset = env.allowReset || true;
+const allowReset = env.allowReset || false;
 
 function getModalStyle() {
     const top = 50;

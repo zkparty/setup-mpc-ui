@@ -1,4 +1,4 @@
 export default {
     projectName: 'zkparty',
-    allowReset: true,
+    allowReset: false,
 }
