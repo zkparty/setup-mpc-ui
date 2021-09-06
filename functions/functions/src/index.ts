@@ -40,7 +40,7 @@ const contributionConverter = {
 // check for the most recent activity (using events) for the circuit.
 // Inactive contributions will be marked INVALIDATED, which will allow
 // a new contributor to start.
-export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRun(async (context) => {
+export const TimeoutWatchdog = functions.pubsub.schedule('every 2 minutes').onRun(async (context) => {
   //functions.logger.debug(`pubsub check ${context.eventType}`);
   const db = fbAdmin.firestore();
 
@@ -99,7 +99,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 5 minutes').onRu
     let expire = false;
     const DEFAULT_MAX_RUNNING_DURATION = 600;
     let expectedDur = DEFAULT_MAX_RUNNING_DURATION; // seconds
-    const MAX_WAIT_SECONDS = 180;
+    const MAX_WAIT_SECONDS = 60;
     if (status === 'WAITING') {
       // Expire 3 minutes after due time if anyone else is waiting
       if (age > MAX_WAIT_SECONDS && laterContribsFound) {
