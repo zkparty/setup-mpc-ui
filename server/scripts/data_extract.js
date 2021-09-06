@@ -1,4 +1,4 @@
-const { getVerifiedContribs } = require('../FirebaseApi');
+const { getContributions } = require('../FirebaseApi');
 const firebase = require('firebase/app');
 const firestore = require('firebase/firestore');
 const fs = require('fs');
@@ -7,7 +7,7 @@ const firebaseConfig = require('../firebase_skey.json');
 const run = () => {
     firebase.initializeApp(firebaseConfig);
 
-    getVerifiedContribs().then(circuits => {
+    getContributions(false).then(circuits => {
         console.log(`return circuits: ${circuits.length}`);
         circuits.forEach(cct => {
             const cctNum = ('00' + cct.number).substr(-2);           
@@ -20,7 +20,9 @@ const run = () => {
 
                 cct.contributions.forEach(cont => {
                     fs.write(fd, `${cont.contributor},${cont.prior},${cont.username},${cont.userId},${cont.duration},${
-                        cont.timeCompleted ? cont.timeCompleted.toMillis() : ''}\n`, err => {if (err) console.warn(err.message)});
+                        cont.timeCompleted ? cont.timeCompleted.toMillis() : ''},${
+                        cont.timeAdded ? cont.timeAdded.toMillis() : ''},${
+                        cont.duration}\n`, err => {if (err) console.warn(err.message)});
                 })
                 fs.close(fd, err => {if (err) console.warn(err.message)});
             });
