@@ -3,3 +3,4 @@
 .eslintcache
 .eslintcache*
 firebase_skey*
+**/*.csv

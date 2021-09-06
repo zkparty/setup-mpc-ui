@@ -1,8 +1,8 @@
-const { getVerifiedContribs } = require('./FirebaseApi');
+const { getVerifiedContribs } = require('../FirebaseApi');
 const firebase = require('firebase/app');
 const firestore = require('firebase/firestore');
 const fs = require('fs');
-const firebaseConfig = require('./firebase_skey.json');
+const firebaseConfig = require('../firebase_skey.json');
 
 const run = () => {
     firebase.initializeApp(firebaseConfig);

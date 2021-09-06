@@ -1,13 +1,13 @@
-const { getVerifiedContribs } = require('./FirebaseApi');
+const { getContributions } = require('../FirebaseApi');
 const firebase = require('firebase/app');
 const firestore = require('firebase/firestore');
 const fs = require('fs');
-const firebaseConfig = require('./firebase_skey.json');
+const firebaseConfig = require('../firebase_skey.json');
 
 const run = () => {
     firebase.initializeApp(firebaseConfig);
 
-    getVerifiedContribs().then(circuits => {
+    getContributions().then(circuits => {
         console.log(`return circuits: ${circuits.length}`);
         circuits.forEach(cct => {
             const cctNum = ('00' + cct.number).substr(-2);           
