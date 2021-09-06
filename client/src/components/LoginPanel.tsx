@@ -26,7 +26,7 @@ export default function LoginPanel(props: any) {
       {`Participate using your GitHub account.`}
     </NormalBodyText>
     <NormalBodyText style={{ marginTop: '8px', color: 'red' }}>
-      {`WARNING: The queue to participate is currently exceedingly long (> 900). Don't join unless you wish to keep your tab open for a long time.`}
+      {`WARNING: The queue to participate is currently exceedingly long (> 700). Don't join unless you wish to keep your tab open for a long time.`}
     </NormalBodyText>
     <Login />
   </div>);
