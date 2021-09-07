@@ -193,6 +193,7 @@ async function prepareCircuit(ceremonyId) {
 async function verifyContribution(ceremonyId, index) {
     const MIN_INDEX = 100;
     console.debug(`Verify contrib ${ceremonyId} index ${index}`);
+    // Sanity check. Reset for new ceremonies. See issue #5
     if (index < MIN_INDEX) {
         // Add event to notify failure
         addContributionEvent(
