@@ -10,43 +10,45 @@ const run = () => {
     // Read site ls dump. 
     // Generate with: gsutil ls gs://trustedsetup-a86f4.appspot.com/clrfund/circuit01 > circuit01_site.txt
     const gsMap = new Map();
-    let indexFd = 0;
 
     const readVerif = () => {
-        fs.open("index_c01.html", 'w', (err, fd) => {
-            if (err)  throw err;
-            
-            // Read verification log
-            new reader.DataReader ("verification_1616.txt", { encoding: "utf8" })
+        vList = [];
+        // Read verification log
+        new reader.DataReader ("verification_1972.txt", { encoding: "utf8" })
             .on ("error", function (error){
                 console.log ("error: " + error);
             })
             .on ("line", function (line){
                 const re = new RegExp('contribution #(.+) (.+):');
-                if (typeof line === 'string') {
-                    //console.log ("line: " + line);
-                    const m = line.match(re);
-                    if (m) {
-                        const idx = m[1];
-                        const uid = m[2];
-                    
-                        //console.log ("match: " + m[1] + ' : ' + m[2]);
-                        const queueIndex = gsMap.get(uid);
-                        console.log(`${idx} : ${uid} = ${queueIndex}`);
-                        fs.write(fd, Buffer.from(`<tr>
-                            <td>${idx}</td>
-                            <td>${uid}</td>
-                            <td><a href="./qvt32_${queueIndex}_${uid}.zkey">${queueIndex ? 'download' : 'n/a'}</a></td>
-                            <td><a href="./qvt32_${queueIndex}_${uid}_verification.log">${queueIndex ? 'link' : 'n/a'}</a></td>
-                            </tr>`), (err) => {if (err) throw err;});
-                    }
+                //console.log ("line: " + line);
+                const m = line.match(re);
+                if (m) {
+                    const idx = m[1];
+                    const uid = m[2];
+                
+                    //console.log ("match: " + m[1] + ' : ' + m[2]);
+                    const queueIndex = gsMap.get(uid);
+                    console.log(`${idx} : ${uid} = ${queueIndex}`);
+                    vList.push({idx, uid, queueIndex});
                 }
             })
             .on ("end", function (){
                 console.log ("EOF");
+                fs.open("index_c01.html", 'w', (err, fd) => {
+                    if (err)  throw err;
+                    
+                    vList.reverse().forEach(e => {
+                        console.log(`${e.idx} : ${e.uid} = ${e.queueIndex}`);
+                        fs.write(fd, Buffer.from(`<tr>
+                            <td>${e.idx}</td>
+                            <td>${e.uid}</td>
+                            <td><a href="./qvt32_${e.queueIndex}_${e.uid}.zkey">${e.queueIndex ? 'download' : 'n/a'}</a></td>
+                            <td><a href="./qvt32_${e.queueIndex}_${e.uid}_verification.log">${e.queueIndex ? 'link' : 'n/a'}</a></td>
+                            </tr>`), (err) => {if (err) throw err;});
+                    });
+                })
             })
             .read ();
-        })    
     };
 
     new reader.DataReader ("circuit01_site.txt", { encoding: "utf8" })
