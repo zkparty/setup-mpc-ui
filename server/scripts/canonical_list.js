@@ -1,10 +1,8 @@
 /* Get a canonical list of valid contributions by parsing the verification log. */
-const { getContributions } = require('../FirebaseApi');
-const firebase = require('firebase/app');
-const firestore = require('firebase/firestore');
 const fs = require('fs');
 const reader = require('buffered-reader');
-const firebaseConfig = require('../firebase_skey.json');
+
+const CCT_PREFIX = 'batchUst32';
 
 const run = () => {
     // Read site ls dump. 
@@ -14,7 +12,7 @@ const run = () => {
     const readVerif = () => {
         vList = [];
         // Read verification log
-        new reader.DataReader ("verification_1972.txt", { encoding: "utf8" })
+        new reader.DataReader ("verification_991.txt", { encoding: "utf8" })
             .on ("error", function (error){
                 console.log ("error: " + error);
             })
@@ -34,7 +32,7 @@ const run = () => {
             })
             .on ("end", function (){
                 console.log ("EOF");
-                fs.open("index_c01.html", 'w', (err, fd) => {
+                fs.open("index_c02.html", 'w', (err, fd) => {
                     if (err)  throw err;
                     
                     vList.reverse().forEach(e => {
@@ -42,8 +40,8 @@ const run = () => {
                         fs.write(fd, Buffer.from(`<tr>
                             <td>${e.idx}</td>
                             <td>${e.uid}</td>
-                            <td><a href="./qvt32_${e.queueIndex}_${e.uid}.zkey">${e.queueIndex ? 'download' : 'n/a'}</a></td>
-                            <td><a href="./qvt32_${e.queueIndex}_${e.uid}_verification.log">${e.queueIndex ? 'link' : 'n/a'}</a></td>
+                            <td><a href="./${CCT_PREFIX}_${e.queueIndex}_${e.uid}.zkey">${e.queueIndex ? 'download' : 'n/a'}</a></td>
+                            <td><a href="./${CCT_PREFIX}_${e.queueIndex}_${e.uid}_verification.log">${e.queueIndex ? 'link' : 'n/a'}</a></td>
                             </tr>`), (err) => {if (err) throw err;});
                     });
                 })
@@ -51,12 +49,12 @@ const run = () => {
             .read ();
     };
 
-    new reader.DataReader ("circuit01_site.txt", { encoding: "utf8" })
+    new reader.DataReader ("circuit02_site.txt", { encoding: "utf8" })
     .on ("error", function (error){
         console.log ("error: " + error);
     })
     .on ("line", function (line){
-        const re = new RegExp('qvt32\_(.+)\_(.+)\.zkey');
+        const re = new RegExp(`${CCT_PREFIX}\_(.+)\_(.+)\.zkey`);
         //console.log ("line: " + line);
         const m = line.match(re);
         if (m) {
@@ -71,33 +69,6 @@ const run = () => {
     .read();
 
 
-    // 
-/*
-    firebase.initializeApp(firebaseConfig);
-
-    getContributions(false).then(circuits => {
-        console.log(`return circuits: ${circuits.length}`);
-        circuits.forEach(cct => {
-            const cctNum = ('00' + cct.number).substr(-2);           
-            let fd;
-            fs.open(`circuit${cctNum}_data.csv`,'w', (err, fd) => {
-                if (err) {
-                    console.warn(err.message);
-                    return;
-                }
-
-                cct.contributions.forEach(cont => {
-                    fs.write(fd, `${cont.contributor},${cont.prior},${cont.username
-                        },${cont.userId},${cont.duration},${
-                        cont.timeCompleted ? cont.timeCompleted.toMillis() : ''},${
-                        cont.timeAdded ? cont.timeAdded.toMillis() : ''},${cont.status}\n`,
-                        err => {if (err) console.warn(err.message)});
-                })
-                fs.close(fd, err => {if (err) console.warn(err.message)});
-            });
-        });
-    });
-    */
 }
 
 if (require.main == module) {
