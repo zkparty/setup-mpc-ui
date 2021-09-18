@@ -1,6 +1,6 @@
 const { getContributions } = require('../FirebaseApi');
 const firebase = require('firebase/app');
-const firestore = require('firebase/firestore');
+//const firestore = require('firebase/firestore');
 const fs = require('fs');
 const firebaseConfig = require('../firebase_skey.json');
 
@@ -11,7 +11,6 @@ const run = () => {
         console.log(`return circuits: ${circuits.length}`);
         circuits.forEach(cct => {
             const cctNum = ('00' + cct.number).substr(-2);           
-            let fd;
             fs.open(`circuit${cctNum}_data.csv`,'w', (err, fd) => {
                 if (err) {
                     console.warn(err.message);
