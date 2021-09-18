@@ -2,7 +2,8 @@
 const fs = require('fs');
 const reader = require('buffered-reader');
 
-const CCT_PREFIX = 'qvt32';
+const CCT_PREFIX = 'batchUst32';
+const CCT_NUM = '02';
 
 const run = () => {
     // Read site ls dump. 
@@ -12,7 +13,7 @@ const run = () => {
     const readVerif = () => {
         vList = [];
         // Read verification log
-        new reader.DataReader ("verification_c01_final.txt", { encoding: "utf8" })
+        new reader.DataReader (`verification_c${CCT_NUM}_final.txt`, { encoding: "utf8" })
             .on ("error", function (error){
                 console.log ("error: " + error);
             })
@@ -32,7 +33,7 @@ const run = () => {
             })
             .on ("end", function (){
                 console.log ("EOF");
-                fs.open("index_c01.html", 'w', (err, fd) => {
+                fs.open(`index_c${CCT_NUM}.html`, 'w', (err, fd) => {
                     if (err)  throw err;
                     
                     vList.reverse().forEach(e => {
@@ -45,7 +46,7 @@ const run = () => {
                             </tr>`), (err) => {if (err) throw err;});
                     });
                 })
-                fs.open("verified_c01.csv", 'w', (err, fd) => {
+                fs.open(`verified_c${CCT_NUM}.csv`, 'w', (err, fd) => {
                     if (err)  throw err;
                     
                     vList.reverse().forEach(e => {
@@ -58,7 +59,7 @@ const run = () => {
             .read ();
     };
 
-    new reader.DataReader ("circuit01_site.txt", { encoding: "utf8" })
+    new reader.DataReader (`circuit${CCT_NUM}_site.txt`, { encoding: "utf8" })
     .on ("error", function (error){
         console.log ("error: " + error);
     })

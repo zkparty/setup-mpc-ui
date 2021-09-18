@@ -2,8 +2,8 @@
 const fs = require('fs');
 const reader = require('buffered-reader');
 
-const CCT_PREFIX = 'qvt32';
-const CCT_NUM = '01';
+const CCT_PREFIX = 'batchUst32';
+const CCT_NUM = '02';
 
 const run = () => {
     // Read circuitxx_data.csv. 
@@ -47,7 +47,7 @@ const run = () => {
                     let slot = previous;
                     if (curr.timeSlot > previous.timeSlot) {
                         if (previous.timeSlot >= 0) timeSlots.push(previous);
-                        slot = { timeSlot: curr.timeSlot, count: 0, countAccepted: 0, maxWait: -1 };
+                        slot = { timeSlot: curr.timeSlot, count: 0, countAccepted: 0, maxWait: 0 };
                     }
                     slot.count++;
                     if (curr.isAccepted) {
@@ -55,7 +55,7 @@ const run = () => {
                         if (slot.maxWait < curr.waitTime) slot.maxWait = curr.waitTime;
                     }
                     return slot;
-                }, {timeSlot: -1, count: 0, countAccepted: 0, maxWait: -1});
+                }, {timeSlot: -1, count: 0, countAccepted: 0, maxWait: 0});
                 // write the output
                 fs.open(`stats_c${CCT_NUM}.csv`, 'w', (err, fd) => {
                     if (err)  throw err;
