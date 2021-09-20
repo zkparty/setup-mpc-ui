@@ -2,8 +2,8 @@
 const fs = require('fs');
 const reader = require('buffered-reader');
 
-const CCT_PREFIX = 'batchUst32';
-const CCT_NUM = '02';
+const CCT_PREFIX = 'qvt32';
+const CCT_NUM = '01';
 
 const run = () => {
     // Read site ls dump. 
@@ -11,7 +11,7 @@ const run = () => {
     const gsMap = new Map();
 
     const readVerif = () => {
-        vList = [];
+        let vList = [];
         // Read verification log
         new reader.DataReader (`verification_c${CCT_NUM}_final.txt`, { encoding: "utf8" })
             .on ("error", function (error){
@@ -33,10 +33,11 @@ const run = () => {
             })
             .on ("end", function (){
                 console.log ("EOF");
+                vList = vList.reverse();
                 fs.open(`index_c${CCT_NUM}.html`, 'w', (err, fd) => {
                     if (err)  throw err;
                     
-                    vList.reverse().forEach(e => {
+                    vList.forEach(e => {
                         console.log(`${e.idx} : ${e.uid} = ${e.queueIndex}`);
                         fs.write(fd, Buffer.from(`<tr>
                             <td>${e.idx}</td>
@@ -49,7 +50,7 @@ const run = () => {
                 fs.open(`verified_c${CCT_NUM}.csv`, 'w', (err, fd) => {
                     if (err)  throw err;
                     
-                    vList.reverse().forEach(e => {
+                    vList.forEach(e => {
                         //console.log(`${e.idx} : ${e.uid} = ${e.queueIndex}`);
                         fs.write(fd, Buffer.from(`${e.idx},${e.uid},${e.queueIndex}\n`), 
                             (err) => {if (err) throw err;});
