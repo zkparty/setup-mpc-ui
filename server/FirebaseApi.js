@@ -519,6 +519,11 @@ const getContributions = async (getVerified = true) => {
   return Promise.all(circuits);  
 }
 
+// Return User object
+const getUserById = async (uid) => {
+  return admin.auth().getUser(uid);
+}
+
 module.exports = {
   getFBSummaries,
   getFBSummary,
@@ -538,4 +543,5 @@ module.exports = {
   getContributions,
   getProjectForCircuit,
   getFBProject,
+  getUserById,
 };
