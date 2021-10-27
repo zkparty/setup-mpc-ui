@@ -8,9 +8,8 @@ test('add 1+1', () => {
     expect(a).toBe(2);
 });
 
-test('init db', () => {
+test('init db', async () => {
     firebase.initializeApp({
-        apiKey: "AIzaSyDNq7V2f4fRSGDR0W9TFsZ3EBgwpkf470w",
         authDomain: "demo-ts.firebaseapp.com",
         projectId: "demo-ts",
       });
@@ -21,7 +20,7 @@ test('init db', () => {
         console.log(`emulator `);
         db.useEmulator("localhost", 8080);
     //}
-    db.collection('ceremonies').add(
+    await db.collection('ceremonies').add(
         {
             'id': 'test',
             'name': 'my Name',
