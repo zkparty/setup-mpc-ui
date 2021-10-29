@@ -10,7 +10,6 @@ test('add 1+1', () => {
 
 test('init db', async () => {
     firebase.initializeApp({
-        authDomain: "demo-ts.firebaseapp.com",
         projectId: "demo-ts",
       });
 
@@ -20,12 +19,29 @@ test('init db', async () => {
         console.log(`emulator `);
         db.useEmulator("localhost", 8080);
     //}
-    await db.collection('ceremonies').add(
+    const ref = await db.collection('ceremonies').add(
         {
             'id': 'test',
             'name': 'my Name',
             'number': 123
         }
-    )
+    );
+    const snap = await ref.get();
+
+    expect(snap).toBeDefined();
+
+    console.log(`id ${snap.id} ${snap.get('name')}`);
+
+    // TODO
+    // CReate ceremony
+    // Add first few contributions and events
+    // 
+    // Testing for race conditions:
+    // Set latest contributor to RUNNING
+    // ** Set up multiple threads
+    // ** Join
+    // Wait for all threads to complete
+    // Test that all queue numbers are different
     
-})
+    
+});
