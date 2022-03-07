@@ -17,7 +17,7 @@ test('init db', async () => {
       });
 
     console.log(`location ${typeof(firebase.firestore)}`);
-    var db = firebase.firestore();
+    var db = await firebase.firestore();
     //if (location.hostname === "localhost") {
         console.log(`emulator `);
         db.useEmulator("localhost", 8080);
@@ -43,7 +43,7 @@ test('init db', async () => {
 
     };
     const ceremony: Ceremony = {
-        id: '0000',
+        id: '',
         title: 'test',
         description: 'test circuit',
         ceremonyState: 'RUNNING',
@@ -67,7 +67,7 @@ test('init db', async () => {
         waiting: 0
     };
 
-    addCeremony(ceremony);
+    await addCeremony(ceremony);
     // Add first few contributions and events
     // 
     // Testing for race conditions:

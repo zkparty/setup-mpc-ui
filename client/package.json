@@ -5,7 +5,7 @@
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "eject": "react-scripts eject",
     "link": "npm link snarkjs && npm link ffjavascript",
     "deploy": "firebase deploy --only hosting"
