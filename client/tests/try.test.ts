@@ -3,8 +3,15 @@ const firestore = require("firebase/firestore")
 const firebaseConfig =require("./firebaseConfig-test.ts");
 
 
-import  { addCeremony } from '../src/api/FirestoreApi';
-import { Ceremony } from '../src/types/ceremony';
+import  { addCeremony, addOrUpdateContribution, addCeremonyEvent } from '../src/api/FirestoreApi';
+import { Ceremony, CeremonyEvent, Contribution } from '../src/types/ceremony';
+
+/**
+ * To test:
+ * firebase emulators:start --only firestore
+ * then, in a new window:
+ * npm run test
+ */
 
 test('add 1+1', () => {
     let a = 1+1;
@@ -35,7 +42,6 @@ test('init db', async () => {
 
     console.log(`id ${snap.id} ${snap.get('name')}`);
 
-    // TODO
     // Create ceremony
     const project = {
         name: 'test',
@@ -67,9 +73,29 @@ test('init db', async () => {
         waiting: 0
     };
 
-    await addCeremony(ceremony);
+    const cId = await addCeremony(ceremony);
     // Add first few contributions and events
+
+    const contrib: Contribution = {
+        participantId: 'p1',
+        status: 'WAITING',
+        queueIndex: 1,
+    }
+    await addOrUpdateContribution(cId, contrib);
+
+    const event: CeremonyEvent = {
+        index: 1,
+        sender: 'USER',
+        eventType: 'JOINED',
+        timestamp: new Date(),
+        message: 'test event 1',
+        acknowledged: false
+    }
+
+    await addCeremonyEvent(cId, event);
+
     // 
+    // TODO
     // Testing for race conditions:
     // Set latest contributor to RUNNING
     // ** Set up multiple threads
