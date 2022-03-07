@@ -83,7 +83,7 @@ test('init db', async () => {
     }
     await addOrUpdateContribution(cId, contrib);
 
-    const event: CeremonyEvent = {
+    let event: CeremonyEvent = {
         index: 1,
         sender: 'USER',
         eventType: 'JOINED',
@@ -93,6 +93,10 @@ test('init db', async () => {
     }
 
     await addCeremonyEvent(cId, event);
+
+    event.index = 2;
+    await addCeremonyEvent(cId, event);
+
 
     // 
     // TODO
