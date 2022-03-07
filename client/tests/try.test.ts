@@ -3,6 +3,9 @@ const firestore = require("firebase/firestore")
 const firebaseConfig =require("./firebaseConfig-test.ts");
 
 
+import  { addCeremony } from '../src/api/FirestoreApi';
+import { Ceremony } from '../src/types/ceremony';
+
 test('add 1+1', () => {
     let a = 1+1;
     expect(a).toBe(2);
@@ -33,7 +36,38 @@ test('init db', async () => {
     console.log(`id ${snap.id} ${snap.get('name')}`);
 
     // TODO
-    // CReate ceremony
+    // Create ceremony
+    const project = {
+        name: 'test',
+        shortName: 'test',
+
+    };
+    const ceremony: Ceremony = {
+        id: '0000',
+        title: 'test',
+        description: 'test circuit',
+        ceremonyState: 'RUNNING',
+        serverURL: '',
+        circuitFileName: '',
+        instructions: '',
+        github: '',
+        homepage: '',
+        adminAddr: '',
+        lastSummaryUpdate: new Date(),
+        startTime: '',
+        endTime: '',
+        paused: false,
+        selectBlock: 0,
+        minParticipants: 0,
+        maxTier2: 0,
+        sequence: 0,
+        ceremonyProgress: 0,
+        numParticipants: 0,
+        complete: 0,
+        waiting: 0
+    };
+
+    addCeremony(ceremony);
     // Add first few contributions and events
     // 
     // Testing for race conditions:
@@ -42,6 +76,6 @@ test('init db', async () => {
     // ** Join
     // Wait for all threads to complete
     // Test that all queue numbers are different
-    
+
     
 });
