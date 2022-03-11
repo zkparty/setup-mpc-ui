@@ -3,7 +3,7 @@ const firestore = require("firebase/firestore")
 const firebaseConfig =require("./firebaseConfig-test.ts");
 
 
-import  { addCeremony, addOrUpdateContribution, addCeremonyEvent, contributionUpdateListener } from '../src/api/FirestoreApi';
+import  { addCeremony, addOrUpdateContribution, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from '../src/api/FirestoreApi';
 import { Ceremony, CeremonyEvent, Contribution, ContributionSummary } from '../src/types/ceremony';
 
 /**
@@ -47,42 +47,92 @@ test('add to db', async () => {
    
 });
 
+const createCircuit = async (): Promise<string> => {
+
+        // Create circuit
+        const project = {
+            name: 'test',
+            shortName: 'test',
+    
+        };
+        const ceremony: Ceremony = {
+            id: '',
+            title: 'test',
+            description: 'test circuit',
+            ceremonyState: 'RUNNING',
+            serverURL: '',
+            circuitFileName: '',
+            instructions: '',
+            github: '',
+            homepage: '',
+            adminAddr: '',
+            lastSummaryUpdate: new Date(),
+            startTime: '',
+            endTime: '',
+            paused: false,
+            selectBlock: 0,
+            minParticipants: 0,
+            maxTier2: 0,
+            sequence: 0,
+            ceremonyProgress: 0,
+            numParticipants: 0,
+            complete: 0,
+            waiting: 0
+        };
+    
+        return addCeremony(ceremony);        
+}
+
+test('join queue', async () => {
+    const db = await initDb();
+
+    const cId = await createCircuit();
+
+    // circuit callback
+    let lastIndex: number = 0;
+    const callback = (indexData: any) => {
+        console.log(`cct queue callback ${indexData.currentIndex} ${indexData.lastValidIndex}`);
+        if (indexData.currentIndex > 1) lastIndex = indexData.currentIndex;
+    };
+
+    await ceremonyQueueListener(cId, callback);
+
+    // Add first few contributions and events
+
+    const contrib: Contribution = {
+        participantId: 'p1',
+        status: 'WAITING',
+        queueIndex: 1,
+    }
+    await addOrUpdateContribution(cId, contrib);
+
+    contrib.queueIndex = 2;
+    contrib.participantId = 'p2';
+    await addOrUpdateContribution(cId, contrib);
+
+    let event: CeremonyEvent = {
+        index: 1,
+        sender: 'USER',
+        eventType: 'START_CONTRIBUTION',
+        timestamp: new Date(),
+        message: 'test event 1',
+        acknowledged: false
+    }
+    await addCeremonyEvent(cId, event);
+
+    event.eventType = 'VERIFIED';
+    await addCeremonyEvent(cId, event);
+
+    ceremonyQueueListenerUnsub();
+
+    expect(lastIndex).toBe(2);
+});
 
 test('add events', async () => {
     const db = await initDb();
 
-    // Create ceremony
-    const project = {
-        name: 'test',
-        shortName: 'test',
+    const cId = await createCircuit();
 
-    };
-    const ceremony: Ceremony = {
-        id: '',
-        title: 'test',
-        description: 'test circuit',
-        ceremonyState: 'RUNNING',
-        serverURL: '',
-        circuitFileName: '',
-        instructions: '',
-        github: '',
-        homepage: '',
-        adminAddr: '',
-        lastSummaryUpdate: new Date(),
-        startTime: '',
-        endTime: '',
-        paused: false,
-        selectBlock: 0,
-        minParticipants: 0,
-        maxTier2: 0,
-        sequence: 0,
-        ceremonyProgress: 0,
-        numParticipants: 0,
-        complete: 0,
-        waiting: 0
-    };
-
-    const cId = await addCeremony(ceremony);
     // Add first few contributions and events
 
     const contrib: Contribution = {
@@ -135,6 +185,9 @@ test('add events', async () => {
     
     // 
     // TODO
+    // Test join queue 
+    //
+
     // Testing for race conditions:
     // Set latest contributor to RUNNING
     // ** Set up multiple threads
