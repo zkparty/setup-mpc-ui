@@ -305,7 +305,7 @@ export const ceremonyListener = async (project: string, callback: (c: Ceremony) 
     });
 };
 
-// Listens for updates to a ceremony
+// Listens for updates to a circuit
 export const ceremonyUpdateListener = async (id: string, callback: (c: Ceremony) => void): Promise<()=>void> => {
   const db = firebase.firestore();
   const ceremonyData = db.collection("ceremonies")
@@ -339,9 +339,9 @@ export const contributionUpdateListener = async (
   // First time, get all docs
   const querySnapshot = await query.get();
   //console.debug(`query snapshot ${querySnapshot.size}`);
-  querySnapshot.docs.forEach(doc => 
+  /* querySnapshot.docs.forEach(doc => 
     callback(doc.data(), 'added')
-  );
+  ); */
 
   return query.onSnapshot(querySnapshot => {
     //console.debug(`contribData snapshot ${querySnapshot.size}`);

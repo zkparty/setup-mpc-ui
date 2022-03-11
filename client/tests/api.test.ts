@@ -3,8 +3,8 @@ const firestore = require("firebase/firestore")
 const firebaseConfig =require("./firebaseConfig-test.ts");
 
 
-import  { addCeremony, addOrUpdateContribution, addCeremonyEvent } from '../src/api/FirestoreApi';
-import { Ceremony, CeremonyEvent, Contribution } from '../src/types/ceremony';
+import  { addCeremony, addOrUpdateContribution, addCeremonyEvent, contributionUpdateListener } from '../src/api/FirestoreApi';
+import { Ceremony, CeremonyEvent, Contribution, ContributionSummary } from '../src/types/ceremony';
 
 /**
  * To test:
@@ -13,22 +13,25 @@ import { Ceremony, CeremonyEvent, Contribution } from '../src/types/ceremony';
  * npm run test
  */
 
-test('add 1+1', () => {
-    let a = 1+1;
-    expect(a).toBe(2);
-});
+const initDb = async (): Promise<any> => {
+    // Don't re-init
+    if (firebase.apps.length > 0) return firebase.apps[0].firetsore;
 
-test('init db', async () => {
     firebase.initializeApp({
         projectId: "demo-ts",
       });
 
     console.log(`location ${typeof(firebase.firestore)}`);
     var db = await firebase.firestore();
-    //if (location.hostname === "localhost") {
-        console.log(`emulator `);
-        db.useEmulator("localhost", 8080);
-    //}
+    console.log(`emulator `);
+    db.useEmulator("localhost", 8080);
+
+    return db;
+}
+
+test('add to db', async () => {
+    const db = await initDb();
+
     const ref = await db.collection('ceremonies').add(
         {
             'id': 'test',
@@ -41,6 +44,12 @@ test('init db', async () => {
     expect(snap).toBeDefined();
 
     console.log(`id ${snap.id} ${snap.get('name')}`);
+   
+});
+
+
+test('add events', async () => {
+    const db = await initDb();
 
     // Create ceremony
     const project = {
@@ -83,6 +92,23 @@ test('init db', async () => {
     }
     await addOrUpdateContribution(cId, contrib);
 
+    contrib.queueIndex = 2;
+    contrib.participantId = 'p2';
+    await addOrUpdateContribution(cId, contrib);
+
+    // Callback for event updates
+    let updateCount: number = 0;
+    const cctUpdated = (
+        contrib: ContributionSummary, 
+        updateType: string, 
+        oldIndex?: number ) => {
+            updateCount++;
+            console.log(`cctUpdated ${contrib.queueIndex} ${updateType} ${oldIndex || '-'}`);
+    };
+
+    const unsub = await contributionUpdateListener(cId, cctUpdated);
+
+
     let event: CeremonyEvent = {
         index: 1,
         sender: 'USER',
@@ -97,7 +123,16 @@ test('init db', async () => {
     event.index = 2;
     await addCeremonyEvent(cId, event);
 
+    event.index = 2;
+    await addCeremonyEvent(cId, event);
 
+    
+    await unsub();    
+
+    expect(updateCount).toEqual(2);
+
+
+    
     // 
     // TODO
     // Testing for race conditions:
