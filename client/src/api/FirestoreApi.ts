@@ -423,6 +423,8 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
     .withConverter(ceremonyConverter)
     .where('ceremonyState', 'in', states)
     .orderBy('sequence', 'asc');
+  
+  console.debug(`after query`);
 
   let found = false;
   let promises: Promise<boolean>[] = [];
@@ -481,6 +483,7 @@ export const joinCircuit = async (ceremonyId: string, participantId: string) => 
     }
     // Allocate a position in the queue
     contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
+    console.log(`got next queue index ${contribution.queueIndex}`);
 
     return setContribution(ceremony, contribution);
 
@@ -502,6 +505,7 @@ export const joinCircuit = async (ceremonyId: string, participantId: string) => 
 
 const setContribution = async (ceremony: Ceremony, contrib: Contribution): Promise<ContributionState> => {
   // Save the contribution record
+  console.log(`ceremony.id ${ceremony.id}`);
   await addOrUpdateContribution(ceremony.id, contrib);
 
   return getContributionState(

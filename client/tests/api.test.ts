@@ -3,7 +3,7 @@ const firestore = require("firebase/firestore")
 const firebaseConfig =require("./firebaseConfig-test.ts");
 
 
-import  { addCeremony, addOrUpdateContribution, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub, ceremonyContributionListener } from '../src/api/FirestoreApi';
+import  { addCeremony, addOrUpdateContribution, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub, ceremonyContributionListener, joinCircuit } from '../src/api/FirestoreApi';
 import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary } from '../src/types/ceremony';
 
 /**
@@ -55,7 +55,7 @@ const createCircuit = async (): Promise<string> => {
             shortName: 'test',
     
         };
-        const ceremony: Ceremony = {
+        const circuit: Ceremony = {
             id: '',
             title: 'test',
             description: 'test circuit',
@@ -80,29 +80,18 @@ const createCircuit = async (): Promise<string> => {
             waiting: 0
         };
     
-        return addCeremony(ceremony);        
+        return addCeremony(circuit);        
 }
 
 const PARTICIPANT_ID_1 = 'p1';
 const PARTICIPANT_ID_2 = 'p2';
 const PARTICIPANT_ID_3 = 'p3';
 
-test('join queue', async () => {
+it('should join circuit', async () => {
     const db = await initDb();
 
     const cId = await createCircuit();
-
-    // circuit callback
-    let joinedIndex: number = -1;
-    const callback = (cs: ContributionState | boolean) => {
-        if (typeof cs === 'boolean') {
-            console.log(`returned ${cs}`);
-        } else {
-            console.log(`cct join callback ${cs.ceremony?.id} ${cs.queueIndex}`);
-            joinedIndex = cs.queueIndex;
-        }
-    };
-
+    console.log(`cct created ${cId}`);
 
     // Add first few contributions and events
 
@@ -118,30 +107,29 @@ test('join queue', async () => {
     contrib.status = 'WAITING';
     await addOrUpdateContribution(cId, contrib);
 
-    // Come in as a new participant. Look for a circuit to contribute to.
-    const unsub = ceremonyContributionListener(PARTICIPANT_ID_3, false, callback);
+    // Come in as a new participant. 
+    const newContrib = await joinCircuit(cId, PARTICIPANT_ID_3);
 
 
+    let event: CeremonyEvent = {
+        index: 1,
+        sender: 'USER',
+        eventType: 'START_CONTRIBUTION',
+        timestamp: new Date(),
+        message: 'test event 1',
+        acknowledged: false
+    }
+    await addCeremonyEvent(cId, event);
 
-    // let event: CeremonyEvent = {
-    //     index: 1,
-    //     sender: 'USER',
-    //     eventType: 'START_CONTRIBUTION',
-    //     timestamp: new Date(),
-    //     message: 'test event 1',
-    //     acknowledged: false
-    // }
-    // await addCeremonyEvent(cId, event);
+    event.eventType = 'VERIFIED';
+    await addCeremonyEvent(cId, event);
 
-    // event.eventType = 'VERIFIED';
-    // await addCeremonyEvent(cId, event);
+    expect(newContrib).toBeDefined();
+    expect(newContrib?.queueIndex).toBe(3);
 
-    expect(joinedIndex).toBe(3);
+}, 10000);
 
-    unsub();
-});
-
-test('monitor queue movement', async () => {
+it('should advance queue', async () => {
     const db = await initDb();
 
     const cId = await createCircuit();
@@ -184,9 +172,9 @@ test('monitor queue movement', async () => {
     ceremonyQueueListenerUnsub();
 
     expect(lastIndex).toBe(2);
-});
+}, 10000);
 
-test('add events', async () => {
+it('should add events', async () => {
     const db = await initDb();
 
     const cId = await createCircuit();
