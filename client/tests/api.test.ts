@@ -3,8 +3,8 @@ const firestore = require("firebase/firestore")
 const firebaseConfig =require("./firebaseConfig-test.ts");
 
 
-import  { addCeremony, addOrUpdateContribution, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub } from '../src/api/FirestoreApi';
-import { Ceremony, CeremonyEvent, Contribution, ContributionSummary } from '../src/types/ceremony';
+import  { addCeremony, addOrUpdateContribution, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub, ceremonyContributionListener } from '../src/api/FirestoreApi';
+import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary } from '../src/types/ceremony';
 
 /**
  * To test:
@@ -83,7 +83,65 @@ const createCircuit = async (): Promise<string> => {
         return addCeremony(ceremony);        
 }
 
+const PARTICIPANT_ID_1 = 'p1';
+const PARTICIPANT_ID_2 = 'p2';
+const PARTICIPANT_ID_3 = 'p3';
+
 test('join queue', async () => {
+    const db = await initDb();
+
+    const cId = await createCircuit();
+
+    // circuit callback
+    let joinedIndex: number = -1;
+    const callback = (cs: ContributionState | boolean) => {
+        if (typeof cs === 'boolean') {
+            console.log(`returned ${cs}`);
+        } else {
+            console.log(`cct join callback ${cs.ceremony?.id} ${cs.queueIndex}`);
+            joinedIndex = cs.queueIndex;
+        }
+    };
+
+
+    // Add first few contributions and events
+
+    const contrib: Contribution = {
+        participantId: PARTICIPANT_ID_1,
+        status: 'RUNNING',
+        queueIndex: 1,
+    }
+    await addOrUpdateContribution(cId, contrib);
+
+    contrib.queueIndex = 2;
+    contrib.participantId = PARTICIPANT_ID_2;
+    contrib.status = 'WAITING';
+    await addOrUpdateContribution(cId, contrib);
+
+    // Come in as a new participant. Look for a circuit to contribute to.
+    const unsub = ceremonyContributionListener(PARTICIPANT_ID_3, false, callback);
+
+
+
+    // let event: CeremonyEvent = {
+    //     index: 1,
+    //     sender: 'USER',
+    //     eventType: 'START_CONTRIBUTION',
+    //     timestamp: new Date(),
+    //     message: 'test event 1',
+    //     acknowledged: false
+    // }
+    // await addCeremonyEvent(cId, event);
+
+    // event.eventType = 'VERIFIED';
+    // await addCeremonyEvent(cId, event);
+
+    expect(joinedIndex).toBe(3);
+
+    unsub();
+});
+
+test('monitor queue movement', async () => {
     const db = await initDb();
 
     const cId = await createCircuit();
