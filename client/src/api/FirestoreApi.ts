@@ -44,7 +44,7 @@ const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
   fromFirestore: (
     snapshot: firebase.firestore.QueryDocumentSnapshot,
     options: firebase.firestore.SnapshotOptions): Ceremony => {
-    return jsonToCeremony({id: snapshot.id, ...snapshot.data(options)});
+    return jsonToCeremony({...snapshot.data(options), id: snapshot.id});
   }
 }
 
@@ -451,7 +451,7 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
 
 // Join this circuit. 
 // TODO - make this an atomic transaction
-export const joinCircuit = async (ceremonyId: string, participantId: string) => {
+export const joinCircuit = async (ceremonyId: string, participantId: string): Promise<ContributionState | undefined> => {
   const db = firebase.firestore();
 
   const ceremonySnapshot = await db.collection('ceremonies')
@@ -473,8 +473,8 @@ export const joinCircuit = async (ceremonyId: string, participantId: string) => 
 
   if (contSnapshot.empty) {
     // No prior entries for this participant
-    console.debug(`ceremony ${ceremonyId}: new participant`);
-    // We have a ceremony to contribute to
+    console.debug(`circuit ${ceremonyId}: new participant`);
+    // We have a circuit to contribute to
     let contribution: Contribution = {
       participantId,
       status: WAITING,
@@ -526,8 +526,15 @@ export const getNextQueueIndex = async (ceremonyId: string, participantId: strin
   if (snapshot.empty) {
     return 1;
   } else {
-    const cont = snapshot.docs[0].data();
-    return cont.queueIndex ? cont.queueIndex + 1 : 1;
+    // An unknown edge case sometimes sets the index to 1.
+    // Looping here should not be necessary, but might avoid this bug.
+    for (let i: number = 0; i < snapshot.size; i++) {
+      const cont = snapshot.docs[i].data();
+      if (cont.queueIndex) {
+        return cont.queueIndex + 1;
+      }
+    }
+    return 1;
   }
 };
 

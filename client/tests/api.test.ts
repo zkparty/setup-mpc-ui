@@ -86,6 +86,7 @@ const createCircuit = async (): Promise<string> => {
 const PARTICIPANT_ID_1 = 'p1';
 const PARTICIPANT_ID_2 = 'p2';
 const PARTICIPANT_ID_3 = 'p3';
+const PARTICIPANT_ID_4 = 'p4';
 
 it('should join circuit', async () => {
     const db = await initDb();
@@ -108,24 +109,15 @@ it('should join circuit', async () => {
     await addOrUpdateContribution(cId, contrib);
 
     // Come in as a new participant. 
-    const newContrib = await joinCircuit(cId, PARTICIPANT_ID_3);
-
-
-    let event: CeremonyEvent = {
-        index: 1,
-        sender: 'USER',
-        eventType: 'START_CONTRIBUTION',
-        timestamp: new Date(),
-        message: 'test event 1',
-        acknowledged: false
-    }
-    await addCeremonyEvent(cId, event);
-
-    event.eventType = 'VERIFIED';
-    await addCeremonyEvent(cId, event);
+    let newContrib = await joinCircuit(cId, PARTICIPANT_ID_3);
 
     expect(newContrib).toBeDefined();
     expect(newContrib?.queueIndex).toBe(3);
+
+    newContrib = await joinCircuit(cId, PARTICIPANT_ID_4);
+
+    expect(newContrib).toBeDefined();
+    expect(newContrib?.queueIndex).toBe(4);
 
 }, 10000);
 

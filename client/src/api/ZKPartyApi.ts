@@ -124,9 +124,6 @@ export function jsonToCeremony(json: any): Ceremony {
     ...rest
   } = json;
 
-  //const start: firebase.firestore.Timestamp = startTime;
-  //console.log(`start time ${start ? start.toDate().toLocaleDateString() : '-'}`);
-
   try {
     let c = 
     {
