@@ -3,7 +3,7 @@ const firestore = require("firebase/firestore")
 const firebaseConfig =require("./firebaseConfig-test.ts");
 
 
-import  { addCeremony, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub, joinCircuit, insertContribution } from '../src/api/FirestoreApi';
+import  { addCeremony, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub, joinCircuit, insertContribution, getNextQueueIndex } from '../src/api/FirestoreApi';
 import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary } from '../src/types/ceremony';
 
 /**
@@ -77,7 +77,8 @@ const createCircuit = async (): Promise<string> => {
             ceremonyProgress: 0,
             numParticipants: 0,
             complete: 0,
-            waiting: 0
+            waiting: 0,
+            highestQueueIndex: 0,
         };
     
         return addCeremony(circuit);        
@@ -99,14 +100,14 @@ it('should join circuit', async () => {
     const contrib: Contribution = {
         participantId: PARTICIPANT_ID_1,
         status: 'RUNNING',
-        queueIndex: 1,
+        queueIndex: await getNextQueueIndex(cId),
     }
-    await insertContribution(null, cId, contrib);
+    await insertContribution(cId, contrib);
 
-    contrib.queueIndex = 2;
+    contrib.queueIndex = await getNextQueueIndex(cId);
     contrib.participantId = PARTICIPANT_ID_2;
     contrib.status = 'WAITING';
-    await insertContribution(null, cId, contrib);
+    await insertContribution(cId, contrib);
 
     // Come in as a new participant. 
     let newContrib = await joinCircuit(cId, PARTICIPANT_ID_3);
@@ -142,11 +143,11 @@ it('should advance queue', async () => {
         status: 'WAITING',
         queueIndex: 1,
     }
-    await insertContribution(null, cId, contrib);
+    await insertContribution(cId, contrib);
 
     contrib.queueIndex = 2;
     contrib.participantId = 'p2';
-    await insertContribution(null, cId, contrib);
+    await insertContribution(cId, contrib);
 
     let event: CeremonyEvent = {
         index: 1,
@@ -178,11 +179,11 @@ it('should add events', async () => {
         status: 'WAITING',
         queueIndex: 1,
     }
-    await insertContribution(null, cId, contrib);
+    await insertContribution(cId, contrib);
 
     contrib.queueIndex = 2;
     contrib.participantId = 'p2';
-    await insertContribution(null, cId, contrib);
+    await insertContribution(cId, contrib);
 
     // Callback for event updates
     let updateCount: number = 0;

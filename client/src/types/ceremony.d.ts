@@ -53,6 +53,7 @@ export interface Ceremony {
   transcript?: string;
   hash?: string; // Participant's own hash
   isCompleted?: boolean; // Participant has completed this circuit
+  highestQueueIndex: number;
 }
 
 export interface Participant {

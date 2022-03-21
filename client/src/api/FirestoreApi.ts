@@ -356,6 +356,7 @@ export const contributionUpdateListener = async (
 
 // Listens for updates to eligible ceremonies that a participant may contribute to.
 // The first such ceremony found will be returned in the callback
+// TODO - Maybe obsolete. Can be removed
 export const ceremonyContributionListener = (participantId: string, isCoordinator: boolean, callback: (c: ContributionState | boolean) => void): () => void => {
 
   const setContribution = async (ceremony: Ceremony, contrib: Contribution): Promise<void> => {
@@ -393,7 +394,7 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
           timeAdded: new Date(),            
         }
         // Allocate a position in the queue
-        contribution.queueIndex = await getNextQueueIndex(null, ceremonyId, participantId);
+        contribution.queueIndex = await getNextQueueIndex(ceremonyId);
 
         await setContribution(ceremony, contribution);
         return true;
@@ -482,19 +483,17 @@ export const joinCircuit = async (ceremonyId: string, participantId: string): Pr
       timeAdded: new Date(),            
     }
 
-    db.runTransaction(async (t) => {
-      // Allocate a position in the queue
-      contribution.queueIndex = await getNextQueueIndex(t, ceremonyId, participantId);
-      console.log(`got next queue index ${contribution.queueIndex}`);
+    // Allocate a position in the queue
+    contribution.queueIndex = await getNextQueueIndex(ceremonyId);
+    console.log(`got next queue index ${contribution.queueIndex}`);
 
-      if (ceremony) {
-        insertContribution(t, ceremony.id, contribution);
-        return getContributionState(
-          ceremony,
-          contribution
-        );
-      }
-    });
+    if (ceremony) {
+      insertContribution(ceremony.id, contribution);
+      return getContributionState(
+        ceremony,
+        contribution
+      );
+    }
   } else {
     const contrib = contSnapshot.docs[0].data();
     if ((contrib.status === WAITING || contrib.status === RUNNING) ) {
@@ -537,33 +536,24 @@ const addContribution = async (ceremony: Ceremony, contrib: Contribution): Promi
   );
 };
 
-export const getNextQueueIndex = async (tx: firebase.firestore.Transaction | null, ceremonyId: string, participantId: string): Promise<number> => {
+export const getNextQueueIndex = async (ceremonyId: string): Promise<number> => {
   let db = firebase.firestore();
-  const query = db.collection("ceremonies")
-    .doc(ceremonyId)
-    .collection('contributions')
-    .withConverter(contributionConverter)
-    .orderBy('queueIndex', 'desc');
+  return db.runTransaction(transaction => {
+    const query = db.collection("ceremonies")
+      .doc(ceremonyId)
+      .withConverter(ceremonyConverter);
 
-  let snapshot;
-  if (tx) {
-    snapshot = await tx.getAll(query);
-  } else {
-    snapshot = await query.get();
-  }
-  if (snapshot.empty) {
-    return 1;
-  } else {
-    // An unknown edge case sometimes sets the index to 1.
-    // Looping here should not be necessary, but might avoid this bug.
-    for (let i: number = 0; i < snapshot.size; i++) {
-      const cont = snapshot.docs[i].data();
-      if (cont.queueIndex) {
-        return cont.queueIndex + 1;
+    return transaction.get(query).then(async doc => {
+      if (doc.exists) {
+        const nextIndex: number = (doc.get("highestQueueIndex") || 0) + 1;
+        await transaction.update(query, {highestQueueIndex: nextIndex});
+        return nextIndex;
+      } else {
+        throw new Error (`Error updating queue index. Circuit not found`);
       }
-    }
-    return 1;
-  }
+    });    
+  });
+
 };
 
 export const getContributionState = async (ceremony: Ceremony, contribution: Contribution): Promise<ContributionState> => {
@@ -735,7 +725,7 @@ export const updateContribution = async (ceremonyId: string, contribution: Contr
 
 };
 
-export const insertContribution = async (t: firebase.firestore.Transaction | null, ceremonyId: string, contribution: Contribution) => {
+export const insertContribution = async (ceremonyId: string, contribution: Contribution) => {
   const db = firebase.firestore();
   if (!contribution.queueIndex) {
     throw new Error(`Attempting to add contribution without queueIndex`);
@@ -747,12 +737,8 @@ export const insertContribution = async (t: firebase.firestore.Transaction | nul
           .collection("contributions")
           .doc();
 
-      if (t) {
-        await t.set(doc, contribution);
-        console.log(`added contribution summary ${doc.id} for index ${contribution.queueIndex}`);
-      } else {
-        doc.set(contribution);
-      }
+      doc.set(contribution);
+      console.log(`added contribution summary ${doc.id} for index ${contribution.queueIndex}`);
   } catch (e) { throw new Error(`Error adding contribution summary: ${e.message}`);}
 
 };
