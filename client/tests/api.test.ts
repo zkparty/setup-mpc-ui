@@ -3,8 +3,9 @@ const firestore = require("firebase/firestore")
 const firebaseConfig =require("./firebaseConfig-test.ts");
 
 
-import  { addCeremony, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub, joinCircuit, insertContribution, getNextQueueIndex } from '../src/api/FirestoreApi';
-import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary } from '../src/types/ceremony';
+import  { addCeremony, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub, joinCircuit, insertContribution, getNextQueueIndex, updateContribution } from '../src/api/FirestoreApi';
+import { Ceremony, CeremonyEvent, Contribution, ContributionSummary, ParticipantState } from '../src/types/ceremony';
+//import * as Types from '../src/types/ceremony';
 
 /**
  * To test:
@@ -119,6 +120,69 @@ it('should join circuit', async () => {
 
     expect(newContrib).toBeDefined();
     expect(newContrib?.queueIndex).toBe(4);
+
+}, 10000);
+
+it('should reuse queue index', async () => {
+    const db = await initDb();
+
+    const cId = await createCircuit();
+    console.log(`cct created ${cId}`);
+
+    // Add first few contributions and events
+
+    const contrib: Contribution = {
+        participantId: PARTICIPANT_ID_1,
+        status: 'RUNNING',
+        queueIndex: await getNextQueueIndex(cId),
+    }
+    await insertContribution(cId, contrib);
+
+    // Add participant to queue
+    let newContrib = await joinCircuit(cId, PARTICIPANT_ID_2);
+    const indexToBeReused = newContrib?.queueIndex;
+
+    // Add intervening participants. 
+    newContrib = await joinCircuit(cId, PARTICIPANT_ID_3);
+    newContrib = await joinCircuit(cId, PARTICIPANT_ID_4);
+
+    // Rejoin as #2
+    newContrib = await joinCircuit(cId, PARTICIPANT_ID_2);
+
+    expect(newContrib).toBeDefined();
+    expect(newContrib?.queueIndex).toBe(indexToBeReused);
+
+}, 10000);
+
+it('should not reuse queue index after timing out', async () => {
+    const INVAL = 'INVALIDATED';
+    const db = await initDb();
+
+    const cId = await createCircuit();
+    console.log(`cct created ${cId}`);
+
+    // Add first contribution
+    let newContrib = await joinCircuit(cId, PARTICIPANT_ID_1);
+
+    // Add participant to queue
+    newContrib = await joinCircuit(cId, PARTICIPANT_ID_2);
+    // Now simulate a timeout or invalid contrib
+    const contrib: Contribution = {
+        participantId: PARTICIPANT_ID_2,
+        status: INVAL,
+        queueIndex: newContrib?.queueIndex,
+    }
+    updateContribution(cId, contrib);
+    
+
+    // Add intervening participants. 
+    newContrib = await joinCircuit(cId, PARTICIPANT_ID_3);
+    newContrib = await joinCircuit(cId, PARTICIPANT_ID_4);
+
+    // Try to rejoin as #2
+    newContrib = await joinCircuit(cId, PARTICIPANT_ID_2);
+
+    expect(newContrib).toBeUndefined();
 
 }, 10000);
 
