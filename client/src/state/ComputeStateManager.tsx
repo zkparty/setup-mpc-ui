@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState, Project } from "../types/ceremony";
 
-import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, getProject } from "../api/FirestoreApi";
+import { addCeremonyEvent, updateContribution, addOrUpdateParticipant, getProject } from "../api/FirestoreApi";
 import { createContext, Dispatch, PropsWithChildren, useContext, useReducer } from "react";
 import { startDownload, startComputation, startUpload, endOfCircuit, getEntropy } from './Compute';
 import { AuthStateContext } from './AuthContext';
@@ -237,7 +237,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 lastSeen: new Date(),
                 status: "RUNNING",
             };
-            addOrUpdateContribution(action.ceremonyId, contribution);
+            updateContribution(action.ceremonyId, contribution);
             newState.contributionState = {...state.contributionState, startTime: Date.now()};
             newState.computeStatus = {...state.computeStatus, running: true, downloading: true};
             startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, action.dispatch);
@@ -330,7 +330,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 );
                 newState.contributionSummary = contribution;
                 
-                addOrUpdateContribution(ceremony.id, contribution).then( () => {
+                updateContribution(ceremony.id, contribution).then( () => {
                     endOfCircuit(state.participant.uid, action.dispatch);
                 });
 
@@ -362,7 +362,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 }
                 const contribution = newState.contributionSummary;
                 //contribution.gistUrl = action.gistUrl;
-                addOrUpdateContribution(ceremony.id, contribution).then( () => {
+                updateContribution(ceremony.id, contribution).then( () => {
                     endOfCircuit(state.participant.uid, action.dispatch);
                 });
 
@@ -473,7 +473,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             contribution.status = 'INVALIDATED';
             const ceremonyId = contribution.ceremony.id;
             const {ceremony, ...newCont } = contribution;
-            addOrUpdateContribution(ceremonyId, newCont).then(() => {
+            updateContribution(ceremonyId, newCont).then(() => {
                 // Add event notifying of error
                 addCeremonyEvent(ceremonyId, createCeremonyEvent(
                     "ABORTED", 
