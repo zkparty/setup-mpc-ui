@@ -3,7 +3,7 @@ const firestore = require("firebase/firestore")
 const firebaseConfig =require("./firebaseConfig-test.ts");
 
 
-import  { addCeremony, addOrUpdateContribution, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub, ceremonyContributionListener, joinCircuit } from '../src/api/FirestoreApi';
+import  { addCeremony, addCeremonyEvent, contributionUpdateListener, ceremonyQueueListener, ceremonyQueueListenerUnsub, joinCircuit, insertContribution } from '../src/api/FirestoreApi';
 import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary } from '../src/types/ceremony';
 
 /**
@@ -101,12 +101,12 @@ it('should join circuit', async () => {
         status: 'RUNNING',
         queueIndex: 1,
     }
-    await addOrUpdateContribution(cId, contrib);
+    await insertContribution(null, cId, contrib);
 
     contrib.queueIndex = 2;
     contrib.participantId = PARTICIPANT_ID_2;
     contrib.status = 'WAITING';
-    await addOrUpdateContribution(cId, contrib);
+    await insertContribution(null, cId, contrib);
 
     // Come in as a new participant. 
     let newContrib = await joinCircuit(cId, PARTICIPANT_ID_3);
@@ -142,11 +142,11 @@ it('should advance queue', async () => {
         status: 'WAITING',
         queueIndex: 1,
     }
-    await addOrUpdateContribution(cId, contrib);
+    await insertContribution(null, cId, contrib);
 
     contrib.queueIndex = 2;
     contrib.participantId = 'p2';
-    await addOrUpdateContribution(cId, contrib);
+    await insertContribution(null, cId, contrib);
 
     let event: CeremonyEvent = {
         index: 1,
@@ -178,11 +178,11 @@ it('should add events', async () => {
         status: 'WAITING',
         queueIndex: 1,
     }
-    await addOrUpdateContribution(cId, contrib);
+    await insertContribution(null, cId, contrib);
 
     contrib.queueIndex = 2;
     contrib.participantId = 'p2';
-    await addOrUpdateContribution(cId, contrib);
+    await insertContribution(null, cId, contrib);
 
     // Callback for event updates
     let updateCount: number = 0;
