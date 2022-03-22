@@ -176,7 +176,7 @@ export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference
     .withConverter(contributionConverter);
 
   let query = await contribQuery
-    .where('status', '==', 'COMPLETE')
+    .where('status', '==', COMPLETE)
     .get();
   const complete = query.size;
   query.forEach(snap => {
@@ -189,7 +189,7 @@ export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference
   });
 
   query = await contribQuery  
-    .where('status', '==', 'WAITING')
+    .where('status', '==', WAITING)
     .get();
   const waiting = query.size;
   console.debug(`complete ${ref.id} ${complete}`);
@@ -267,7 +267,7 @@ export const circuitEventListener = async (callback: (e: any) => void): Promise<
       var event = docSnapshot.doc.data();
       const ceremony = docSnapshot.doc.ref.parent.parent;
       //console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
-      if (event.eventType === 'VERIFIED') {
+      if (event.eventType === VERIFIED) {
         callback(ceremony);
       }
     });
