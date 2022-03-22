@@ -4,7 +4,7 @@ import { Ceremony, Project } from "../types/ceremony";
 
 import { Dispatch } from "react";
 import { getParticipantContributions } from '../api/FirestoreApi';
-import { zKey } from 'snarkjs';
+import { zKey, powersOfTau } from 'snarkjs';
 
 export const startDownload = (ceremonyId: string, index: number, dispatch: Dispatch<any>) => {
     // DATA DOWNLOAD
@@ -27,7 +27,7 @@ export const startDownload = (ceremonyId: string, index: number, dispatch: Dispa
     });
 };
 
-export const startComputation = (params: Uint8Array, entropy: Uint8Array, participant: string, dispatch: Dispatch<any>) => {
+export const startComputation = (params: Uint8Array, entropy: Uint8Array, participant: string, dispatch: Dispatch<any>, phase: number = 2) => {
 
     const progressOptions = {
         progressCallback: (val: number, total: number) => {
