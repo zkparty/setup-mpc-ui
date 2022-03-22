@@ -33,6 +33,7 @@ export interface Ceremony {
   serverURL: string;
   description: string;
   circuitFileName: string;
+  mode: ComputeMode;
   instructions: string;
   github: string;
   homepage: string;

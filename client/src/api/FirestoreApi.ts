@@ -1,6 +1,6 @@
 import { Ceremony, CeremonyEvent, CeremonyState, 
   Contribution, ContributionState, ContributionSummary, 
-  Participant, ParticipantState, Project } from '../types/ceremony';
+  Participant, ParticipantState, Project, ComputeMode } from '../types/ceremony';
 import firebase from 'firebase/app';
 import firestore from "firebase/firestore";
 import { jsonToCeremony, jsonToContribution } from './ZKPartyApi';
@@ -44,7 +44,11 @@ const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
   fromFirestore: (
     snapshot: firebase.firestore.QueryDocumentSnapshot,
     options: firebase.firestore.SnapshotOptions): Ceremony => {
-    return jsonToCeremony({...snapshot.data(options), id: snapshot.id});
+    return jsonToCeremony({
+      mode: ComputeMode.POWERSOFTAU,
+      ...snapshot.data(options),
+      id: snapshot.id
+    });
   }
 }
 
