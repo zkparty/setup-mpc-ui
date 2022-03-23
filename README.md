@@ -105,7 +105,7 @@ Things to note from the transcript:
 
 --------
 
-Copyright ©️ 2021, Stonebell Consulting Pty Ltd
+Copyright ©️ 2022, Stonebell Consulting Pty Ltd
 
 License: ISC
 
