@@ -6,11 +6,11 @@ import { Dispatch } from "react";
 import { getParticipantContributions } from '../api/FirestoreApi';
 import { zKey } from 'snarkjs';
 
-export const startDownload = (ceremonyId: string, index: number, dispatch: Dispatch<any>) => {
+export const startDownload = (ceremonyId: string, circuitPrefix: string, index: number, dispatch: Dispatch<any>) => {
     // DATA DOWNLOAD
     console.debug(`getting data ${ceremonyId} ${index}`);
     const progressCb = (progress: number) => dispatch({type: 'PROGRESS_UPDATE', data: progress})
-    getParamsFile(ceremonyId, index, progressCb).then( paramData => {
+    getParamsFile(ceremonyId, circuitPrefix, index, progressCb).then( paramData => {
         //setTimeout(() => {
             console.debug(`downloaded ${paramData?.length}`);
             dispatch({
@@ -56,9 +56,10 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, partic
     }
 };
 
-export const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispatch: Dispatch<any>) => {
+export const startUpload = (ceremonyId: string, circuitPrefix: string, index: number, data: Uint8Array, dispatch: Dispatch<any>) => {
     uploadParams(
         ceremonyId, 
+        circuitPrefix,
         index, 
         data, 
         (progress) => dispatch({type: 'PROGRESS_UPDATE', data: progress})

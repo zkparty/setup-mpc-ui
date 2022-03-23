@@ -240,7 +240,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             updateContribution(action.ceremonyId, contribution);
             newState.contributionState = {...state.contributionState, startTime: Date.now()};
             newState.computeStatus = {...state.computeStatus, running: true, downloading: true};
-            startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, action.dispatch);
+            startDownload(state.contributionState.ceremony.id, state.contributionState.ceremony.zkeyPrefix, state.contributionState.lastValidIndex, action.dispatch);
             newState.progress = {count: 0, total: 0};
             return newState;
         }
@@ -305,7 +305,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.paramData = new Uint8Array();
             //const msg = `Computation completed.`;
             //newState = addMessage(newState, msg);
-            startUpload(state.contributionState.ceremony.id, state.contributionState.queueIndex, action.newParams, action.dispatch);
+            startUpload(state.contributionState.ceremony.id, state.contributionState.ceremony.zkeyPrefix, state.contributionState.queueIndex, action.newParams, action.dispatch);
             return newState;
         }
         case 'UPLOADED': {
