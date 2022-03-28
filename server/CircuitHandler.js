@@ -160,12 +160,14 @@ async function prepareCircuit(ceremonyId) {
         addStatusUpdateEvent(ceremonyId, `Circuit file parsed. The circuit has ${numConstraints} constraints. It will require 2**${powers} powers of tau.`);
         console.log('Ceremony updated');
 
+        const { zkeyPrefix } = await getFBCeremony(ceremonyId);
+
         // Prepare zkey file
         try {
             const potPath = await getPoTPath(powers);
 
             // Have PoT & r1cs files. Now make the zkey file.
-            const initZkey = zkeyFileNameFromIndex(0);
+            const initZkey = zkeyFileNameFromIndex(zkeyPrefix, 0);
             const zkeyFile = localFilePath( initZkey, true, ceremonyId);
             await snarkjs.zKey.newZKey(r1csFile, potPath, zkeyFile, consoleLogger);
             console.log(`Zkey file generated: ${zkeyFile}`);
@@ -211,11 +213,11 @@ async function verifyContribution(ceremonyId, index) {
 
             // Download params
             let newZkeyFile;
-            newZkeyFile = await downloadZkey( ceremonyId, index );
+            newZkeyFile = await downloadZkey( ceremonyId, ceremony.zkeyPrefix, index );
 
             if (newZkeyFile) {
                 // Verify
-                const initFile = localFilePath(zkeyFileNameFromIndex(0), true, ceremonyId);
+                const initFile = localFilePath(zkeyFileNameFromIndex(ceremony.zkeyPrefix, 0), true, ceremonyId);
                 const powers = ceremony.powersNeeded;
                 const potFile = await getPoTPath(powers);
                 await getLogLock();
@@ -328,12 +330,12 @@ const getPoTPath = async (powers) => {
     });
 };
 
-const paramsFileNameFromIndex = (index) => {
-    return `ph2_${formatIndex(index)}.params`;
+const paramsFileNameFromIndex = (cctPrefix, index) => {
+    return `${cctPrefix}_${formatIndex(index)}.params`;
 }
 
-const zkeyFileNameFromIndex = (index) => {
-    return `ph2_${formatIndex(index)}.zkey`;
+const zkeyFileNameFromIndex = (cctPrefix, index) => {
+    return `${cctPrefix}_${formatIndex(index)}.zkey`;
 }
 
 const siteFileName = (cctPrefix, index, user, isVerification = false) => {
@@ -387,9 +389,9 @@ const localFilePath = (filename, includePrefix=false, ceremonyId='') => {
     return path.join(fullPath, filename);
 }
 
-async function downloadFile(ceremonyId, index, isParams) {
+async function downloadFile(ceremonyId, cctPrefix, index, isParams) {
     console.debug(`downloadFile ${index}`);
-    const p = isParams ? paramsFileNameFromIndex(index) : zkeyFileNameFromIndex(index);
+    const p = isParams ? paramsFileNameFromIndex(cctPrefix, index) : zkeyFileNameFromIndex(cctPrefix, index);
     console.log(`file is ${p}`);
 
     return checkAndDownloadFromStorage(
@@ -399,12 +401,12 @@ async function downloadFile(ceremonyId, index, isParams) {
     );
 };
 
-async function downloadParams(ceremonyId, index) {
-    return downloadFile(ceremonyId, index, true);
+async function downloadParams(ceremonyId, cctPrefix, index) {
+    return downloadFile(ceremonyId, cctPrefix, index, true);
 };
 
-async function downloadZkey(ceremonyId, index) {
-    return downloadFile(ceremonyId, index, false);
+async function downloadZkey(ceremonyId, cctPrefix, index) {
+    return downloadFile(ceremonyId, cctPrefix, index, false);
 };
 
 module.exports = {
