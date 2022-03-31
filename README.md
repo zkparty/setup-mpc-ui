@@ -6,10 +6,10 @@ This repo has a suite of components for browser-based trusted setup ceremonies.
 The client application is a node.js app to facilitate ceremony setup, monitoring, and contribution. 
 
 Contribution computation is performed in the browser. The computation code
-is compiled to WASM, based on [this repo](https://github.com/glamperd/phase2-bn254), a fork of [Kobi Gurkan's phase 2 computation module](https://github.com/kobigurk/phase2-bn254) with these changes:
-* For the WASM build, return the result hash to the caller.
-* Also for the WASM build: Progress is reported by invoking a callback.
-* Corrected errors in progress report count totals. 
+is compiled to WASM, based on snarkjs v0.4.15 with these changes:
+* Progress is reported by invoking a callback.
+* At the end of the computation, return the result hash to the caller.
+* The total number of points to be computed is pre-calculated so that progress counts are accurate
 
 ### functions
 A node.js application providing code to be deployed as Firebase functions. These functions provide housekeeping services.
