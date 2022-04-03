@@ -113,9 +113,8 @@ const joinNewCircuit = (
           // Have new contribution and queue index
           dispatch({
             type: 'SET_CEREMONY',
-            data: cs,
+            data: {...cs, updateQueue},
           });
-          ceremonyQueueListener(newCircuit.id, updateQueue);
         }
       });
       dispatch({ type: 'JOINING_CIRCUIT' });

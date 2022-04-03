@@ -193,7 +193,7 @@ async function prepareCircuit(ceremonyId) {
 };
 
 async function verifyContribution(ceremonyId, index) {
-    const MIN_INDEX = 100;
+    const MIN_INDEX = 1;
     console.debug(`Verify contrib ${ceremonyId} index ${index}`);
     // Sanity check. Reset for new ceremonies. See issue #5
     if (index < MIN_INDEX) {
@@ -322,7 +322,7 @@ const getPoTPath = async (powers) => {
                 );
                 // TODO - put these status messages in a status field on the FB ceremony doc
                 if (!potFileLocal) reject(`Couldn't find or download download PoT file`);
-                addStatusUpdateEvent(ceremonyId, `Powers-of-tau file is available: ${potFileLocal}`);
+                //addStatusUpdateEvent(ceremonyId, `Powers-of-tau file is available: ${potFileLocal}`);
                 resolve(potFileLocal);
             } else reject(err.message);
 

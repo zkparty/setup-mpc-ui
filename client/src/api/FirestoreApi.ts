@@ -451,7 +451,6 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
 };
 
 // Join this circuit. 
-// TODO - make this an atomic transaction
 export const joinCircuit = async (ceremonyId: string, participantId: string): Promise<ContributionState | undefined> => {
   const db = firebase.firestore();
 

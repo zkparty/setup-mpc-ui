@@ -1,6 +1,6 @@
 [
     {
-      "origin": ["https://trustedsetup-a86f4.web.app", "https://trustedsetuptest.web.app", "http://localhost:5000", "https://mpc.zkopru.network", "https://trustedsetup.web.app", "https://ceremony.clr.fund"],
+      "origin": ["https://trustedsetup-a86f4.web.app", "https://trustedsetuptest.web.app", "http://localhost:5000", "https://semaphore.zkparty.net", "https://mpc.zkopru.network", "https://trustedsetup.web.app", "https://ceremony.clr.fund"],
       "method": ["GET"],
       "maxAgeSeconds": 3600
     }
