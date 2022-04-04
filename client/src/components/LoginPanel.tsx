@@ -27,7 +27,7 @@ export default function LoginPanel(props: any) {
       {`Participate using your GitHub account.`}
     </NormalBodyText>
     <NormalBodyText style={{ marginTop: '8px' }}>
-      {`The ceremony is opening soon.`}  
+      {` `}  
   </NormalBodyText> 
     <Login />
   </div>);

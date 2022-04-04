@@ -209,6 +209,12 @@ export const CircuitSummary14 = functions.pubsub.schedule('every 5 minutes').onR
 export const CircuitSummary15 = functions.pubsub.schedule('every 5 minutes').onRun(
   async (context) => DoCircuitSummary(15)
 );
+export const CircuitSummary16 = functions.pubsub.schedule('every 5 minutes').onRun(
+  async (context) => DoCircuitSummary(16)
+);
+export const CircuitSummary17 = functions.pubsub.schedule('every 5 minutes').onRun(
+  async (context) => DoCircuitSummary(17)
+);
 
 const DoCircuitSummary = async (i: number) => {
     const db = fbAdmin.firestore();
