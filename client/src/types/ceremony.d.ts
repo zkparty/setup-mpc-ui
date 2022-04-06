@@ -21,10 +21,10 @@ export type ParticipantRunningState =
 
 export type TranscriptState = "WAITING" | "VERIFYING" | "COMPLETE";
 
-export enum ComputeMode { 
-  "ZKEY",
-  "POWERSOFTAU",
-}
+// export enum ComputeMode { 
+//   "ZKEY",
+//   "POWERSOFTAU",
+// };
 
 export interface Ceremony {
   // firebase-only data
@@ -169,3 +169,5 @@ export interface Project {
   circuits: string[];
   coordinators: string[];
 }
+
+export declare function f(): void;

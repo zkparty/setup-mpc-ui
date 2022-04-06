@@ -1,6 +1,6 @@
 import { Ceremony, CeremonyEvent, CeremonyState, 
   Contribution, ContributionState, ContributionSummary, 
-  Participant, ParticipantState, Project, ComputeMode } from '../types/ceremony';
+  Participant, ParticipantState, Project } from '../types/ceremony';
 import firebase from 'firebase/app';
 import firestore from "firebase/firestore";
 import { jsonToCeremony, jsonToContribution } from './ZKPartyApi';
@@ -13,6 +13,11 @@ const PRESELECTION = "PRESELECTION";
 const VERIFIED = "VERIFIED";
 const VERIFY_FAILED = "VERIFY_FAILED";
 const ABORTED = "ABORTED";
+
+enum ComputeMode { 
+  ZKEY,
+  POWERSOFTAU,
+};
 
 const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
   toFirestore: (c: Partial<Ceremony>) => {

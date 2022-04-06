@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { getParamsFile, uploadParams } from "../api/FileApi";
-import { Ceremony, ComputeMode, Project } from "../types/ceremony";
+import { Ceremony, Project } from "../types/ceremony";
 
 import { Dispatch } from "react";
 import { getParticipantContributions } from '../api/FirestoreApi';
@@ -26,6 +26,12 @@ export const startDownload = (ceremonyId: string, index: number, dispatch: Dispa
          dispatch({type: 'ABORT_CIRCUIT', data: err.message, dispatch});
     });
 };
+
+enum ComputeMode { 
+    ZKEY,
+    POWERSOFTAU,
+  };
+  
 
 const PROGRESS_UPDATE = 'PROGRESS_UPDATE';
 export const startComputation = (params: Uint8Array, entropy: Uint8Array, participant: string, dispatch: Dispatch<any>, mode: ComputeMode = ComputeMode.ZKEY) => {
