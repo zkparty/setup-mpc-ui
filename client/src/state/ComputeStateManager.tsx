@@ -16,6 +16,12 @@ export enum Step {
     RUNNING,
     COMPLETE,
 }
+
+enum ComputeMode { 
+    ZKEY,
+    POWERSOFTAU,
+  };
+
       
 export const createCeremonyEvent = (eventType: string, message: string, index: number | undefined): CeremonyEvent => {
     return {
@@ -240,7 +246,8 @@ export const computeStateReducer = (state: any, action: any):any => {
             updateContribution(action.ceremonyId, contribution);
             newState.contributionState = {...state.contributionState, startTime: Date.now()};
             newState.computeStatus = {...state.computeStatus, running: true, downloading: true};
-            startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, action.dispatch);
+            const suffix: string = (state.contributionState.ceremony.mode === 'POWERSOFTAU') ? 'ptau' : 'zkey';
+            startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, state.contributionState.ceremony.zkeyPrefix, suffix, action.dispatch);
             newState.progress = {count: 0, total: 0};
             return newState;
         }
@@ -256,7 +263,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             //newState = addMessage(newState, msg);
             newState.computeStatus = {...state.computeStatus, downloaded: true, started: true};
             const userId = state.participant?.authId || 'anonymous';
-            startComputation(action.data, state.entropy, userId , action.dispatch);
+            startComputation(action.data, state.entropy, userId , action.dispatch, ComputeMode.POWERSOFTAU);
             console.debug('running computation......');
             newState.progress={ data: 0 };
             return newState;
@@ -305,7 +312,13 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.paramData = new Uint8Array();
             //const msg = `Computation completed.`;
             //newState = addMessage(newState, msg);
-            startUpload(state.contributionState.ceremony.id, state.contributionState.queueIndex, action.newParams, action.dispatch);
+            const suffix: string = (state.contributionState.ceremony.mode === 'POWERSOFTAU') ? 'ptau' : 'zkey';
+            startUpload(state.contributionState.ceremony.id, 
+                state.contributionState.queueIndex, 
+                state.contributionState.ceremony.zkeyPrefix, 
+                suffix, 
+                action.newParams, 
+                action.dispatch);
             return newState;
         }
         case 'UPLOADED': {

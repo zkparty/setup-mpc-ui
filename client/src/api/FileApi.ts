@@ -3,16 +3,16 @@ import "firebase/storage";
 import { resolve } from 'path';
 import fetchStream from 'fetch-readablestream';
 
-const formatParamsFileName = (index: number): string => {
+const formatParamsFileName = (index: number, prefix: string, suffix: string): string => {
     var tmp = "000" + index.toString();
     var padIndex = tmp.substr(tmp.length-4);
-    return `ph2_${padIndex}.zkey`;
+    return `${prefix}_${padIndex}.${suffix}`;
 };
 
-export const getParamsFile = async (ceremonyId: string, index: number, progressCallback: (p: number) => void): Promise<Uint8Array> => {
+export const getParamsFile = async (ceremonyId: string, index: number, prefix: string, suffix: string, progressCallback: (p: number) => void): Promise<Uint8Array> => {
     const storage = firebase.storage();
 
-    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
+    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index, prefix, suffix)}`);
     const metadata = await fileRef.getMetadata()
         .catch((err: any) => { 
             console.log(`Expected params file doesn't exist? ${err.message}`); 
@@ -52,9 +52,9 @@ export const getParamsFile = async (ceremonyId: string, index: number, progressC
     return chunks;
 };
 
-export const uploadParams = async (ceremonyId: string, index: number, params: Uint8Array, progressCallback: (p: number) => void): Promise<string> => {
+export const uploadParams = async (ceremonyId: string, index: number, prefix: string, suffix: string, params: Uint8Array, progressCallback: (p: number) => void): Promise<string> => {
     const storage = firebase.storage();
-    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
+    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index, prefix, suffix)}`);
     const executor = (resolve: (val: string) => void, reject: (reason: any) => void) => {
         const uploadTask = fileRef.put(params);
 
