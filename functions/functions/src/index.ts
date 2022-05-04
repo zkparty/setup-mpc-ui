@@ -1,3 +1,4 @@
+//import { firestore } from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { DocumentSnapshot, QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 
@@ -45,7 +46,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 2 minutes').onRu
   const db = fbAdmin.firestore();
 
   const ceremonySnap = await db.collection('ceremonies')
-    .where('ceremonyState', '==', 'RUNNING')
+    .where('ceremonyState', '==', RUNNING)
     .get();
 
   functions.logger.debug(`${ceremonySnap.size} ceremonies running`);
@@ -56,7 +57,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 2 minutes').onRu
     // Get last complete contribution. 
     const lastComplete = await ceremony.ref.collection('contributions')
       .orderBy('queueIndex')
-      .where('status', 'in', ['COMPLETE', 'INVALIDATED'])
+      .where('status', 'in', [COMPLETE, INVALIDATED])
       .limitToLast(1)
       .get();
     //functions.logger.debug(`got lastComplete ${lastComplete.size}`);
@@ -68,7 +69,7 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 2 minutes').onRu
     const nextContrib = await ceremony.ref.collection('contributions')
       .orderBy('queueIndex')
       .where('queueIndex', '>', lastCompleteIndex)
-      .where('status', 'in', ['RUNNING', 'WAITING'])
+      .where('status', 'in', [RUNNING, WAITING])
       .get();
     if (nextContrib.empty) {
       //functions.logger.debug(`No expiry candidate ${ceremony.id}`);
@@ -100,13 +101,13 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 2 minutes').onRu
     const DEFAULT_MAX_RUNNING_DURATION = 600;
     let expectedDur = DEFAULT_MAX_RUNNING_DURATION; // seconds
     const MAX_WAIT_SECONDS = 60;
-    if (status === 'WAITING') {
+    if (status === WAITING) {
       // Expire 3 minutes after due time if anyone else is waiting
       if (age > MAX_WAIT_SECONDS && laterContribsFound) {
         functions.logger.info(`expired waiting contribution ${contrib.id} ${waiterIndex}. ${nextContrib.size} waiting`);
         expire = true;
       }
-    } else if (status === 'RUNNING') {
+    } else if (status === RUNNING) {
       // Expire after 10 minutes or calculated expected duration, whichever is greater
       const numConstraints: number | undefined = ceremony.get('numConstraints');
       if (numConstraints) {
@@ -120,11 +121,11 @@ export const TimeoutWatchdog = functions.pubsub.schedule('every 2 minutes').onRu
     }
     if (expire) {
       functions.logger.info(`Invalidating expired contribution ${waiterIndex} for ${ceremony.get('title')}`);
-      await contrib.ref.set({'status': 'INVALIDATED'}, { merge: true });
+      await contrib.ref.set({'status': INVALIDATED}, { merge: true });
       // add event
       await ceremony.ref.collection('events')
         .add({
-          eventType: 'INVALIDATED',
+          eventType: INVALIDATED,
           index: waiterIndex,
           sender: 'WATCHDOG',
           message: `No activity detected for ${Math.floor(age)} seconds for ${status} contribution. Max ${Math.floor(expectedDur)} secs.`,
@@ -147,7 +148,7 @@ export const CeremonyStarter = functions.pubsub.schedule('every 30 minutes').onR
 
   snap.forEach(async (ceremony: DocumentSnapshot) => {
       functions.logger.debug(`ceremony ${ceremony.id} is ready to start`);
-      await ceremony.ref.set({'ceremonyState': 'RUNNING'}, { merge: true });
+      await ceremony.ref.set({'ceremonyState': RUNNING}, { merge: true });
       // add event
       await ceremony.ref.collection('events')
         .add({
@@ -210,11 +211,30 @@ export const CircuitSummary15 = functions.pubsub.schedule('every 5 minutes').onR
   async (context) => DoCircuitSummary(15)
 );
 
+const cctId: string = '8DGQ3FOGk4Msx8hNncti';
+
+export const AutoValidate = functions.firestore
+  .document(`ceremonies/${cctId}/events/{eventId}`)
+  .onCreate(async (snapshot, context) => {
+    const event: any = snapshot.data();
+    if (event.eventType === 'PARAMS_UPLOADED') {
+      // create new event to automatically mark as verified
+      const db = fbAdmin.firestore();
+      await db.collection(`ceremonies/${cctId}/events`).add({
+        index: event.index,
+        eventType: 'VERIFIED',
+        message: 'Auto-verified',
+        sender: 'FUNCTION',
+        timestamp: fbAdmin.firestore.Timestamp.now(),
+      });
+    }
+  });
+
 const DoCircuitSummary = async (i: number) => {
     const db = fbAdmin.firestore();
     const snap = await db
       .collection("ceremonies")
-      .where('ceremonyState', '==', 'RUNNING')
+      .where('ceremonyState', '==', RUNNING)
       .get();
   
       
