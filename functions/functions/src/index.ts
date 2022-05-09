@@ -11,4 +11,4 @@ exports.TimeoutWatchdog = TimeoutWatchdog;
 exports.CeremonyStarter = CeremonyStarter;
 exports.AutoValidate = AutoValidate;
 exports.Metrics = require('./Metrics');
-exports.Auth = require('./Auth');
+exports.Auth = require('./AuthFunction');
