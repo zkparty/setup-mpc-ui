@@ -15,6 +15,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "@firebase/firestore-types": "^2.2.0",
+    "cors": "^2.8.5",
     "firebase": "^8.1.2",
     "firebase-admin": "^9.4.2",
     "firebase-functions": "^3.11.0"
