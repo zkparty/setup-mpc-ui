@@ -39,7 +39,8 @@ const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
         ceremonyData = {...ceremonyData, endTime: end};
       }
     } catch (err) {
-      console.error(`Unexpected error parsing dates: ${err.message}`);
+      if (err instanceof Error) 
+        console.error(`Unexpected error parsing dates: ${err.message}`);
     };
     return {
       ...ceremonyData,
@@ -121,7 +122,7 @@ export async function updateCeremony(circuit: Ceremony): Promise<void> {
 
     console.debug(`ceremony ${circuit.id} updated`);
   } catch (e) {
-    console.error(`ceremony update failed: ${e.message}`);
+    if (e instanceof Error) console.error(`ceremony update failed: ${e.message}`);
     throw new Error(`error updating ceremony data: ${e}`);
   }
 };
@@ -231,7 +232,7 @@ export const addCeremonyEvent = async (ceremonyId: string, event: CeremonyEvent)
         await doc.set(event);
         console.log(`added event ${doc.id}`);
     } catch (e) { 
-      console.warn(`Error adding event: ${e.message}`);
+      if (e instanceof Error) console.warn(`Error adding event: ${e.message}`);
       //throw new Error(`Error adding event: ${e.message}`);
     }
 };
@@ -460,7 +461,6 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
 };
 
 // Join this circuit. 
-// TODO - make this an atomic transaction
 export const joinCircuit = async (ceremonyId: string, participantId: string): Promise<ContributionState | undefined> => {
   const db = firebase.firestore();
 
@@ -730,7 +730,9 @@ export const updateContribution = async (ceremonyId: string, contribution: Contr
     } else {
       throw new Error(`Attempting to update contribution, but it it wasn't found`);
     }
-  } catch (e) { throw new Error(`Error adding/updating contribution summary: ${e.message}`);}
+  } catch (e) { 
+    throw new Error(`Error adding/updating contribution summary: ${(e instanceof Error) ? e.message : ''}`);
+  }
 
 };
 
@@ -748,7 +750,9 @@ export const insertContribution = async (ceremonyId: string, contribution: Contr
 
       doc.set(contribution);
       console.log(`added contribution summary ${doc.id} for index ${contribution.queueIndex}`);
-  } catch (e) { throw new Error(`Error adding contribution summary: ${e.message}`);}
+  } catch (e) { 
+    throw new Error(`Error adding contribution summary: ${(e instanceof Error) ? e.message: ''}`);
+  }
 
 };
 
@@ -764,6 +768,7 @@ export const addOrUpdateParticipant = async (participant: Participant) => {
     await doc.set(participant);
     console.debug(`updated participant ${doc.id}`);
   } catch (e) {
+    if (e instanceof Error)
      console.warn(`Error trying to update participant ${e.message}`);
   }
 
@@ -786,7 +791,8 @@ const  getParticipantContributionsSnapshot = async (project: Project, participan
       });
     // Return the filtered set
     return projectContribs;
-  } catch (e) { throw new Error(`Error getting contributions: ${e.message}`);}
+  } catch (e) { 
+      throw new Error(`Error getting contributions: ${(e instanceof Error) ? e.message : ''}`);}
 }
 
 export const getParticipantContributions = async (project: Project, participant: string, isCoordinator: boolean = false): Promise<any[]> => {
@@ -834,7 +840,8 @@ export const resetContributions = async (participant: string): Promise<void> => 
       count ++;
     });
     console.log(`Reset ${count} contributions`);
-  } catch (e) { throw new Error(`Error resetting contribution: ${e.message}`);}
+  } catch (e) { 
+    throw new Error(`Error resetting contribution: ${(e instanceof Error) ? e.message : ''}`);}
 }
 
 export const getUserStatus = async (userId: string, project: string): Promise<string> => {
@@ -852,7 +859,8 @@ export const getUserStatus = async (userId: string, project: string): Promise<st
       status = 'COORDINATOR'
     }
   } catch (err) {
-    console.warn(`Error getting user status: ${err.message}`);
+    if (err instanceof Error)
+      console.warn(`Error getting user status: ${err.message}`);
   }
 
   // if (status === 'USER' && userId.signature) {
@@ -871,7 +879,8 @@ export const getSiteSettings = async (): Promise<firebase.firestore.DocumentData
     
     return snapshot.data();
   } catch (err) {
-    console.warn(`Error getting site settings: ${err.message}`);
+    if (err instanceof Error)
+      console.warn(`Error getting site settings: ${err.message}`);
   }
 }
 
@@ -899,7 +908,8 @@ export const getProject = async (project: string): Promise<Project | undefined> 
     return proj;
 
   } catch (err) {
-    console.warn(`Error getting project settings: ${err.message}`);
+    if (err instanceof Error)
+      console.warn(`Error getting project settings: ${err.message}`);
   }
 }
 

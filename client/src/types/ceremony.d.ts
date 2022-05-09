@@ -40,7 +40,6 @@ export interface Ceremony {
   adminAddr: string;
   lastSummaryUpdate: Date;
 
-  // fetched from mpc server, cached by zkp server for when / if mpc server is disconnected
   ceremonyState: CeremonyState;
   startTime: Date | string;
   endTime: Date | string | undefined;
@@ -60,6 +59,7 @@ export interface Ceremony {
   hash?: string; // Participant's own hash
   isCompleted?: boolean; // Participant has completed this circuit
   highestQueueIndex: number;
+  zkeyPrefix: string;
 }
 
 export interface Participant {

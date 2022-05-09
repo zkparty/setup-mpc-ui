@@ -50,6 +50,7 @@ const Login = () => {
           .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
         })
     } catch (err) {
+      if (err instanceof Error)
       console.warn(err.message);
     }
   };

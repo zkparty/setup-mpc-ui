@@ -96,6 +96,7 @@ export const uploadCircuitFile = async (ceremonyId: string, circuitFile: File): 
         //const fbFileRef = ceremonyDataRef.child(circuitFile.name);
         return fbFileRef.put(circuitFile);
     } catch (err) {
+        if (err instanceof Error)
         console.warn(`Error uploading circuit file: ${err.message}`);
         throw err;
     }

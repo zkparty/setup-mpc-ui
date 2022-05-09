@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState, Project } from "../types/ceremony";
 
-import { addCeremonyEvent, updateContribution, addOrUpdateParticipant, getProject } from "../api/FirestoreApi";
+import { addCeremonyEvent, updateContribution, addOrUpdateParticipant, getProject, ceremonyQueueListener } from "../api/FirestoreApi";
 import { createContext, Dispatch, PropsWithChildren, useContext, useReducer } from "react";
 import { startDownload, startComputation, startUpload, endOfCircuit, getEntropy } from './Compute';
 import { AuthStateContext } from './AuthContext';
@@ -432,6 +432,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 newState.computeStatus.ready = true;
             } else {
                 newState.step = Step.QUEUED;
+                ceremonyQueueListener(action.data.ceremony.id, action.data.updateQueue);
             }
             return newState;
         }
