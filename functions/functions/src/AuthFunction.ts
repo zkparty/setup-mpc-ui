@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import { ethers } from 'ethers';
 
 const express = require('express');
 const app = express();
@@ -20,12 +21,28 @@ app.use(authenticate);
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+const PREFIX = '\x19Ethereum Signed Message:\n';
+
 app.post('/', (req: any, res: any) => {
-    functions.logger.debug(`Method ${req.method}`);
-    functions.logger.debug(`Addr ${req.body.ethAddress}`);
 
+    functions.logger.info(`Sign-in request for ${req.ethAddress}, sig: ${req.sig}`);
 
-    //functions.logger.info(`Sign-in request for ${request.ethAddress}, sig: ${request.sig}`);
+    // ECRecover to verify signature is from the supplied address
+    const message = PREFIX + 'ZKParty sign-in';
+    const msgHash = ethers.utils.id(message);
+    const recoveredAddress = ethers.utils.recoverAddress(msgHash, req.sig);
+    if (recoveredAddress !== req.ethAddress) {
+        res.status(401).send('Authorization failed');
+    }
+
+    // Is this address already registered? Then return JWT
+    
+
+    // Get address balance
+
+    // Reverse lookup ENS name
+
+    // Build JWT
 
     res.status(200).send('OK');
 });
