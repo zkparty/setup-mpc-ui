@@ -203,6 +203,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
         ceremony.current = props.ceremony;
         console.debug(`ceremony id ${ceremony.current.id}`);
       } catch (err) {
+        if (err instanceof Error)
         console.log(`Cannot parse provided ceremony ${err.message}`);
       }
     } else {
@@ -307,6 +308,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
       if (!ceremony.current.title || ceremony.current.title.length == 0) {enqueueSnackbar("Must have a title"); isValid = false;}
       if (!ceremony.current.description || ceremony.current.description.length == 0) {enqueueSnackbar("Must have a description"); isValid = false;};
     } catch (err) {
+      if (err instanceof Error)
       console.log(`Error validating input: ${err.message}`);
       isValid = false;
     }

@@ -101,6 +101,7 @@ const queueStatus = (contribState: ContributionState) => {
     queue = contribState.queueIndex - contribState.currentIndex; 
     dots = ' .'.repeat(Math.max(queue, 0));
   } catch (err) {
+    if (err instanceof Error)
     console.warn(`Wait queue error: ${err.message}`);
   }
   return (
