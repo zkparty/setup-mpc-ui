@@ -12,10 +12,14 @@ const app = express();
 
 const authenticate = (req: any, res: any, next: any) => {
 
-    functions.logger.debug(`req body: ${JSON.stringify(req.body)}`);
+    //functions.logger.debug(`req body: ${JSON.stringify(req.body)}`);
     if (req.method !== 'POST') {
         res.status(403).send('Forbidden!');
         return;
+    }
+
+    if (req.body.ethAddress === undefined || req.body.sig === undefined) {
+        res.status(400).send('Invalid request');
     }
     next();
 };
@@ -26,7 +30,6 @@ app.use(express.urlencoded({extended: true}));
 
 app.post('/', (req: any, res: any) => {
 
-    functions.logger.debug(`POST req body: ${JSON.stringify(req.body)}`);
     const { ethAddress, sig } = req.body;
     
     functions.logger.info(`Sign-in request for ${ethAddress}, sig: ${sig}`);
@@ -43,7 +46,7 @@ app.post('/', (req: any, res: any) => {
     const auth = fbAdmin.auth();
     auth.getUser(ethAddress)
         .then((userRecord: functions.auth.UserRecord) => {
-            console.log(`User ${ethAddress} found ${userRecord.toJSON()}`);
+            functions.logger.info(`User ${ethAddress} found: ${userRecord.displayName}`);
         })
         .catch((err: any) => {
             if (err.code === 'auth/user-not-found') {
@@ -51,6 +54,21 @@ app.post('/', (req: any, res: any) => {
                 // Get address balance
 
                 // Reverse lookup ENS name
+
+                // If OK, create user
+                functions.logger.debug('Creating user');
+                auth
+                    .createUser({
+                        uid: ethAddress,
+                        displayName: ethAddress,
+                    })
+                    .then((userRecord: functions.auth.UserRecord) => {
+                        // See the UserRecord reference doc for the contents of userRecord.
+                        functions.logger.info('Successfully created new user:', userRecord.uid);
+                    })
+                    .catch((error: any) => {
+                        functions.logger.info('Error creating new user:', error);
+                    });
 
             } else {
                 functions.logger.error(`Unexpected error in getUser: ${JSON.stringify(err)}`);
