@@ -11,7 +11,7 @@ it('should match recovered address', async () => {
     const ethAddress = wallet.address;
     console.info(`Address: ${ethAddress}`);
     // sign message
-    const msg = 'ZKParty sign-in';
+    const msg = require('../src/types/constants').AUTH_MESSAGE;
     const sig = await wallet.signMessage(msg);
     console.info(`Sig: ${sig}`);
 

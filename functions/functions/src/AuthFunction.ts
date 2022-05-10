@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import { ethers } from 'ethers';
-//import { UserRecord } from 'firebase-functions/v1/auth';
+const { AUTH_MESSAGE } = require('./types/constants');
+
 const fbAdmin = require('firebase-admin');
 
 const express = require('express');
@@ -35,8 +36,7 @@ app.post('/', (req: any, res: any) => {
     functions.logger.info(`Sign-in request for ${ethAddress}, sig: ${sig}`);
 
     // ECRecover to verify signature is from the supplied address
-    const message = 'ZKParty sign-in';
-    const msgHash = ethers.utils.hashMessage(message);
+    const msgHash = ethers.utils.hashMessage(AUTH_MESSAGE);
     const recoveredAddress = ethers.utils.recoverAddress(msgHash, sig);
     if (recoveredAddress !== ethAddress) {
         res.status(401).send('Authorization failed');

@@ -138,3 +138,4 @@ export interface ContributionState {
   status: ParticipantState;
   startTime?: Timestamp;
 }
+
