@@ -6,6 +6,7 @@ import { accentColor, lighterBackground } from "../styles";
 import { Button, Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
 import { getUserStatus } from "../api/FirestoreApi";
 import { AuthButton, AuthButtonText } from './../styles';
+import axios from 'axios';
 
 const Login = () => {
   const [error, setErrors] = useState("");
@@ -50,10 +51,73 @@ const Login = () => {
           .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
         })
     } catch (err) {
-      if (err instanceof Error)
-      console.warn(err.message);
+      if (err instanceof Error) console.warn(err.message);
     }
   };
+
+  const handleEthereumLogin = async () => {
+    // Check cookie
+    // Connect to browser wallet
+    if (window.ethereum.isNullish()) {
+      console.error('Metamask is not installed. Signin aborted.');
+      return;
+    }
+    const project = authState.project ? authState.project : 'unknown';
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const account = accounts[0];
+      console.debug(`Metamask account: ${account}`);
+      // Sign message
+      const signinMessage = `0x${Buffer.from('ZKParty sign-in').toString('hex')}`;
+      const sign = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [signinMessage, account],
+      });
+      console.log(`Signature: ${sign}`);
+      // Save cookie
+      // Get JWT
+      const url = `https://us-central1-${firebase.app().name}.cloudfunctions.net/Auth-Auth`;
+      const body = {
+        ethAddress: account,
+        sig: sign,
+      }
+      const response = await axios.post(url, body);
+      if (response.status < 300) {
+        console.log(`JWT Response ${response.data}`);
+        // Sign in
+        firebase
+          .auth()
+          .setPersistence(firebase.auth.Auth.Persistence.NONE)
+          .then(() => {
+            firebase
+              .auth()
+              .signInWithCustomToken(response.data)
+                .then((result: firebase.auth.UserCredential) => {
+                  //console.debug(result);
+                  // Get user privileges
+                  if (result.user && result.user.uid) {
+                    getUserStatus(result.user.uid, project)
+                      .then((resp: string) => {
+                        console.log(`privs: ${resp}`);
+                        if (resp === 'COORDINATOR') {
+                          dispatch({type: 'SET_COORDINATOR'})
+                        }
+                    });
+                  }
+                  //console.debug(`dispatch LOGIN`);
+                  dispatch({
+                    type: 'LOGIN',
+                    user: { ...result.user, additionalUserInfo: result.additionalUserInfo },
+                  });
+                })
+                .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
+              })
+
+      } 
+    } catch (err) {
+      console.error(`Error while logging in: ${(err instanceof Error) ? err.message : ''}`);
+    }
+  }
 
   const logOut = () => {
     firebase.auth().signOut();
@@ -65,7 +129,7 @@ const Login = () => {
 
   return (
     <div>
-      <AuthButton onClick={handleGithubLogin} style={{ marginTop: '78px', }}>
+      <AuthButton onClick={handleEthereumLogin} style={{ marginTop: '78px', }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <GitHubIcon htmlColor="#000" />
           <div style={{ width: '24px' }} />

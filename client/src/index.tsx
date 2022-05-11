@@ -4,8 +4,8 @@ import * as React from "react";
 import queryString from 'query-string';
 import reportWebVitals from './reportWebVitals';
 
-const qsProj: string | string[] | null = queryString.parse(location.search).project;
-const project: string = qsProj == null ? '' : typeof qsProj === 'string' ? qsProj : qsProj[0];
+const qsProj: string | (string | null)[] | null = queryString.parse(location.search).project;
+const project: string | null = (qsProj == null) ? '' : typeof qsProj === 'string' ? qsProj : qsProj[0];
 
 ReactDOM.render(
     <React.StrictMode>

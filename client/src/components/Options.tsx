@@ -1,7 +1,7 @@
 import { Button, Checkbox, FormControlLabel, FormGroup, Modal, Typography } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { composeClasses } from '@material-ui/data-grid';
-import { PlayCircleFilledWhite } from '@material-ui/icons';
+//import { composeClasses } from '@material-ui/data-grid';
+//import { PlayCircleFilledWhite } from '@material-ui/icons';
 import * as React from 'react';
 import { Dispatch, useContext } from 'react';
 import { resetContributions } from '../api/FirestoreApi';

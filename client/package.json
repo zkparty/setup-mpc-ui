@@ -27,6 +27,7 @@
     "@types/react-window": "^1.8.2",
     "@types/styled-components": "^4.4.2",
     "@types/webfontloader": "^1.6.32",
+    "axios": "^0.27.2",
     "color": "^3.1.2",
     "dotenv": "^8.2.0",
     "fetch-readablestream": "^0.2.0",
