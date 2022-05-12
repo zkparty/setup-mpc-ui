@@ -51,7 +51,7 @@ app.post('/', (req: any, res: any) => {
     const msgHash = ethers.utils.hashMessage(AUTH_MESSAGE);
     const recoveredAddress = ethers.utils.recoverAddress(msgHash, sig);
     functions.logger.debug(`recovered: ${recoveredAddress}`);
-    if (recoveredAddress !== ethAddress) {
+    if (recoveredAddress !== ethers.utils.getAddress(ethAddress)) {
         res.status(401).send('Authorization failed');
         return;
     }
