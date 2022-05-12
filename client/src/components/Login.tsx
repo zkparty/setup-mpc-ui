@@ -58,7 +58,7 @@ const Login = () => {
   const handleEthereumLogin = async () => {
     // Check cookie
     // Connect to browser wallet
-    if (window.ethereum.isNullish()) {
+    if (!window.ethereum) {
       console.error('Metamask is not installed. Signin aborted.');
       return;
     }
@@ -67,8 +67,9 @@ const Login = () => {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const account = accounts[0];
       console.debug(`Metamask account: ${account}`);
-      // Sign message
+      // Sign message. TODO - put message in a constant that's also reachable from functions
       const signinMessage = `0x${Buffer.from('ZKParty sign-in').toString('hex')}`;
+      console.log(`msg to be signed: ${signinMessage}`);
       const sign = await window.ethereum.request({
         method: 'personal_sign',
         params: [signinMessage, account],
@@ -76,12 +77,24 @@ const Login = () => {
       console.log(`Signature: ${sign}`);
       // Save cookie
       // Get JWT
-      const url = `https://us-central1-${firebase.app().name}.cloudfunctions.net/Auth-Auth`;
+      const app = firebase.app().options as any;
+      const name = app.projectId;
+      const url = `https://us-central1-${name}.cloudfunctions.net/Auth-Auth`;
       const body = {
         ethAddress: account,
         sig: sign,
       }
-      const response = await axios.post(url, body);
+
+      const response = await axios.request({
+        url: url,
+        method: 'post',
+        data: body,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+
       if (response.status < 300) {
         console.log(`JWT Response ${response.data}`);
         // Sign in

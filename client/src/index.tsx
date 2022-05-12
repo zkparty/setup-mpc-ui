@@ -4,7 +4,7 @@ import * as React from "react";
 import queryString from 'query-string';
 import reportWebVitals from './reportWebVitals';
 
-const qsProj: string | (string | null)[] | null = queryString.parse(location.search).project;
+const qsProj: string | (string | null)[] | null = queryString.parse(window.location.search).project;
 const project: string | null = (qsProj == null) ? '' : typeof qsProj === 'string' ? qsProj : qsProj[0];
 
 ReactDOM.render(

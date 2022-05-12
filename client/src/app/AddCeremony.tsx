@@ -128,7 +128,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const inputField = (props: StandardTextFieldProps & {oldValue: string}) => {
+const InputField = (props: StandardTextFieldProps & {oldValue: string}) => {
   //const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState<any | null>(props.oldValue);
 
@@ -244,7 +244,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
       ceremony.current.circuitFileName = circuitFile.name;
   }
 
-  const title = inputField({
+  const title = InputField({
       id:"title", 
       label:"Title", 
       type:'text',
@@ -254,7 +254,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
   });
   //console.debug(`title value: ${title.value()}`);
 
-  const description = inputField({
+  const description = InputField({
     id:"desc", 
     label:"Description", 
     type:'text',
@@ -272,7 +272,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
   const startTimeStr = formatDate(ceremony.current?.startTime);
   const endTimeStr = formatDate(ceremony.current?.endTime);
 
-  const startTime = inputField({
+  const startTime = InputField({
     id: 'start-time',
     label: 'Start Time',
     type: 'datetime-local',
@@ -281,7 +281,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
     defaultValue: startTimeStr,
   });
 
-  const endTime = inputField({
+  const endTime = InputField({
     id: 'end-time',
     label: 'End Time',
     type: 'datetime-local',
@@ -290,7 +290,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
     defaultValue: endTimeStr,
   });
 
-  const minParticipants = inputField({
+  const minParticipants = InputField({
     id:"min-participants", 
     label:"Minimum Participants", 
     type:'number',

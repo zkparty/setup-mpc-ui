@@ -7,20 +7,28 @@ const fbAdmin = require('firebase-admin');
 const express = require('express');
 const app = express();
 
-// const cors = require('cors')({
+const cors = require('cors');//({
 //     origin: true,
 //   });
 
 const authenticate = (req: any, res: any, next: any) => {
 
     //functions.logger.debug(`req body: ${JSON.stringify(req.body)}`);
-    if (req.method !== 'POST') {
+    functions.logger.debug(`req method: ${req.method}`);
+
+    res.set("Access-Control-Allow-Origin", "*");
+    if (req.method === 'OPTIONS') {
+        // Send response to OPTIONS requests
+        //functions.logger.debug(`OPTIONS request`);
+    } else if (req.method === 'POST') {
+        if (req.body.ethAddress === undefined || req.body.sig === undefined) {
+            res.status(400).send('Invalid request');
+            return;
+        }
+    } else {
+        functions.logger.info(`Disallowed method: ${req.method}`);
         res.status(403).send('Forbidden!');
         return;
-    }
-
-    if (req.body.ethAddress === undefined || req.body.sig === undefined) {
-        res.status(400).send('Invalid request');
     }
     next();
 };
@@ -28,6 +36,10 @@ const authenticate = (req: any, res: any, next: any) => {
 app.use(authenticate);
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(cors({ 
+    origin: true,
+    methods: 'POST',
+}));
 
 app.post('/', (req: any, res: any) => {
 
@@ -38,8 +50,10 @@ app.post('/', (req: any, res: any) => {
     // ECRecover to verify signature is from the supplied address
     const msgHash = ethers.utils.hashMessage(AUTH_MESSAGE);
     const recoveredAddress = ethers.utils.recoverAddress(msgHash, sig);
+    functions.logger.debug(`recovered: ${recoveredAddress}`);
     if (recoveredAddress !== ethAddress) {
         res.status(401).send('Authorization failed');
+        return;
     }
 
     // Is this address already registered? Then return JWT
@@ -91,6 +105,10 @@ app.post('/', (req: any, res: any) => {
                 res.status(500).send(msg);
             });
 
+});
+
+app.options('/', (req: any, res: any) => {
+    functions.logger.debug(`options request`);
 });
 
 exports.Auth = functions.https.onRequest(app);
