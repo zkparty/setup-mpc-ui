@@ -1,20 +1,19 @@
 import * as functions from 'firebase-functions';
 import { ethers } from 'ethers';
 const { AUTH_MESSAGE } = require('./types/constants');
+const { EthRPCUrl } = require('../config.json');
 
 const fbAdmin = require('firebase-admin');
 
 const express = require('express');
 const app = express();
 
-const cors = require('cors');//({
-//     origin: true,
-//   });
+const cors = require('cors');
 
 const authenticate = (req: any, res: any, next: any) => {
 
     //functions.logger.debug(`req body: ${JSON.stringify(req.body)}`);
-    functions.logger.debug(`req method: ${req.method}`);
+    //functions.logger.debug(`req method: ${req.method}`);
 
     res.set("Access-Control-Allow-Origin", "*");
     if (req.method === 'OPTIONS') {
@@ -46,6 +45,9 @@ app.post('/', (req: any, res: any) => {
     const { ethAddress, sig } = req.body;
     
     functions.logger.info(`Sign-in request for ${ethAddress}, sig: ${sig}`);
+    //let accepted = false;
+
+    // TODO: Rate limit to avoid DoS
 
     // ECRecover to verify signature is from the supplied address
     const msgHash = ethers.utils.hashMessage(AUTH_MESSAGE);
@@ -60,21 +62,35 @@ app.post('/', (req: any, res: any) => {
     const auth = fbAdmin.auth();
     auth.getUser(ethAddress)
         .then((userRecord: functions.auth.UserRecord) => {
+            //accepted = true;
             functions.logger.info(`User ${ethAddress} found: ${userRecord.displayName}`);
+            returnCustomToken(res, ethAddress);
         })
-        .catch((err: any) => {
+        .catch(async (err: any) => {
             if (err.code === 'auth/user-not-found') {
                 // Not already registered
-                // Get address balance
+                const node = new ethers.providers.JsonRpcProvider(EthRPCUrl);
+                // Get nonce. Require > 3 txs, as an anti-sybil mechanism
+                const nonce = await node.getTransactionCount(ethAddress);
+                functions.logger.debug(`Nonce = ${nonce}`);
+                if (nonce <= 3) {
+                    res.status(401).send('Inelligible account');
+                    return;
+                }
 
                 // Reverse lookup ENS name
+                const ensName = await node.lookupAddress(ethAddress);
+                if (ensName) {
+                    functions.logger.info(`ENS name: ${ensName}`);                    
+                }
 
                 // If OK, create user
+                //accepted = true;
                 functions.logger.debug('Creating user');
                 auth
                     .createUser({
                         uid: ethAddress,
-                        displayName: ethAddress,
+                        displayName: ensName || ethAddress,
                     })
                     .then((userRecord: functions.auth.UserRecord) => {
                         // See the UserRecord reference doc for the contents of userRecord.
@@ -83,7 +99,7 @@ app.post('/', (req: any, res: any) => {
                     .catch((error: any) => {
                         functions.logger.info('Error creating new user:', error);
                     });
-
+                returnCustomToken(res, ethAddress);
             } else {
                 functions.logger.error(`Unexpected error in getUser: ${JSON.stringify(err)}`);
                 res.status(500).send(`Error in getUser: ${err}`);
@@ -91,21 +107,24 @@ app.post('/', (req: any, res: any) => {
             }
         });
 
-
-    // Build JWT
-    const additionalClaims = {};
-    auth.createCustomToken(ethAddress, additionalClaims)
-            .then((customToken: any) => {
-                // Send token back to client
-                res.status(200).send(customToken);
-            })
-            .catch((error: any) => {
-                const msg = `Error creating custom token:', ${(error instanceof Error) ? error : ''}`;
-                console.log(msg);
-                res.status(500).send(msg);
-            });
-
 });
+
+const returnCustomToken = (res: any, ethAddress: string) => {
+    // Build JWT
+    functions.logger.debug(`creating JWT`);
+    const additionalClaims = {};
+    fbAdmin.auth().createCustomToken(ethAddress, additionalClaims)
+        .then((customToken: any) => {
+            // Send token back to client
+            res.status(200).send(customToken);
+            functions.logger.debug(`success`);
+        })
+        .catch((error: any) => {
+            const msg = `Error creating custom token:', ${(error instanceof Error) ? error : ''}`;
+            functions.logger.error(msg);
+            res.status(500).send(msg);
+        });
+}
 
 app.options('/', (req: any, res: any) => {
     functions.logger.debug(`options request`);
