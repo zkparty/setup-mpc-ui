@@ -31,25 +31,9 @@ const Login = () => {
           firebase
           .auth()
           .signInWithPopup(provider)
-          .then((result: any) => {
-            //console.debug(result);
-            // Get user privileges
-            getUserStatus(result.user.email, project)
-              .then((resp: string) => {
-                console.log(`privs: ${resp}`);
-                if (resp === 'COORDINATOR') {
-                  dispatch({type: 'SET_COORDINATOR'})
-                }
-            });
-            //console.debug(`dispatch LOGIN`);
-            dispatch({
-              type: 'LOGIN',
-              user: { ...result.user, additionalUserInfo: result.additionalUserInfo },
-              accessToken: result.credential.accessToken,
-            });
-          })
-          .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
+          .then(user => userLogin(user, u => u.user?.email))
         })
+          .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
     } catch (err) {
       if (err instanceof Error) console.warn(err.message);
     }
@@ -62,7 +46,6 @@ const Login = () => {
       console.error('Metamask is not installed. Signin aborted.');
       return;
     }
-    const project = authState.project ? authState.project : 'unknown';
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const account = accounts[0];
@@ -91,7 +74,7 @@ const Login = () => {
         data: body,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+          //'Access-Control-Allow-Origin': '*'
         }
       });
 
@@ -105,32 +88,39 @@ const Login = () => {
             firebase
               .auth()
               .signInWithCustomToken(response.data)
-                .then((result: firebase.auth.UserCredential) => {
-                  //console.debug(result);
-                  // Get user privileges
-                  if (result.user && result.user.uid) {
-                    getUserStatus(result.user.uid, project)
-                      .then((resp: string) => {
-                        console.log(`privs: ${resp}`);
-                        if (resp === 'COORDINATOR') {
-                          dispatch({type: 'SET_COORDINATOR'})
-                        }
-                    });
-                  }
-                  //console.debug(`dispatch LOGIN`);
-                  dispatch({
-                    type: 'LOGIN',
-                    user: { ...result.user, additionalUserInfo: result.additionalUserInfo },
-                  });
-                })
+                .then(user => userLogin(user, (u) => u.user?.uid))
                 .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
-              })
-
+          })
       } 
     } catch (err) {
       console.error(`Error while logging in: ${(err instanceof Error) ? err.message : ''}`);
     }
   }
+
+  // Handle a user once login has been confirmed
+  // 
+  const userLogin = (userCred: firebase.auth.UserCredential, idGetter: (u: firebase.auth.UserCredential) => string | null | undefined) => {
+    //console.debug(result);
+    const project = authState.project ? authState.project : 'unknown';
+    // Get user privileges
+    if (userCred.user && userCred.user.uid) {
+      const id = idGetter(userCred);
+      if (id) {
+        getUserStatus(id, project)
+          .then((resp: string) => {
+            console.log(`privs: ${resp}`);
+            if (resp === 'COORDINATOR') {
+              dispatch({type: 'SET_COORDINATOR'})
+            }
+        });
+      }
+      //console.debug(`dispatch LOGIN`);
+      dispatch({
+        type: 'LOGIN',
+        user: { ...userCred.user, additionalUserInfo: userCred.additionalUserInfo },
+      });
+    }
+  };
 
   const logOut = () => {
     firebase.auth().signOut();
