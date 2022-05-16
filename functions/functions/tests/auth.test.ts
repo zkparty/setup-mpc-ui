@@ -33,3 +33,16 @@ it('should recover from metamask sig', async () => {
 
     expect(recoveredAddr).toBe(account);
 });
+
+jest.setTimeout(60000);
+
+it('should get ENS name', async () => {
+    const url = require('../config.json').EthRPCUrl;
+    const node = new ethers.providers.JsonRpcProvider(url);
+    const ethAddress = "0x704f0bf988a10c0e8a35d14F9515c567DAA68043";
+    // Reverse lookup ENS name
+    const ensName = await node.lookupAddress(ethAddress);
+
+    expect(ensName).toBe('geoff.eth');
+
+});
