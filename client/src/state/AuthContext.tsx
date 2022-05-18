@@ -49,8 +49,8 @@ export const AuthContextProvider = (props:AuthProps) => {
             user: user,
             //accessToken: (user as any).stsTokenManager?.accessToken,
           });
-          if (!user?.email) {
-            console.warn(`user email not available`);
+          if (!user?.displayName) {
+            console.warn(`user displayName not available`);
           }
         } else {
           dispatch(

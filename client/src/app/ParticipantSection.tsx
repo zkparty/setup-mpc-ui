@@ -126,7 +126,7 @@ const getParticipant = async (dispatch: Dispatch<any>, authState: AuthContextInt
   console.debug(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
   dispatch({
     type: 'SET_PARTICIPANT',
-    data: newParticipant(authState.authUser.uid, authState.authUser.additionalUserInfo?.username),
+    data: newParticipant(authState.authUser.uid, authState.authUser.displayName),
     accessToken: authState.accessToken });
   // Trigger contribution count for this user
   await getContributions(project, authState.authUser.uid, dispatch, authState.isCoordinator);
