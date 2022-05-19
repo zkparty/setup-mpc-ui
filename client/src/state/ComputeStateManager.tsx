@@ -227,9 +227,13 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'START_COMPUTE': {
-            //const msg = `It's your turn to contribute`;
-            //newState = addMessage(state, msg);
+            console.debug(`START_COMPUTE ${state.computeStatus.running}`);
+            if (state.computeStatus.running) { // Avoid multiple invocations
+                return state;
+            }
+
             // Create event in Firestore
+            // Maybe do this with pub/sub for faster turnaround
             addCeremonyEvent(action.ceremonyId, createCeremonyEvent(
                 "START_CONTRIBUTION",
                 `Starting turn for index ${action.index}`,
@@ -243,15 +247,35 @@ export const computeStateReducer = (state: any, action: any):any => {
                 lastSeen: new Date(),
                 status: "RUNNING",
             };
-            updateContribution(action.ceremonyId, contribution);
+            updateContribution(action.ceremonyId, contribution).then(() => {
+                action.dispatch({
+                    type: 'DOWNLOAD',
+                    dispatch: action.dispatch,
+                })
+            });
+
+            newState.contributionState = {...state.contributionState, startTime: Date.now()};
+            newState.computeStatus = {...state.computeStatus, running: true };
+            return newState;
+        }
+        case 'DOWNLOAD': {            
+            console.debug(`DOWNLOAD`);
+            if (state.computeStatus.downloading) { // Avoid multiple invocations
+                return state;
+            }
             newState.contributionState = {...state.contributionState, startTime: Date.now()};
             newState.computeStatus = {...state.computeStatus, running: true, downloading: true};
             const suffix: string = (state.contributionState.ceremony.mode === 'POWERSOFTAU') ? 'ptau' : 'zkey';
             startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, state.contributionState.ceremony.zkeyPrefix, suffix, action.dispatch);
             newState.progress = {count: 0, total: 0};
+            console.debug(`Started download`);
             return newState;
         }
         case 'DOWNLOADED': {
+
+            console.debug(`DOWNLOADED: ${state.computeStatus.downloaded}`);
+            if (state.computeStatus.downloaded) { return state } // Avoid duplicate invocations
+
             //console.log('Source params', action.data);
             addCeremonyEvent(action.ceremonyId, createCeremonyEvent(
                 "PARAMS_DOWNLOADED",
@@ -265,7 +289,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             const userId = state.participant?.authId || 'anonymous';
             startComputation(action.data, state.entropy, userId , action.dispatch, ComputeMode.POWERSOFTAU);
             console.debug('running computation......');
-            newState.progress={ data: 0 };
+            newState.progress = 0;
             return newState;
         }
         case 'PROGRESS_UPDATE': {
