@@ -28,7 +28,7 @@ import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import { CeremonyProgress } from './ProgressPanel';
 import { useSelectionContext } from '../state/SelectionContext';
 
-const allowReset = true; // if true, the 'Options' panel is available
+const allowOptions = true; // if true, the 'Options' panel is available
 
 interface ScrollProps {
   children: React.ReactElement;
@@ -139,7 +139,7 @@ const MainMenu = (props: MainMenuProps) => {
             onClick={ enableLogout ? props.logout : undefined } 
             style={{ color: (enableLogout ? textColor : subtleText) }} />
         </StyledMenuItem>
-        {allowReset ? (
+        {allowOptions ? (
           <StyledMenuItem>
             <ListItemText primary="Options" onClick={toggleOptions} style={{ color: textColor }} />
           </StyledMenuItem>
@@ -149,12 +149,20 @@ const MainMenu = (props: MainMenuProps) => {
           (<StyledMenuItem>
             <ListItemText primary="New Circuit" onClick={newCircuit} style={{ color: textColor }}/>
           </StyledMenuItem>) 
-          : (<></>)
+          : (<div></div>)
         }
       </StyledMenu>
       <Options open={openOptions} close={toggleOptions} />
     </span>
   );
+};
+
+const LoginDetails = () => {
+  const auth = useContext(AuthStateContext);
+
+  const userName = auth.isLoggedIn ? auth.authUser.displayName : 'Connect';
+
+  return (<span style={{ color: textColor }}>{userName}</span>);
 };
 
 export default function ButtonAppBar() {
@@ -220,6 +228,7 @@ export default function ButtonAppBar() {
                 />
               </div> 
             : (<></>)}
+            <LoginDetails />
           </Toolbar>
         </AppBar>
       </ElevationScroll>

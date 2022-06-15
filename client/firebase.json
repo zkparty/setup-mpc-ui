@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "trustedsetup",
     "public": "build",
     "ignore": [
       "firebase.json",
@@ -28,7 +29,7 @@
     }
   },
   "firestore": {
-    "rules": "firestore.rules",
+    "rules": "tests/firestore.rules",
     "indexes": "firestore.indexes.json"
   }
 }

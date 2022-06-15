@@ -2,7 +2,7 @@ import { Ceremony, CeremonyEvent, CeremonyState,
   Contribution, ContributionState, ContributionSummary, 
   Participant, ParticipantState, Project } from '../types/ceremony';
 import firebase from 'firebase/app';
-import "firebase/firestore";
+import firestore from "firebase/firestore";
 import { jsonToCeremony, jsonToContribution } from './ZKPartyApi';
 
 const COMPLETE = "COMPLETE";
@@ -13,6 +13,11 @@ const PRESELECTION = "PRESELECTION";
 const VERIFIED = "VERIFIED";
 const VERIFY_FAILED = "VERIFY_FAILED";
 const ABORTED = "ABORTED";
+
+enum ComputeMode { 
+  ZKEY,
+  POWERSOFTAU,
+};
 
 const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
   toFirestore: (c: Partial<Ceremony>) => {
@@ -34,7 +39,8 @@ const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
         ceremonyData = {...ceremonyData, endTime: end};
       }
     } catch (err) {
-      console.error(`Unexpected error parsing dates: ${err.message}`);
+      if (err instanceof Error) 
+        console.error(`Unexpected error parsing dates: ${err.message}`);
     };
     return {
       ...ceremonyData,
@@ -44,7 +50,11 @@ const ceremonyConverter: firebase.firestore.FirestoreDataConverter<Ceremony> = {
   fromFirestore: (
     snapshot: firebase.firestore.QueryDocumentSnapshot,
     options: firebase.firestore.SnapshotOptions): Ceremony => {
-    return jsonToCeremony({id: snapshot.id, ...snapshot.data(options)});
+    return jsonToCeremony({
+      mode: ComputeMode.POWERSOFTAU,
+      ...snapshot.data(options),
+      id: snapshot.id
+    });
   }
 }
 
@@ -112,7 +122,7 @@ export async function updateCeremony(circuit: Ceremony): Promise<void> {
 
     console.debug(`ceremony ${circuit.id} updated`);
   } catch (e) {
-    console.error(`ceremony update failed: ${e.message}`);
+    if (e instanceof Error) console.error(`ceremony update failed: ${e.message}`);
     throw new Error(`error updating ceremony data: ${e}`);
   }
 };
@@ -147,7 +157,7 @@ export const getCeremonies = async (project: string): Promise<Ceremony[]> => {
         .withConverter(ceremonyConverter)
         .get();
       const c: Ceremony | undefined = cctSnap.data();
-      if (c && c.ceremonyState === RUNNING) {
+      if (c && (c.ceremonyState in {RUNNING, PRESELECTION})) {
         return c;
       } else {
         return null;
@@ -156,7 +166,7 @@ export const getCeremonies = async (project: string): Promise<Ceremony[]> => {
   
   const initCcts: Ceremony[] = [];
   let ccts: Ceremony[] = circuits.reduce((arr, curr) => {
-       if (curr != null) arr.push(curr); return arr; 
+       if (curr != null) arr.push({...curr, isCompleted: false}); return arr; 
      }, initCcts);
   
   // Sort by sequence
@@ -176,7 +186,7 @@ export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference
     .withConverter(contributionConverter);
 
   let query = await contribQuery
-    .where('status', '==', 'COMPLETE')
+    .where('status', '==', COMPLETE)
     .get();
   const complete = query.size;
   query.forEach(snap => {
@@ -189,7 +199,7 @@ export const getCeremonyCount = async (ref: firebase.firestore.DocumentReference
   });
 
   query = await contribQuery  
-    .where('status', '==', 'WAITING')
+    .where('status', '==', WAITING)
     .get();
   const waiting = query.size;
   console.debug(`complete ${ref.id} ${complete}`);
@@ -222,7 +232,7 @@ export const addCeremonyEvent = async (ceremonyId: string, event: CeremonyEvent)
         await doc.set(event);
         console.log(`added event ${doc.id}`);
     } catch (e) { 
-      console.warn(`Error adding event: ${e.message}`);
+      if (e instanceof Error) console.warn(`Error adding event: ${e.message}`);
       //throw new Error(`Error adding event: ${e.message}`);
     }
 };
@@ -267,7 +277,7 @@ export const circuitEventListener = async (callback: (e: any) => void): Promise<
       var event = docSnapshot.doc.data();
       const ceremony = docSnapshot.doc.ref.parent.parent;
       //console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
-      if (event.eventType === 'VERIFIED') {
+      if (event.eventType === VERIFIED) {
         callback(ceremony);
       }
     });
@@ -305,7 +315,7 @@ export const ceremonyListener = async (project: string, callback: (c: Ceremony) 
     });
 };
 
-// Listens for updates to a ceremony
+// Listens for updates to a circuit
 export const ceremonyUpdateListener = async (id: string, callback: (c: Ceremony) => void): Promise<()=>void> => {
   const db = firebase.firestore();
   const ceremonyData = db.collection("ceremonies")
@@ -339,9 +349,9 @@ export const contributionUpdateListener = async (
   // First time, get all docs
   const querySnapshot = await query.get();
   //console.debug(`query snapshot ${querySnapshot.size}`);
-  querySnapshot.docs.forEach(doc => 
+  /* querySnapshot.docs.forEach(doc => 
     callback(doc.data(), 'added')
-  );
+  ); */
 
   return query.onSnapshot(querySnapshot => {
     //console.debug(`contribData snapshot ${querySnapshot.size}`);
@@ -356,11 +366,12 @@ export const contributionUpdateListener = async (
 
 // Listens for updates to eligible ceremonies that a participant may contribute to.
 // The first such ceremony found will be returned in the callback
+// TODO - Maybe obsolete. Can be removed
 export const ceremonyContributionListener = (participantId: string, isCoordinator: boolean, callback: (c: ContributionState | boolean) => void): () => void => {
 
   const setContribution = async (ceremony: Ceremony, contrib: Contribution): Promise<void> => {
     // Save the contribution record
-    await addOrUpdateContribution(ceremony.id, contrib);
+    await updateContribution(ceremony.id, contrib);
 
     const cs = await getContributionState(
       ceremony,
@@ -393,7 +404,7 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
           timeAdded: new Date(),            
         }
         // Allocate a position in the queue
-        contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
+        contribution.queueIndex = await getNextQueueIndex(ceremonyId);
 
         await setContribution(ceremony, contribution);
         return true;
@@ -423,6 +434,8 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
     .withConverter(ceremonyConverter)
     .where('ceremonyState', 'in', states)
     .orderBy('sequence', 'asc');
+  
+  console.debug(`after query`);
 
   let found = false;
   let promises: Promise<boolean>[] = [];
@@ -448,7 +461,7 @@ export const ceremonyContributionListener = (participantId: string, isCoordinato
 };
 
 // Join this circuit. 
-export const joinCircuit = async (ceremonyId: string, participantId: string) => {
+export const joinCircuit = async (ceremonyId: string, participantId: string): Promise<ContributionState | undefined> => {
   const db = firebase.firestore();
 
   const ceremonySnapshot = await db.collection('ceremonies')
@@ -470,19 +483,26 @@ export const joinCircuit = async (ceremonyId: string, participantId: string) => 
 
   if (contSnapshot.empty) {
     // No prior entries for this participant
-    console.debug(`ceremony ${ceremonyId}: new participant`);
-    // We have a ceremony to contribute to
+    console.debug(`circuit ${ceremonyId}: new participant`);
+    // We have a circuit to contribute to
     let contribution: Contribution = {
       participantId,
       status: WAITING,
       lastSeen: new Date(),
       timeAdded: new Date(),            
     }
+
     // Allocate a position in the queue
-    contribution.queueIndex = await getNextQueueIndex(ceremonyId, participantId);
+    contribution.queueIndex = await getNextQueueIndex(ceremonyId);
+    console.log(`got next queue index ${contribution.queueIndex}`);
 
-    return setContribution(ceremony, contribution);
-
+    if (ceremony) {
+      insertContribution(ceremony.id, contribution);
+      return getContributionState(
+        ceremony,
+        contribution
+      );
+    }
   } else {
     const contrib = contSnapshot.docs[0].data();
     if ((contrib.status === WAITING || contrib.status === RUNNING) ) {
@@ -490,8 +510,12 @@ export const joinCircuit = async (ceremonyId: string, participantId: string) => 
       console.log(`Reusing contrib ${contrib.queueIndex}`);
       contrib.lastSeen = new Date();
       contrib.status = WAITING;
-      return setContribution(ceremony, contrib);
-    } else {
+      await updateContribution(ceremony.id, contrib);
+      return getContributionState(
+        ceremony,
+        contrib
+      );
+  } else {
       // Either COMPLETE or INVALIDATED - skip this circuit
       console.log(`Participant has already attempted ${ceremonyId}`);
       return undefined;
@@ -501,7 +525,8 @@ export const joinCircuit = async (ceremonyId: string, participantId: string) => 
 
 const setContribution = async (ceremony: Ceremony, contrib: Contribution): Promise<ContributionState> => {
   // Save the contribution record
-  await addOrUpdateContribution(ceremony.id, contrib);
+  console.log(`ceremony.id ${ceremony.id}`);
+  await updateContribution(ceremony.id, contrib);
 
   return getContributionState(
     ceremony,
@@ -509,21 +534,35 @@ const setContribution = async (ceremony: Ceremony, contrib: Contribution): Promi
   );
 };
 
-export const getNextQueueIndex = async (ceremonyId: string, participantId: string): Promise<number> => {
-  const db = firebase.firestore();
-  const query = db.collection("ceremonies")
-    .doc(ceremonyId)
-    .collection('contributions')
-    .withConverter(contributionConverter)
-    .orderBy('queueIndex', 'desc');
-  
-  const snapshot = await query.get();
-  if (snapshot.empty) {
-    return 1;
-  } else {
-    const cont = snapshot.docs[0].data();
-    return cont.queueIndex ? cont.queueIndex + 1 : 1;
-  }
+const addContribution = async (ceremony: Ceremony, contrib: Contribution): Promise<ContributionState> => {
+  // Save the contribution record
+  console.log(`ceremony.id ${ceremony.id}`);
+  await updateContribution(ceremony.id, contrib);
+
+  return getContributionState(
+    ceremony,
+    contrib
+  );
+};
+
+export const getNextQueueIndex = async (ceremonyId: string): Promise<number> => {
+  let db = firebase.firestore();
+  return db.runTransaction(transaction => {
+    const query = db.collection("ceremonies")
+      .doc(ceremonyId)
+      .withConverter(ceremonyConverter);
+
+    return transaction.get(query).then(async doc => {
+      if (doc.exists) {
+        const nextIndex: number = (doc.get("highestQueueIndex") || 0) + 1;
+        await transaction.update(query, {highestQueueIndex: nextIndex});
+        return nextIndex;
+      } else {
+        throw new Error (`Error updating queue index. Circuit not found`);
+      }
+    });    
+  });
+
 };
 
 export const getContributionState = async (ceremony: Ceremony, contribution: Contribution): Promise<ContributionState> => {
@@ -664,9 +703,9 @@ export const ceremonyQueueListener = async (ceremonyId: string, callback: (c: an
   });
 };
 
-export const addOrUpdateContribution = async (ceremonyId: string, contribution: Contribution) => {
+export const updateContribution = async (ceremonyId: string, contribution: Contribution) => {
   if (!contribution.queueIndex) {
-    throw new Error(`Attempting to add or update contribution without queueIndex`);
+    throw new Error(`Attempting to update contribution without queueIndex`);
   }
   const db = firebase.firestore();
   try {
@@ -678,17 +717,7 @@ export const addOrUpdateContribution = async (ceremonyId: string, contribution: 
       .where('queueIndex', '==', contribution.queueIndex)
       .limit(1);
     const contrib = await indexQuery.get();
-    if (contrib.empty) {
-      // New contributor
-      const doc = await db
-          .doc(`ceremonies/${ceremonyId}`)
-          .collection("contributions")
-          .withConverter(contributionConverter)
-          .doc();
-      
-      await doc.set(contribution);
-      console.log(`added contribution summary ${doc.id} for index ${contribution.queueIndex}`);
-    } else {
+    if (!contrib.empty) {
       // Update existing contribution
       const doc = contrib.docs[0];
       const oldStatus = doc.get('status');
@@ -698,10 +727,35 @@ export const addOrUpdateContribution = async (ceremonyId: string, contribution: 
       } else {
         await doc.ref.update(contribution);
       }
+    } else {
+      throw new Error(`Attempting to update contribution, but it it wasn't found`);
     }
-  } catch (e) { throw new Error(`Error adding/updating contribution summary: ${e.message}`);}
+  } catch (e) { 
+    throw new Error(`Error adding/updating contribution summary: ${(e instanceof Error) ? e.message : ''}`);
+  }
 
 };
+
+export const insertContribution = async (ceremonyId: string, contribution: Contribution) => {
+  const db = firebase.firestore();
+  if (!contribution.queueIndex) {
+    throw new Error(`Attempting to add contribution without queueIndex`);
+  }
+  try {
+      // New contributor
+      const doc = db
+          .doc(`ceremonies/${ceremonyId}`)
+          .collection("contributions")
+          .doc();
+
+      doc.set(contribution);
+      console.log(`added contribution summary ${doc.id} for index ${contribution.queueIndex}`);
+  } catch (e) { 
+    throw new Error(`Error adding contribution summary: ${(e instanceof Error) ? e.message: ''}`);
+  }
+
+};
+
 
 export const addOrUpdateParticipant = async (participant: Participant) => {
   const db = firebase.firestore();
@@ -714,6 +768,7 @@ export const addOrUpdateParticipant = async (participant: Participant) => {
     await doc.set(participant);
     console.debug(`updated participant ${doc.id}`);
   } catch (e) {
+    if (e instanceof Error)
      console.warn(`Error trying to update participant ${e.message}`);
   }
 
@@ -736,7 +791,8 @@ const  getParticipantContributionsSnapshot = async (project: Project, participan
       });
     // Return the filtered set
     return projectContribs;
-  } catch (e) { throw new Error(`Error getting contributions: ${e.message}`);}
+  } catch (e) { 
+      throw new Error(`Error getting contributions: ${(e instanceof Error) ? e.message : ''}`);}
 }
 
 export const getParticipantContributions = async (project: Project, participant: string, isCoordinator: boolean = false): Promise<any[]> => {
@@ -784,7 +840,8 @@ export const resetContributions = async (participant: string): Promise<void> => 
       count ++;
     });
     console.log(`Reset ${count} contributions`);
-  } catch (e) { throw new Error(`Error resetting contribution: ${e.message}`);}
+  } catch (e) { 
+    throw new Error(`Error resetting contribution: ${(e instanceof Error) ? e.message : ''}`);}
 }
 
 export const getUserStatus = async (userId: string, project: string): Promise<string> => {
@@ -802,7 +859,8 @@ export const getUserStatus = async (userId: string, project: string): Promise<st
       status = 'COORDINATOR'
     }
   } catch (err) {
-    console.warn(`Error getting user status: ${err.message}`);
+    if (err instanceof Error)
+      console.warn(`Error getting user status: ${err.message}`);
   }
 
   // if (status === 'USER' && userId.signature) {
@@ -821,7 +879,8 @@ export const getSiteSettings = async (): Promise<firebase.firestore.DocumentData
     
     return snapshot.data();
   } catch (err) {
-    console.warn(`Error getting site settings: ${err.message}`);
+    if (err instanceof Error)
+      console.warn(`Error getting site settings: ${err.message}`);
   }
 }
 
@@ -849,7 +908,8 @@ export const getProject = async (project: string): Promise<Project | undefined> 
     return proj;
 
   } catch (err) {
-    console.warn(`Error getting project settings: ${err.message}`);
+    if (err instanceof Error)
+      console.warn(`Error getting project settings: ${err.message}`);
   }
 }
 

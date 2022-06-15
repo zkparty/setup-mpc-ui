@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { resetContrib } = require('./FirebaseApi');
+const { resetContrib } = require('../FirebaseApi');
 
 const run = () => {
 

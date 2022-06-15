@@ -72,6 +72,8 @@ onmessage = (event) =>  {
   if (event.data && event.data.type === 'LOAD_PARAMS') {
     console.log(`LOAD_PARAMS in service-worker`);
 
+
+    
     //const wasm = import('phase2');
     //setWasm(wasm);
   };

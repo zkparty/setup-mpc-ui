@@ -5,7 +5,7 @@
     "noImplicitAny": true,
     "module": "esnext",
     "target": "es6",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "esModuleInterop": true,
     "lib": [
       "dom",
@@ -21,9 +21,11 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "declaration": true,
+    "useUnknownInCatchVariables": false
   },
   "include": [
-    "src",
-    "public/worker.js" ]
+    "src"
+  ]
 }

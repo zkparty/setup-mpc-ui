@@ -107,7 +107,8 @@ const tryDate = (d: firebase.firestore.Timestamp | undefined, defaultResult?: Da
   try {
     return d.toDate();
   } catch (e) {
-    console.warn(`error converting firebase date ${e.message}`);
+    if (e instanceof Error)
+      console.warn(`error converting firebase date ${e.message}`);
     return defaultResult;
   }
 }
@@ -124,9 +125,6 @@ export function jsonToCeremony(json: any): Ceremony {
     ...rest
   } = json;
 
-  //const start: firebase.firestore.Timestamp = startTime;
-  //console.log(`start time ${start ? start.toDate().toLocaleDateString() : '-'}`);
-
   try {
     let c = 
     {
@@ -137,7 +135,8 @@ export function jsonToCeremony(json: any): Ceremony {
     };
     return c;
   } catch (e) { 
-    console.warn(`Error converting ceremony: ${e.message}`);
+    if (e instanceof Error)
+      console.warn(`Error converting ceremony: ${e.message}`);
     throw e;
   }
 }
@@ -148,6 +147,7 @@ export const jsonToContribution = (json: any): Contribution => {
       ...json
     }
   } catch (err) {
+    if (err instanceof Error)
     console.error(`Error converting contrib: ${err.message}`);
     throw err;
   }
@@ -214,7 +214,8 @@ export const createSummaryGist = async (settings: any, userContributions: any[],
   } else {
     try {
       await navigator.clipboard.writeText(content);
-    } catch (err) {console.warn(`Error copying to clipboard ${err.message}`)}
+    } catch (err) {
+      if (err instanceof Error) console.warn(`Error copying to clipboard ${err.message}`)}
   }
   return null;
 }

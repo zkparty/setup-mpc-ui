@@ -4,9 +4,10 @@ import {
   accentColor,
   textColor,
 } from "../styles";
+import env from '../env';
 
 const LandingPageTitle = styled.div`
-  font-family: Shrikhand;
+  font-family: Luckiest Guy;
   font-size: 24px;
   font-weight: normal;
   text-transform: lowercase;
@@ -16,7 +17,7 @@ const LandingPageTitle = styled.div`
   flex: 1;
 `;
 
-const TITLE_TEXT = "zkopru";
+const TITLE_TEXT = env.projectName;
 
 interface TitleProps {
   title?: string;

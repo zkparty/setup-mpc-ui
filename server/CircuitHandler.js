@@ -109,7 +109,7 @@ const getCircuitSettings = async (projectId, circuitId) => {
 const uploadToSite = async (project, circuit, localFile, fileName) => {
     //const settings = await getCircuitSettings(project.id, circuitId);
     const { siteBucketName } = project;
-    const { zkeyPrefix, siteFolder } = circuit;
+    const { siteFolder } = circuit;
 
     //const storage = firebase.storage();
     const pubSiteUrl = `${fbSkey.project_id}.appspot.com`;
@@ -160,12 +160,14 @@ async function prepareCircuit(ceremonyId) {
         addStatusUpdateEvent(ceremonyId, `Circuit file parsed. The circuit has ${numConstraints} constraints. It will require 2**${powers} powers of tau.`);
         console.log('Ceremony updated');
 
+        const { zkeyPrefix } = await getFBCeremony(ceremonyId);
+
         // Prepare zkey file
         try {
             const potPath = await getPoTPath(powers);
 
             // Have PoT & r1cs files. Now make the zkey file.
-            const initZkey = zkeyFileNameFromIndex(0);
+            const initZkey = zkeyFileNameFromIndex(zkeyPrefix, 0);
             const zkeyFile = localFilePath( initZkey, true, ceremonyId);
             await snarkjs.zKey.newZKey(r1csFile, potPath, zkeyFile, consoleLogger);
             console.log(`Zkey file generated: ${zkeyFile}`);
@@ -191,98 +193,112 @@ async function prepareCircuit(ceremonyId) {
 };
 
 async function verifyContribution(ceremonyId, index) {
+    const MIN_INDEX = 1;
     console.debug(`Verify contrib ${ceremonyId} index ${index}`);
-    try {
-        const ceremony = await getFBCeremony(ceremonyId);
-        const contrib = await getContribution(ceremonyId, index);
-
-        // Download params
-        let newZkeyFile;
-        newZkeyFile = await downloadZkey( ceremonyId, index );
-
-        if (newZkeyFile) {
-            // Verify
-            const initFile = localFilePath(zkeyFileNameFromIndex(0), true, ceremonyId);
-            const powers = ceremony.powersNeeded;
-            const potFile = await getPoTPath(powers);
-            await getLogLock();
-            console.debug(`Init file ${initFile}\nPoT ${potFile}`);
-            logCatcher = [];
-            const verified = await snarkjs.zKey.verifyFromInit(initFile, potFile, newZkeyFile, catchLogger);
-            console.log(`Contribution ${index} was${verified ? '' : ' not'} verified`);
-
-            if (!verified) {
-                // Invalidate the contribution.
-
-                // Add event to notify failure
-                addContributionEvent(
-                    ceremonyId, 
-                    index,
-                    'VERIFY_FAILED',
-                    `Contribution failed to be verified.`
-                );
-                updateContribution(ceremonyId, { queueIndex: index, status: "INVALIDATED" });
-            }
-
-            // Save verification log
-            const ceremonyName = ceremony.title;
-            let verificationLog = `Verification transcript for ${ceremonyName} phase 2 contribution.\nContributor number ${index}\n`;
-            logCatcher.forEach(m => {
-                verificationLog += m + '\n';
-            });
-            clearLogLock();
-            // Save to firestore contribution record
-            let verifFile;
-            let ok = verified;
-            if (verified) {
-                await addVerificationToContribution(ceremonyId, index, verificationLog);
-
-                // Save to local file
-                verifFile = localFilePath(`verification_${index}.txt`, true, ceremonyId);
-                fs.writeFile(verifFile, verificationLog, err => {
-                    if (err) {
-                        console.err(`Error writing verification record: ${err.message}`);
-                        ok = false;
-                    }
-                });
-            }
-            
-            if (ok) {
-                console.log(`Verification log written to ${verifFile}`);
-                // Add event
-                addContributionEvent(
-                    ceremonyId, 
-                    index,
-                    'VERIFIED',
-                    `Contribution verified. Log saved to ${verifFile}`
-                );
-                
-                const project = await getProjectForCircuit(ceremonyId);
-                console.debug(`project: ${JSON.stringify(project)}`);
-                const { zkeyPrefix } = ceremony;
-                const { participantAuthId } = contrib;
-                const userName = participantAuthId || 'anonymous';
-                // Send zkey file to cloud site
-                const siteFile = siteFileName(zkeyPrefix, index, userName);
-                const verifFileName = siteFileName(zkeyPrefix, index, userName, true);
-                await uploadToSite(project, ceremony, newZkeyFile, siteFile);
-                // Send verification log to cloud site
-                await uploadToSite(project, ceremony, verifFile, verifFileName);
-                // update circuit's index.html and upload it
-                await updateAndUploadIndex(ceremony, contrib, project, siteFile, verifFileName);
-            }
-        }
-    } catch (err) {
-        console.warn(`Error while verifying: ${err.message}`);
+    // Sanity check. Reset for new ceremonies. See issue #5
+    if (index < MIN_INDEX) {
+        // Add event to notify failure
         addContributionEvent(
             ceremonyId, 
             index,
             'VERIFY_FAILED',
-            `Error caught while verifying. ${err.message}`
+            `Index too low`
         );
-        updateContribution(ceremonyId, { queueIndex: index, status: "INVALIDATED" });
+        updateContribution(ceremonyId, { queueIndex: index, status: "INVALIDATED" });        
         clearLogLock();
-    } 
+    } else {
+        try {
+            const ceremony = await getFBCeremony(ceremonyId);
+            const contrib = await getContribution(ceremonyId, index);
+
+            // Download params
+            let newZkeyFile;
+            newZkeyFile = await downloadZkey( ceremonyId, ceremony.zkeyPrefix, index );
+
+            if (newZkeyFile) {
+                // Verify
+                const initFile = localFilePath(zkeyFileNameFromIndex(ceremony.zkeyPrefix, 0), true, ceremonyId);
+                const powers = ceremony.powersNeeded;
+                const potFile = await getPoTPath(powers);
+                await getLogLock();
+                console.debug(`Init file ${initFile}\nPoT ${potFile}`);
+                logCatcher = [];
+                const verified = await snarkjs.zKey.verifyFromInit(initFile, potFile, newZkeyFile, catchLogger);
+                console.log(`Contribution ${index} was${verified ? '' : ' not'} verified`);
+
+                if (!verified) {
+                    // Invalidate the contribution.
+
+                    // Add event to notify failure
+                    addContributionEvent(
+                        ceremonyId, 
+                        index,
+                        'VERIFY_FAILED',
+                        `Contribution failed to be verified.`
+                    );
+                    updateContribution(ceremonyId, { queueIndex: index, status: "INVALIDATED" });
+                }
+
+                // Save verification log
+                const ceremonyName = ceremony.title;
+                let verificationLog = `Verification transcript for ${ceremonyName} phase 2 contribution.\nContributor number ${index}\n`;
+                logCatcher.forEach(m => {
+                    verificationLog += m + '\n';
+                });
+                clearLogLock();
+                // Save to firestore contribution record
+                let verifFile;
+                let ok = verified;
+                if (verified) {
+                    await addVerificationToContribution(ceremonyId, index, verificationLog);
+
+                    // Save to local file
+                    verifFile = localFilePath(`verification_${index}.txt`, true, ceremonyId);
+                    fs.writeFile(verifFile, verificationLog, err => {
+                        if (err) {
+                            console.err(`Error writing verification record: ${err.message}`);
+                            ok = false;
+                        }
+                    });
+                }
+                
+                if (ok) {
+                    console.log(`Verification log written to ${verifFile}`);
+                    // Add event
+                    addContributionEvent(
+                        ceremonyId, 
+                        index,
+                        'VERIFIED',
+                        `Contribution verified. Log saved to ${verifFile}`
+                    );
+                    
+                    const project = await getProjectForCircuit(ceremonyId);
+                    console.debug(`project: ${JSON.stringify(project)}`);
+                    const { zkeyPrefix } = ceremony;
+                    const { participantAuthId } = contrib;
+                    const userName = participantAuthId || 'anonymous';
+                    // Send zkey file to cloud site
+                    const siteFile = siteFileName(zkeyPrefix, index, userName);
+                    const verifFileName = siteFileName(zkeyPrefix, index, userName, true);
+                    await uploadToSite(project, ceremony, newZkeyFile, siteFile);
+                    // Send verification log to cloud site
+                    await uploadToSite(project, ceremony, verifFile, verifFileName);
+                    // update circuit's index.html and upload it
+                    await updateAndUploadIndex(ceremony, contrib, project, siteFile, verifFileName);
+                }
+            }
+        } catch (err) {
+            console.warn(`Error while verifying: ${err.message}`);
+            addContributionEvent(
+                ceremonyId, 
+                index,
+                'VERIFY_FAILED',
+                `Error caught while verifying. ${err.message}`
+            );
+            updateContribution(ceremonyId, { queueIndex: index, status: "INVALIDATED" });
+            clearLogLock();
+        } 
+    }
 };
 
 // Get powers of tau file and return its local path.
@@ -306,7 +322,7 @@ const getPoTPath = async (powers) => {
                 );
                 // TODO - put these status messages in a status field on the FB ceremony doc
                 if (!potFileLocal) reject(`Couldn't find or download download PoT file`);
-                addStatusUpdateEvent(ceremonyId, `Powers-of-tau file is available: ${potFileLocal}`);
+                //addStatusUpdateEvent(ceremonyId, `Powers-of-tau file is available: ${potFileLocal}`);
                 resolve(potFileLocal);
             } else reject(err.message);
 
@@ -314,12 +330,12 @@ const getPoTPath = async (powers) => {
     });
 };
 
-const paramsFileNameFromIndex = (index) => {
-    return `ph2_${formatIndex(index)}.params`;
+const paramsFileNameFromIndex = (cctPrefix, index) => {
+    return `${cctPrefix}_${formatIndex(index)}.params`;
 }
 
-const zkeyFileNameFromIndex = (index) => {
-    return `ph2_${formatIndex(index)}.zkey`;
+const zkeyFileNameFromIndex = (cctPrefix, index) => {
+    return `${cctPrefix}_${formatIndex(index)}.zkey`;
 }
 
 const siteFileName = (cctPrefix, index, user, isVerification = false) => {
@@ -332,7 +348,8 @@ const formatIndex = (index) => {
 
 const PLACEHOLDER = '<!--REPLACE-->'
 const contribHtml = (contribNo, user, zkey, verification) => {
-    return `<td>${contribNo}</td>
+    return `<tr>
+    <td>${contribNo}</td>
     <td>${user}</td>
     <td><a href="./${zkey}">download</a></td>
     <td><a href="./${verification}">link</a></td>
@@ -372,9 +389,9 @@ const localFilePath = (filename, includePrefix=false, ceremonyId='') => {
     return path.join(fullPath, filename);
 }
 
-async function downloadFile(ceremonyId, index, isParams) {
+async function downloadFile(ceremonyId, cctPrefix, index, isParams) {
     console.debug(`downloadFile ${index}`);
-    const p = isParams ? paramsFileNameFromIndex(index) : zkeyFileNameFromIndex(index);
+    const p = isParams ? paramsFileNameFromIndex(cctPrefix, index) : zkeyFileNameFromIndex(cctPrefix, index);
     console.log(`file is ${p}`);
 
     return checkAndDownloadFromStorage(
@@ -384,12 +401,12 @@ async function downloadFile(ceremonyId, index, isParams) {
     );
 };
 
-async function downloadParams(ceremonyId, index) {
-    return downloadFile(ceremonyId, index, true);
+async function downloadParams(ceremonyId, cctPrefix, index) {
+    return downloadFile(ceremonyId, cctPrefix, index, true);
 };
 
-async function downloadZkey(ceremonyId, index) {
-    return downloadFile(ceremonyId, index, false);
+async function downloadZkey(ceremonyId, cctPrefix, index) {
+    return downloadFile(ceremonyId, cctPrefix, index, false);
 };
 
 module.exports = {

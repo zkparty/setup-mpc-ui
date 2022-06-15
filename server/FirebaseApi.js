@@ -466,7 +466,9 @@ const resetContrib = async (circuitId, participantId, idx) => {
   }
 }
 
-const getVerifiedContribs = async () => {
+const getContributions = async (getVerified = true) => {
+  // getVerified: if true, only verified contribs will be included, otherwise
+  // all contribs will be returned.
   //const db = firebase.firestore();
 
   const cctQuery = await db.collection('ceremonies')
@@ -484,9 +486,12 @@ const getVerifiedContribs = async () => {
       //const cct = cctDoc.data();
       const cctNo = cctDoc.get('sequence');
       const cctId = cctDoc.id;
-      const contribQuery = await cctDoc.ref.collection('contributions')
-        .withConverter(contributionConverter)
-        .where('status', '==', 'COMPLETE')
+      const contribRef = await cctDoc.ref.collection('contributions')
+        .withConverter(contributionConverter);
+      let contribQuery = getVerified ? contribRef.where('status', '==', 'COMPLETE') :
+          contribRef;
+
+      contribQuery = await contribQuery
         .orderBy('queueIndex')
         .get();
       
@@ -499,6 +504,8 @@ const getVerifiedContribs = async () => {
           userId: doc.get('participantId'),
           duration: doc.get('duration'),
           timeCompleted: doc.get('timeCompleted'),
+          timeAdded: doc.get('timeAdded'),
+          status: doc.get('status'),
         });
       });
       resolve({
@@ -510,6 +517,11 @@ const getVerifiedContribs = async () => {
   }
   
   return Promise.all(circuits);  
+}
+
+// Return User object
+const getUserById = async (uid) => {
+  return admin.auth().getUser(uid);
 }
 
 module.exports = {
@@ -528,7 +540,8 @@ module.exports = {
   addVerificationToContribution,
   updateContribution,
   resetContrib,
-  getVerifiedContribs,
+  getContributions,
   getProjectForCircuit,
   getFBProject,
+  getUserById,
 };

@@ -7,7 +7,6 @@ import {
 } from "../styles";
 import { ComputeDispatchContext } from '../state/ComputeStateManager';
 
-
 const Acknowledge = ({ contribute }: { contribute: () => void}) =>
   (<div style={{ display: 'grid', marginTop: '78px' }}>
     <AuthButton onClick={contribute}>
@@ -38,9 +37,12 @@ export default function WelcomePanel(props: any) {
           </SubtleBody>
           <Acknowledge contribute={handleClick} />
           <div style={{ height: '41px' }} />
-          <SubtleBody style={{ textAlign: 'center', color: '#aa0000' }}>
+          {
+            /*<SubtleBody style={{ textAlign: 'center', color: '#aa0000' }}>
             {`Please note: Zkopru has no token and there won't be an airdrop to trusted setup participants`}
-          </SubtleBody>
+            </SubtleBody>
+          */
+          }
         </div>
       ) : (
         <SubtleBody style={{ textAlign: 'center' }}>

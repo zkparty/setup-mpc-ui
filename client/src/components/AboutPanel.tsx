@@ -6,19 +6,21 @@ import { AuthStateContext } from '../state/AuthContext';
 import { accentColor, darkerBackground, inverseText, lighterBackground, NormalBodyText, PanelTitle, StyledButton, SubtleBody, subtleText, AuthButton, AuthButtonText } from '../styles';
 import About from './About';
 import ViewLog from './ViewLog';
+import { ComputeStateContext } from '../state/ComputeStateManager';
 
-const project = 'zkopru';
+import env from '../env';
 
 export default function AboutPanel(props: any) {
   const [modalOpen, setModalOpen] = useState(false);
   const authState = useContext(AuthStateContext);
-  //const [modalContent, setModalContent] = useState('');
+  const computeState = useContext(ComputeStateContext);
 
   const closeModal = () => {setModalOpen(false)};
   const openModal = () => {
-    //setModalContent(`about zkopru ...`);
     setModalOpen(true);
   }
+
+  const { project } = computeState;
 
   const leftPanel = (
     <div style={{
@@ -28,16 +30,18 @@ export default function AboutPanel(props: any) {
       marginBottom: '50px',
       marginRight: '8xp',
     }}>
-      <PanelTitle>{`about ${project}`}</PanelTitle>
-      <SubtleBody>
-        [zk-optimistic-rollup]
-      </SubtleBody>
+      <PanelTitle>{`about ${project?.shortName || env.projectName}`}</PanelTitle>
+      {/*<SubtleBody>
+      //  [zk-optimistic-rollup]
+      //</SubtleBody>
       <div style={{ height: '121px' }} />
       <NormalBodyText style={{ wordWrap: 'break-word', marginBottom: '40px', maxWidth: '424px' }}>
         Zkopru is a novel layer-2 scaling solution that
         supports private transfers and private atomic
         swaps between ETH, ERC20, ERC721 at a low cost.
       </NormalBodyText>
+      */
+      }
       <div style={{ display: 'flex' }}>
         <AuthButton
           onClick={openModal}
@@ -93,7 +97,7 @@ export default function AboutPanel(props: any) {
       open={modalOpen}
       close={closeModal}
       content={(<About isParticipant={authState.isLoggedIn} />)}
-      title={`About the zkopru trusted setup`} />
+      title={`About the ${project?.shortName || env.projectName} trusted setup`} />
   :
     (<></>);
 
@@ -101,7 +105,7 @@ export default function AboutPanel(props: any) {
     <div style={{ display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
       {leftPanel}
       <div style={{ flex: 1, height: '1px', minWidth: '0px', maxWidth: '264px' }} />
-      {featuresPanel}
+      {/*featuresPanel*/}
       {aboutModal}
     </div>
   );

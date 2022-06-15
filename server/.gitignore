@@ -3,3 +3,4 @@ dist
 .cache
 firebase_skey*.json
 .env
+*.txt

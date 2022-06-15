@@ -4,13 +4,13 @@ import { Ceremony, Project } from "../types/ceremony";
 
 import { Dispatch } from "react";
 import { getParticipantContributions } from '../api/FirestoreApi';
-import { zKey } from 'snarkjs';
+//import { zKey, powersOfTau } from 'snarkjs';
 
-export const startDownload = (ceremonyId: string, index: number, dispatch: Dispatch<any>) => {
+export const startDownload = (ceremonyId: string, index: number, prefix: string, suffix: string, dispatch: Dispatch<any>) => {
     // DATA DOWNLOAD
     console.debug(`getting data ${ceremonyId} ${index}`);
     const progressCb = (progress: number) => dispatch({type: 'PROGRESS_UPDATE', data: progress})
-    getParamsFile(ceremonyId, index, progressCb).then( paramData => {
+    getParamsFile(ceremonyId, index, prefix, suffix, progressCb).then( paramData => {
         //setTimeout(() => {
             console.debug(`downloaded ${paramData?.length}`);
             dispatch({
@@ -26,7 +26,13 @@ export const startDownload = (ceremonyId: string, index: number, dispatch: Dispa
          dispatch({type: 'ABORT_CIRCUIT', data: err.message, dispatch});
     });
 };
+enum ComputeMode { 
+    ZKEY,
+    POWERSOFTAU,
+  };
+  
 
+const PROGRESS_UPDATE = 'PROGRESS_UPDATE';
 export const startComputation = (params: Uint8Array, entropy: Uint8Array, participant: string, 
     dispatch: Dispatch<any>, worker: Worker) => {
 
@@ -34,13 +40,21 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, partic
         progressCallback: (val: number, total: number) => {
             //console.debug(`compute progress = ${val} of ${total}`);
             dispatch({
-                type: 'PROGRESS_UPDATE',
+                type: PROGRESS_UPDATE,
                 data: total > 0 ? 100 * val / total : 0,
             })
         }
     }
     const inputFd = { type: 'mem', data: params }; 
     let outFd =  { type: 'mem', data: new Uint8Array() }; 
+
+    const handleResult = (hash: any) => {
+        console.log(`contribution hash: ${JSON.stringify(hash)}`);
+        dispatch({type: 'SET_HASH', hash});
+        const result = outFd.data;
+        console.debug(`COMPLETE ${result.length}`);
+        dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
+    }
 
     try {
         console.log(`params ${params.buffer.byteLength} ${entropy.buffer.byteLength}`);
@@ -66,12 +80,13 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, partic
     }
 };
 
-export const startUpload = (ceremonyId: string, index: number, data: Uint8Array, dispatch: Dispatch<any>) => {
+export const startUpload = (ceremonyId: string, index: number, prefix: string, suffix: string, data: Uint8Array, dispatch: Dispatch<any>) => {
     uploadParams(
         ceremonyId, 
-        index, 
+        index,
+        prefix, suffix, 
         data, 
-        (progress) => dispatch({type: 'PROGRESS_UPDATE', data: progress})
+        (progress) => dispatch({type: PROGRESS_UPDATE, data: progress})
     ).then(
         paramsFile => {
             dispatch({

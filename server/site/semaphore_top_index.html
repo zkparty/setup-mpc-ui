@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>Semaphore Trusted Setup MPC Data</h1>
+<h2>Powers of Tau (Phase 1) Files</h2>
+<a href="../ptau/pot13_final.ptau">pot13_final.ptau</a>
+<br />
+<a href="../ptau/pot14_final.ptau">pot14_final.ptau</a>
+<br />
+
+<h2>Circuits</h2>
+<table>
+<tr>
+    <td width="400px">
+<a href="./semaphore16/index.html">Semaphore 16 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore17/index.html">Semaphore 17 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore18/index.html">Semaphore 18 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore19/index.html">Semaphore 19 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore20/index.html">Semaphore 20 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore21/index.html">Semaphore 21 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore22/index.html">Semaphore 22 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore23/index.html">Semaphore 23 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore24/index.html">Semaphore 24 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore25/index.html">Semaphore 25 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore26/index.html">Semaphore 26 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore27/index.html">Semaphore 27 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore28/index.html">Semaphore 28 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore29/index.html">Semaphore 29 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore30/index.html">Semaphore 30 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore31/index.html">Semaphore 31 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore32/index.html">Semaphore 32 Levels</a>
+    </td>
+</tr>
+<tr>
+    <td width="400px">
+<a href="./semaphore64/index.html">Semaphore 64 Levels</a>
+    </td>
+</tr>
+</table>
+
+<h2>How to verify</h2>
+<p>You can verify any contribution by downloading the required files and 
+using a command line instruction to run the verification</p>
+<ul>Prerequisites
+<li>Node.js, version 12 or higher</li>
+<li>Install snarkjs: <pre>npm install -g snarkjs</pre></li>
+</ul>
+<br />
+<ul>Commands
+<li>Download the Powers-of-Tau file (see circuit page to find which is required)</li>
+<li>Download the contribution zkey file you wish to verify</li>
+<p>then</p>
+<li>Download the circuit's .r1cs file</li>
+<li>Run the verification command: <pre>snarkjs zkv [.r1cs] [.ptau] [.zkey]</pre></li>
+<p>or</p>
+<li>Download the initial zkey file (contribution 0)</li>
+<li>Run the verification command: <pre>snarkjs zkvi [cxx_0000.zkey] [.ptau] [.zkey]</pre></li>
+</ul>
+<p>A successful verification will end with:
+    <pre>[INFO]  snarkJS: ZKey Ok!</pre>
+</p>
+</body>
+</html>
