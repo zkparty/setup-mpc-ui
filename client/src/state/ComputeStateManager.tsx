@@ -3,7 +3,7 @@ import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionS
 
 import { addCeremonyEvent, addOrUpdateContribution, addOrUpdateParticipant, getProject } from "../api/FirestoreApi";
 import { createContext, Dispatch, PropsWithChildren, useContext, useReducer } from "react";
-import { startDownload, startComputation, startUpload, endOfCircuit, getEntropy } from './Compute';
+import { startDownload, startComputation, startUpload, endOfCircuit, getEntropy, startWorkerThread } from './Compute';
 import { AuthStateContext } from './AuthContext';
 
 export enum Step {
@@ -256,7 +256,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             //newState = addMessage(newState, msg);
             newState.computeStatus = {...state.computeStatus, downloaded: true, started: true};
             const userId = state.participant?.authId || 'anonymous';
-            startComputation(action.data, state.entropy, userId , action.dispatch);
+            startComputation(action.data, state.entropy, userId , action.dispatch, state.worker);
             console.debug('running computation......');
             newState.progress={ data: 0 };
             return newState;
@@ -391,7 +391,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'ACKNOWLEDGE': {
-            //startWorkerThread();
+            startWorkerThread(action.dispatch);
             return {...state, step: Step.ACKNOWLEDGED};
         }
         case 'WAIT': {
@@ -505,4 +505,3 @@ export const computeStateReducer = (state: any, action: any):any => {
     console.debug(`state after reducer ${newState.step}`);
     return newState;
 }
-

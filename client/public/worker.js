@@ -6,7 +6,7 @@
 
 console.debug(`worker.js`);
 
-self.importScripts('./pkg/phase2/phase2.js');
+self.importScripts('./pkg/small_pot.js');
 
 // @ts-ignore
 const { contribute } = wasm_bindgen;
@@ -14,7 +14,7 @@ const { contribute } = wasm_bindgen;
 //let client;
 async function load() {
   // @ts-ignore
-  await wasm_bindgen('./pkg/phase2/phase2_bg.wasm');
+  await wasm_bindgen('./pkg/small_pot_bg.wasm');
 
   // let data = await fetch('./zk_transaction_1_2.params');
   // let data2 = await data.arrayBuffer()
@@ -22,10 +22,10 @@ async function load() {
   console.debug('wasm module loaded');
 }
 
-function compute(sourceParams, entropy) {
+function compute(sourceParams, g1Points, g2Points) {
   try {
-    console.debug(`compute starting. params: ${sourceParams.length} ${entropy.length}`);
-    const result = contribute(sourceParams, entropy, reportProgress, setHash);
+    console.debug(`compute starting. params: ${sourceParams.length} ${g1Points}`);
+    const result = contribute(sourceParams, g1Points, g2Points /*, setHash*/);
     console.debug(`contribute done ${result.length}`);
     const message = {
         error: false,
@@ -85,10 +85,11 @@ onmessage = (event) =>  {
     console.log(`COMPUTE in service-worker ${JSON.stringify(event.data)}`);
     
     const sourceParams = new Uint8Array(event.data.params);
-    const entropy = new Uint8Array(event.data.entropy);
-    console.debug(`lengths: ${sourceParams.length} ${entropy.length}`);
+    const g1Points = 2**16;
+    let g2Points = 16;
+    console.debug(`lengths: ${sourceParams.length}`);
     try {
-      compute(sourceParams, entropy);
+      compute(sourceParams, g1Points, g2Points);
     } catch (err) {
       console.error(`Error in compute(): ${err.message}`);
     }

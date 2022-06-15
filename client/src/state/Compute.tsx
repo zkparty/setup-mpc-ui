@@ -27,7 +27,8 @@ export const startDownload = (ceremonyId: string, index: number, dispatch: Dispa
     });
 };
 
-export const startComputation = (params: Uint8Array, entropy: Uint8Array, participant: string, dispatch: Dispatch<any>) => {
+export const startComputation = (params: Uint8Array, entropy: Uint8Array, participant: string, 
+    dispatch: Dispatch<any>, worker: Worker) => {
 
     const progressOptions = {
         progressCallback: (val: number, total: number) => {
@@ -42,15 +43,24 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, partic
     let outFd =  { type: 'mem', data: new Uint8Array() }; 
 
     try {
-        zKey.contribute( inputFd, outFd, 
-                participant, entropy.buffer, console, progressOptions).then(
-                    (hash: any) => {
+        console.log(`params ${params.buffer.byteLength} ${entropy.buffer.byteLength}`);
+        const message = {
+            type: 'COMPUTE', 
+            params: params.buffer
+        };
+        worker.postMessage(message,
+            [
+                params.buffer
+            ]);
+        /*zKey.contribute( inputFd, outFd, 
+                participant, entropy.buffer, console, progressOptions).then( */
+          /*          (hash: any) => {
                         console.log(`contribution hash: ${JSON.stringify(hash)}`);
                         dispatch({type: 'SET_HASH', hash});
                         const result = outFd.data;
                         console.debug(`COMPLETE ${result.length}`);
                         dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
-                });
+                }); */
     } catch (err) {
         console.error(`Error in contribute: ${err}`);
     }
@@ -114,4 +124,50 @@ export const getEntropy = () => {
 };
 
 
+let worker: Worker | null = null;
+
+export const startWorkerThread = (dispatch: React.Dispatch<any>) => {
+    if (worker) return;
+    if (!dispatch) return;
+
+    worker = new window.Worker('./worker.js');
+    console.debug('worker thread started');
+    //worker.onmessage = (e) => ('online', loadWasm);
+    worker.onmessage = (event) => {
+        //console.log('message from worker:', event);
+        const data = (typeof event.data === 'string') ?
+        JSON.parse(event.data)
+        : event.data;
+      switch (data.type) {
+        case 'ONLINE': {
+            worker?.postMessage({type: 'LOAD_WASM'});
+            break;
+        }
+        case 'PROGRESS': {
+            //console.log(`message from service worker ${message}`);
+
+            dispatch({
+                type: 'PROGRESS_UPDATE',
+                data: data.total > 0 ? 100 * data.count / data.total : 0,
+            })
+            break;
+        }
+        case 'HASH': { 
+            dispatch({type: 'SET_HASH', hash: data.hash});
+            break; 
+        }
+        case 'COMPLETE': { 
+            const result = new Uint8Array(data.result);
+            console.debug(`COMPLETE ${result.length}`);
+            dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
+            break; 
+        }
+        case 'ERROR': {
+            console.log(`Error while computing. ${JSON.stringify(data)}`);
+        }
+      }
+    };
+
+    dispatch({ type: 'SET_WORKER', data: worker });
+}
 
