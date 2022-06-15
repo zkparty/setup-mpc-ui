@@ -1,13 +1,14 @@
 {
   "name": "trusted-setup-frontend",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Trusted Setup multi-party computation user interface",
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "link": "npm link phase2"
+    "link": "npm link snarkjs && npm link ffjavascript",
+    "deploy": "firebase deploy --only hosting"
   },
   "keywords": [],
   "author": "",

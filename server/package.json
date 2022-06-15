@@ -1,12 +1,12 @@
 {
   "name": "server",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
-  "author": "",
+  "author": "Geoff Lamperd",
   "license": "ISC",
   "dependencies": {
     "@google-cloud/firestore": "^4.7.1",

@@ -18,16 +18,24 @@ const LandingPageTitle = styled.div`
 
 const TITLE_TEXT = "zkopru";
 
-export class ZKTitle extends React.Component {
+interface TitleProps {
+  title?: string;
+}
+
+export class ZKTitle extends React.Component<TitleProps> {
   refreshInterval: number;
   secondsOfLit: number;
   interval: number | undefined; 
+  titleText: string;
 
-  constructor(props: any) {
+  constructor(props: TitleProps) {
     super(props);
     this.refreshInterval = 1000 / 12;
     this.secondsOfLit = 0.5;
     this.interval = undefined;
+    this.titleText = props.title || TITLE_TEXT;
+    console.debug(`title text = ${props.title}`);
+    this.setState({ actualText: this.titleText });
   }
 
   state = {
@@ -48,7 +56,7 @@ export class ZKTitle extends React.Component {
 
         if (Math.random() < 0.3) {
           this.setState({
-            actualText: TITLE_TEXT
+            actualText: this.titleText
           });
         }
       }, this.secondsOfLit * 1000);

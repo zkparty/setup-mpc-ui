@@ -241,6 +241,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.contributionState = {...state.contributionState, startTime: Date.now()};
             newState.computeStatus = {...state.computeStatus, running: true, downloading: true};
             startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, action.dispatch);
+            newState.progress = {count: 0, total: 0};
             return newState;
         }
         case 'DOWNLOADED': {
@@ -294,7 +295,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 computed: true,
                 newParams: action.newParams,
             };
-            newState.progress = {count: 0, total: 100};
+            newState.progress = 0;
             addCeremonyEvent(state.contributionState.ceremony.id, createCeremonyEvent(
                 "COMPUTE_CONTRIBUTION", 
                 `Contribution for participant ${state.contributionState.queueIndex} completed OK`,
@@ -332,12 +333,12 @@ export const computeStateReducer = (state: any, action: any):any => {
                 addOrUpdateContribution(ceremony.id, contribution).then( () => {
                     endOfCircuit(state.participant.uid, action.dispatch);
                 });
-                //msg = `Thank you for your contribution.`;
-                //newState = addMessage(newState, msg);
 
                 // Mark it complete
                 const cct = getCurrentCircuit(newState);
                 if (cct) { cct.isCompleted = true; }
+
+                newState.userContributions.push({...contribution, ceremony: cct});
     
                 //startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
             }
@@ -364,8 +365,6 @@ export const computeStateReducer = (state: any, action: any):any => {
                 addOrUpdateContribution(ceremony.id, contribution).then( () => {
                     endOfCircuit(state.participant.uid, action.dispatch);
                 });
-                //msg = `Thank you for your contribution.`;
-                //newState = addMessage(newState, msg);
 
                 // Mark it complete
                 const cct = getCurrentCircuit(newState);

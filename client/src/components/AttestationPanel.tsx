@@ -57,19 +57,30 @@ export default function AttestationPanel(props: any) {
 
   const { project, summaryGistUrl } = state;
   let text=(<></>);
-  if (summaryGistUrl && project) {
-    text = (
-      <div style={{ display: 'flex' }}>
-        <StyledAccentButton
-           href={tweetText(project, summaryGistUrl)} target='_blank' >
-              <TwitterIcon fontSize='large' />
-              Share your attestation
-        </StyledAccentButton>
-        <StyledButton href={summaryGistUrl} target='_blank' >
-          View your summary
-        </StyledButton>
-      </div>
-    );
+  if (project) {
+    if (summaryGistUrl) {
+      text = (
+        <div style={{ display: 'flex' }}>
+          <StyledAccentButton
+            href={tweetText(project, summaryGistUrl)} target='twitter' >
+                <TwitterIcon fontSize='large' />
+                Share your attestation
+          </StyledAccentButton>
+          <StyledButton href={summaryGistUrl} target='attestation' >
+            View your summary
+          </StyledButton>
+        </div>
+      );
+    } else {
+      text = (<div style={{ textAlign: 'left' }}>
+          Your attestation details have been copied to the clipboard. Please
+          paste them to a public gist. &nbsp;
+          <a href='https://gist.github.com' 
+            target='attestation' 
+            style={{ color: 'lightseagreen' }} 
+          >Click here</a> to create your gist (opens a new tab).
+        </div>);
+    }
   }
 
   return (
