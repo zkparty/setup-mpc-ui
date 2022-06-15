@@ -73,10 +73,10 @@ app.post('/', (req: any, res: any) => {
                 // Get nonce. Require > 3 txs, as an anti-sybil mechanism
                 const nonce = await node.getTransactionCount(ethAddress);
                 functions.logger.debug(`Nonce = ${nonce}`);
-                if (nonce <= 3) {
-                    res.status(401).send('Inelligible account');
-                    return;
-                }
+                //if (nonce <= 3) {
+                //    res.status(401).send('Inelligible account');
+                //    return;
+                //}
 
                 // Reverse lookup ENS name
                 const ensName = await node.lookupAddress(ethAddress);

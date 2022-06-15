@@ -26,6 +26,7 @@
     "useUnknownInCatchVariables": false
   },
   "include": [
-    "src"
+    "src",
+    "public/worker.js"
   ]
 }
