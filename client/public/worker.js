@@ -88,7 +88,7 @@ onmessage = (event) =>  {
     
     const sourceParams = new Uint8Array(event.data.params);
     const g1Points = 2**16;
-    let g2Points = 16;
+    let g2Points = 2;
     console.debug(`lengths: ${sourceParams.length}`);
     try {
       compute(sourceParams, g1Points, g2Points);
