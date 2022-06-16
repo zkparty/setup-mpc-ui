@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { useContext } from 'react';
 import {
   AuthButton,
@@ -17,7 +16,7 @@ const Acknowledge = ({ contribute }: { contribute: () => void}) =>
 export default function WelcomePanel(props: any) {
   const dispatch = useContext(ComputeDispatchContext);
   const handleClick = () => {
-    if (dispatch) dispatch({type: 'ACKNOWLEDGE' });
+    if (dispatch) dispatch({type: 'ACKNOWLEDGE', dispatch });
   }
 
   const isRunning = true;

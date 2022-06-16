@@ -57,7 +57,7 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, partic
     }
 
     try {
-        console.log(`params ${params.buffer.byteLength} ${entropy.buffer.byteLength}`);
+        console.log(`params ${params.buffer.byteLength}`);
         const message = {
             type: 'COMPUTE', 
             params: params.buffer

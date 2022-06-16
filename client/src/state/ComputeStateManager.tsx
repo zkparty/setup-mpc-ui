@@ -428,6 +428,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'ACKNOWLEDGE': {
+            console.debug(`ACKNOWLEDGE`);
             startWorkerThread(action.dispatch);
             return {...state, step: Step.ACKNOWLEDGED};
         }
