@@ -1,20 +1,26 @@
 /// <reference lib="webworker" />
 /* eslint-disable no-restricted-globals */
 
-//import init, { contribute } from "./pkg/phase2/phase2.js";
+//import { createCipheriv } from "crypto";
+
+//import { createCipheriv } from "crypto";
+import init, { contribute } from "./pkg";
 //import { parentPort } from 'worker_threads';
 
-console.debug(`worker.js`);
+console.log(`worker.js`);
 
-self.importScripts('./pkg/small_pot.js');
+postMessage({ type: 'start' });
+
+//self.importScripts('./pkg/small_pot.js');
 
 // @ts-ignore
-const { contribute } = wasm_bindgen;
+//const { contribute } = wasm_bindgen;
 //let sourceParams = new Uint8Array();
 //let client;
 async function load() {
   // @ts-ignore
-  await wasm_bindgen('./pkg/small_pot_bg.wasm');
+  //await wasm_bindgen('./pkg/small_pot_bg.wasm');
+  await init();
 
   // let data = await fetch('./zk_transaction_1_2.params');
   // let data2 = await data.arrayBuffer()

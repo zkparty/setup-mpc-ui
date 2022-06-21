@@ -145,14 +145,18 @@ export const startWorkerThread = (dispatch: React.Dispatch<any>) => {
     if (worker) return;
     if (!dispatch) return;
 
-    worker = new window.Worker('./worker.js');
+    console.log(`CrossOriginIsolated? ${window.crossOriginIsolated}`);
+    worker = new Worker('worker.js', { type: "module"});
+    worker.onerror = (err) => {
+        console.error(`Error in worker: ${JSON.stringify(err)}`)
+    }
     console.debug('worker thread started');
     //worker.onmessage = (e) => ('online', loadWasm);
     worker.onmessage = (event) => {
-        //console.log('message from worker:', event);
+        console.log('message from worker:', JSON.stringify(event));
         const data = (typeof event.data === 'string') ?
-        JSON.parse(event.data)
-        : event.data;
+            JSON.parse(event.data)
+          : event.data;
       switch (data.type) {
         case 'ONLINE': {
             worker?.postMessage({type: 'LOAD_WASM'});
