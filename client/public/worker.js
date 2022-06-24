@@ -4,10 +4,10 @@
 //import { createCipheriv } from "crypto";
 
 //import { createCipheriv } from "crypto";
-import init, { contribute } from "./pkg";
+import init, { contribute, initThreadPool } from "./pkg/small_pot.js";
 //import { parentPort } from 'worker_threads';
 
-console.log(`worker.js`);
+console.log(`worker.js isolated? ${self.crossOriginIsolated}`);
 
 postMessage({ type: 'start' });
 
@@ -21,6 +21,7 @@ async function load() {
   // @ts-ignore
   //await wasm_bindgen('./pkg/small_pot_bg.wasm');
   await init();
+  await initThreadPool(navigator.hardwareConcurrency);
 
   // let data = await fetch('./zk_transaction_1_2.params');
   // let data2 = await data.arrayBuffer()
@@ -86,7 +87,10 @@ onmessage = (event) =>  {
 
   if (event.data && event.data.type === 'LOAD_WASM') {
     console.log(`LOAD_WASM in service-worker ${event}`);
-    load();
+    load().then(() => {
+      postMessage({ type: 'LOADED' });
+      console.log('loaded')
+    });
   };
 
   if (event.data && event.data.type === 'COMPUTE') {

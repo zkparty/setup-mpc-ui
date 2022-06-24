@@ -162,6 +162,10 @@ export const startWorkerThread = (dispatch: React.Dispatch<any>) => {
             worker?.postMessage({type: 'LOAD_WASM'});
             break;
         }
+        case 'LOADED': {
+            console.debug('WASM loaded');
+            break;
+        }
         case 'PROGRESS': {
             //console.log(`message from service worker ${message}`);
 
