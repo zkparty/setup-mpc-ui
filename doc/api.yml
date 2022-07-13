@@ -22,7 +22,7 @@ tags:
 # schemes:
 # - http
 paths:
-  /Auth-Auth:
+  /login:
     post:
       tags:
       - login
@@ -38,19 +38,19 @@ paths:
         description: includes a message signed using the Ethereum standard signing method
         required: true
         schema:
-          $ref: '#/definitions/authRequest'
+          $ref: '#/definitions/AuthRequest'
       responses:
+        200:
+          description: Successful login
+          schema:
+            $ref: '#/definitions/AuthResponse'
         400:
           description: Invalid request. Missing parameters
         401:
           description: Eth address doesn't match message signer, or account nonce is too low
         403:
           description: Invalid HTTP method
-      security:
-      - petstore_auth:
-        - write:pets
-        - read:pets
-  /participant/join:
+  /queue/join:
     post:
       tags:
       - join
@@ -60,33 +60,26 @@ paths:
       produces:
       - application/json
       parameters:
-      - name: status
-        in: query
-        description: Status values that need to be considered for filter
+      - in: body
+        name: participant
+        schema: 
+          $ref: '#/definitions/Participant'
+        description: Participant joining the queue
         required: true
-        type: array
-        items:
-          type: string
-          enum:
-          - available
-          - pending
-          - sold
-          default: available
-        collectionFormat: multi
       responses:
         200:
           description: successful operation
           schema:
             type: array
             items:
-              $ref: '#/definitions/Pet'
+              $ref: '#/definitions/QueueStatus'
         400:
           description: Invalid status value
       security:
       - petstore_auth:
         - write:pets
         - read:pets
-  /participant/status:
+  /queue/status:
     post:
       tags:
       - status
@@ -96,7 +89,6 @@ paths:
       operationId: findPetsByTags
       produces:
       - application/json
-      - application/xml
       parameters:
       - name: tags
         in: query
@@ -110,9 +102,9 @@ paths:
         200:
           description: successful operation
           schema:
-            type: array
+            type: object
             items:
-              $ref: '#/definitions/Pet'
+              $ref: '#/definitions/QueueStatus'
         400:
           description: Invalid tag value
       security:
@@ -141,7 +133,7 @@ paths:
         200:
           description: successful operation
           schema:
-            $ref: '#/definitions/Pet'
+            $ref: '#/definitions/QueueStatus'
         400:
           description: Invalid ID supplied
         404:
@@ -151,7 +143,7 @@ paths:
   /contribution/status:
     post:
       tags:
-      - contribbution status
+      - contribution status
       summary: advises contribution status
       operationId: contributionStatus
       produces:
@@ -177,11 +169,11 @@ paths:
         200:
           description: successful operation
           schema:
-            $ref: '#/definitions/ApiResponse'
+            $ref: '#/definitions/Contribution'
       security:
-      - petstore_auth:
-        - write:pets
-        - read:pets
+      - queue_auth:
+        - write:queue
+        - read:queue
   /contribution/complete:
     post:
       tags:
@@ -199,8 +191,6 @@ paths:
             additionalProperties:
               type: integer
               format: int32
-      security:
-      - api_key: []
   /contribution/leave:
     post:
       tags:
@@ -219,8 +209,6 @@ paths:
             additionalProperties:
               type: integer
               format: int32
-      security:
-      - api_key: []
 
   /ceremony/status:
     get:
@@ -245,106 +233,110 @@ paths:
         400:
           description: Invalid Order
 securityDefinitions:
-  petstore_auth:
+  auth_with_eth_account:
     type: oauth2
-    authorizationUrl: http://petstore.swagger.io/oauth/dialog
-    flow: implicit
+    tokenUrl: https://us-central1-trustedsetuptest.cloudfunctions.net/Auth-Auth
+    flow: application
     scopes:
-      write:pets: modify pets in your account
-      read:pets: read your pets
-  api_key:
+      write:queue_entry: Join or leave the contribution queue
+      read:queue_entry: Get status details for own queue entry
+      write:contribution: Submit an updated contribution
+      read:contribution: Receive the prior contribution
+  auth_with_github:
     type: apiKey
     name: api_key
     in: header
 definitions:
   AuthRequest:
     type: object
+    description: A JSON object. The sig property must contain a hex represenation of 
+      a message - 'ZKParty sign-in' - signed with the private key for ethAddress using
+      Ethereum standard signing (i.e. the message is prefixed by \x19Ethereum Signed Message ...)
+      The Eth account must have a nonce >= 3 on mainnet.
     properties:
       ethAddress:
         type: string
       sig:
         type: string
-  Category:
+  AuthResponse:
+    type: object
+    description: The response to a successful authorisation request is a JWT token. This
+      token must be retained and used in the header for all subsequent requests requiring 
+      authentication.
+      If the authorisation request is unsuccessful, the response will be a brief message.
+      Response codes are a better indication of the status.
+    properties:
+      token:
+        type: string
+      participant:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/Participant'
+  Participant:
     type: object
     properties:
       id:
-        type: integer
-        format: int64
-      name:
         type: string
-    xml:
-      name: Category
-  User:
+      idType:
+        type: string
+        enum: 
+        - ethAddress
+        - ensName
+        - githubHandle
+    required:
+    - id
+  ParticipantQueueStatus:
     type: object
+    description: Status of the participant's queue position,
+      including details of the next expected check-in time
     properties:
       id:
-        type: integer
-        format: int64
-      username:
         type: string
-      firstName:
+      queueStatus:
         type: string
-      lastName:
-        type: string
-      email:
-        type: string
-      password:
-        type: string
-      phone:
-        type: string
-      userStatus:
+        enum:
+        - notQueued
+        - queued
+        - reqdyToContribute
+        - contributing
+        - expired
+      nextCheckinTime:
         type: integer
         format: int32
-        description: User Status
-    xml:
-      name: User
-  Tag:
-    type: object
-    properties:
-      id:
+      queuePosition:
         type: integer
-        format: int64
-      name:
-        type: string
-    xml:
-      name: Tag
-  Pet:
-    type: object
+        format: int32
     required:
-    - name
-    - photoUrls
+    - id
+    - queueStatus 
+    - nextCheckinTime
+    - queuePosition
+  Contribution:
+    type: object
+    description: The prior contributor's submission, ready to be updated
     properties:
-      id:
-        type: integer
-        format: int64
-      category:
-        $ref: '#/definitions/Category'
-      name:
-        type: string
-        example: doggie
-      photoUrls:
+      g1Data:
         type: array
-        xml:
-          name: photoUrl
-          wrapped: true
         items:
           type: string
-      tags:
+      g2Data:
         type: array
-        xml:
-          name: tag
-          wrapped: true
         items:
-          $ref: '#/definitions/Tag'
-      status:
-        type: string
-        description: pet status in the store
-        enum:
-        - available
-        - pending
-        - sold
-    xml:
-      name: Pet
+          type: string
+      history:
+        type: array
+        items:
+          type: object
+          additionalProperties:
+            $ref: '#/definitions/HistoryEntry'
+    required:
+    - g1Data
+    - g2Data 
+    - history  
+  HistoryEntry:
+    type: object
+    description: Participant's contribution summary
+  
   ApiResponse:
     type: object
     properties:
@@ -356,8 +348,8 @@ definitions:
       message:
         type: string
 externalDocs:
-  description: Find out more about Swagger
-  url: http://swagger.io
+  description: About the trusted setup UI
+  url: http://zkparty.live
 # Added by API Auto Mocking Plugin
 # host: virtserver.swaggerhub.com
 # basePath: /STONEBELLAU_1/TrustedSetup/1.0.0

@@ -4,7 +4,7 @@ const fbAdmin = require('firebase-admin');
 
 
 // Temporary function to auto-validate
-const cctId: string = '8DGQ3FOGk4Msx8hNncti';
+const cctId: string = '0RrDECWtUs5UmLvxPCXo';
 
 const AutoValidate = functions.firestore
   .document(`ceremonies/${cctId}/events/{eventId}`)
