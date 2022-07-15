@@ -1,9 +1,6 @@
 /// <reference lib="webworker" />
 /* eslint-disable no-restricted-globals */
 
-//import { createCipheriv } from "crypto";
-
-//import { createCipheriv } from "crypto";
 import init, { contribute, initThreadPool } from "./pkg/small_pot.js";
 //import { parentPort } from 'worker_threads';
 
@@ -52,27 +49,27 @@ function compute(sourceParams, g1Points, g2Points) {
   }
 }
 
-const setHash = (h) => {
-  console.debug(`hash ${h}`);
-  postMessage(
-    JSON.stringify({
-        error: false,
-        type: 'HASH',
-        hash: h
-    }),
-  );
-};
+// const setHash = (h) => {
+//   console.debug(`hash ${h}`);
+//   postMessage(
+//     JSON.stringify({
+//         error: false,
+//         type: 'HASH',
+//         hash: h
+//     }),
+//   );
+// };
 
-const reportProgress = (count, total) => {
-  //console.debug(`sw progress: ${count} of ${total}`);
-  postMessage(
-        JSON.stringify({
-            error: false,
-            type: 'PROGRESS',
-            count: count,
-            total: total
-        }));
-};
+// const reportProgress = (count, total) => {
+//   //console.debug(`sw progress: ${count} of ${total}`);
+//   postMessage(
+//         JSON.stringify({
+//             error: false,
+//             type: 'PROGRESS',
+//             count: count,
+//             total: total
+//         }));
+// };
 
 onmessage = (event) =>  {
   console.log(`message event: ${JSON.stringify(event.data)} TYPE:${event.data.type}`);
