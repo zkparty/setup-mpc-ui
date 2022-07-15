@@ -1,26 +1,21 @@
-swagger: '2.0'
+---
+swagger: "2.0"
 info:
-  description: |
-    Trusted Setup participant API.
-    This is a draft specification. It is subject to change without notice. 
-  version: 1.0.0
   title: Trusted Setup MPC
+  description: "Trusted Setup participant API.\nThis is a draft specification. It
+    is subject to change without notice. \n"
   termsOfService: tbd
   contact:
     email: gl@abc.com
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
 host: us-central1-trustedsetuptest.cloudfunctions.net
-# basePath: /v2
-tags:
-- name: login
-  description: Log in using an ethereum account
-  externalDocs:
-    description: Find out more
-    url: http://zkparty.live/
-# schemes:
-# - http
+basePath: ""
+schemes:
+- https
+- http
 paths:
   /login:
     post:
@@ -35,7 +30,8 @@ paths:
       parameters:
       - in: body
         name: body
-        description: includes a message signed using the Ethereum standard signing method
+        description: includes a message signed using the Ethereum standard signing
+          method
         required: true
         schema:
           $ref: '#/definitions/AuthRequest'
@@ -47,7 +43,8 @@ paths:
         400:
           description: Invalid request. Missing parameters
         401:
-          description: Eth address doesn't match message signer, or account nonce is too low
+          description: Eth address doesn't match message signer, or account nonce
+            is too low
         403:
           description: Invalid HTTP method
   /queue/join:
@@ -62,23 +59,19 @@ paths:
       parameters:
       - in: body
         name: participant
-        schema: 
-          $ref: '#/definitions/Participant'
         description: Participant joining the queue
         required: true
+        schema:
+          $ref: '#/definitions/Participant'
       responses:
         200:
           description: successful operation
           schema:
             type: array
             items:
-              $ref: '#/definitions/QueueStatus'
+              $ref: '#/definitions/ParticipantQueueStatus'
         400:
           description: Invalid status value
-      security:
-      - petstore_auth:
-        - write:pets
-        - read:pets
   /queue/status:
     post:
       tags:
@@ -90,56 +83,41 @@ paths:
       produces:
       - application/json
       parameters:
-      - name: tags
-        in: query
+      - in: query
+        name: tags
         description: Tags to filter by
         required: true
-        type: array
+        collectionFormat: multi
         items:
           type: string
-        collectionFormat: multi
+        type: array
       responses:
         200:
           description: successful operation
           schema:
             type: object
-            items:
-              $ref: '#/definitions/QueueStatus'
         400:
           description: Invalid tag value
-      security:
-      - petstore_auth:
-        - write:pets
-        - read:pets
-      deprecated: true
   /contribution/start:
     post:
       tags:
       - contribute
       summary: Request prior transcript and start contribution
-      description: Advises the participant's readiness to begin the computation. The server will verify 
-        the participant's eligibility to start, and, if eligible, return the last valid transcript.
+      description: Advises the participant's readiness to begin the computation. The
+        server will verify the participant's eligibility to start, and, if eligible,
+        return the last valid transcript.
       operationId: constributionStart
       produces:
       - application/json
-      parameters:
-      - name: petId
-        in: path
-        description: ID of pet to return
-        required: true
-        type: integer
-        format: int64
       responses:
         200:
           description: successful operation
           schema:
-            $ref: '#/definitions/QueueStatus'
+            $ref: '#/definitions/ParticipantQueueStatus'
         400:
           description: Invalid ID supplied
         404:
           description: Pet not found
-      security:
-      - api_key: []
   /contribution/status:
     post:
       tags:
@@ -149,19 +127,19 @@ paths:
       produces:
       - application/json
       parameters:
-      - name: petId
-        in: path
+      - in: path
+        name: petId
         description: ID of pet to update
         required: true
-        type: integer
         format: int64
-      - name: additionalMetadata
-        in: formData
+        type: integer
+      - in: formData
+        name: additionalMetadata
         description: Additional data to pass to server
         required: false
         type: string
-      - name: file
-        in: formData
+      - in: formData
+        name: file
         description: file to upload
         required: false
         type: file
@@ -170,16 +148,13 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/Contribution'
-      security:
-      - queue_auth:
-        - write:queue
-        - read:queue
   /contribution/complete:
     post:
       tags:
       - contribution complete
       summary: Returns a completed contribution
-      description: Advises that the computation has completed and returns the updated transcript
+      description: Advises that the computation has completed and returns the updated
+        transcript
       operationId: contributionComplete
       produces:
       - application/json
@@ -188,16 +163,13 @@ paths:
           description: successful operation
           schema:
             type: object
-            additionalProperties:
-              type: integer
-              format: int32
-  /contribution/leave:
+  /queue/leave:
     post:
       tags:
-      - contribution 
+      - contribution
       summary: Request to leave the queue
-      description: Requests that the participant's queue position is given up. Only valid for 
-         participants who have previously joiined the queue.
+      description: Requests that the participant's queue position is given up. Only
+        valid for participants who have previously joiined the queue.
       operationId: contributionLeave
       produces:
       - application/json
@@ -206,10 +178,6 @@ paths:
           description: successful operation
           schema:
             type: object
-            additionalProperties:
-              type: integer
-              format: int32
-
   /ceremony/status:
     get:
       tags:
@@ -224,71 +192,70 @@ paths:
         description: order placed for purchasing the pet
         required: true
         schema:
-          $ref: '#/definitions/Order'
+          $ref: '#/definitions/CeremonyStatus'
       responses:
         200:
           description: successful operation
           schema:
-            $ref: '#/definitions/Order'
+            $ref: '#/definitions/CeremonyStatus'
         400:
           description: Invalid Order
-securityDefinitions:
-  auth_with_eth_account:
-    type: oauth2
-    tokenUrl: https://us-central1-trustedsetuptest.cloudfunctions.net/Auth-Auth
-    flow: application
-    scopes:
-      write:queue_entry: Join or leave the contribution queue
-      read:queue_entry: Get status details for own queue entry
-      write:contribution: Submit an updated contribution
-      read:contribution: Receive the prior contribution
-  auth_with_github:
-    type: apiKey
-    name: api_key
-    in: header
 definitions:
-  AuthRequest:
+  ApiResponse:
     type: object
-    description: A JSON object. The sig property must contain a hex represenation of 
-      a message - 'ZKParty sign-in' - signed with the private key for ethAddress using
-      Ethereum standard signing (i.e. the message is prefixed by \x19Ethereum Signed Message ...)
-      The Eth account must have a nonce >= 3 on mainnet.
     properties:
-      ethAddress:
+      code:
+        type: integer
+        format: int32
+      type:
         type: string
-      sig:
+      message:
         type: string
   AuthResponse:
     type: object
-    description: The response to a successful authorisation request is a JWT token. This
-      token must be retained and used in the header for all subsequent requests requiring 
-      authentication.
-      If the authorisation request is unsuccessful, the response will be a brief message.
-      Response codes are a better indication of the status.
+    description: The response to a successful authorisation request is a JWT token.
+      This token must be retained and used in the header for all subsequent requests
+      requiring authentication. If the authorisation request is unsuccessful, the
+      response will be a brief message. Response codes are a better indication of
+      the status.
     properties:
       token:
         type: string
       participant:
         type: object
-        additionalProperties:
-          $ref: '#/definitions/Participant'
+  AuthRequest:
+    type: object
+    description: A JSON object. The sig property must contain a hex represenation
+      of a message - 'ZKParty sign-in' - signed with the private key for ethAddress
+      using Ethereum standard signing (i.e. the message is prefixed by \x19Ethereum
+      Signed Message ...) The Eth account must have a nonce >= 3 on mainnet.
+    properties:
+      ethAddress:
+        type: string
+      sig:
+        type: string
   Participant:
     type: object
+    required:
+    - id
     properties:
       id:
         type: string
       idType:
         type: string
-        enum: 
+        enum:
         - ethAddress
         - ensName
         - githubHandle
-    required:
-    - id
   ParticipantQueueStatus:
     type: object
-    description: Status of the participant's queue position,
-      including details of the next expected check-in time
+    required:
+    - id
+    - queueStatus
+    - nextCheckinTime
+    - queuePosition
+    description: Status of the participant's queue position, including details of
+      the next expected check-in time
     properties:
       id:
         type: string
@@ -306,13 +273,15 @@ definitions:
       queuePosition:
         type: integer
         format: int32
-    required:
-    - id
-    - queueStatus 
-    - nextCheckinTime
-    - queuePosition
+  HistoryEntry:
+    type: object
+    description: Particiant's contribution summary
   Contribution:
     type: object
+    required:
+    - g1Data
+    - g2Data
+    - history
     description: The prior contributor's submission, ready to be updated
     properties:
       g1Data:
@@ -329,30 +298,30 @@ definitions:
           type: object
           additionalProperties:
             $ref: '#/definitions/HistoryEntry'
-    required:
-    - g1Data
-    - g2Data 
-    - history  
-  HistoryEntry:
+  CeremonyStatus:
     type: object
-    description: Participant's contribution summary
-  
-  ApiResponse:
-    type: object
-    properties:
-      code:
-        type: integer
-        format: int32
-      type:
-        type: string
-      message:
-        type: string
+    description: Overall ceremony summary metrics
+securityDefinitions:
+  auth_with_eth_account:
+    type: oauth2
+    flow: application
+    tokenUrl: https://us-central1-trustedsetuptest.cloudfunctions.net/Auth-Auth
+    scopes:
+      read:queue_entry: Get status details for own queue entry
+      read:contribution: Receive the prior contribution
+      write:queue_entry: Join or leave the contribution queue
+      write:contribution: Submit an updated contribution
+  auth_with_github:
+    type: apiKey
+    name: api_key
+    in: header
+tags:
+- name: login
+  description: Log in using an ethereum account
+  externalDocs:
+    description: Find out more
+    url: http://zkparty.live/
 externalDocs:
-  description: About the trusted setup UI
-  url: http://zkparty.live
-# Added by API Auto Mocking Plugin
-# host: virtserver.swaggerhub.com
-# basePath: /STONEBELLAU_1/TrustedSetup/1.0.0
-schemes:
- - https
- - http
+  description: Find out more
+  url: http://zkparty.live/
+...
