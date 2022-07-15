@@ -8,8 +8,8 @@ info:
   contact:
     email: gl@abc.com
   license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    name: CC0
+    url: http://creativecommons.org/publicdomain/zero/1.0/
   version: 1.0.0
 host: us-central1-trustedsetuptest.cloudfunctions.net
 basePath: ""
