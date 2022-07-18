@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { AuthDispatchContext, AuthStateContext } from "../state/AuthContext";
 import GitHubIcon from "@material-ui/icons/GitHub";
+import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import firebase from "firebase";
 import { accentColor, lighterBackground } from "../styles";
 import { Button, Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
@@ -105,14 +106,14 @@ const Login = () => {
                 .then(user => userLogin(user, (u) => u.user?.uid))
                 .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
           })
-      } 
+      }
     } catch (err) {
       console.error(`Error while logging in: ${(err instanceof Error) ? err.message : ''}`);
     }
   }
 
   // Handle a user once login has been confirmed
-  // 
+  //
   const userLogin = (userCred: firebase.auth.UserCredential, idGetter: (u: firebase.auth.UserCredential) => string | null | undefined) => {
     //console.debug(result);
     const project = authState.project ? authState.project : 'unknown';
@@ -148,7 +149,14 @@ const Login = () => {
     <div>
       <AuthButton onClick={handleEthereumLogin} style={{ marginTop: '78px', }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <GitHubIcon htmlColor="#000" />
+          <AccountBalanceWalletIcon htmlColor="#000" />
+          <div style={{ width: '24px' }} />
+          <AuthButtonText>Login</AuthButtonText>
+        </div>
+      </AuthButton>
+      <AuthButton onClick={handleGithubLogin} style={{ marginLeft: '30px',}}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <GitHubIcon htmlColor="#000" />
           <div style={{ width: '24px' }} />
           <AuthButtonText>Login</AuthButtonText>
         </div>

@@ -24,11 +24,11 @@ export default function LoginPanel(props: any) {
       {`Trusted Setup Ceremony`}
     </SubtleBody>
     <NormalBodyText style={{ marginTop: '8px' }}>
-      {`Participate using your Ethereum account.`}
+      {`Participate using your Ethereum wallet (preferred)`}
     </NormalBodyText>
-    <NormalBodyText style={{ marginTop: '8px' }}>
-      {`(Login via GitHub to be added)`}  
-    </NormalBodyText> 
+    <NormalBodyText style={{ marginTop: '4px' }}>
+      {`or using your Github account`}
+    </NormalBodyText>
     <Login />
   </div>);
 }
