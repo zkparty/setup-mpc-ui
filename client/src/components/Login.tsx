@@ -1,7 +1,8 @@
 import React, { useState, useContext } from "react";
 import { AuthDispatchContext, AuthStateContext } from "../state/AuthContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEthereum  } from '@fortawesome/free-brands-svg-icons';
 import GitHubIcon from "@material-ui/icons/GitHub";
-import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import firebase from "firebase";
 import { accentColor, lighterBackground } from "../styles";
 import { Button, Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
@@ -149,7 +150,7 @@ const Login = () => {
     <div>
       <AuthButton onClick={handleEthereumLogin} style={{ marginTop: '78px', }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <AccountBalanceWalletIcon htmlColor="#000" />
+          <FontAwesomeIcon icon={faEthereum} color="#000" />
           <div style={{ width: '24px' }} />
           <AuthButtonText>Login</AuthButtonText>
         </div>
