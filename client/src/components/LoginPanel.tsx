@@ -1,5 +1,5 @@
 import { Typography } from '@material-ui/core';
-import * as React from 'react';
+import React, { useState, useEffect } from "react";
 import {
   WelcomeTitle,
   SubtleBody,
@@ -10,6 +10,18 @@ import Login from './Login';
 import env from '../env';
 
 export default function LoginPanel(props: any) {
+
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  const updateWindowDimensions = () => {
+    setWindowWidth(window.innerWidth);
+  }
+
+  useEffect(() => {
+    updateWindowDimensions();
+    window.addEventListener('resize', updateWindowDimensions);
+    return () => window.addEventListener('resize', updateWindowDimensions);
+  }, []);
 
   return (
   <div style={{
@@ -23,12 +35,14 @@ export default function LoginPanel(props: any) {
     <SubtleBody style={{ textAlign: 'center' }}>
       {`Trusted Setup Ceremony`}
     </SubtleBody>
-    <NormalBodyText style={{ marginTop: '8px' }}>
-      {`Participate using your Ethereum wallet (preferred)`}
+    <NormalBodyText style={{ display: windowWidth < 1023 ? '' : 'none', textAlign: 'center', marginTop: '8px' }}>
+      {`The ceremony has to be performed in desktop due to computation constrains. Please open this website on a desktop browser`}
     </NormalBodyText>
-    <NormalBodyText style={{ marginTop: '4px' }}>
-      {`or using your Github account`}
+    <NormalBodyText style={{ display: windowWidth > 1023 ? '' : 'none', textAlign: 'center', marginTop: '8px' }}>
+      {`Participate using your Ethereum wallet (preferred) or using your Github account`}
     </NormalBodyText>
-    <Login />
+    <div style={{ display: windowWidth > 1023 ? '' : 'none', }} >
+      <Login/>
+    </div>
   </div>);
 }
