@@ -4,20 +4,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEthereum  } from '@fortawesome/free-brands-svg-icons';
 import GitHubIcon from "@material-ui/icons/GitHub";
 import firebase from "firebase";
-import { accentColor, lighterBackground } from "../styles";
+import { AuthButton, AuthButtonText, accentColor, lighterBackground } from "../styles";
 import { Button, Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { getUserStatus } from "../api/FirestoreApi";
-import { AuthButton, AuthButtonText } from './../styles';
 import axios from 'axios';
 
 const Login = () => {
   const [error, setErrors] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const dispatch = useContext(AuthDispatchContext);
   const authState = useContext(AuthStateContext);
 
   if (!dispatch) return (<></>);
 
   const handleGithubLogin = () => {
+    setIsLoading(true);
     const provider = new firebase.auth.GithubAuthProvider();
 
     provider.addScope('read:user');
@@ -33,15 +36,23 @@ const Login = () => {
           firebase
           .auth()
           .signInWithPopup(provider)
-          .then(user => userLogin(user, u => u.user?.email))
+          .then(user => {
+            userLogin(user, u => u.user?.email);
+            setIsLoading(false);
+          })
         })
-          .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
+        .catch((e: { message: React.SetStateAction<string>; }) => {
+          setErrors(e.message);
+          setIsLoading(false);
+        })
     } catch (err) {
       if (err instanceof Error) console.warn(err.message);
+      setIsLoading(false);
     }
   };
 
   const handleEthereumLogin = async () => {
+    setIsLoading(true);
     // Check cookie
     const COOKIE_NAME = 'signed_signin_message';
     try {
@@ -104,12 +115,20 @@ const Login = () => {
             firebase
               .auth()
               .signInWithCustomToken(response.data)
-                .then(user => userLogin(user, (u) => u.user?.uid))
-                .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
+                .then(user => {
+                  userLogin(user, (u) => u.user?.uid);
+                  setIsLoading(false);
+                })
+                .catch((e: { message: React.SetStateAction<string>; }) => {
+                  setErrors(e.message);
+                  setIsLoading(false);
+                })
           })
       }
+      setIsLoading(false);
     } catch (err) {
       console.error(`Error while logging in: ${(err instanceof Error) ? err.message : ''}`);
+      setIsLoading(false);
     }
   }
 
@@ -148,20 +167,22 @@ const Login = () => {
 
   return (
     <div>
-      <AuthButton onClick={handleEthereumLogin} style={{ marginTop: '78px', }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <FontAwesomeIcon icon={faEthereum} color="#000" />
-          <div style={{ width: '24px' }} />
-          <AuthButtonText>Login</AuthButtonText>
-        </div>
-      </AuthButton>
-      <AuthButton onClick={handleGithubLogin} style={{ marginLeft: '30px',}}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <GitHubIcon htmlColor="#000" />
-          <div style={{ width: '24px' }} />
-          <AuthButtonText>Login</AuthButtonText>
-        </div>
-      </AuthButton>
+      {isLoading ? <LoadingSpinner></LoadingSpinner> : <div>
+        <AuthButton onClick={handleEthereumLogin} disabled={isLoading} style={{ marginTop: '78px', }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FontAwesomeIcon icon={faEthereum} color="#000" />
+            <div style={{ width: '24px' }} />
+            <AuthButtonText>Login</AuthButtonText>
+          </div>
+        </AuthButton>
+        <AuthButton onClick={handleGithubLogin} disabled={isLoading} style={{ marginLeft: '30px',}}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <GitHubIcon htmlColor="#000" />
+            <div style={{ width: '24px' }} />
+            <AuthButtonText>Login</AuthButtonText>
+          </div>
+        </AuthButton>
+      </div>}
       {/* <FormGroup row>
         <FormControlLabel
           control={
