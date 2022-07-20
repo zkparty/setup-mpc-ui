@@ -1,5 +1,11 @@
+# Install dependencies
+```npm install```
 
-CORS policy for storage file access
+# Run react app with hot reload (development)
+```npm start```
+
+
+# CORS policy for storage file access
 
 * Set web app domain name(s) as origin in cors.json. Add a localhost entry for testing with emulators
 * Run this command, substituting your storage domain name:
