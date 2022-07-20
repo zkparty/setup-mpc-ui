@@ -3,6 +3,7 @@ const serviceAccount = require("./firebase_skey.json");
 const firestore = require('firebase');
 
 // TODO - put in .env
+// !WARNING - change this for test!!!
 const DB_URL = "https://trustedsetup-a86f4.firebaseio.com";
 
 admin.initializeApp({
