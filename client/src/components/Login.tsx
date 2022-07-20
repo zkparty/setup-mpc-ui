@@ -1,14 +1,15 @@
 import React, { useState, useContext } from "react";
-import { AuthDispatchContext, AuthStateContext } from "../state/AuthContext";
+import axios from 'axios';
+import firebase from "firebase";
+import GitHubIcon from "@material-ui/icons/GitHub";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEthereum  } from '@fortawesome/free-brands-svg-icons';
-import GitHubIcon from "@material-ui/icons/GitHub";
-import firebase from "firebase";
-import { AuthButton, AuthButtonText, accentColor, lighterBackground } from "../styles";
-import { Button, Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
-import LoadingSpinner from "../components/LoadingSpinner";
+
 import { getUserStatus } from "../api/FirestoreApi";
-import axios from 'axios';
+import { AuthButton, AuthButtonText } from "../styles";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { AuthDispatchContext, AuthStateContext } from "../state/AuthContext";
+
 
 const Login = () => {
   const [error, setErrors] = useState("");
@@ -25,8 +26,6 @@ const Login = () => {
 
     provider.addScope('read:user');
     if (!authState.manualAttestation) provider.addScope('gist');
-
-    const project = authState.project ? authState.project : 'unknown';
 
     try {
       firebase
@@ -125,12 +124,11 @@ const Login = () => {
                 })
           })
       }
-      setIsLoading(false);
     } catch (err) {
       console.error(`Error while logging in: ${(err instanceof Error) ? err.message : ''}`);
       setIsLoading(false);
     }
-  }
+  };
 
   // Handle a user once login has been confirmed
   //
@@ -157,16 +155,8 @@ const Login = () => {
     }
   };
 
-  const logOut = () => {
-    firebase.auth().signOut();
-  };
-
-  const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'MANUAL_ATTESTATION',  option: event.target.checked });
-  };
-
   return (
-    <div>
+    <>
       {isLoading ? <LoadingSpinner></LoadingSpinner> : <div>
         <AuthButton onClick={handleEthereumLogin} disabled={isLoading} style={{ marginTop: '78px', }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -183,21 +173,7 @@ const Login = () => {
           </div>
         </AuthButton>
       </div>}
-      {/* <FormGroup row>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={authState.manualAttestation}
-              onChange={handleOptionChange}
-              name="attest"
-              color={"primary"}
-            />
-          }
-          label="Manual attestation"
-          style={{ display: 'flex', alignItems: 'center', marginTop: '30px' }}
-        />
-      </FormGroup> */}
-    </div>
+    </>
   );
 };
 

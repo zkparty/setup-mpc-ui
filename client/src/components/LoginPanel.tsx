@@ -1,10 +1,8 @@
-import { Typography } from '@material-ui/core';
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   WelcomeTitle,
   SubtleBody,
   NormalBodyText,
-  subtleText,
 } from "../styles";
 import Login from './Login';
 import env from '../env';
