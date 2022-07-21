@@ -35,10 +35,7 @@ const Login = () => {
           firebase
           .auth()
           .signInWithPopup(provider)
-          .then(user => {
-            userLogin(user, u => u.user?.email);
-            setIsLoading(false);
-          })
+          .then(user => userLogin(user, u => u.user?.email))
         })
         .catch((e: { message: React.SetStateAction<string>; }) => {
           setErrors(e.message);
@@ -114,10 +111,7 @@ const Login = () => {
             firebase
               .auth()
               .signInWithCustomToken(response.data)
-                .then(user => {
-                  userLogin(user, (u) => u.user?.uid);
-                  setIsLoading(false);
-                })
+                .then(user => userLogin(user, (u) => u.user?.uid))
                 .catch((e: { message: React.SetStateAction<string>; }) => {
                   setErrors(e.message);
                   setIsLoading(false);
@@ -148,6 +142,7 @@ const Login = () => {
         });
       }
       //console.debug(`dispatch LOGIN`);
+      setIsLoading(true);
       dispatch({
         type: 'LOGIN',
         user: { ...userCred.user, additionalUserInfo: userCred.additionalUserInfo },
