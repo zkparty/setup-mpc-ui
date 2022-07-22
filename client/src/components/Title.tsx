@@ -26,7 +26,7 @@ interface TitleProps {
 export class ZKTitle extends React.Component<TitleProps> {
   refreshInterval: number;
   secondsOfLit: number;
-  interval: number | undefined; 
+  interval: number | undefined;
   titleText: string;
 
   constructor(props: TitleProps) {
@@ -36,7 +36,6 @@ export class ZKTitle extends React.Component<TitleProps> {
     this.interval = undefined;
     this.titleText = props.title || TITLE_TEXT;
     console.debug(`title text = ${props.title}`);
-    this.setState({ actualText: this.titleText });
   }
 
   state = {
