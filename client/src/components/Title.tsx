@@ -32,7 +32,6 @@ export class ZKTitle extends React.Component<TitleProps> {
     this.secondsOfLit = 0.5;
     this.interval = undefined;
     this.titleText = props.title || TITLE_TEXT;
-    console.debug(`title text = ${props.title}`);
   }
 
   state = {
