@@ -1,9 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import {
-  accentColor,
-  textColor,
-} from "../styles";
+import { textColor } from "../styles";
 import env from '../env';
 
 const LandingPageTitle = styled.div`
