@@ -1,9 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import {
-  accentColor,
-  textColor,
-} from "../styles";
+import { textColor } from "../styles";
 import env from '../env';
 
 const LandingPageTitle = styled.div`
@@ -26,7 +23,7 @@ interface TitleProps {
 export class ZKTitle extends React.Component<TitleProps> {
   refreshInterval: number;
   secondsOfLit: number;
-  interval: number | undefined; 
+  interval: number | undefined;
   titleText: string;
 
   constructor(props: TitleProps) {
@@ -35,8 +32,6 @@ export class ZKTitle extends React.Component<TitleProps> {
     this.secondsOfLit = 0.5;
     this.interval = undefined;
     this.titleText = props.title || TITLE_TEXT;
-    console.debug(`title text = ${props.title}`);
-    this.setState({ actualText: this.titleText });
   }
 
   state = {
