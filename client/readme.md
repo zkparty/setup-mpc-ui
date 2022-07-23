@@ -18,7 +18,12 @@ const firebaseConfig = {
 export default firebaseConfig;
 ```
 
-## 3. Run react app with hot reload (development)
+## 3. Add the pkg directory from small-powers-of-tau in
+``` /public/ ```
+Remember to check in ```/public/pkg/snippets/wasm-bindgen-rayon../src/workerHelpers.js``` that
+the import pkg is referencing the correct file ```../../../small_pot.js```(approximately line 54)
+
+## 4. Run react app with hot reload (development)
 ```npm start```
 
 ## CORS policy for storage file access
