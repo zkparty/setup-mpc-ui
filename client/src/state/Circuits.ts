@@ -1,6 +1,6 @@
-import { Ceremony } from "../types/ceremony";
+import { Dispatch } from "react";
 
-import { Dispatch, useContext } from "react";
+import { Ceremony } from "../types/ceremony";
 import { circuitEventListener, getCeremonies } from '../api/FirestoreApi';
 
 export const startCircuitListener = (project: string, dispatch: Dispatch<any>) => {
