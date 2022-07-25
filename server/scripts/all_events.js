@@ -28,8 +28,7 @@ const run = () => {
             snap.forEach(docSnap => {
                 const event = docSnap.data();
                 if (event.timestamp) {
-                    fs.write(fd, `${event.index},${event.timestamp.toMillis()},${event.eventType
-                        },\n`,
+                    fs.write(fd, `${event.index},${event.timestamp.toMillis()},${event.eventType},\n`,
                         err => {if (err) console.warn(err.message)});
                 }
             });
