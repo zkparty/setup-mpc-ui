@@ -448,10 +448,10 @@ export const computeStateReducer = (state: any, action: any):any => {
             //const msg = `You are in the queue for ceremony ${action.data.ceremony.title}`;
             //newState = addMessage(newState, msg);
             // Collect entropy
-            if (newState.entropy.length == 0) {
+            if (newState.entropy.length === 0) {
                 newState.entropy = getEntropy();
             }
-            if (newState.contributionState.queueIndex == 1) {
+            if (newState.contributionState.queueIndex === 1) {
                 // There is no prior contributor to wait for
                 newState.step = Step.RUNNING;
                 newState.computeStatus.ready = true;
@@ -463,7 +463,7 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'UPDATE_QUEUE': {
             newState.contributionState = {...state.contributionState, ...action.data};
-            if (newState.contributionState.queueIndex == newState.contributionState.currentIndex) {
+            if (newState.contributionState.queueIndex === newState.contributionState.currentIndex) {
                 console.debug(`we are go`);
                 if (action.unsub) action.unsub(); // unsubscribe from the queue listener
                 newState.step = Step.RUNNING;
