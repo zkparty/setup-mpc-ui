@@ -1,27 +1,31 @@
 import React, { useState, useContext } from "react";
-import { AuthDispatchContext, AuthStateContext } from "../state/AuthContext";
-import GitHubIcon from "@material-ui/icons/GitHub";
-import firebase from "firebase";
-import { accentColor, lighterBackground } from "../styles";
-import { Button, Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
-import { getUserStatus } from "../api/FirestoreApi";
-import { AuthButton, AuthButtonText } from './../styles';
 import axios from 'axios';
+import firebase from "firebase";
+import GitHubIcon from "@material-ui/icons/GitHub";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEthereum  } from '@fortawesome/free-brands-svg-icons';
+
+import { getUserStatus } from "../api/FirestoreApi";
+import { AuthButton, AuthButtonText } from "../styles";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { AuthDispatchContext, AuthStateContext } from "../state/AuthContext";
+
 
 const Login = () => {
   const [error, setErrors] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const dispatch = useContext(AuthDispatchContext);
   const authState = useContext(AuthStateContext);
 
   if (!dispatch) return (<></>);
 
   const handleGithubLogin = () => {
+    setIsLoading(true);
     const provider = new firebase.auth.GithubAuthProvider();
 
     provider.addScope('read:user');
     if (!authState.manualAttestation) provider.addScope('gist');
-
-    const project = authState.project ? authState.project : 'unknown';
 
     try {
       firebase
@@ -33,13 +37,18 @@ const Login = () => {
           .signInWithPopup(provider)
           .then(user => userLogin(user, u => u.user?.email))
         })
-          .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
+        .catch((e: { message: React.SetStateAction<string>; }) => {
+          setErrors(e.message);
+          setIsLoading(false);
+        })
     } catch (err) {
       if (err instanceof Error) console.warn(err.message);
+      setIsLoading(false);
     }
   };
 
   const handleEthereumLogin = async () => {
+    setIsLoading(true);
     // Check cookie
     const COOKIE_NAME = 'signed_signin_message';
     try {
@@ -103,16 +112,20 @@ const Login = () => {
               .auth()
               .signInWithCustomToken(response.data)
                 .then(user => userLogin(user, (u) => u.user?.uid))
-                .catch((e: { message: React.SetStateAction<string>; }) => setErrors(e.message))
+                .catch((e: { message: React.SetStateAction<string>; }) => {
+                  setErrors(e.message);
+                  setIsLoading(false);
+                })
           })
-      } 
+      }
     } catch (err) {
       console.error(`Error while logging in: ${(err instanceof Error) ? err.message : ''}`);
+      setIsLoading(false);
     }
-  }
+  };
 
   // Handle a user once login has been confirmed
-  // 
+  //
   const userLogin = (userCred: firebase.auth.UserCredential, idGetter: (u: firebase.auth.UserCredential) => string | null | undefined) => {
     //console.debug(result);
     const project = authState.project ? authState.project : 'unknown';
@@ -129,6 +142,7 @@ const Login = () => {
         });
       }
       //console.debug(`dispatch LOGIN`);
+      setIsLoading(true);
       dispatch({
         type: 'LOGIN',
         user: { ...userCred.user, additionalUserInfo: userCred.additionalUserInfo },
@@ -136,38 +150,25 @@ const Login = () => {
     }
   };
 
-  const logOut = () => {
-    firebase.auth().signOut();
-  };
-
-  const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'MANUAL_ATTESTATION',  option: event.target.checked });
-  };
-
   return (
-    <div>
-      <AuthButton onClick={handleEthereumLogin} style={{ marginTop: '78px', }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <>
+      {isLoading ? <LoadingSpinner></LoadingSpinner> : <div>
+        <AuthButton onClick={handleEthereumLogin} disabled={isLoading} style={{ marginTop: '78px', }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FontAwesomeIcon icon={faEthereum} color="#000" />
+            <div style={{ width: '24px' }} />
+            <AuthButtonText>Login</AuthButtonText>
+          </div>
+        </AuthButton>
+        <AuthButton onClick={handleGithubLogin} disabled={isLoading} style={{ marginLeft: '30px',}}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <GitHubIcon htmlColor="#000" />
-          <div style={{ width: '24px' }} />
-          <AuthButtonText>Login</AuthButtonText>
-        </div>
-      </AuthButton>
-      {/* <FormGroup row>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={authState.manualAttestation}
-              onChange={handleOptionChange}
-              name="attest"
-              color={"primary"}
-            />
-          }
-          label="Manual attestation"
-          style={{ display: 'flex', alignItems: 'center', marginTop: '30px' }}
-        />
-      </FormGroup> */}
-    </div>
+            <div style={{ width: '24px' }} />
+            <AuthButtonText>Login</AuthButtonText>
+          </div>
+        </AuthButton>
+      </div>}
+    </>
   );
 };
 

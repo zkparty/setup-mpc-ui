@@ -17,12 +17,12 @@ export enum Step {
     COMPLETE,
 }
 
-enum ComputeMode { 
+enum ComputeMode {
     ZKEY,
     POWERSOFTAU,
   };
 
-      
+
 export const createCeremonyEvent = (eventType: string, message: string, index: number | undefined): CeremonyEvent => {
     return {
         sender: "PARTICIPANT",
@@ -73,7 +73,7 @@ export interface ComputeStatus {
     uploaded: boolean,
     progress: { count: number, total: number},
 };
-  
+
 export const initialComputeStatus: ComputeStatus = {
     ready: false,
     running: false,
@@ -202,7 +202,7 @@ export const computeStateReducer = (state: any, action: any):any => {
     let newState = {...state};
     switch (action.type) {
         case 'UPDATE_CIRCUIT': {
-            // A circuit has been added or updated. 
+            // A circuit has been added or updated.
             const circuit: Ceremony = action.data;
             const idx = findCircuitIndex(newState.circuits, circuit.id);
             if (idx >= 0) {
@@ -258,7 +258,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             newState.computeStatus = {...state.computeStatus, running: true };
             return newState;
         }
-        case 'DOWNLOAD': {            
+        case 'DOWNLOAD': {
             console.debug(`DOWNLOAD`);
             if (state.computeStatus.downloading) { // Avoid multiple invocations
                 return state;
@@ -309,7 +309,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                     h = h.concat('\n');
                     j = 0;
                 }
-                separator = ' ';                
+                separator = ' ';
             }
             console.debug(`Hash: ${h}`);
             //const msg = `Hash: ${h}`;
@@ -328,7 +328,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             };
             newState.progress = 0;
             addCeremonyEvent(state.contributionState.ceremony.id, createCeremonyEvent(
-                "COMPUTE_CONTRIBUTION", 
+                "COMPUTE_CONTRIBUTION",
                 `Contribution for participant ${state.contributionState.queueIndex} completed OK`,
                 state.contributionState.queueIndex
             ));
@@ -337,11 +337,11 @@ export const computeStateReducer = (state: any, action: any):any => {
             //const msg = `Computation completed.`;
             //newState = addMessage(newState, msg);
             const suffix: string = (state.contributionState.ceremony.mode === 'POWERSOFTAU') ? 'ptau' : 'zkey';
-            startUpload(state.contributionState.ceremony.id, 
-                state.contributionState.queueIndex, 
-                state.contributionState.ceremony.zkeyPrefix, 
-                suffix, 
-                action.newParams, 
+            startUpload(state.contributionState.ceremony.id,
+                state.contributionState.queueIndex,
+                state.contributionState.ceremony.zkeyPrefix,
+                suffix,
+                action.newParams,
                 action.dispatch);
             return newState;
         }
@@ -350,7 +350,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             // Avoid double invocation
             if (!state.contributionSummary || state.contributionSummary.status !== 'COMPLETE') {
                 addCeremonyEvent(ceremony.id, createCeremonyEvent(
-                    "PARAMS_UPLOADED", 
+                    "PARAMS_UPLOADED",
                     `Parameters for participant ${queueIndex} uploaded to ${action.file}`,
                     queueIndex
                 ));
@@ -359,14 +359,14 @@ export const computeStateReducer = (state: any, action: any):any => {
                 const duration = (Date.now() - startTime) / 1000;
                 const contribution = createContributionSummary(
                     state.participant ? state.participant.uid : '??',
-                    "COMPLETE", 
-                    action.file, 
-                    queueIndex, 
+                    "COMPLETE",
+                    action.file,
+                    queueIndex,
                     state.hash,
                     duration
                 );
                 newState.contributionSummary = contribution;
-                
+
                 updateContribution(ceremony.id, contribution).then( () => {
                     endOfCircuit(state.participant.uid, action.dispatch);
                 });
@@ -376,7 +376,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 if (cct) { cct.isCompleted = true; }
 
                 newState.userContributions.push({...contribution, ceremony: cct});
-    
+
                 //startCreateGist(ceremony, queueIndex, state.hash, state.accessToken, action.dispatch);
             }
             newState.progress = 0;
@@ -390,7 +390,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 const { queueIndex, ceremony } = state.contributionState;
                 if (action.gistUrl) {
                     addCeremonyEvent(ceremony.id, createCeremonyEvent(
-                        "GIST_CREATED", 
+                        "GIST_CREATED",
                         `Contribution recorded at ${action.gistUrl}`,
                         queueIndex
                     ));
@@ -429,7 +429,7 @@ export const computeStateReducer = (state: any, action: any):any => {
         }
         case 'ACKNOWLEDGE': {
             console.debug(`ACKNOWLEDGE`);
-            startWorkerThread(action.dispatch);
+            if (!state.worker) startWorkerThread(action.dispatch);
             return {...state, step: Step.ACKNOWLEDGED};
         }
         case 'WAIT': {
@@ -487,8 +487,8 @@ export const computeStateReducer = (state: any, action: any):any => {
                 newState.step = Step.COMPLETE;
             }
             updateCompletedCircuits(state.circuits, action.data.contributions);
-            return {...state, 
-                contributionCount: action.data.count, 
+            return {...state,
+                contributionCount: action.data.count,
                 userContributions: action.data.contributions,
                 step: newState.step,
                 joiningCircuit: false,
@@ -515,7 +515,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             updateContribution(ceremonyId, newCont).then(() => {
                 // Add event notifying of error
                 addCeremonyEvent(ceremonyId, createCeremonyEvent(
-                    "ABORTED", 
+                    "ABORTED",
                     `Error encountered while processing: ${action.data}`,
                     contribution.queueIndex
                 )).then(() => {

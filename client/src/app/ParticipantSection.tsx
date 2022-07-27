@@ -1,22 +1,20 @@
-import React, { Dispatch, useContext, useEffect, useRef } from "react";
+import { Dispatch, useContext, useEffect, useRef } from "react";
 import Typography from "@material-ui/core/Typography";
 import { AuthContextInterface, AuthStateContext } from "../state/AuthContext";
 
 import { Ceremony, Participant, Project } from "../types/ceremony";
 
-import { 
-  ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings, joinCircuit } from "../api/FirestoreApi";
+import { ceremonyQueueListenerUnsub, joinCircuit } from "../api/FirestoreApi";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext, ComputeContextInterface } from '../state/ComputeStateManager';
 import { getContributions } from "../state/Compute";
 import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
 import ProgressPanel from "../components/ProgressPanel";
 import LoginPanel from "../components/LoginPanel";
-import { auth } from "firebase-admin";
 
 const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
 
-const handleStepChange = (state: ComputeContextInterface, 
+const handleStepChange = (state: ComputeContextInterface,
     dispatch: Dispatch<any> | undefined,
     authState: AuthContextInterface
   ) => {
@@ -68,7 +66,7 @@ const handleStepChange = (state: ComputeContextInterface,
 };
 
 const joinNewCircuit = (
-  dispatch: Dispatch<any>, 
+  dispatch: Dispatch<any>,
   circuits: Ceremony[],
   participant: Participant | undefined,
   joiningCircuit: boolean = false,
@@ -91,7 +89,7 @@ const joinNewCircuit = (
       console.warn(`lastValidIndex is 0. Queue update not accepted`);
     }
   }
-  
+
   console.debug(`joinCircuit ${joiningCircuit}`);
   const newCircuit = advanceCircuit(circuits);
   console.debug(`new circuit is ${newCircuit?.id}`);
@@ -145,7 +143,7 @@ export const ParticipantSection = () => {
   const authState = useContext(AuthStateContext);
   const summaryStarted = useRef<boolean>(false);
 
-  const { step, computeStatus, participant, contributionState, circuits, 
+  const { step, computeStatus, participant, contributionState, circuits,
     joiningCircuit, worker, seriesIsComplete, userContributions, summaryGistUrl, project, accessToken } = state;
 
   useEffect(() => {
@@ -196,10 +194,10 @@ export const ParticipantSection = () => {
         break;
       }
       case (Step.INITIALISED):
-      case (Step.ENTROPY_COLLECTED): 
-      case (Step.WAITING): 
-      case (Step.QUEUED): 
-      case (Step.RUNNING): 
+      case (Step.ENTROPY_COLLECTED):
+      case (Step.WAITING):
+      case (Step.QUEUED):
+      case (Step.RUNNING):
       case (Step.COMPLETE): {
         content = (<ProgressPanel />);
         break;
@@ -207,8 +205,8 @@ export const ParticipantSection = () => {
   }};
 
   return (
-      <div>
+      <>
         {content}
-      </div>
+      </>
   );
 };

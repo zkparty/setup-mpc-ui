@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dispatch, PropsWithChildren, useEffect, useReducer, useState } from "react";
+import { Dispatch, PropsWithChildren, useEffect, useReducer } from "react";
 import firebase from "firebase";
 import { getSiteSettings, getUserStatus } from "../api/FirestoreApi";
 
@@ -42,7 +42,7 @@ export const AuthContextProvider = (props:AuthProps) => {
           getSiteSettings()
             .then(data => {if (data) dispatch({ type: 'SITE_SETTINGS', data })})
             .catch(err => console.error(`Error getting site settings: ${err.message}`));
-        
+
           //console.debug(`dispatch login ${JSON.stringify(user)}`);
           dispatch({
             type: 'LOGIN',
@@ -77,7 +77,7 @@ export const AuthContextProvider = (props:AuthProps) => {
           }
         });
     }
-    
+
   }, [state.loaded, state.authUser, state.project, state.defaultProject]);
 
   return (

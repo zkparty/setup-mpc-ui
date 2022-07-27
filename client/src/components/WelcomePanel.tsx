@@ -25,7 +25,7 @@ export default function WelcomePanel(props: any) {
   <div style={{ display: 'flex', flexFlow: 'column', alignItems: 'center' }}>
     <WelcomeTitle>Welcome.</WelcomeTitle>
     <div style={{ height: '41px' }} />
-    {isRunning ? 
+    {isRunning ?
       (
         <div>
           <SubtleBody style={{ textAlign: 'center' }}>
