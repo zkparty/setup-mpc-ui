@@ -12,11 +12,13 @@ export const startDownload = (ceremonyId: string, index: number, prefix: string,
     const progressCb = (progress: number) => dispatch({type: 'PROGRESS_UPDATE', data: progress})
     getParamsFile(ceremonyId, index, prefix, suffix, progressCb).then( paramData => {
         //setTimeout(() => {
+            // deep copy so params can be transfered to worker (even with multiple invocations of same function)
+            const paramsToTransferToWorker = new Uint8Array(paramData);
             console.debug(`downloaded ${paramData?.length}`);
             dispatch({
                 type: 'DOWNLOADED',
                 ceremonyId,
-                data: paramData,
+                data: paramsToTransferToWorker,
                 dispatch,
             });
         //}, 500);
