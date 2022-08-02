@@ -40,6 +40,8 @@
     <title>Trusted Setup</title>
   </head>
   <body>
+    <!-- The script belows should be deleted when Firefox implements Module Workers: https://bugzilla.mozilla.org/show_bug.cgi?id=1247687-->
+    <script src="/module-workers-polyfill.js"></script>
     <div id="root"></div>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
