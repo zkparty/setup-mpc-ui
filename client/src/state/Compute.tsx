@@ -46,7 +46,8 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, partic
                         dispatch({type: 'COMPUTE_DONE', newParams: result, dispatch });
                 }); */
     } catch (err) {
-        console.error(`Error in contribute: ${err}`);
+        if (err.name === 'DataCloneError') console.warn(`This might be caused by React running the reducer twice to guarantee pureness. Read more in https://github.com/facebook/react/issues/16295: ${err}`);
+        else console.error(`Error in contribute: ${err}`);
     }
 };
 
