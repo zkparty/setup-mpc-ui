@@ -15,8 +15,7 @@ export function getCeremonySummariesCached(): Promise<Ceremony[]> {
       return json.map(jsonToCeremony);
     })
     .catch(err => {
-      console.error("Error occurred fetching ceremonies:");
-      console.error(err);
+      console.error("Error occurred fetching ceremonies: " + err);
       throw err;
     });
 }
@@ -31,8 +30,7 @@ export function getCeremonySummaries(): Promise<Ceremony[]> {
       return json.map(jsonToCeremony);
     })
     .catch(err => {
-      console.error("Error occurred fetching ceremonies:");
-      console.error(err);
+      console.error("Error occurred fetching ceremonies: " + err);
       throw err;
     });
 }
@@ -53,8 +51,7 @@ export function getCeremonyDataCached(id: string): Promise<Ceremony | null> {
       return jsonToCeremony(json);
     })
     .catch(err => {
-      console.error("Error occurred fetching ceremony:");
-      console.error(err);
+      console.error("Error occurred fetching ceremony: " + err);
       throw err;
     });
 }
@@ -75,31 +72,13 @@ export function getCeremonyData(id: string): Promise<Ceremony | null> {
       return jsonToCeremony(json);
     })
     .catch(err => {
-      console.error("Error occurred fetching ceremony:");
-      console.error(err);
+      console.error("Error occurred fetching ceremony: " + err);
       throw err;
     });
 };
 
 export function addCeremony(ceremony: Ceremony): Promise<string> {
   return addCeremonyToDB(ceremony);
-  // throws if fetch error
-  // return fetch(`${url}/api/add-ceremony`, {
-  //   method: "post",
-  //   body: JSON.stringify(ceremony),
-  //   headers: { "Content-Type": "application/json" }
-  // })
-  //   .then(response => {
-  //     return response.json();
-  //   })
-  //   .then(json => {
-  //     return json.id;
-  //   })
-  //   .catch(err => {
-  //     console.error("Error occurred posting ceremony:");
-  //     console.error(err);
-  //     throw err;
-  //   });
 };
 
 const tryDate = (d: firebase.firestore.Timestamp | undefined, defaultResult?: Date): Date | undefined => {
@@ -126,7 +105,7 @@ export function jsonToCeremony(json: any): Ceremony {
   } = json;
 
   try {
-    let c = 
+    let c =
     {
       ...rest,
       lastSummaryUpdate: tryDate(lastSummaryUpdate),
@@ -134,7 +113,7 @@ export function jsonToCeremony(json: any): Ceremony {
       endTime: tryDate(endTime),
     };
     return c;
-  } catch (e) { 
+  } catch (e) {
     if (e instanceof Error)
       console.warn(`Error converting ceremony: ${e.message}`);
     throw e;
@@ -183,8 +162,7 @@ const addGist = async (summary: string, description: string, authToken: string):
 
   })
   .catch(err => console.warn(`Error creating gist. ${err}`));
-  
-  console.debug(`${res && res.ok ? 'ok' : 'error'}`);
+
   if (res && res.ok) return (await res.json()).html_url;
   return '';
 }
@@ -195,8 +173,8 @@ export const createSummaryGist = async (settings: any, userContributions: any[],
   const template = gistBodyTemplate ? gistBodyTemplate.replaceAll('{EOL}', EOL) : '{BODY}';
   let body = '';
   userContributions.map(c => {
-    body += 
-    `Circuit: ${c.ceremony.title} 
+    body +=
+    `Circuit: ${c.ceremony.title}
           Contributor # ${c.queueIndex}
           Hash: ${c.hash}
 

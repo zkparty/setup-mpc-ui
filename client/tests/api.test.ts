@@ -22,9 +22,7 @@ const initDb = async (): Promise<any> => {
         projectId: "demo-ts",
       });
 
-    console.log(`location ${typeof(firebase.firestore)}`);
     var db = await firebase.firestore();
-    console.log(`emulator `);
     db.useEmulator("localhost", 8080);
 
     return db;
@@ -45,7 +43,7 @@ test('add to db', async () => {
     expect(snap).toBeDefined();
 
     console.log(`id ${snap.id} ${snap.get('name')}`);
-   
+
 });
 
 const createCircuit = async (): Promise<string> => {
@@ -54,7 +52,7 @@ const createCircuit = async (): Promise<string> => {
         const project = {
             name: 'test',
             shortName: 'test',
-    
+
         };
         const circuit: Ceremony = {
             id: '',
@@ -81,8 +79,8 @@ const createCircuit = async (): Promise<string> => {
             waiting: 0,
             highestQueueIndex: 0,
         };
-    
-        return addCeremony(circuit);        
+
+        return addCeremony(circuit);
 }
 
 const PARTICIPANT_ID_1 = 'p1';
@@ -110,7 +108,7 @@ it('should join circuit', async () => {
     contrib.status = 'WAITING';
     await insertContribution(cId, contrib);
 
-    // Come in as a new participant. 
+    // Come in as a new participant.
     let newContrib = await joinCircuit(cId, PARTICIPANT_ID_3);
 
     expect(newContrib).toBeDefined();
@@ -142,7 +140,7 @@ it('should reuse queue index', async () => {
     let newContrib = await joinCircuit(cId, PARTICIPANT_ID_2);
     const indexToBeReused = newContrib?.queueIndex;
 
-    // Add intervening participants. 
+    // Add intervening participants.
     newContrib = await joinCircuit(cId, PARTICIPANT_ID_3);
     newContrib = await joinCircuit(cId, PARTICIPANT_ID_4);
 
@@ -173,9 +171,9 @@ it('should not reuse queue index after timing out', async () => {
         queueIndex: newContrib?.queueIndex,
     }
     updateContribution(cId, contrib);
-    
 
-    // Add intervening participants. 
+
+    // Add intervening participants.
     newContrib = await joinCircuit(cId, PARTICIPANT_ID_3);
     newContrib = await joinCircuit(cId, PARTICIPANT_ID_4);
 
@@ -252,8 +250,8 @@ it('should add events', async () => {
     // Callback for event updates
     let updateCount: number = 0;
     const cctUpdated = (
-        contrib: ContributionSummary, 
-        updateType: string, 
+        contrib: ContributionSummary,
+        updateType: string,
         oldIndex?: number ) => {
             updateCount++;
             console.log(`cctUpdated ${contrib.queueIndex} ${updateType} ${oldIndex || '-'}`);
@@ -279,16 +277,16 @@ it('should add events', async () => {
     event.index = 2;
     await addCeremonyEvent(cId, event);
 
-    
-    await unsub();    
+
+    await unsub();
 
     expect(updateCount).toEqual(2);
 
 
-    
-    // 
+
+    //
     // TODO
-    // Test join queue 
+    // Test join queue
     //
 
     // Testing for race conditions:
@@ -298,5 +296,5 @@ it('should add events', async () => {
     // Wait for all threads to complete
     // Test that all queue numbers are different
 
-    
+
 });

@@ -26,8 +26,7 @@ function getCeremonySummariesCached() {
   }).then(function (json) {
     return json.map(jsonToCeremony);
   }).catch(function (err) {
-    console.error("Error occurred fetching ceremonies:");
-    console.error(err);
+    console.error("Error occurred fetching ceremonies: " + err);
     throw err;
   });
 }
@@ -41,8 +40,7 @@ function getCeremonySummaries() {
   }).then(function (json) {
     return json.map(jsonToCeremony);
   }).catch(function (err) {
-    console.error("Error occurred fetching ceremonies:");
-    console.error(err);
+    console.error("Error occurred fetching ceremonies: " + err);
     throw err;
   });
 }
@@ -64,8 +62,7 @@ function getCeremonyDataCached(id) {
 
     return jsonToCeremony(json);
   }).catch(function (err) {
-    console.error("Error occurred fetching ceremony:");
-    console.error(err);
+    console.error("Error occurred fetching ceremony: " + err);
     throw err;
   });
 }
@@ -87,8 +84,7 @@ function getCeremonyData(id) {
 
     return jsonToCeremony(json);
   }).catch(function (err) {
-    console.error("Error occurred fetching ceremony:");
-    console.error(err);
+    console.error("Error occurred fetching ceremony: " + err);
     throw err;
   });
 }

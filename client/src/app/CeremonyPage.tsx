@@ -79,7 +79,6 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
   const [viewLogOpen, setOpenViewLog] = useState(false);
 
   let { ceremonyId } = selection;
-  console.log(`have id ${ceremonyId}`);
 
   const statusUpdate = (event: CeremonyEvent) => {
     enqueueSnackbar(event.message);
@@ -92,7 +91,6 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
 
   const updateContribution = (doc: ContributionSummary, changeType: string, oldIndex?: number) => {
     // A contribution has been updated
-    //console.debug(`contribution update: ${doc.queueIndex} ${changeType} ${oldIndex}`);
     let newContributions = contributions;
     switch (changeType) {
       case 'added': {
@@ -137,7 +135,7 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
 
   const gridRows = contributions.map(v => {
     return {
-      ...v, 
+      ...v,
       id: v.queueIndex,
       timestamp: v.timeCompleted ? moment(v.timeCompleted.toDate()).format('lll') : '',
       duration: `${Math.round(moment.duration(v.duration, 'seconds').asMinutes())}m`,
@@ -193,9 +191,9 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
             <br />
             <div style={{ width: '80%', display: 'flex' }}>
               <div style={{ marginLeft: 'auto' }}>
-                <CeremonyDetails 
-                  ceremony={ceremony} 
-                  numContCompleted={contribStats.completed} 
+                <CeremonyDetails
+                  ceremony={ceremony}
+                  numContCompleted={contribStats.completed}
                   numContWaiting={contribStats.waiting}
                   transcript={contribStats.transcript}
                   lastVerified={contribStats.lastVerified}
@@ -207,9 +205,9 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
             </div>
             <br />
             <ContributionsGrid contributions={gridRows} openViewer={openViewLog} />
-            <ViewLog open={viewLogOpen} 
-              close={closeViewLog} 
-              content={viewLogContent.current} 
+            <ViewLog open={viewLogOpen}
+              close={closeViewLog}
+              content={viewLogContent.current}
               title={`Verification transcript for contributor number ${viewLogIndex.current}`}
             />
           </div>
@@ -231,16 +229,16 @@ const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
     <AuthStateContext.Consumer>{Auth => {
       return (<div>
         {Auth.isCoordinator ?
-          (<Fab 
-            variant="round" 
+          (<Fab
+            variant="round"
             onClick={props.handleEdit}
             aria-label="edit">
             <EditIcon />
-          </Fab>) 
+          </Fab>)
           : (<></>)
         }
-        <Fab 
-          variant="round" 
+        <Fab
+          variant="round"
           onClick={props.handleClose}
           aria-label="close">
           <CloseIcon />
@@ -251,14 +249,13 @@ const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
   );
 }
 
-const CeremonyDetails = (props: { 
-    ceremony: Ceremony, 
-    numContCompleted: number, 
-    numContWaiting: number, 
+const CeremonyDetails = (props: {
+    ceremony: Ceremony,
+    numContCompleted: number,
+    numContWaiting: number,
     openViewLog: (c: string, i: any)=>void,
     lastVerified: number,
     transcript: string }) => {
-  //console.debug(`start ${props.ceremony.startTime}`);
 
   const status = ceremonyStatus(props.ceremony);
 
@@ -300,7 +297,7 @@ const CeremonyDetails = (props: {
               <tr>
                 <td className='title'>Verification Transcript</td>
                 <td className='content'>
-                  <button 
+                  <button
                     onClick={() => {props.openViewLog(props.transcript, props.lastVerified)}}
                     style={{ backgroundColor: lighterBackground, color: textColor, borderStyle: 'solid' }}
                   >view</button>
@@ -318,20 +315,20 @@ const CeremonyDetails = (props: {
 };
 
 const getColumns = (openViewer: (s: string, n: any)=>void): GridColDef[] => {
-//  const cols = 
+//  const cols =
   return (
   [
     { field: 'queueIndex', headerName: '#', description: 'Queue position', type: 'number', width: 50, sortable: true },
     { field: 'timestamp', headerName: 'Time', width: 180, sortable: true },
     { field: 'status', headerName: 'Status', width: 120, sortable: false },
     { field: 'duration', headerName: 'Duration', type: 'string', width: 90, sortable: false },
-    { field: 'hash', 
+    { field: 'hash',
       headerName: 'Hash',
       description: 'The hash resulting from this contribution',
       sortable: false,
       width: 120,
     },
-    { field: 'gistUrl', 
+    { field: 'gistUrl',
       headerName: 'Attestation',
       description: 'Link to the attestation',
       sortable: false,
@@ -339,12 +336,12 @@ const getColumns = (openViewer: (s: string, n: any)=>void): GridColDef[] => {
       renderCell: (params: GridCellParams) => {
         const v = params.value?.toString();
         return (
-          v ? 
+          v ?
             <a href={v} target='_blank' style={{ color: textColor }}>link</a>
           : <></>
         )},
     },
-    { field: 'verification', 
+    { field: 'verification',
       headerName: 'Verification',
       description: 'The verification log',
       sortable: false,
@@ -353,8 +350,8 @@ const getColumns = (openViewer: (s: string, n: any)=>void): GridColDef[] => {
         const v = params.value;
         const r = params.row;
         return (
-          v ? 
-            <button 
+          v ?
+            <button
               onClick={() => {
                 openViewer(v?.toString(), params.getValue(1, 'queueIndex'))
               }}
@@ -373,9 +370,9 @@ const ContributionsGrid = (props: { contributions: any[], openViewer: (s: string
   return (
     <div style={{ height: 450, width: 800 }}>
       <Typography variant="h5" style={{ color: accentColor, background: lighterBackground }}>Contributions</Typography>
-      <DataGrid 
-        rows={props.contributions} 
-        columns={cols} 
+      <DataGrid
+        rows={props.contributions}
+        columns={cols}
         pageSize={8}
         rowHeight={40}
         sortingMode='server'

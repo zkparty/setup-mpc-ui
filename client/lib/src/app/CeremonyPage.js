@@ -159,7 +159,7 @@ exports.CeremonyPage = function () {
     ZKPartyApi_1.getCeremonyData(id).then(function (ceremony) {
       setCeremony(ceremony);
     }).catch(function (err) {
-      console.error("error getting ceremony: ".concat(err));
+      console.error("Error getting ceremony: ".concat(err));
     });
   };
 

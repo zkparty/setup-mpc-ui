@@ -171,7 +171,7 @@ export const ParticipantSection = () => {
 
   const logState =  () => {
     const { running,  downloaded,  computed,  uploaded } = computeStatus;
-    console.log(`compute step: ${running? 'running' : '-'
+    console.debug(`compute step: ${running? 'running' : '-'
     } ${running && !downloaded  ? 'downloading' :
         running && downloaded && !computed ? 'computing' :
         running && computed && !uploaded ? 'uploading' :

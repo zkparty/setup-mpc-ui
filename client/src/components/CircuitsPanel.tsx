@@ -31,7 +31,6 @@ export default function CircuitsPanel() {
   const authState = useContext(AuthStateContext);
   const [loaded, setLoaded] = useState(false);
   const [viewWidth, setViewWidth] = useState(window.innerWidth);
-  //console.debug(`render circuits table`);
 
   const { circuits, project, projectId } = state;
   const { isLoggedIn, } = authState;

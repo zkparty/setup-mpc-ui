@@ -4,8 +4,6 @@
 import init, { contribute, initThreadPool } from "./pkg-firefox/small_pot.js";
 //import { parentPort } from 'worker_threads';
 
-console.log(`worker.js isolated? ${self.crossOriginIsolated}`);
-
 postMessage({ type: 'start' });
 
 //self.importScripts('./pkg/small_pot.js');
@@ -28,7 +26,7 @@ async function load() {
 
 function compute(sourceParams, g1Points, g2Points) {
   try {
-    console.debug(`compute starting. params: ${sourceParams.length} ${g1Points}`);
+    console.debug(`compute starting, params: ${sourceParams.length} ${g1Points}`);
     const result = contribute(sourceParams, g1Points, g2Points /*, setHash*/);
     console.debug(`contribute done ${result.length}`);
     const message = {
@@ -38,7 +36,7 @@ function compute(sourceParams, g1Points, g2Points) {
     };
     postMessage(message, [result.buffer]);
   } catch (err) {
-    console.log(`Error in compute: ${JSON.stringify(err)}`);
+    console.error('Error in compute: ' + err);
     postMessage(
       JSON.stringify({
         error: true,
@@ -49,54 +47,26 @@ function compute(sourceParams, g1Points, g2Points) {
   }
 }
 
-// const setHash = (h) => {
-//   console.debug(`hash ${h}`);
-//   postMessage(
-//     JSON.stringify({
-//         error: false,
-//         type: 'HASH',
-//         hash: h
-//     }),
-//   );
-// };
-
-// const reportProgress = (count, total) => {
-//   //console.debug(`sw progress: ${count} of ${total}`);
-//   postMessage(
-//         JSON.stringify({
-//             error: false,
-//             type: 'PROGRESS',
-//             count: count,
-//             total: total
-//         }));
-// };
-
 onmessage = (event) =>  {
-  console.log(`message event: ${JSON.stringify(event.data)} TYPE:${event.data.type}`);
+  console.debug(`message event: ${JSON.stringify(event.data)} TYPE:${event.data.type}`);
   if (event.data && event.data.type === 'LOAD_PARAMS') {
-    console.log(`LOAD_PARAMS in service-worker`);
-
-
-
     //const wasm = import('phase2');
     //setWasm(wasm);
   };
 
   if (event.data && event.data.type === 'LOAD_WASM') {
-    console.log(`LOAD_WASM in service-worker ${event}`);
+    console.debug(`service-worker: LOAD_WASM ${event}`);
     load().then(() => {
       postMessage({ type: 'LOADED' });
-      console.log('loaded')
     });
   };
 
   if (event.data && event.data.type === 'COMPUTE') {
-    console.log(`COMPUTE in service-worker ${JSON.stringify(event.data)}`);
+    console.debug(`service-worker: COMPUTE ${JSON.stringify(event.data)}`);
 
     const sourceParams = new Uint8Array(event.data.params);
     const g1Points = 2**16;
     let g2Points = 2;
-    console.debug(`lengths: ${sourceParams.length}`);
     try {
       compute(sourceParams, g1Points, g2Points);
     } catch (err) {

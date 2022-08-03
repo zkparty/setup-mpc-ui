@@ -14,14 +14,14 @@ export const getParamsFile = async (ceremonyId: string, index: number, prefix: s
 
     const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index, prefix, suffix)}`);
     const metadata = await fileRef.getMetadata()
-        .catch((err: any) => { 
-            console.log(`Expected params file doesn't exist? ${err.message}`); 
+        .catch((err: any) => {
+            console.debug(`Expected params file doesn't exist? ${err.message}`);
             throw err;
     });
-    
+
     const url = await fileRef.getDownloadURL();
     const totBytes = metadata.size;
-    console.log(`Fetching ${url}  ${totBytes} `);
+    console.debug(`fetching ${url}  ${totBytes} `);
 
     const readAllChunks = async (readableStream: any): Promise<Uint8Array> => {
         const reader = readableStream.getReader();
@@ -31,8 +31,6 @@ export const getParamsFile = async (ceremonyId: string, index: number, prefix: s
         do {
             const resp = await reader.read();
             const { value } : { value:Uint8Array } = resp;
-
-            //console.debug(`chunk ${JSON.stringify(resp)}`);
 
             done = resp.done;
             if (!done) {
@@ -70,7 +68,7 @@ export const uploadParams = async (ceremonyId: string, index: number, prefix: st
                     break;
                 }
                 case firebase.storage.TaskState.PAUSED: {
-                    console.log(`upload paused!`)
+                    console.debug(`upload paused!`)
                     break;
                 }
                 }
@@ -80,7 +78,7 @@ export const uploadParams = async (ceremonyId: string, index: number, prefix: st
         },
         () => {
             // success
-            console.log(`Params uploaded to ${uploadTask.snapshot.ref.fullPath}. ${uploadTask.snapshot.totalBytes} bytes`);
+            console.debug(`Params uploaded to ${uploadTask.snapshot.ref.fullPath}. ${uploadTask.snapshot.totalBytes} bytes`);
             resolve(uploadTask.snapshot.ref.fullPath);
     })};
     return new Promise(executor);

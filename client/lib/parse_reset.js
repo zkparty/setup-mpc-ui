@@ -24,8 +24,6 @@ var run = function run() {
     var records = lines.map(function (line) {
       return line.split(',');
     });
-    console.log("records: " + records.length);
-    console.log("records[1]: " + records[1]);
     records.forEach(function (record, i) {
       if (i > 0 && record.length >= 4) {
         FirestoreApi_1.resetContrib(record[1], record[3].trim(), parseInt(record[2]));

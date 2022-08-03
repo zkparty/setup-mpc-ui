@@ -70,7 +70,7 @@ const Login = () => {
         console.debug(`Metamask account: ${account}`);
         // Sign message. TODO - put message in a constant that's also reachable from functions
         const signinMessage = `0x${Buffer.from(SIGNIN_MESSAGE).toString('hex')}`;
-        console.log(`msg to be signed: ${signinMessage}`);
+        console.debug(`msg to be signed: ${signinMessage}`);
         signature = await window.ethereum.request({
           method: 'personal_sign',
           params: [signinMessage, account],
@@ -80,7 +80,7 @@ const Login = () => {
         const sigData = { ethAddress: account, sig: signature };
         localStorage.setItem(COOKIE_NAME, JSON.stringify(sigData));
       }
-      console.log(`Signature: ${signature}`);
+      console.debug(`signature: ${signature}`);
 
       // Get JWT
       const app = firebase.app().options as any;
@@ -102,7 +102,7 @@ const Login = () => {
       });
 
       if (response.status < 300) {
-        console.log(`JWT Response ${response.data}`);
+        console.debug(`JWT Response ${response.data}`);
         // Sign in
         firebase
           .auth()
@@ -135,7 +135,7 @@ const Login = () => {
       if (id) {
         getUserStatus(id, project)
           .then((resp: string) => {
-            console.log(`privs: ${resp}`);
+            console.debug(`privs: ${resp}`);
             if (resp === 'COORDINATOR') {
               dispatch({type: 'SET_COORDINATOR'})
             }

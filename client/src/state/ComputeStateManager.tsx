@@ -259,7 +259,6 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'DOWNLOAD': {
-            console.debug(`DOWNLOAD`);
             if (state.computeStatus.downloading) { // Avoid multiple invocations
                 return state;
             }
@@ -268,7 +267,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             const suffix: string = (state.contributionState.ceremony.mode === 'POWERSOFTAU') ? 'ptau' : 'zkey';
             startDownload(state.contributionState.ceremony.id, state.contributionState.lastValidIndex, state.contributionState.ceremony.zkeyPrefix, suffix, action.dispatch);
             newState.progress = {count: 0, total: 0};
-            console.debug(`Started download`);
+            console.debug(`started download`);
             return newState;
         }
         case 'DOWNLOADED': {
@@ -276,7 +275,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             console.debug(`DOWNLOADED: ${state.computeStatus.downloaded}`);
             if (state.computeStatus.downloaded) { return state } // Avoid duplicate invocations
 
-            //console.log('Source params', action.data);
+
             addCeremonyEvent(action.ceremonyId, createCeremonyEvent(
                 "PARAMS_DOWNLOADED",
                 `Parameters from participant ${state.contributionState.lastValidIndex} downloaded OK`,
@@ -311,7 +310,7 @@ export const computeStateReducer = (state: any, action: any):any => {
                 }
                 separator = ' ';
             }
-            console.debug(`Hash: ${h}`);
+            console.debug(`hash: ${h}`);
             //const msg = `Hash: ${h}`;
             //newState = addMessage(state, msg);
             newState.hash = h;
@@ -320,7 +319,7 @@ export const computeStateReducer = (state: any, action: any):any => {
             return newState;
         }
         case 'COMPUTE_DONE': {
-            console.log(`Computation finished ${action.newParams.length}`);
+            console.debug(`computation finished ${action.newParams.length}`);
             newState.computeStatus = {
                 ...state.computeStatus,
                 computed: true,
@@ -464,7 +463,6 @@ export const computeStateReducer = (state: any, action: any):any => {
         case 'UPDATE_QUEUE': {
             newState.contributionState = {...state.contributionState, ...action.data};
             if (newState.contributionState.queueIndex == newState.contributionState.currentIndex) {
-                console.debug(`we are go`);
                 if (action.unsub) action.unsub(); // unsubscribe from the queue listener
                 newState.step = Step.RUNNING;
                 newState.computeStatus.ready = true;

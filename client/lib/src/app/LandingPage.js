@@ -164,7 +164,7 @@ var ParticipantsSection = function ParticipantsSection() {
     ZKPartyApi_1.getCeremonySummaries().then(function (ceremonies) {
       setCeremonies(ceremonies);
     }).catch(function (err) {
-      console.error("error getting ceremonies: ".concat(err));
+      console.error("Error getting ceremonies: ".concat(err));
     });
   };
 

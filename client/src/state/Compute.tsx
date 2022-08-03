@@ -30,7 +30,7 @@ const PROGRESS_UPDATE = 'PROGRESS_UPDATE';
 export const startComputation = (params: Uint8Array, entropy: Uint8Array, participant: string,
     dispatch: Dispatch<any>, worker: Worker) => {
     try {
-        console.log(`params ${params.buffer.byteLength}`);
+        console.debug(`params ${params.buffer.byteLength}`);
         const message = {
             type: 'COMPUTE',
             params: params.buffer
@@ -39,7 +39,6 @@ export const startComputation = (params: Uint8Array, entropy: Uint8Array, partic
         /*zKey.contribute( inputFd, outFd,
                 participant, entropy.buffer, console, progressOptions).then( */
           /*          (hash: any) => {
-                        console.log(`contribution hash: ${JSON.stringify(hash)}`);
                         dispatch({type: 'SET_HASH', hash});
                         const result = outFd.data;
                         console.debug(`COMPLETE ${result.length}`);
@@ -112,7 +111,7 @@ export const getEntropy = () => {
 export const startWorkerThread = (dispatch: Dispatch<any>) => {
     if (!dispatch) return;
 
-    console.log(`CrossOriginIsolated? ${window.crossOriginIsolated}`);
+    console.debug(`CrossOriginIsolated? ${window.crossOriginIsolated}`);
     let workerString: string;
     const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
     if ( isFirefox ) workerString = 'worker-firefox.js';
@@ -125,7 +124,7 @@ export const startWorkerThread = (dispatch: Dispatch<any>) => {
     console.debug('worker thread started');
     //worker.onmessage = (e) => ('online', loadWasm);
     worker.onmessage = (event) => {
-        console.log('message from worker:', JSON.stringify(event));
+        console.debug('message from worker:', JSON.stringify(event));
         const data = (typeof event.data === 'string') ?
             JSON.parse(event.data)
           : event.data;
@@ -139,8 +138,6 @@ export const startWorkerThread = (dispatch: Dispatch<any>) => {
             break;
         }
         case 'PROGRESS': {
-            //console.log(`message from service worker ${message}`);
-
             dispatch({
                 type: 'PROGRESS_UPDATE',
                 data: data.total > 0 ? 100 * data.count / data.total : 0,
@@ -158,7 +155,7 @@ export const startWorkerThread = (dispatch: Dispatch<any>) => {
             break;
         }
         case 'ERROR': {
-            console.log(`Error while computing. ${JSON.stringify(data)}`);
+            console.error(`Error while computing. ${JSON.stringify(data)}`);
         }
       }
     };

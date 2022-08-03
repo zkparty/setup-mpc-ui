@@ -19,12 +19,10 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function FileUploader(props: { id: string, onChange: (f: File) => void }) {
-    
+
     const classes = useStyles();
 
     const handleFile = ({ target } : React.ChangeEvent<HTMLInputElement>) => {
-        console.log(`target file: ${target.files? target.files[0].name : "-"}`);
-        
         if (target.files) {
             props.onChange(target.files[0]);
         }

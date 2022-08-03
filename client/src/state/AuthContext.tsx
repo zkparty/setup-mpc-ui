@@ -93,7 +93,7 @@ export const authStateReducer = (state: any, action: any):any => {
   let newState = {...state};
   switch (action.type) {
     case 'LOGIN': {
-      console.debug(`LOGIN token ${action.accessToken}`);
+      console.debug(`login token ${action.accessToken}`);
       if (action.accessToken !== undefined) newState = {...newState, accessToken: action.accessToken};
       return {...newState, isLoggedIn: true, authUser: {...state.authUser, ...action.user}, loaded: true };
     }
@@ -114,6 +114,5 @@ export const authStateReducer = (state: any, action: any):any => {
       return {...newState, project: action.data};
     }
   }
-  console.log(`unknown action type ${action.type}`);
   return state;
 }
