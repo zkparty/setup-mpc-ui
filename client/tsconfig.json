@@ -27,6 +27,7 @@
   },
   "include": [
     "src",
-    "public/worker.js"
+    "public/worker-chrome.js",
+    "public/worker-firefox.js",
   ]
 }

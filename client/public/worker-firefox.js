@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 /* eslint-disable no-restricted-globals */
 
-import init, { contribute, initThreadPool } from "./pkg/small_pot.js";
+import init, { contribute, initThreadPool } from "./pkg-firefox/small_pot.js";
 //import { parentPort } from 'worker_threads';
 
 console.log(`worker.js isolated? ${self.crossOriginIsolated}`);
@@ -77,7 +77,7 @@ onmessage = (event) =>  {
     console.log(`LOAD_PARAMS in service-worker`);
 
 
-    
+
     //const wasm = import('phase2');
     //setWasm(wasm);
   };
@@ -92,7 +92,7 @@ onmessage = (event) =>  {
 
   if (event.data && event.data.type === 'COMPUTE') {
     console.log(`COMPUTE in service-worker ${JSON.stringify(event.data)}`);
-    
+
     const sourceParams = new Uint8Array(event.data.params);
     const g1Points = 2**16;
     let g2Points = 2;

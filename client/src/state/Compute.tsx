@@ -113,7 +113,12 @@ export const startWorkerThread = (dispatch: Dispatch<any>) => {
     if (!dispatch) return;
 
     console.log(`CrossOriginIsolated? ${window.crossOriginIsolated}`);
-    let worker = new Worker('worker.js', { type: "module"});
+    let workerString: string;
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    if ( isFirefox ) workerString = 'worker-firefox.js';
+    else workerString = 'worker-chrome.js';
+    let worker = new Worker(workerString, { type: "module"});
+
     worker.onerror = (err) => {
         console.error(`Error in worker: ${JSON.stringify(err)}`)
     }
