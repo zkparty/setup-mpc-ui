@@ -1,8 +1,9 @@
-import dotenv from 'dotenv';
 import express from 'express';
 import { router as ceremonyRoutes } from './routes/ceremony';
+import {config as dotEnvConfig} from 'dotenv';
 
-dotenv.config();
+dotEnvConfig();
+
 const app = express();
 const port = process.env.PORT;
 
