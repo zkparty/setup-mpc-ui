@@ -11,7 +11,7 @@ export type CeremonyState =
   | "PAUSED"
   | "UNKNOWN";
 
-export interface CeremonyStatus {
+export interface Ceremony {
     // firebase-only data
     id: string;
     title: string;
