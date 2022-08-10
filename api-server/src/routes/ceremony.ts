@@ -3,12 +3,11 @@ import {config as dotEnvConfig} from 'dotenv';
 import { getCeremony } from '../controllers/ceremony';
 
 dotEnvConfig();
-
+const domain: string = process.env.DOMAIN!;
 const router = express.Router();
 
 router.get('/status', async (req: Request, res: Response) => {
-    // TODO: define if API works with only one ceremony or more than one
-    const ceremony = await getCeremony('3');
+    const ceremony = await getCeremony(domain);
     res.json(ceremony);
 });
 

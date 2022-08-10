@@ -9,10 +9,11 @@ dotEnvConfig();
 initializeApp({ credential: cert(serviceAccount as ServiceAccount) });
 
 const app = express();
+const domain = process.env.DOMAIN;
 const port = process.env.PORT;
 
 app.use('/ceremony', ceremonyRoutes);
 
 app.listen(port, async () => {
-  console.log(`⚡️[server]: Running at https://localhost:${port}`);
+  console.log(`⚡️[server]: Running at https://${domain}:${port}`);
 });
