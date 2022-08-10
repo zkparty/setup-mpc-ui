@@ -12,6 +12,7 @@ const app = express();
 const domain = process.env.DOMAIN;
 const port = process.env.PORT;
 
+app.use(express.json());
 app.use('/ceremony', ceremonyRoutes);
 
 app.listen(port, async () => {

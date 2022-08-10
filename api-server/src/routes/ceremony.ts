@@ -1,13 +1,17 @@
 import express, { Request, Response } from 'express';
-import {config as dotEnvConfig} from 'dotenv';
-import { getCeremony } from '../controllers/ceremony';
+import { createCeremony, getCeremony } from '../controllers/ceremony';
+import { Ceremony } from '../models/ceremony';
 
-dotEnvConfig();
-const domain: string = process.env.DOMAIN!;
 const router = express.Router();
 
+router.post('/create', async (req: Request, res: Response) => {
+    const ceremony = req.body as Ceremony;
+    const result = await createCeremony(ceremony);
+    res.json(result);
+});
+
 router.get('/status', async (req: Request, res: Response) => {
-    const ceremony = await getCeremony(domain);
+    const ceremony = await getCeremony();
     res.json(ceremony);
 });
 

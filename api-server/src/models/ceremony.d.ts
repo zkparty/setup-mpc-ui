@@ -12,7 +12,7 @@ export type CeremonyState =
   | "UNKNOWN";
 
 export interface Ceremony {
-    // firebase-only data
+    // user should input this
     id: string;
     title: string;
     serverURL: string;
@@ -23,26 +23,28 @@ export interface Ceremony {
     github: string;
     homepage: string;
     adminAddr: string;
-    lastSummaryUpdate: Date;
-
+    startTime: Date;
+    endTime: Date;
+    minParticipants: number;
+    // server would compute this
     ceremonyState: CeremonyState;
-    startTime: Date | string;
-    endTime: Date | string | undefined;
-    completedAt?: Date;
+    zkeyPrefix: string;
     paused: boolean;
     selectBlock: number;
-    minParticipants: number;
+    lastSummaryUpdate: Date;
     maxTier2: number;
     sequence: number;
-    ceremonyProgress: number; // this is only returned by /api/state-summary, else must be computed by us
-    numParticipants: number; // this is only returned by /api/state-summary, else must be computed by us
+    ceremonyProgress: number;
+    numParticipants: number;
     complete: number;
     waiting: number;
+    currentIndex: number;
+    lastValidIndex: number;
+    highestQueueIndex: number;
+    completedAt?: Date;
     numConstraints?: number;
     averageDuration?: number;
     transcript?: string;
     hash?: string; // Participant's own hash
     isCompleted?: boolean; // Participant has completed this circuit
-    highestQueueIndex: number;
-    zkeyPrefix: string;
 }
