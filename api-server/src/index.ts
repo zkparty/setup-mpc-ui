@@ -1,4 +1,5 @@
 import express from 'express';
+import morgan from 'morgan';
 import {config as dotEnvConfig} from 'dotenv';
 import { initializeApp, cert, ServiceAccount } from 'firebase-admin/app';
 import { router as ceremonyRoutes } from './routes/ceremony';
@@ -13,6 +14,7 @@ const domain = process.env.DOMAIN;
 const port = process.env.PORT;
 
 app.use(express.json());
+app.use(morgan('combined'));
 app.use('/ceremony', ceremonyRoutes);
 
 app.listen(port, async () => {
