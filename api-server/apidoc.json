@@ -1,0 +1,7 @@
+  {
+    "name": "API Server",
+    "version": "1.0.0",
+    "description": "",
+    "sampleUrl": "http://localhost:3003",
+    "header": { "filename": "README.md" }
+  }
