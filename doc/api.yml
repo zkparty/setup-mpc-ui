@@ -106,7 +106,7 @@ paths:
       description: Advises the participant's readiness to begin the computation. The
         server will verify the participant's eligibility to start, and, if eligible,
         return the last valid transcript.
-      operationId: constributionStart
+      operationId: contributionStart
       produces:
       - application/json
       responses:
@@ -117,7 +117,7 @@ paths:
         400:
           description: Invalid ID supplied
         404:
-          description: Pet not found
+          description: Not found
   /contribution/status:
     post:
       tags:
@@ -128,21 +128,10 @@ paths:
       - application/json
       parameters:
       - in: path
-        name: petId
-        description: ID of pet to update
+        name: userId
+        description: contributor's ID
         required: true
-        format: int64
-        type: integer
-      - in: formData
-        name: additionalMetadata
-        description: Additional data to pass to server
-        required: false
         type: string
-      - in: formData
-        name: file
-        description: file to upload
-        required: false
-        type: file
       responses:
         200:
           description: successful operation
