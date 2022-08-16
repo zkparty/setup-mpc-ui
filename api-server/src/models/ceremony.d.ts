@@ -3,11 +3,9 @@ export type ComputeMode =
   | "POWERSOFTAU";
 
 export type CeremonyState =
-  | "PRESELECTION"
-  | "SELECTED"
-  | "RUNNING"
-  | "COMPLETE"
   | "WAITING"
+  | "RUNNING"
+  | "COMPLETED"
   | "PAUSED"
   | "UNKNOWN";
 
@@ -28,19 +26,15 @@ export interface Ceremony {
     minParticipants: number;
     // server would compute this
     ceremonyState: CeremonyState;
-    zkeyPrefix: string;
-    paused: boolean;
-    selectBlock: number;
     lastSummaryUpdate: Date;
-    maxTier2: number;
-    sequence: number;
-    ceremonyProgress: number;
     numParticipants: number;
     complete: number;
     waiting: number;
     currentIndex: number;
     lastValidIndex: number;
     highestQueueIndex: number;
+    sequence?: number;
+    zkeyPrefix?: string;
     completedAt?: Date;
     numConstraints?: number;
     averageDuration?: number;

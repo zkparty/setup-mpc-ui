@@ -16,13 +16,21 @@ const router = express.Router();
  * @apiSuccessExample {json} Success-Response:
  *  HTTP/1.1 200 OK
  *  {
- *    "JWT": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjB4NUNhNTY1NjlENUNDNTA4MmMzOWEyYTAzMWEwYzYzMTQzMTYzOGI5NyIsImlhdCI6MTUxNjIzOTAyMn0.I8BXaPkl65vjwYpL7Xf3uDBhPusunGMb90pfCE7BxL8"
+ *    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjB4NUNhNTY1NjlENUNDNTA4MmMzOWEyYTAzMWEwYzYzMTQzMTYzOGI5NyIsImlhdCI6MTUxNjIzOTAyMn0.I8BXaPkl65vjwYpL7Xf3uDBhPusunGMb90pfCE7BxL8",
+ *    "message": "User logged in",
+ *    "code": 0
  *  }
+ * @apiErrorExample {json} Success-Response:
+ * HTTP/1.1 200 OK
+ * {
+ *   "message": "Address is too new"
+ *   "code": -1
+ * }
  */
 router.post('/login', async (req: Request, res: Response) => {
     const loginRequest = req.body as LoginRequest;
-    const result = loginParticipant(loginRequest);
-    res.json({'message': 'ok'});
+    const result = await loginParticipant(loginRequest);
+    res.json(result);
 });
 // TODO: create another route for Github login
 
