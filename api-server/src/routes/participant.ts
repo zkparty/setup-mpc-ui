@@ -5,14 +5,18 @@ import { loginParticipant } from '../controllers/participant';
 const router = express.Router();
 
 /**
- * @api {post} /participant/login Log in as a ceremony participant
+ * @api {post} /participant/login/address Log in as a ceremony participant
  * @apiName loginParticipant
  * @apiGroup Participant
  * @apiDescription Every ceremony's participant needs to be logged in to
  * avoid sybil attacks (multiple accounts).
  * @apiBody {String} title="A Test Ceremony"
  * @apiBody {String} description="This is a test for API development"
- * @apiSuccess {String} JWT
+ * @apiSuccess {String} token
+ * @apiSuccess {String} message
+ * @apiSuccess {Number} code
+ * @apiError {String} message
+ * @apiError {Number} code
  * @apiSuccessExample {json} Success-Response:
  *  HTTP/1.1 200 OK
  *  {
@@ -27,7 +31,7 @@ const router = express.Router();
  *   "code": -1
  * }
  */
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login/address', async (req: Request, res: Response) => {
     const loginRequest = req.body as LoginRequest;
     const result = await loginParticipant(loginRequest);
     res.json(result);
