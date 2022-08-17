@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { LoginRequest } from '../models/participant';
-import { loginParticipant } from '../controllers/participant';
+import { loginParticipantWithAddress } from '../controllers/participant';
 
 const router = express.Router();
 
@@ -33,7 +33,7 @@ const router = express.Router();
  */
 router.post('/login/address', async (req: Request, res: Response) => {
     const loginRequest = req.body as LoginRequest;
-    const result = await loginParticipant(loginRequest);
+    const result = await loginParticipantWithAddress(loginRequest);
     res.json(result);
 });
 // TODO: create another route for Github login

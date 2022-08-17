@@ -5,7 +5,7 @@ import { LoginRequest, LoginResponse } from "../models/participant";
 
 dotEnvConfig();
 
-export async function loginParticipant(loginRequest: LoginRequest): Promise<LoginResponse> {
+export async function loginParticipantWithAddress(loginRequest: LoginRequest): Promise<LoginResponse> {
     const {address, signature} = loginRequest;
     const signedMessage: string = process.env.SIGNED_MESSAGE!;
     const hash = ethers.utils.hashMessage(signedMessage);
