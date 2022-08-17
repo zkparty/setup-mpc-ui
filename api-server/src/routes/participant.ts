@@ -36,7 +36,6 @@ router.post('/login/address', async (req: Request, res: Response) => {
     const result = await loginParticipantWithAddress(loginRequest);
     res.json(result);
 });
-// TODO: create another route for Github login
 
 export{router};
 
