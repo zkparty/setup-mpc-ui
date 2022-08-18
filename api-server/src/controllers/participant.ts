@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { auth } from "firebase-admin";
 import {config as dotEnvConfig} from 'dotenv';
-import { LoginRequest, LoginResponse } from "../models/participant";
+import { LoginRequest, LoginResponse, queueStatus } from "../models/participant";
 
 dotEnvConfig();
 
@@ -51,4 +51,8 @@ async function createParticipant(address: string): Promise<LoginResponse> {
         // auth/uid-already-exists is covered in an upper level (login function)
         return <LoginResponse>{code: -4, message: error};
      }
+}
+
+export async function joinQueue(): Promise<queueStatus | {}> {
+    return {};
 }

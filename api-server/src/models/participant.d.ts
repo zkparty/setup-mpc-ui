@@ -7,3 +7,15 @@ export interface LoginResponse {
     token?: string;
     message?: string;
 }
+
+export type queueState =
+  | "WAITING"
+  | "RUNNING"
+  | "COMPLETED"
+  | "ABSENT"
+  | "UNKNOWN";
+export interface queueStatus {
+    status: queueState;
+    expectedTimeToStart: Date;
+    checkingDeadline: Date;
+}

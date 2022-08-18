@@ -36,6 +36,10 @@ router.post('/login/address', async (req: Request, res: Response) => {
     const result = await loginParticipantWithAddress(loginRequest);
     res.json(result);
 });
+// TODO: /queue/join route
+router.post('/queue/join', async (req: Request, res: Response) => {
+    res.json('Hello');
+});
 
 export{router};
 
