@@ -1,10 +1,10 @@
 import { ethers } from 'ethers';
-import { auth } from "firebase-admin";
 import jwt, { Secret } from 'jsonwebtoken';
 import {config as dotEnvConfig} from 'dotenv';
 import { getFirestore } from 'firebase-admin/firestore';
 import { NextFunction, Request, Response } from 'express';
-import { LoginRequest, LoginResponse, User } from "../models/participant";
+import { AuthenticatedRequest, LoginRequest, LoginResponse } from "../models/request";
+import { Participant } from "../models/participant";
 import { getCeremony } from './ceremony';
 
 
@@ -22,7 +22,7 @@ export async function loginParticipantWithAddress(loginRequest: LoginRequest): P
     const user = await getParticipant(address);
     if(user){
         const token = createToken(user);
-        return <LoginResponse>{code: 0, token: token, message: 'User logged in'};
+        return <LoginResponse>{code: 0, token: token, message: 'Participant logged in'};
     } else {
         const result = await createParticipant(address);
         return result;
@@ -35,14 +35,14 @@ function isSignatureInvalid(address: string, signature: string): boolean {
     return recoveredAddress !== ethers.utils.getAddress(address);
 }
 
-async function getParticipant(address: string): Promise<User> {
+async function getParticipant(address: string): Promise<Participant> {
     const db = getFirestore();
     const raw = await db.collection('users-'+DOMAIN).doc(address).get();
-    const data = raw.data() as User;
+    const data = raw.data() as Participant;
     return data;
 }
 
-function createToken(user: User): string {
+function createToken(user: Participant): string {
     const token = jwt.sign(user, JWT_SECRET_KEY, { expiresIn: JWT_EXPIRATION_TIME});
     return token;
 }
@@ -60,7 +60,7 @@ async function createParticipant(address: string): Promise<LoginResponse> {
         const ensName = await RPCnode.lookupAddress(address);
         const [currentIndex, highestIndex] = await getCurrentIndexAndHighestIndex()
         const db = getFirestore();
-        const user: User = {
+        const user: Participant = {
             uid: address,
             displayName: ensName || address,
             role: 'PARTICIPANT',
@@ -73,7 +73,7 @@ async function createParticipant(address: string): Promise<LoginResponse> {
         };
         await db.collection('users-'+DOMAIN).doc(address).set(user);
         const token = createToken(user);
-        return <LoginResponse>{code: 1, token: token, message: 'User created'};
+        return <LoginResponse>{code: 1, token: token, message: 'Participant created'};
      } catch (error) {
         // something went wrong creating the user
         // uid already exists is covered in an upper level (login function)
@@ -96,12 +96,10 @@ export async function authenticateParticipant(req: Request, res: Response, next:
     if (!authHeader){
         res.sendStatus(401);
     }
-    const idToken = authHeader?.split(" ")[1];
+    const token = authHeader?.split(" ")[1];
     try {
-        const firebaseAuth = auth();
-        const user = await firebaseAuth.verifyIdToken(idToken || "");
-        console.log(user)
-        res.locals.user = user.uid;
+        const user = jwt.verify(token || '', JWT_SECRET_KEY) as Participant;
+        (req as AuthenticatedRequest).user = user;
         return next();
     } catch (error) {
         // TODO: specific error in logs. In all error catches

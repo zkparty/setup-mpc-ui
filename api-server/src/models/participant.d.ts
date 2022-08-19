@@ -1,13 +1,3 @@
-export interface LoginRequest {
-    address: string;
-    signature: string;
-}
-export interface LoginResponse {
-    code: number;
-    token?: string;
-    message?: string;
-}
-
 export type userRole =
   | "PARTICIPANT"
   | "COORDINATOR";
@@ -20,7 +10,8 @@ export type queueState =
   | "UNKNOWN"
   | "LEFT"
   | "FAILEDTOCHECK";
-export interface User {
+
+export interface Participant {
     uid: string;
     displayName: string;
     role: userRole;
