@@ -11,14 +11,14 @@ dotEnvConfig();
 initializeApp({ credential: cert(serviceAccount as ServiceAccount) });
 
 const app = express();
-const domain = process.env.DOMAIN;
-const port = process.env.PORT;
+const DOMAIN = process.env.DOMAIN;
+const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(morgan('combined'));
 app.use('/ceremony', ceremonyRoutes);
 app.use('/participant', participantRoutes);
 
-app.listen(port, async () => {
-  console.log(`⚡️[server]: Running at https://${domain}:${port}`);
+app.listen(PORT, async () => {
+  console.log(`⚡️[server]: Running at https://${DOMAIN}:${PORT}`);
 });

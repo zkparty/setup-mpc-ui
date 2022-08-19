@@ -14,6 +14,8 @@ const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET_KEY!;
 const JWT_EXPIRATION_TIME: string = process.env.JWT_EXPIRATION_TIME!;
 const SIGNED_MESSAGE: string = process.env.SIGNED_MESSAGE!;
 const AVERAGE_TIME_IN_SECONDS = Number(process.env.AVERAGE_TIME_IN_SECONDS!);
+const ETH_RPC_URL: string = process.env.ETH_RPC_URL!;
+const ANTI_SYBIL_NONCE_MINIMUM: string = process.env.ANTI_SYBIL_NONCE_MINIMUM!;
 
 export async function loginParticipantWithAddress(loginRequest: LoginRequest): Promise<LoginResponse> {
     const {address, signature} = loginRequest;
@@ -49,10 +51,10 @@ function createToken(user: Participant): string {
 }
 
 async function createParticipant(address: string): Promise<LoginResponse> {
-     const RPCnode = new ethers.providers.JsonRpcProvider(process.env.ETH_RPC_URL);
+     const RPCnode = new ethers.providers.JsonRpcProvider(ETH_RPC_URL);
      // require more than 3 txs, as an anti-sybil mechanism
      const nonce = await RPCnode.getTransactionCount(address);
-     const nonceMinimum= Number(process.env.ANTI_SYBIL_NONCE_MINIMUM);
+     const nonceMinimum= Number(ANTI_SYBIL_NONCE_MINIMUM);
      if (nonce <  nonceMinimum){
          return <LoginResponse>{code: -2, message: 'Address is too new'};
      }
