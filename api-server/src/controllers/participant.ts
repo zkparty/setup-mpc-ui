@@ -19,6 +19,7 @@ const ANTI_SYBIL_NONCE_MINIMUM: string = process.env.ANTI_SYBIL_NONCE_MINIMUM!;
 export async function loginParticipantWithAddress(loginRequest: LoginRequest): Promise<LoginResponse> {
     const {address, signature} = loginRequest;
     if ( isSignatureInvalid(address, signature) ){
+        console.error('LoginError: Invalid signature');
         return <LoginResponse>{code: -1, message: "Invalid signature"};
     }
     const user = await getParticipant(address);
@@ -55,7 +56,8 @@ async function createParticipant(address: string): Promise<LoginResponse> {
      const nonce = await RPCnode.getTransactionCount(address);
      const nonceMinimum= Number(ANTI_SYBIL_NONCE_MINIMUM);
      if (nonce <  nonceMinimum){
-         return <LoginResponse>{code: -2, message: 'Address is too new'};
+        console.error('CreateError: Address is too new');
+        return <LoginResponse>{code: -2, message: 'Address is too new'};
      }
      try {
         // reverse lookup ENS name
@@ -79,6 +81,7 @@ async function createParticipant(address: string): Promise<LoginResponse> {
      } catch (error) {
         // something went wrong creating the user
         // uid already exists is covered in an upper level (login function)
+        console.error('CreateError: ', error);
         return <LoginResponse>{code: -3, message: error};
      }
 }
@@ -120,6 +123,7 @@ async function getCheckingDeadline(): Promise<Date> {
 export async function authenticateParticipant(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
     if (!authHeader){
+        console.error('LoginError: No authorization header');
         res.sendStatus(401);
     }
     const token = authHeader?.split(" ")[1];
@@ -128,7 +132,7 @@ export async function authenticateParticipant(req: Request, res: Response, next:
         (req as AuthenticatedRequest).user = user;
         return next();
     } catch (error) {
-        // TODO: specific error in logs. In all error catches
+        console.error('AuthenticateError: ', error);
         res.sendStatus(401);
     }
 }
