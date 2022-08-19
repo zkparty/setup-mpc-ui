@@ -1,8 +1,32 @@
+import passport from 'passport';
+import {config as dotEnvConfig} from 'dotenv';
 import express, { Request, Response } from 'express';
-import { LoginRequest } from '../models/request';
+import { Strategy as GitHubStrategy} from 'passport-github2';
 import { loginParticipantWithAddress, authenticateParticipant } from '../controllers/participant';
+import { LoginRequest } from '../models/request';
+
+dotEnvConfig();
+
+const PORT = process.env.PORT;
+const DOMAIN = process.env.DOMAIN;
+const GITHUB_CLIENT_ID: string = process.env.GITHUB_CLIENT_ID!;
+const GITHUB_CLIENT_SECRET: string = process.env.GITHUB_CLIENT_SECRET!;
+
+passport.use(new GitHubStrategy({
+    clientID: GITHUB_CLIENT_ID,
+    clientSecret: GITHUB_CLIENT_SECRET,
+    callbackURL: `http://${DOMAIN}:${PORT}/login/github/callback`
+  },
+  function(accessToken: any, refreshToken: any, profile: any, done: any) {
+    // asynchronous verification, for effect...
+    process.nextTick( () => {
+      return done(null, profile);
+    });
+  }
+));
 
 const router = express.Router();
+router.use(passport.initialize());
 
 /**
  * @api {post} /participant/login/address Log in as a ceremony participant
@@ -36,6 +60,16 @@ router.post('/login/address', async (req: Request, res: Response) => {
     const result = await loginParticipantWithAddress(loginRequest);
     res.json(result);
 });
+
+router.get('/login/github', passport.authenticate('github', { scope: [ 'user:email' ] }), (req: Request, res: Response) => {});
+
+router.get('/login/github/callback', passport.authenticate('github', { failureRedirect: '/login' }), (req: Request, res: Response) => {
+    // TODO
+    const githubUser = req.user;
+    res.send(githubUser);
+});
+
+
 // TODO: /queue/join route
 router.get('/queue/join', authenticateParticipant, async (req: Request, res: Response) => {
     res.json('Hello');
