@@ -1,4 +1,4 @@
-export type userRole =
+export type participantRole =
   | "PARTICIPANT"
   | "COORDINATOR";
 
@@ -14,7 +14,7 @@ export type queueState =
 export interface Participant {
     uid: string;
     displayName: string;
-    role: userRole;
+    role: participantRole;
     addedAt: Date;
     lastUpdate: Date;
     status: queueState;
