@@ -40,7 +40,7 @@ function isSignatureInvalid(address: string, signature: string): boolean {
 
 async function getParticipant(address: string): Promise<Participant> {
     const db = getFirestore();
-    const raw = await db.collection('users-'+DOMAIN).doc(address).get();
+    const raw = await db.collection('ceremonies').doc(DOMAIN).collection('participants').doc(address).get();
     const data = raw.data() as Participant;
     return data;
 }
@@ -75,7 +75,7 @@ async function createParticipant(address: string): Promise<LoginResponse> {
             expectedTimeToStart: getExpectedTimeToStart(averageTime, currentIndex, highestIndex),
             checkingDeadline: await getCheckingDeadline(),
         };
-        await db.collection('users-'+DOMAIN).doc(address).set(user);
+        await db.collection('ceremonies').doc(DOMAIN).collection('participants').doc(address).set(user);
         const token = createToken(user);
         return <LoginResponse>{code: 1, token: token, message: 'Participant created'};
      } catch (error) {
@@ -93,7 +93,7 @@ async function getAverageTimeAndIndexes(): Promise<[number,number,number]> {
     const highestIndex = ceremony.highestQueueIndex;
     ceremony.highestQueueIndex = highestIndex + 1;
     const db = getFirestore();
-    await db.collection('counts').doc(DOMAIN).set(ceremony);
+    await db.collection('ceremonies').doc(DOMAIN).set(ceremony);
     return [averageTime, currentIndex, highestIndex];
 }
 
