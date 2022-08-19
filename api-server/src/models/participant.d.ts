@@ -8,14 +8,26 @@ export interface LoginResponse {
     message?: string;
 }
 
+export type userRole =
+  | "PARTICIPANT"
+  | "COORDINATOR";
+
 export type queueState =
   | "WAITING"
   | "RUNNING"
   | "COMPLETED"
   | "ABSENT"
-  | "UNKNOWN";
-export interface queueStatus {
+  | "UNKNOWN"
+  | "LEFT"
+  | "FAILEDTOCHECK";
+export interface User {
+    uid: string;
+    displayName: string;
+    role: userRole;
+    addedAt: Date;
+    lastUpdate: Date;
     status: queueState;
+    index: number;
     expectedTimeToStart: Date;
     checkingDeadline: Date;
 }

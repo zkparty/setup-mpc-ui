@@ -3,12 +3,12 @@ import {config as dotEnvConfig} from 'dotenv';
 import { Ceremony } from '../models/ceremony';
 
 dotEnvConfig();
-const domain: string = process.env.DOMAIN!;
+const DOMAIN: string = process.env.DOMAIN!;
 
 export async function createCeremony(ceremony: Ceremony): Promise<WriteResult> {
     const db = getFirestore();
-    ceremony.id = domain;
-    ceremony.serverURL = `https://${domain}`;
+    ceremony.id = DOMAIN;
+    ceremony.serverURL = `https://${DOMAIN}`;
     ceremony.ceremonyState = 'WAITING';
     ceremony.lastSummaryUpdate = new Date;
     ceremony.numParticipants = 0;
@@ -17,13 +17,13 @@ export async function createCeremony(ceremony: Ceremony): Promise<WriteResult> {
     ceremony.currentIndex = 0;
     ceremony.lastValidIndex = 0;
     ceremony.highestQueueIndex = 0;
-    const result = await db.collection('ceremonies').doc(domain).set(ceremony);
+    const result = await db.collection('ceremonies').doc(DOMAIN).set(ceremony);
     return result;
 }
 
 export async function getCeremony(): Promise<Ceremony> {
     const db = getFirestore();
-    const raw = await db.collection('ceremonies').doc(domain).get();
+    const raw = await db.collection('ceremonies').doc(DOMAIN).get();
     const data = raw.data() as Ceremony;
     return data || {};
 }

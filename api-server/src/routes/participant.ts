@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { LoginRequest } from '../models/participant';
-import { loginParticipantWithAddress } from '../controllers/participant';
+import { loginParticipantWithAddress, authenticateParticipant } from '../controllers/participant';
 
 const router = express.Router();
 
@@ -37,7 +37,7 @@ router.post('/login/address', async (req: Request, res: Response) => {
     res.json(result);
 });
 // TODO: /queue/join route
-router.post('/queue/join', async (req: Request, res: Response) => {
+router.get('/queue/join', authenticateParticipant, async (req: Request, res: Response) => {
     res.json('Hello');
 });
 

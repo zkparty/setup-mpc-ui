@@ -1,34 +1,50 @@
 import { ethers } from 'ethers';
 import { auth } from "firebase-admin";
+import jwt, { Secret } from 'jsonwebtoken';
 import {config as dotEnvConfig} from 'dotenv';
-import { LoginRequest, LoginResponse, queueStatus } from "../models/participant";
+import { getFirestore } from 'firebase-admin/firestore';
+import { NextFunction, Request, Response } from 'express';
+import { LoginRequest, LoginResponse, User } from "../models/participant";
+import { getCeremony } from './ceremony';
+
 
 dotEnvConfig();
+const DOMAIN: string = process.env.DOMAIN!;
+const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET_KEY!;
+const JWT_EXPIRATION_TIME: string = process.env.JWT_EXPIRATION_TIME!;
+const SIGNED_MESSAGE: string = process.env.SIGNED_MESSAGE!;
 
 export async function loginParticipantWithAddress(loginRequest: LoginRequest): Promise<LoginResponse> {
     const {address, signature} = loginRequest;
-    const signedMessage: string = process.env.SIGNED_MESSAGE!;
-    const hash = ethers.utils.hashMessage(signedMessage);
-    const recoveredAddress = ethers.utils.recoverAddress(hash, signature);
-    // check signature is correct
-    if (recoveredAddress !== ethers.utils.getAddress(address)){
+    if ( isSignatureInvalid(address, signature) ){
         return <LoginResponse>{code: -1, message: "Invalid signature"};
     }
-    try {
-        // check if user exists
-        const firebaseAuth = auth();
-        const user = await firebaseAuth.getUser(address);
-        const token = await firebaseAuth.createCustomToken(user.uid);
+    const user = await getParticipant(address);
+    if(user){
+        const token = createToken(user);
         return <LoginResponse>{code: 0, token: token, message: 'User logged in'};
-    } catch (error: any) {
-        if (error.code === 'auth/user-not-found'){
-            const result = await createParticipant(address);
-            return result;
-        } else {
-            // something went wrong with Firebase
-            return <LoginResponse>{code: -3, message: error}
-        }
+    } else {
+        const result = await createParticipant(address);
+        return result;
     }
+}
+
+function isSignatureInvalid(address: string, signature: string): boolean {
+    const hash = ethers.utils.hashMessage(SIGNED_MESSAGE);
+    const recoveredAddress = ethers.utils.recoverAddress(hash, signature);
+    return recoveredAddress !== ethers.utils.getAddress(address);
+}
+
+async function getParticipant(address: string): Promise<User> {
+    const db = getFirestore();
+    const raw = await db.collection('users-'+DOMAIN).doc(address).get();
+    const data = raw.data() as User;
+    return data;
+}
+
+function createToken(user: User): string {
+    const token = jwt.sign(user, JWT_SECRET_KEY, { expiresIn: JWT_EXPIRATION_TIME});
+    return token;
 }
 
 async function createParticipant(address: string): Promise<LoginResponse> {
@@ -40,19 +56,56 @@ async function createParticipant(address: string): Promise<LoginResponse> {
          return <LoginResponse>{code: -2, message: 'Address is too new'};
      }
      // reverse lookup ENS name
-     const ensName = await RPCnode.lookupAddress(address);
      try {
-        const firebaseAuth = auth();
-        const user = await firebaseAuth.createUser({uid : address, displayName: ensName || address});
-        const token = await firebaseAuth.createCustomToken(user.uid);
+        const ensName = await RPCnode.lookupAddress(address);
+        const [currentIndex, highestIndex] = await getCurrentIndexAndHighestIndex()
+        const db = getFirestore();
+        const user: User = {
+            uid: address,
+            displayName: ensName || address,
+            role: 'PARTICIPANT',
+            addedAt: new Date(),
+            lastUpdate: new Date(),
+            status: "WAITING",
+            index: highestIndex,
+            expectedTimeToStart: new Date(), // TODO
+            checkingDeadline: new Date(), // TODO
+        };
+        await db.collection('users-'+DOMAIN).doc(address).set(user);
+        const token = createToken(user);
         return <LoginResponse>{code: 1, token: token, message: 'User created'};
      } catch (error) {
         // something went wrong creating the user
-        // auth/uid-already-exists is covered in an upper level (login function)
-        return <LoginResponse>{code: -4, message: error};
+        // uid already exists is covered in an upper level (login function)
+        return <LoginResponse>{code: -3, message: error};
      }
 }
 
-export async function joinQueue(): Promise<queueStatus | {}> {
-    return {};
+async function getCurrentIndexAndHighestIndex(): Promise<[number,number]> {
+    const ceremony = await getCeremony();
+    const currentIndex = ceremony.currentIndex;
+    const highestIndex = ceremony.highestQueueIndex;
+    ceremony.highestQueueIndex = highestIndex + 1;
+    const db = getFirestore();
+    await db.collection('counts').doc(DOMAIN).set(ceremony);
+    return [currentIndex, highestIndex];
 }
+
+export async function authenticateParticipant(req: Request, res: Response, next: NextFunction){
+    const authHeader = req.headers.authorization;
+    if (!authHeader){
+        res.sendStatus(401);
+    }
+    const idToken = authHeader?.split(" ")[1];
+    try {
+        const firebaseAuth = auth();
+        const user = await firebaseAuth.verifyIdToken(idToken || "");
+        console.log(user)
+        res.locals.user = user.uid;
+        return next();
+    } catch (error) {
+        // TODO: specific error in logs. In all error catches
+        res.sendStatus(401);
+    }
+}
+
