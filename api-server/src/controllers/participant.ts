@@ -10,11 +10,10 @@ import { getCeremony } from './ceremony';
 
 dotEnvConfig();
 const DOMAIN: string = process.env.DOMAIN!;
-const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET_KEY!;
-const JWT_EXPIRATION_TIME: string = process.env.JWT_EXPIRATION_TIME!;
-const SIGNED_MESSAGE: string = process.env.SIGNED_MESSAGE!;
-const AVERAGE_TIME_IN_SECONDS = Number(process.env.AVERAGE_TIME_IN_SECONDS!);
 const ETH_RPC_URL: string = process.env.ETH_RPC_URL!;
+const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET_KEY!;
+const SIGNED_MESSAGE: string = process.env.SIGNED_MESSAGE!;
+const JWT_EXPIRATION_TIME: string = process.env.JWT_EXPIRATION_TIME!;
 const ANTI_SYBIL_NONCE_MINIMUM: string = process.env.ANTI_SYBIL_NONCE_MINIMUM!;
 
 export async function loginParticipantWithAddress(loginRequest: LoginRequest): Promise<LoginResponse> {
@@ -58,10 +57,10 @@ async function createParticipant(address: string): Promise<LoginResponse> {
      if (nonce <  nonceMinimum){
          return <LoginResponse>{code: -2, message: 'Address is too new'};
      }
-     // reverse lookup ENS name
      try {
+        // reverse lookup ENS name
         const ensName = await RPCnode.lookupAddress(address);
-        const [currentIndex, highestIndex] = await getCurrentIndexAndHighestIndex()
+        const [averageTime, currentIndex, highestIndex] = await getAverageTimeAndIndexes()
         const db = getFirestore();
         const user: Participant = {
             uid: address,
@@ -71,8 +70,8 @@ async function createParticipant(address: string): Promise<LoginResponse> {
             lastUpdate: new Date(),
             status: "WAITING",
             index: highestIndex,
-            expectedTimeToStart: getExpectedTimeToStart(currentIndex, highestIndex),
-            checkingDeadline: new Date(), // TODO
+            expectedTimeToStart: getExpectedTimeToStart(averageTime, currentIndex, highestIndex),
+            checkingDeadline: await getCheckingDeadline(),
         };
         await db.collection('users-'+DOMAIN).doc(address).set(user);
         const token = createToken(user);
@@ -84,22 +83,38 @@ async function createParticipant(address: string): Promise<LoginResponse> {
      }
 }
 
-async function getCurrentIndexAndHighestIndex(): Promise<[number,number]> {
+async function getAverageTimeAndIndexes(): Promise<[number,number,number]> {
     const ceremony = await getCeremony();
+    const averageTime = ceremony.averageSecondsPerContribution;
     const currentIndex = ceremony.currentIndex;
     const highestIndex = ceremony.highestQueueIndex;
     ceremony.highestQueueIndex = highestIndex + 1;
     const db = getFirestore();
     await db.collection('counts').doc(DOMAIN).set(ceremony);
-    return [currentIndex, highestIndex];
+    return [averageTime, currentIndex, highestIndex];
 }
 
-function getExpectedTimeToStart(currentIndex: number, highestIndex: number): Date {
+function getExpectedTimeToStart(averageTime: number, currentIndex: number, highestIndex: number): Date {
     const remainingParticipants = highestIndex - currentIndex;
-    const remainingTime = remainingParticipants * AVERAGE_TIME_IN_SECONDS;
+    const remainingTime = remainingParticipants * averageTime;
     const remainingTimeMilliseconds = remainingTime * 1000;
-    const expectedTimeToStart = new Date(new Date().getTime() + remainingTimeMilliseconds);
+    const expectedTimeToStart = new Date( Date.now() + remainingTimeMilliseconds);
     return expectedTimeToStart;
+}
+
+async function getCheckingDeadline(): Promise<Date> {
+    const ceremony = await getCeremony();
+    const averageTime = ceremony.averageSecondsPerContribution;
+    const currentIndex = ceremony.currentIndex;
+    const highestIndex = ceremony.highestQueueIndex;
+    const expectedTimeToStart = getExpectedTimeToStart(averageTime, currentIndex, highestIndex);
+    const halfOfExpectedTime = ( Date.now() - expectedTimeToStart.getTime() ) / 2;
+    const anHour = 60 * 60 * 1000; // minutes * seconds * milliseconds
+    if (halfOfExpectedTime < anHour){
+        return new Date( Date.now() + halfOfExpectedTime );
+    } else {
+        return new Date( Date.now() + anHour );
+    }
 }
 
 export async function authenticateParticipant(req: Request, res: Response, next: NextFunction) {
