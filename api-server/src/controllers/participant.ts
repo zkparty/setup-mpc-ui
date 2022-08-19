@@ -13,6 +13,7 @@ const DOMAIN: string = process.env.DOMAIN!;
 const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET_KEY!;
 const JWT_EXPIRATION_TIME: string = process.env.JWT_EXPIRATION_TIME!;
 const SIGNED_MESSAGE: string = process.env.SIGNED_MESSAGE!;
+const AVERAGE_TIME_IN_SECONDS = Number(process.env.AVERAGE_TIME_IN_SECONDS!);
 
 export async function loginParticipantWithAddress(loginRequest: LoginRequest): Promise<LoginResponse> {
     const {address, signature} = loginRequest;
@@ -68,7 +69,7 @@ async function createParticipant(address: string): Promise<LoginResponse> {
             lastUpdate: new Date(),
             status: "WAITING",
             index: highestIndex,
-            expectedTimeToStart: new Date(), // TODO
+            expectedTimeToStart: getExpectedTimeToStart(currentIndex, highestIndex),
             checkingDeadline: new Date(), // TODO
         };
         await db.collection('users-'+DOMAIN).doc(address).set(user);
@@ -91,7 +92,15 @@ async function getCurrentIndexAndHighestIndex(): Promise<[number,number]> {
     return [currentIndex, highestIndex];
 }
 
-export async function authenticateParticipant(req: Request, res: Response, next: NextFunction){
+function getExpectedTimeToStart(currentIndex: number, highestIndex: number): Date {
+    const remainingParticipants = highestIndex - currentIndex;
+    const remainingTime = remainingParticipants * AVERAGE_TIME_IN_SECONDS;
+    const remainingTimeMilliseconds = remainingTime * 1000;
+    const expectedTimeToStart = new Date(new Date().getTime() + remainingTimeMilliseconds);
+    return expectedTimeToStart;
+}
+
+export async function authenticateParticipant(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
     if (!authHeader){
         res.sendStatus(401);

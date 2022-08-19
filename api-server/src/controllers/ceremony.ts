@@ -4,6 +4,7 @@ import { Ceremony } from '../models/ceremony';
 
 dotEnvConfig();
 const DOMAIN: string = process.env.DOMAIN!;
+const AVERAGE_TIME_IN_SECONDS = Number(process.env.AVERAGE_TIME_IN_SECONDS!);
 
 export async function createCeremony(ceremony: Ceremony): Promise<WriteResult> {
     const db = getFirestore();
@@ -17,6 +18,7 @@ export async function createCeremony(ceremony: Ceremony): Promise<WriteResult> {
     ceremony.currentIndex = 0;
     ceremony.lastValidIndex = 0;
     ceremony.highestQueueIndex = 0;
+    ceremony.averageSecondsPerContribution = AVERAGE_TIME_IN_SECONDS;
     const result = await db.collection('ceremonies').doc(DOMAIN).set(ceremony);
     return result;
 }

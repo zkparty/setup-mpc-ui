@@ -33,11 +33,11 @@ export interface Ceremony {
     currentIndex: number;
     lastValidIndex: number;
     highestQueueIndex: number;
+    averageSecondsPerContribution: number;
     sequence?: number;
     zkeyPrefix?: string;
     completedAt?: Date;
     numConstraints?: number;
-    averageDuration?: number;
     transcript?: string;
     hash?: string; // Participant's own hash
     isCompleted?: boolean; // Participant has completed this circuit
