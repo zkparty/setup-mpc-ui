@@ -3,8 +3,11 @@ import session from 'express-session';
 import {config as dotEnvConfig} from 'dotenv';
 import express, { Request, Response } from 'express';
 import { Strategy as GitHubStrategy} from 'passport-github2';
-import { loginParticipantWithAddress, authenticateParticipant, loginParticipantWithGithub } from '../controllers/participant';
+import { loginParticipantWithAddress, authenticateParticipant, loginParticipantWithGithub, getParticipant } from '../controllers/participant';
 import { GithubUserProfile, LoginRequest } from '../models/request';
+import { startContribution } from '../controllers/contribution';
+import { getCeremony } from '../controllers/ceremony';
+import { Participant } from '../models/participant';
 
 dotEnvConfig();
 
@@ -117,9 +120,20 @@ router.get('/login/github/callback', passport.authenticate('github', { failureRe
 });
 
 
-// TODO: /queue/join route
 router.get('/queue/join', authenticateParticipant, async (req: Request, res: Response) => {
-    res.json('Hello');
+  const user = req.user as Participant;
+  const participant = await getParticipant(user.uid);
+  const ceremony = await getCeremony();
+  if (participant.index == ceremony.currentIndex){
+    const result = await startContribution(participant, ceremony);
+    res.json(result);
+  } else {
+    res.json({
+      status: participant.status,
+      checkingDeadline: participant.checkingDeadline,
+      expectedTimeToStart: participant.expectedTimeToStart,
+    });
+  }
 });
 
 export{router};
