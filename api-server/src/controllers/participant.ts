@@ -55,13 +55,10 @@ export async function loginParticipantWithGithub(githubUser: GithubUserProfile):
 function githubCreatedAfterMinimumTime(createdAt: string): boolean {
     const creationTime = new Date(createdAt);
     const minimumTime = new Date(ANTI_SYBIL_CREATION_TIME_MINIMUM);
-    console.log(creationTime)
-    console.log(minimumTime)
-    console.log(creationTime <= minimumTime)
     return creationTime >= minimumTime;
 }
 
-async function getParticipant(uid: string): Promise<Participant> {
+export async function getParticipant(uid: string): Promise<Participant> {
     const db = getFirestore();
     const raw = await db.collection('ceremonies').doc(DOMAIN).collection('participants').doc(uid).get();
     const data = raw.data() as Participant;
