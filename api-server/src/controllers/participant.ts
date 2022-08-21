@@ -3,7 +3,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import {config as dotEnvConfig} from 'dotenv';
 import { getFirestore } from 'firebase-admin/firestore';
 import { NextFunction, Request, Response } from 'express';
-import { AuthenticatedRequest, LoginRequest, LoginResponse } from "../models/request";
+import { AuthenticatedRequest, GithubUserProfile, LoginRequest, LoginResponse } from "../models/request";
 import { Participant } from "../models/participant";
 import { getCeremony } from './ceremony';
 
@@ -15,6 +15,7 @@ const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET_KEY!;
 const SIGNED_MESSAGE: string = process.env.SIGNED_MESSAGE!;
 const JWT_EXPIRATION_TIME: string = process.env.JWT_EXPIRATION_TIME!;
 const ANTI_SYBIL_NONCE_MINIMUM: string = process.env.ANTI_SYBIL_NONCE_MINIMUM!;
+const ANTI_SYBIL_CREATION_TIME_MINIMUM: string = process.env.ANTI_SYBIL_CREATION_TIME_MINIMUM!;
 
 export async function loginParticipantWithAddress(loginRequest: LoginRequest): Promise<LoginResponse> {
     const {address, signature} = loginRequest;
@@ -27,7 +28,7 @@ export async function loginParticipantWithAddress(loginRequest: LoginRequest): P
         const token = createToken(user);
         return <LoginResponse>{code: 0, token: token, message: 'Participant logged in'};
     } else {
-        const result = await createParticipant(address);
+        const result = await createParticipantWithAddress(address);
         return result;
     }
 }
@@ -38,9 +39,31 @@ function isSignatureInvalid(address: string, signature: string): boolean {
     return recoveredAddress !== ethers.utils.getAddress(address);
 }
 
-async function getParticipant(address: string): Promise<Participant> {
+export async function loginParticipantWithGithub(githubUser: GithubUserProfile): Promise<LoginResponse> {
+    const createdAt = githubUser._json.created_at;
+    const username = githubUser.username;
+    const user = await getParticipant(username);
+    if (user){
+        const token = createToken(user);
+        return <LoginResponse>{code: 0, token: token, message: 'Participant logged in'};
+    } else {
+        const result = await createParticipantWithGithub(username, createdAt);
+        return result;
+    }
+}
+
+function githubCreatedAfterMinimumTime(createdAt: string): boolean {
+    const creationTime = new Date(createdAt);
+    const minimumTime = new Date(ANTI_SYBIL_CREATION_TIME_MINIMUM);
+    console.log(creationTime)
+    console.log(minimumTime)
+    console.log(creationTime <= minimumTime)
+    return creationTime >= minimumTime;
+}
+
+async function getParticipant(uid: string): Promise<Participant> {
     const db = getFirestore();
-    const raw = await db.collection('ceremonies').doc(DOMAIN).collection('participants').doc(address).get();
+    const raw = await db.collection('ceremonies').doc(DOMAIN).collection('participants').doc(uid).get();
     const data = raw.data() as Participant;
     return data;
 }
@@ -50,7 +73,7 @@ function createToken(user: Participant): string {
     return token;
 }
 
-async function createParticipant(address: string): Promise<LoginResponse> {
+async function createParticipantWithAddress(address: string): Promise<LoginResponse> {
      const RPCnode = new ethers.providers.JsonRpcProvider(ETH_RPC_URL);
      // require more than 3 txs, as an anti-sybil mechanism
      const nonce = await RPCnode.getTransactionCount(address);
@@ -84,6 +107,36 @@ async function createParticipant(address: string): Promise<LoginResponse> {
         console.error('CreateError: ', error);
         return <LoginResponse>{code: -3, message: error};
      }
+}
+
+async function createParticipantWithGithub(username: string, createdAt: string): Promise<LoginResponse> {
+    if ( githubCreatedAfterMinimumTime(createdAt) ){
+        console.error('LoginError: Github profile created after minimum creation time');
+        return <LoginResponse>{code: -3, message: 'Github profile created after minimum creation time'};
+    }
+    try {
+        const [averageTime, currentIndex, highestIndex] = await getAverageTimeAndIndexes()
+        const db = getFirestore();
+        const user: Participant = {
+            uid: username,
+            displayName: username,
+            role: 'PARTICIPANT',
+            addedAt: new Date(),
+            lastUpdate: new Date(),
+            status: "WAITING",
+            index: highestIndex,
+            expectedTimeToStart: getExpectedTimeToStart(averageTime, currentIndex, highestIndex),
+            checkingDeadline: await getCheckingDeadline(),
+        };
+        await db.collection('ceremonies').doc(DOMAIN).collection('participants').doc(username).set(user);
+        const token = createToken(user);
+        return <LoginResponse>{code: 1, token: token, message: 'Participant created'};
+    } catch (error) {
+        // something went wrong creating the user
+        // uid already exists is covered in an upper level (login function)
+        console.error('CreateError: ', error);
+        return <LoginResponse>{code: -3, message: error};
+    }
 }
 
 async function getAverageTimeAndIndexes(): Promise<[number,number,number]> {

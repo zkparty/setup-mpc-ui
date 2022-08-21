@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { EmailIdentifier } from 'firebase-admin/lib/auth/identifier';
 
 export interface LoginRequest {
     address: string;
@@ -13,4 +14,11 @@ export interface LoginResponse {
 
 export interface AuthenticatedRequest extends Request {
   user: User;
+}
+
+export interface GithubUserProfile {
+  username: string;
+  _json: {
+    created_at: string;
+  }
 }
