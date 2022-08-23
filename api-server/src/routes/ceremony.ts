@@ -32,6 +32,14 @@ const router = express.Router();
  *      "_nanoseconds": 176469000
  *    }
  *  }
+ * @apiError {Number} code
+ * @apiError {String} message
+ * @apiErrorExample {json} Success-Response:
+ *  HTTP/1.1 200 OK
+ *  {
+ *    "code": -1,
+ *    "message": "Ceremony is already created"
+ *  }
  */
 router.post('/create', async (req: Request, res: Response) => {
     const createdCeremony = await getCeremony();
