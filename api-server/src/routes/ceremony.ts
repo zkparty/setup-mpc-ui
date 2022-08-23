@@ -34,9 +34,14 @@ const router = express.Router();
  *  }
  */
 router.post('/create', async (req: Request, res: Response) => {
-    const ceremony = req.body as Ceremony;
-    const result = await createCeremony(ceremony);
-    res.json(result);
+    const createdCeremony = await getCeremony();
+    if (createdCeremony){
+        res.json({code: -1, message: 'Ceremony is already created'});
+    } else {
+        const ceremony = req.body as Ceremony;
+        const result = await createCeremony(ceremony);
+        res.json(result);
+    }
 });
 
 /**
