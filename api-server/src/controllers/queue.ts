@@ -32,7 +32,9 @@ export async function joinQueue(participant: Participant){
     await ceremonyRef.update({highestQueueIndex: index});
     // join queue in ceremony
     await ceremonyRef.collection('queue').doc(uid).set(queue);
-    return queue;
+    // retrieve queue from db with standarized format
+    const savedQueue = await getQueue(uid);
+    return savedQueue;
 }
 
 function getExpectedTimeToStart(ceremony: Ceremony): Date {

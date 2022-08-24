@@ -18,8 +18,8 @@ const router = express.Router();
  * @apiBody {String} github="https://github.com/zkparty/setup-mpc-ui"
  * @apiBody {String} homepage="https://trustedsetuptest.web.app"
  * @apiBody {String} adminAddr="admin@example.com"
- * @apiBody {Number} startTime="1660168996428"
- * @apiBody {Number} endTime="1660169996428"
+ * @apiBody {String} startTime="2022-08-24T16:30:13.314Z"
+ * @apiBody {String} endTime="2022-10-24T16:30:13.314Z"
  * @apiBody {Number} minParticipants="2"
  * @apiSuccess {Object} _writeTime firestore saving result response
  * @apiSuccess {Number} _writeTime._seconds
