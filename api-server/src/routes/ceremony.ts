@@ -67,6 +67,9 @@ router.post('/create', async (req: Request, res: Response) => {
  *      ...
  *    }
  *  }
+ *  @apiErrorExample {json} Success-Response:
+ *  HTTP/1.1 200 OK
+ *  { }
  */
 router.get('/status', async (_req: Request, res: Response) => {
     const ceremony = await getCeremony();
