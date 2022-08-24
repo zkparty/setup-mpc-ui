@@ -18,14 +18,26 @@ const router = express.Router();
  * @apiSuccess {Number} index
  * @apiSuccess {String} uid
  * @apiSuccess {String} status
+ * @apiSuccess {Object} expectedTimeToStart firestore timestamp (use seconds to build a Date object)
+ * @apiSuccess {Number} expectedTimeToStart._seconds
+ * @apiSuccess {Number} expectedTimeToStart._nanoseconds
+ * @apiSuccess {Object} checkingDeadline firestore timestamp (use seconds to build a Date object)
+ * @apiSuccess {Number} checkingDeadline._seconds
+ * @apiSuccess {Number} checkingDeadline._nanoseconds
  * @apiSuccessExample {json} Success-Response:
  *  HTTP/1.1 200 OK
  *  {
  *    "index": 0,
  *    "uid": "0xfAce669798EbFA92Ec1e47Adc86b1eA213F564bD",
  *    "status": "WAITING",
- *    "expectedTimeToStart": "2022-08-24T03:15:47.691Z",
- *    "checkingDeadline": "2022-08-24T03:16:02.945Z"
+ *    "expectedTimeToStart": {
+ *      "_seconds": 1660170237,
+ *      "_nanoseconds": 176469000
+ *    },
+ *    "checkingDeadline": {
+ *      "_seconds": 1660270237,
+ *      "_nanoseconds": 176469000
+ *    }
  *  }
  */
 router.get('/join', authenticateParticipant, async (req: Request, res: Response) => {

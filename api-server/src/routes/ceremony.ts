@@ -21,7 +21,7 @@ const router = express.Router();
  * @apiBody {String} startTime="2022-08-24T16:30:13.314Z"
  * @apiBody {String} endTime="2022-10-24T16:30:13.314Z"
  * @apiBody {Number} minParticipants="2"
- * @apiSuccess {Object} _writeTime firestore saving result response
+ * @apiSuccess {Object} _writeTime firestore saving result response (use seconds to build a Date object)
  * @apiSuccess {Number} _writeTime._seconds
  * @apiSuccess {Number} _writeTime._nanoseconds
  * @apiSuccessExample {json} Success-Response:
