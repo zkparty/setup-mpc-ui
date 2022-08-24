@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { Timestamp } from 'firebase-admin/firestore';
 import { createCeremony, getCeremony } from '../controllers/ceremony';
 import { Ceremony } from '../models/ceremony';
 
@@ -18,12 +19,8 @@ const router = express.Router();
  * @apiBody {String} github="https://github.com/zkparty/setup-mpc-ui"
  * @apiBody {String} homepage="https://trustedsetuptest.web.app"
  * @apiBody {String} adminAddr="admin@example.com"
- * @apiBody {Object} startTime firestore timestamp (use seconds to build a Date object)
- * @apiBody {Number} startTime._seconds=1661374869
- * @apiBody {Number} startTime._nanoseconds=0
- * @apiBody {Object} endTime firestore timestamp (use seconds to build a Date object)
- * @apiBody {Number} endTime._seconds=1662374869
- * @apiBody {Number} endTime._nanoseconds=0
+ * @apiBody {Number} startTime=1661374869
+ * @apiBody {Number} endTime=1662374869
  * @apiBody {Number} minParticipants="2"
  * @apiSuccess {Object} _writeTime firestore saving result response (use seconds to build a Date object)
  * @apiSuccess {Number} _writeTime._seconds
@@ -51,6 +48,8 @@ router.post('/create', async (req: Request, res: Response) => {
         res.json({code: -1, message: 'Ceremony is already created'});
     } else {
         const ceremony = req.body as Ceremony;
+        ceremony.startTime = Timestamp.fromMillis(ceremony.startTime as any);
+        ceremony.endTime = Timestamp.fromMillis(ceremony.endTime as any);
         const result = await createCeremony(ceremony);
         res.json(result);
     }
