@@ -1,5 +1,5 @@
 import {config as dotEnvConfig} from 'dotenv';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { Ceremony } from '../models/ceremony';
 import { Participant } from '../models/participant';
 import { Queue } from '../models/queue';
@@ -8,6 +8,7 @@ import { getCeremony } from './ceremony';
 
 dotEnvConfig();
 const DOMAIN: string = process.env.DOMAIN!;
+const SECONDS_ALLOWANCE_FOR_CHECKIN = Number(process.env.SECONDS_ALLOWANCE_FOR_CHECKIN!);
 
 export async function getQueue(uid: string): Promise<Queue> {
     const db = getFirestore();
@@ -47,12 +48,19 @@ export async function checkinQueue(participant: Participant): Promise<Queue|Erro
         return <ErrorResponse>{code: -1, message: 'Participant has not joined the queue'};
     }
     if (queue.status !== 'WAITING'){
+        console.log('inside status != waiting')
         return queue; // indicates the status in queue (COMPLETED, ABSENT, LEFT)
     }
-    if (queue.checkingDeadline > new Date() ){
+    //const checkingDeadline = new Date(queue.checkingDeadline._seconds *1000);
+    const now = new Date( Date.now() + (SECONDS_ALLOWANCE_FOR_CHECKIN *1000));
+    //console.log(checkingDeadline);
+    console.log(now)
+    if (queue.checkingDeadline < now ){
+        console.log('inside checking deadline > now')
         return absentQueue(queue, ceremony);
     }
     if (ceremony.currentIndex !== index){
+        console.log('inside current index !== index')
         const db = getFirestore();
         await db.collection('ceremonies').doc(DOMAIN).collection('queue').doc(uid).update({
             expectedTimeToStart: getExpectedTimeToStart(ceremony, index),
