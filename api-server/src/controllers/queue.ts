@@ -70,6 +70,19 @@ export async function checkinQueue(participant: Participant): Promise<Queue|Erro
     return savedQueue;
 }
 
+export async function leaveQueue(queue: Queue, ceremony: Ceremony): Promise<Queue|ErrorResponse> {
+    if (queue.status === 'WAITING' || queue.status === 'READY' || queue.status === 'RUNNING'){
+        const db = getFirestore();
+        const ceremonyDB = db.collection('ceremonies').doc(DOMAIN);
+        await ceremonyDB.collection('queue').doc(queue.uid).update({status: 'LEFT'});
+        await ceremonyDB.update({waiting: ceremony.waiting - 1});
+        queue.status = 'LEFT';
+        return queue;
+    } else {
+        return <ErrorResponse>{code: -1, message: 'Queue status indicates that leaving is not possible'};
+    }
+}
+
 async function absentQueue(queue: Queue, ceremony: Ceremony): Promise<Queue> {
     const db = getFirestore();
     const ceremonyDB = db.collection('ceremonies').doc(DOMAIN);
