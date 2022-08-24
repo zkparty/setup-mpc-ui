@@ -51,10 +51,7 @@ export async function checkinQueue(participant: Participant): Promise<Queue|Erro
         console.log('inside status != waiting')
         return queue; // indicates the status in queue (COMPLETED, ABSENT, LEFT)
     }
-    //const checkingDeadline = new Date(queue.checkingDeadline._seconds *1000);
-    const now = new Date( Date.now() + (SECONDS_ALLOWANCE_FOR_CHECKIN *1000));
-    //console.log(checkingDeadline);
-    console.log(now)
+    const now = Timestamp.fromMillis(Date.now() + (SECONDS_ALLOWANCE_FOR_CHECKIN *1000));
     if (queue.checkingDeadline < now ){
         console.log('inside checking deadline > now')
         return absentQueue(queue, ceremony);
@@ -85,24 +82,25 @@ async function absentQueue(queue: Queue, ceremony: Ceremony): Promise<Queue> {
     return queue;
 }
 
-function getExpectedTimeToStart(ceremony: Ceremony, index: number): Date {
+function getExpectedTimeToStart(ceremony: Ceremony, index: number): Timestamp {
     const averageTime = ceremony.averageSecondsPerContribution;
     const currentIndex = ceremony.currentIndex;
 
     const remainingParticipants = index - currentIndex;
     const remainingTime = remainingParticipants * averageTime * 1000;
-    const expectedTimeToStart = new Date( Date.now() + remainingTime);
+    const expectedTimeToStart = Timestamp.fromMillis(Date.now() + remainingTime);
     return expectedTimeToStart;
 }
 
-async function getCheckingDeadline(index: number): Promise<Date> {
+async function getCheckingDeadline(index: number): Promise<Timestamp> {
     const ceremony = await getCeremony();
     const expectedTimeToStart = getExpectedTimeToStart(ceremony, index);
-    const halfOfExpectedTime = ( Date.now() - expectedTimeToStart.getTime() ) / 2;
+    const expectedTimeToStartMillis = expectedTimeToStart.seconds + 1000;
+    const halfOfExpectedTime = ( Date.now() - expectedTimeToStartMillis ) / 2;
     const anHour = 60 * 60 * 1000; // minutes * seconds * milliseconds
     if (halfOfExpectedTime < anHour){
-        return new Date( Date.now() + halfOfExpectedTime );
+        return Timestamp.fromMillis(Date.now() + halfOfExpectedTime);
     } else {
-        return new Date( Date.now() + anHour );
+        return Timestamp.fromMillis(Date.now() + anHour);
     }
 }

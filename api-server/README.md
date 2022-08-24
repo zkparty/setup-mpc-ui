@@ -1,6 +1,6 @@
 # **API Server for Trusted Setup Ceremonies**
 
-The following web server was developed for other developers and teams to use it when building their own client. This application aims to replace the ```functions``` directory that is currently deployed on Firebase and uses Cloud Functions (Lambda functions).
+The following web server was developed for other developers and teams to use it when building their own client. This application aims to replace the ```functions``` directory that is currently deployed on Firebase and uses Cloud Functions (Lambda functions). To learn more about this API check out the [KGZ Ceremony Specs](https://github.com/zkparty/kzg-ceremony-specs).
 
 ## **Overview**
 This API server will be deployed for a specific ceremony. For example:

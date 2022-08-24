@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase-admin/firestore";
+
 export type queueState =
   | "WAITING"
   | "READY"
@@ -11,6 +13,6 @@ export interface Queue {
     index: number;
     uid: string;
     status: queueState;
-    expectedTimeToStart: Date;
-    checkingDeadline: Date;
+    expectedTimeToStart: Timestamp;
+    checkingDeadline: Timestamp;
 }

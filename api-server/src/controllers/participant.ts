@@ -1,11 +1,10 @@
 import { ethers } from 'ethers';
 import jwt, { Secret } from 'jsonwebtoken';
 import {config as dotEnvConfig} from 'dotenv';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { NextFunction, Request, Response } from 'express';
 import { AuthenticatedRequest, GithubUserProfile, LoginRequest, LoginResponse } from "../models/request";
 import { Participant } from "../models/participant";
-import { getCeremony } from './ceremony';
 
 
 dotEnvConfig();
@@ -87,8 +86,7 @@ async function createParticipantWithAddress(address: string): Promise<LoginRespo
             uid: address,
             displayName: ensName || address,
             role: 'PARTICIPANT',
-            addedAt: new Date(),
-            lastUpdate: new Date(),
+            addedAt: Timestamp.now(),
         };
         await db.collection('ceremonies').doc(DOMAIN).collection('participants').doc(address).set(user);
         const token = createToken(user);
@@ -111,8 +109,7 @@ async function createParticipantWithGithub(username: string, createdAt: string):
             uid: username,
             displayName: username,
             role: 'PARTICIPANT',
-            addedAt: new Date(),
-            lastUpdate: new Date(),
+            addedAt: Timestamp.now(),
         };
         await db.collection('ceremonies').doc(DOMAIN).collection('participants').doc(username).set(user);
         const token = createToken(user);

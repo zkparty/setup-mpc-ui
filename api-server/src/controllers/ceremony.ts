@@ -1,4 +1,4 @@
-import { getFirestore, WriteResult } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp, WriteResult } from 'firebase-admin/firestore';
 import {config as dotEnvConfig} from 'dotenv';
 import { Ceremony } from '../models/ceremony';
 
@@ -11,7 +11,7 @@ export async function createCeremony(ceremony: Ceremony): Promise<WriteResult> {
     ceremony.id = DOMAIN;
     ceremony.serverURL = `https://${DOMAIN}`;
     ceremony.ceremonyState = 'WAITING';
-    ceremony.lastSummaryUpdate = new Date;
+    ceremony.lastSummaryUpdate = Timestamp.now();
     ceremony.numParticipants = 0;
     ceremony.complete = 0;
     ceremony.waiting = 0;

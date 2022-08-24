@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase-admin/firestore";
+
 export type ComputeMode =
   | "ZKEY"
   | "POWERSOFTAU";
@@ -21,12 +23,12 @@ export interface Ceremony {
     github: string;
     homepage: string;
     adminAddr: string;
-    startTime: Date;
-    endTime: Date;
+    startTime: Timestamp;
+    endTime: Timestamp;
     minParticipants: number;
     // server would compute this
     ceremonyState: CeremonyState;
-    lastSummaryUpdate: Date;
+    lastSummaryUpdate: Timestamp;
     numParticipants: number;
     complete: number;
     waiting: number;
@@ -36,7 +38,7 @@ export interface Ceremony {
     averageSecondsPerContribution: number;
     sequence?: number;
     zkeyPrefix?: string;
-    completedAt?: Date;
+    completedAt?: Timestamp;
     numConstraints?: number;
     transcript?: string;
     hash?: string; // Participant's own hash
