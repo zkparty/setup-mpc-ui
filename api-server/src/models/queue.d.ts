@@ -1,11 +1,11 @@
 export type queueState =
   | "WAITING"
+  | "READY"
   | "RUNNING"
   | "COMPLETED"
   | "ABSENT"
-  | "UNKNOWN"
   | "LEFT"
-  | "FAILEDTOCHECK";
+  | "UNKNOWN";
 
 export interface Queue {
     index: number;

@@ -1,7 +1,7 @@
 import {config as dotEnvConfig} from 'dotenv';
 import express, { Request, Response } from 'express';
 import { Participant } from '../models/participant';
-import { getQueue, joinQueue } from '../controllers/queue';
+import { getQueue, joinQueue, checkinQueue } from '../controllers/queue';
 import { authenticateParticipant } from '../controllers/participant';
 
 dotEnvConfig();
@@ -45,10 +45,16 @@ router.get('/join', authenticateParticipant, async (req: Request, res: Response)
     const queue = await getQueue(participant.uid);
     if (queue){
         res.json(queue || {});
-    } else {
-        const result = await joinQueue(participant);
-        res.json(result);
+        return;
     }
+    const result = await joinQueue(participant);
+    res.json(result);
+});
+
+router.get('/checkin', authenticateParticipant, async (req: Request, res: Response) => {
+    const participant = req.user as Participant;
+    const result = await checkinQueue(participant);
+    res.json(result);
 });
 
 export{router};

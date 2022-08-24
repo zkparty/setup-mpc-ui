@@ -12,6 +12,11 @@ export interface LoginResponse {
     message?: string;
 }
 
+export interface ErrorResponse {
+  code: number;
+  message: string;
+}
+
 export interface AuthenticatedRequest extends Request {
   user: User;
 }
