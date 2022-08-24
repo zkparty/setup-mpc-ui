@@ -82,7 +82,6 @@ async function createParticipantWithAddress(address: string): Promise<LoginRespo
      try {
         // reverse lookup ENS name
         const ensName = await RPCnode.lookupAddress(address);
-        const [averageTime, currentIndex, highestIndex] = await getAverageTimeAndIndexes()
         const db = getFirestore();
         const user: Participant = {
             uid: address,
@@ -90,10 +89,6 @@ async function createParticipantWithAddress(address: string): Promise<LoginRespo
             role: 'PARTICIPANT',
             addedAt: new Date(),
             lastUpdate: new Date(),
-            status: "WAITING",
-            index: highestIndex,
-            expectedTimeToStart: getExpectedTimeToStart(averageTime, currentIndex, highestIndex),
-            checkingDeadline: await getCheckingDeadline(),
         };
         await db.collection('ceremonies').doc(DOMAIN).collection('participants').doc(address).set(user);
         const token = createToken(user);
@@ -101,8 +96,7 @@ async function createParticipantWithAddress(address: string): Promise<LoginRespo
      } catch (error) {
         // something went wrong creating the user
         // uid already exists is covered in an upper level (login function)
-        console.error('CreateError: ', error);
-        return <LoginResponse>{code: -3, message: error};
+        throw error;
      }
 }
 
@@ -112,7 +106,6 @@ async function createParticipantWithGithub(username: string, createdAt: string):
         return <LoginResponse>{code: -3, message: 'Github profile created after minimum creation time'};
     }
     try {
-        const [averageTime, currentIndex, highestIndex] = await getAverageTimeAndIndexes()
         const db = getFirestore();
         const user: Participant = {
             uid: username,
@@ -120,10 +113,6 @@ async function createParticipantWithGithub(username: string, createdAt: string):
             role: 'PARTICIPANT',
             addedAt: new Date(),
             lastUpdate: new Date(),
-            status: "WAITING",
-            index: highestIndex,
-            expectedTimeToStart: getExpectedTimeToStart(averageTime, currentIndex, highestIndex),
-            checkingDeadline: await getCheckingDeadline(),
         };
         await db.collection('ceremonies').doc(DOMAIN).collection('participants').doc(username).set(user);
         const token = createToken(user);
@@ -131,42 +120,7 @@ async function createParticipantWithGithub(username: string, createdAt: string):
     } catch (error) {
         // something went wrong creating the user
         // uid already exists is covered in an upper level (login function)
-        console.error('CreateError: ', error);
-        return <LoginResponse>{code: -3, message: error};
-    }
-}
-
-async function getAverageTimeAndIndexes(): Promise<[number,number,number]> {
-    const ceremony = await getCeremony();
-    const averageTime = ceremony.averageSecondsPerContribution;
-    const currentIndex = ceremony.currentIndex;
-    const highestIndex = ceremony.highestQueueIndex;
-    ceremony.highestQueueIndex = highestIndex + 1;
-    const db = getFirestore();
-    await db.collection('ceremonies').doc(DOMAIN).set(ceremony);
-    return [averageTime, currentIndex, highestIndex];
-}
-
-function getExpectedTimeToStart(averageTime: number, currentIndex: number, highestIndex: number): Date {
-    const remainingParticipants = highestIndex - currentIndex;
-    const remainingTime = remainingParticipants * averageTime;
-    const remainingTimeMilliseconds = remainingTime * 1000;
-    const expectedTimeToStart = new Date( Date.now() + remainingTimeMilliseconds);
-    return expectedTimeToStart;
-}
-
-async function getCheckingDeadline(): Promise<Date> {
-    const ceremony = await getCeremony();
-    const averageTime = ceremony.averageSecondsPerContribution;
-    const currentIndex = ceremony.currentIndex;
-    const highestIndex = ceremony.highestQueueIndex;
-    const expectedTimeToStart = getExpectedTimeToStart(averageTime, currentIndex, highestIndex);
-    const halfOfExpectedTime = ( Date.now() - expectedTimeToStart.getTime() ) / 2;
-    const anHour = 60 * 60 * 1000; // minutes * seconds * milliseconds
-    if (halfOfExpectedTime < anHour){
-        return new Date( Date.now() + halfOfExpectedTime );
-    } else {
-        return new Date( Date.now() + anHour );
+        throw error;
     }
 }
 

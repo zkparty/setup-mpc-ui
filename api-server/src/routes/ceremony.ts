@@ -68,9 +68,9 @@ router.post('/create', async (req: Request, res: Response) => {
  *    }
  *  }
  */
-router.get('/status', async (req: Request, res: Response) => {
+router.get('/status', async (_req: Request, res: Response) => {
     const ceremony = await getCeremony();
-    res.json(ceremony);
+    res.json(ceremony || {});
 });
 
 export {router};

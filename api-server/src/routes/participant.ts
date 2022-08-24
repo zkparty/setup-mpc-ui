@@ -3,11 +3,9 @@ import session from 'express-session';
 import {config as dotEnvConfig} from 'dotenv';
 import express, { Request, Response } from 'express';
 import { Strategy as GitHubStrategy} from 'passport-github2';
-import { loginParticipantWithAddress, authenticateParticipant, loginParticipantWithGithub, getParticipant } from '../controllers/participant';
+import { loginParticipantWithAddress, loginParticipantWithGithub } from '../controllers/participant';
 import { GithubUserProfile, LoginRequest } from '../models/request';
-import { startContribution } from '../controllers/contribution';
-import { getCeremony } from '../controllers/ceremony';
-import { Participant } from '../models/participant';
+
 
 dotEnvConfig();
 
@@ -103,7 +101,7 @@ router.post('/login/address', async (req: Request, res: Response) => {
  *   "code": -1
  * }
  */
-router.get('/login/github', passport.authenticate('github', { scope: [ 'user:email' ] }), (req: Request, res: Response) => {});
+router.get('/login/github', passport.authenticate('github', { scope: [ 'user:email' ] }), (_req: Request, _res: Response) => {});
 
 /**
  * @api {get} /participant/login/github/callback API callback after Github authorization
@@ -117,23 +115,6 @@ router.get('/login/github/callback', passport.authenticate('github', { failureRe
     const githubUser = req.user! as GithubUserProfile;
     const result = await loginParticipantWithGithub(githubUser);
     res.send(result);
-});
-
-
-router.get('/queue/join', authenticateParticipant, async (req: Request, res: Response) => {
-  const user = req.user as Participant;
-  const participant = await getParticipant(user.uid);
-  const ceremony = await getCeremony();
-  if (participant.index == ceremony.currentIndex){
-    const result = await startContribution(participant, ceremony);
-    res.json(result);
-  } else {
-    res.json({
-      status: participant.status,
-      checkingDeadline: participant.checkingDeadline,
-      expectedTimeToStart: participant.expectedTimeToStart,
-    });
-  }
 });
 
 export{router};

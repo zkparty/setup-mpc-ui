@@ -3,6 +3,7 @@ import express from 'express';
 import {config as dotEnvConfig} from 'dotenv';
 import { initializeApp, cert, ServiceAccount } from 'firebase-admin/app';
 import { router as ceremonyRoutes } from './routes/ceremony';
+import { router as queueRoutes } from './routes/queue';
 import { router as participantRoutes } from './routes/participant';
 import serviceAccount from './firebase_skey.json';
 
@@ -16,6 +17,7 @@ const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(morgan('combined'));
+app.use('/queue', queueRoutes);
 app.use('/ceremony', ceremonyRoutes);
 app.use('/participant', participantRoutes);
 
