@@ -1,12 +1,15 @@
 import {config as dotEnvConfig} from 'dotenv';
 import express, { Request, Response } from 'express';
 import { Participant } from '../models/participant';
-import { getQueue, joinQueue, checkinQueue } from '../controllers/queue';
+import { ceremonyExists } from '../controllers/ceremony';
 import { authenticateParticipant } from '../controllers/participant';
+import { getQueue, joinQueue, checkinQueue } from '../controllers/queue';
+
 
 dotEnvConfig();
 
 const router = express.Router();
+router.use(ceremonyExists);
 
 /**
  * @api {get} /queue/join Join the queue to contribute to the ceremony

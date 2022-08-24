@@ -48,16 +48,13 @@ export async function checkinQueue(participant: Participant): Promise<Queue|Erro
         return <ErrorResponse>{code: -1, message: 'Participant has not joined the queue'};
     }
     if (queue.status !== 'WAITING'){
-        console.log('inside status != waiting')
         return queue; // indicates the status in queue (COMPLETED, ABSENT, LEFT)
     }
-    const now = Timestamp.fromMillis(Date.now() + (SECONDS_ALLOWANCE_FOR_CHECKIN *1000));
-    if (queue.checkingDeadline < now ){
-        console.log('inside checking deadline > now')
+    const now = Timestamp.fromMillis(Date.now() - (SECONDS_ALLOWANCE_FOR_CHECKIN *1000));
+    if ( queue.checkingDeadline.valueOf() < now.valueOf() ){
         return absentQueue(queue, ceremony);
     }
     if (ceremony.currentIndex !== index){
-        console.log('inside current index !== index')
         const db = getFirestore();
         await db.collection('ceremonies').doc(DOMAIN).collection('queue').doc(uid).update({
             expectedTimeToStart: getExpectedTimeToStart(ceremony, index),
@@ -95,7 +92,7 @@ function getExpectedTimeToStart(ceremony: Ceremony, index: number): Timestamp {
 async function getCheckingDeadline(index: number): Promise<Timestamp> {
     const ceremony = await getCeremony();
     const expectedTimeToStart = getExpectedTimeToStart(ceremony, index);
-    const expectedTimeToStartMillis = expectedTimeToStart.seconds + 1000;
+    const expectedTimeToStartMillis = expectedTimeToStart.seconds * 1000;
     const halfOfExpectedTime = ( Date.now() - expectedTimeToStartMillis ) / 2;
     const anHour = 60 * 60 * 1000; // minutes * seconds * milliseconds
     if (halfOfExpectedTime < anHour){

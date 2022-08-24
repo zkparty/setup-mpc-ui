@@ -1,6 +1,7 @@
 import { getFirestore, Timestamp, WriteResult } from 'firebase-admin/firestore';
 import {config as dotEnvConfig} from 'dotenv';
 import { Ceremony } from '../models/ceremony';
+import { Request, Response, NextFunction } from 'express';
 
 dotEnvConfig();
 const DOMAIN: string = process.env.DOMAIN!;
@@ -28,4 +29,12 @@ export async function getCeremony(): Promise<Ceremony> {
     const raw = await db.collection('ceremonies').doc(DOMAIN).get();
     const data = raw.data() as Ceremony;
     return data;
+}
+
+export async function ceremonyExists(req: Request, res: Response, next: NextFunction) {
+    const ceremony = await getCeremony();
+    if (ceremony){
+        return next();
+    }
+    res.json({code: -1, message: 'There is no ceremony created'});
 }

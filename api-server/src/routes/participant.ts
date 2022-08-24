@@ -5,6 +5,7 @@ import express, { Request, Response } from 'express';
 import { Strategy as GitHubStrategy} from 'passport-github2';
 import { loginParticipantWithAddress, loginParticipantWithGithub } from '../controllers/participant';
 import { GithubUserProfile, LoginRequest } from '../models/request';
+import { ceremonyExists } from '../controllers/ceremony';
 
 
 dotEnvConfig();
@@ -39,6 +40,7 @@ passport.use(new GitHubStrategy({
 const router = express.Router();
 router.use(session({ secret: COOKIE_SESSION_SECRET, resave: false, saveUninitialized: false }));
 router.use(passport.initialize());
+router.use(ceremonyExists);
 
 /**
  * @api {post} /participant/login/address Log in as a ceremony participant using a public address
