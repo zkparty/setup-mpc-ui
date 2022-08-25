@@ -31,7 +31,11 @@ export async function joinQueue(participant: Participant): Promise<Queue> {
     };
     const ceremonyDB = db.collection('ceremonies').doc(DOMAIN);
     // set new highest queue index
-    await ceremonyDB.update({highestQueueIndex: index, waiting: ceremony.waiting + 1});
+    await ceremonyDB.update({
+        highestQueueIndex: index,
+        waiting: ceremony.waiting + 1,
+        numParticipants: ceremony.numParticipants + 1,
+    });
     // join queue in ceremony
     await ceremonyDB.collection('queue').doc(uid).set(queue);
     // retrieve queue from db with standarized format

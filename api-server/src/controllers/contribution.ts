@@ -1,30 +1,34 @@
 import {config as dotEnvConfig} from 'dotenv';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { Participant } from "../models/participant";
-import { Ceremony } from '../models/ceremony';
+import { ErrorResponse } from '../models/request';
+import { getCeremony } from './ceremony';
+import { getQueue } from './queue';
+
 
 dotEnvConfig();
 const DOMAIN: string = process.env.DOMAIN!;
+const SECONDS_ALLOWANCE_FOR_START = Number(process.env.SECONDS_ALLOWANCE_FOR_START!);
+const SECONDS_ALLOWANCE_TO_COMPUTE = Number(process.env.SECONDS_ALLOWANCE_TO_COMPUTE!);
 
-export async function startContribution(participant: Participant, ceremony: Ceremony) {
-    try {
-        const db = getFirestore();
-        const ceremonyDoc = db.collection('ceremonies').doc(DOMAIN);
-        // update participant state
-        const newParticipant = {
-            ...participant,
-            lastUpdate: new Date(),
-            status: 'RUNNING',
-        }
-        await ceremonyDoc.collection('participant').doc(participant.uid).set(newParticipant);
-        // update ceremony state
-        const newCeremony = {
-            ...ceremony,
-            waiting: ceremony.waiting - 1,
-        }
-        await ceremonyDoc.set(newCeremony);
-        // TODO: start computation
-    } catch (error) {
-        console.error('UpdateError: ', error);
+export async function startContribution(participant: Participant) {
+    const ceremony = await getCeremony();
+    const queue = await getQueue(participant.uid);
+    const db = getFirestore();
+    const ceremonyDB = db.collection('ceremonies').doc(DOMAIN);
+    if (queue.status !== 'READY' && ceremony.currentIndex === queue.index) {
+        return <ErrorResponse>{code: -1, message: 'The participant cannot start the contribution'};
     }
+    const now = Timestamp.fromMillis(Date.now() - (SECONDS_ALLOWANCE_FOR_START *1000));
+    if ( now > queue.checkingDeadline){
+        // must be called within N seconds otherwise next in queue has to start
+        await ceremonyDB.update({currentIndex: ceremony.currentIndex + 1});
+        await ceremonyDB.collection('queue').doc(queue.uid).update({status: 'ABSENT'});
+        return <ErrorResponse>{code: -1, message: 'The time to call this function has expired'};
+    }
+    await ceremonyDB.collection('queue').doc(queue.uid).update({
+        status: 'RUNNING',
+        computingDeadline: Timestamp.fromMillis(Date.now() + (SECONDS_ALLOWANCE_TO_COMPUTE * 1000)),
+    });
+    return {'transcript': ceremony.transcript};
 }

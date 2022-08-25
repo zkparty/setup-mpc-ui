@@ -1,7 +1,8 @@
 import { getFirestore, Timestamp, WriteResult } from 'firebase-admin/firestore';
+import { Request, Response, NextFunction } from 'express';
 import {config as dotEnvConfig} from 'dotenv';
 import { Ceremony } from '../models/ceremony';
-import { Request, Response, NextFunction } from 'express';
+
 
 dotEnvConfig();
 const DOMAIN: string = process.env.DOMAIN!;
