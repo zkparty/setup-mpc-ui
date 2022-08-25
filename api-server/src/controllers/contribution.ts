@@ -40,3 +40,19 @@ export async function saveImplementationDetails(uid: string, details: Implementa
     const db = getFirestore();
     await db.collection('ceremonies').doc(DOMAIN).collection('implementations').doc(uid).set(details);
 }
+
+export async function completeContribution(participant: Participant, transcript: Transcript): Promise<any> {
+    const uid = participant.uid;
+    const db = getFirestore();
+    // TODO: verify transcript. What happens if it is wrong
+    // TODO: append transcript to ceremony
+    const ceremony = await getCeremony();
+    const ceremonyDB = db.collection('ceremonies').doc(DOMAIN);
+    await ceremonyDB.update({
+        currentIndex: ceremony.currentIndex + 1,
+        complete: ceremony.complete + 1,
+    });
+    await ceremonyDB.collection('queue').doc(uid).update({status: 'COMPLETED'});
+    const queue = await getQueue(uid);
+    return queue;
+}
