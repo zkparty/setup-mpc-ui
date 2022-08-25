@@ -38,15 +38,15 @@ export async function joinQueue(participant: Participant): Promise<Queue> {
     });
     // join queue in ceremony
     await ceremonyDB.collection('queue').doc(uid).set(queue);
-    // retrieve queue from db with standarized format
-    const savedQueue = await getQueue(uid);
-    return savedQueue;
+    return queue;
 }
 
 export async function checkinQueue(participant: Participant): Promise<Queue|ErrorResponse> {
     const uid = participant.uid;
     const queue = await getQueue(uid);
     const ceremony = await getCeremony();
+    const db = getFirestore();
+    const ceremonyDB = db.collection('ceremonies').doc(DOMAIN);
     const index = queue.index;
     if (!queue){
         return <ErrorResponse>{code: -1, message: 'Participant has not joined the queue'};
@@ -56,11 +56,11 @@ export async function checkinQueue(participant: Participant): Promise<Queue|Erro
     }
     const now = Timestamp.fromMillis(Date.now() - (SECONDS_ALLOWANCE_FOR_CHECKIN *1000));
     if ( queue.checkingDeadline.valueOf() < now.valueOf() ){
+        // if participant missed the deadline then we change status to ABSENT
         return absentQueue(queue, ceremony);
     }
     if (ceremony.currentIndex !== index){
-        const db = getFirestore();
-        await db.collection('ceremonies').doc(DOMAIN).collection('queue').doc(uid).update({
+        await ceremonyDB.collection('queue').doc(uid).update({
             expectedTimeToStart: getExpectedTimeToStart(ceremony, index),
             checkingDeadline: await getCheckingDeadline(index),
         });
@@ -68,10 +68,10 @@ export async function checkinQueue(participant: Participant): Promise<Queue|Erro
         return savedQueue;
     }
     // participant is ready to start contribution
-    const db = getFirestore();
-    await db.collection('ceremonies').doc(DOMAIN).collection('queue').doc(uid).update({status: 'READY'});
-    const savedQueue = await getQueue(uid);
-    return savedQueue;
+    await ceremonyDB.collection('queue').doc(uid).update({status: 'READY'});
+    await ceremonyDB.update({waiting: ceremony.waiting -1 });
+    queue.status = 'READY';
+    return queue;
 }
 
 export async function leaveQueue(queue: Queue, ceremony: Ceremony): Promise<Queue|ErrorResponse> {
