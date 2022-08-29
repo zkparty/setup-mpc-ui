@@ -56,3 +56,21 @@ export async function completeContribution(participant: Participant, transcript:
     const queue = await getQueue(uid);
     return queue;
 }
+
+export async function abortContribution(participant: Participant){
+    const uid = participant.uid;
+    const queue = await getQueue(uid);
+    if (queue.status === 'WAITING' || queue.status === 'READY' || queue.status === 'RUNNING'){
+        const db = getFirestore();
+        const ceremony = await getCeremony();
+        const ceremonyDB = db.collection('ceremonies').doc(DOMAIN);
+        await ceremonyDB.update({
+            currentIndex: ceremony.currentIndex + 1,
+        });
+        await ceremonyDB.collection('queue').doc(uid).update({status: 'LEFT'});
+        queue.status = 'LEFT';
+        return queue;
+    } else {
+        return <ErrorResponse>{code: -1, message: 'Queue status indicates that aborting is not possible'};
+    }
+}
