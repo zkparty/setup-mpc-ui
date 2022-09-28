@@ -1,5 +1,3 @@
-import { Button } from "@material-ui/core";
-import color from "color";
 import styled, { css } from "styled-components";
 import WebFont from 'webfontloader';
 

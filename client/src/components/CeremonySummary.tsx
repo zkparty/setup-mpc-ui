@@ -64,7 +64,7 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
     const c = props.ceremony;
     const [ selection, dispatch ] = useSelectionContext();
     const classes = useStyles();
-  
+
     const onClick = () => {
       dispatch({
         type: 'DISPLAY_CEREMONY',
@@ -72,11 +72,10 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
       });
     };
 
-    //console.log(`ceremony id: ${c.id}`);
     const progress = c.complete ? Math.floor(Math.min(100, 100 * c.complete/c.minParticipants)) : 0;
 
     const status = ceremonyStatus(c);
-  
+
     return (
       <CeremonyContainer onClick={onClick}>
         <CeremonyTitle>{c.title}</CeremonyTitle>
@@ -85,7 +84,7 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
         <br />
         <Flex>
           <Bold>Status:&nbsp;</Bold>{` ${status}`}
-          {(c.ceremonyState === "RUNNING" ? 
+          {(c.ceremonyState === "RUNNING" ?
               (<div className={classes.root}>
                 <LinearProgressWithLabel value={progress} />
               </div>)
@@ -94,12 +93,12 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
         <br />
         <Flex>
           <Bold>Contribution Progress:&nbsp;</Bold>
-          {` ${(c.complete===undefined) ? '-' : c.complete } completed. 
+          {` ${(c.complete===undefined) ? '-' : c.complete } completed.
             ${(c.waiting===undefined) ? '-' : c.waiting} waiting.
             Target: ${c.minParticipants} `}
         </Flex>
       </CeremonyContainer>
     );
   };
-  
+
   export default CeremonySummary;

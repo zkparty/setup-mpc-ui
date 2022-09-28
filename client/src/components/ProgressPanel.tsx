@@ -3,10 +3,6 @@ import * as React from 'react';
 import { useContext } from 'react';
 import {
   accentColor,
-  secondAccent,
-  textColor,
-  PageContainer,
-  lighterBackground,
   NormalBodyText,
   SubtleBody,
   subtleText,
@@ -37,25 +33,22 @@ const StyledHeader = styled.div`
 
 interface ProgressBarProps extends LinearProgressProps {
   size: string,
-  barColor: string,
+  barcolor: string,
 }
 
-const StyledProgressBar = styled(LinearProgress).attrs((props: ProgressBarProps) => ({
-  size: props.size || 'normal',
-  barColor: props.barColor || accentColor,
-}))`
-  padding-top: ${ ({ size }) => {return (size === 'small') ? '0px' : '5px';} }; 
-  border-radius: 20px; 
+const StyledProgressBar = styled(LinearProgress)<ProgressBarProps>`
+  padding-top: ${ ({ size }) => {return (size === 'small') ? '0px' : '5px';} };
+  border-radius: 20px;
   background-color: ${darkerBackground};
   border: 2px solid ${darkerBackground};
-  width: ${ ({ size }) => { 
-    if (size === 'normal') return '491px'; 
-    else return 'default' } }; 
+  width: ${ ({ size }) => {
+    if (size === 'normal') return '491px';
+    else return 'default' } };
 
   & > .MuiLinearProgress-barColorPrimary {
     border-radius: 20px;
-    background-color: ${({barColor}) => barColor};
-    border-color: ${({barColor}) => barColor};
+    background-color: ${({barcolor}) => barcolor};
+    border-color: ${({barcolor}) => barcolor };
   }
 
   &.MuiLinearProgress-root.MuiLinearProgress-colorPrimary {
@@ -65,12 +58,12 @@ const StyledProgressBar = styled(LinearProgress).attrs((props: ProgressBarProps)
 
 const stepText = (step: Step, computeStatus: ComputeStatus): string => {
   switch (step) {
-    case Step.ACKNOWLEDGED: 
-    case Step.INITIALISED: 
+    case Step.ACKNOWLEDGED:
+    case Step.INITIALISED:
     case Step.ENTROPY_COLLECTED: {
         return 'Preparing';
     }
-    case Step.QUEUED: 
+    case Step.QUEUED:
     case Step.WAITING: {
         return 'Waiting';
     }
@@ -87,20 +80,21 @@ const stepText = (step: Step, computeStatus: ComputeStatus): string => {
 const queueText = (queue: number) => {
   if (queue > 1) {
     return `No. ${queue} in line`;
-  } else if (queue == 1) {
+  } else if (queue === 1) {
     return 'Next in line';
   } else {
     return 'Your turn';
-  } 
+  }
 }
 
 const queueStatus = (contribState: ContributionState) => {
   let queue = 0;
   let dots = '';
   try {
-    queue = contribState.queueIndex - contribState.currentIndex; 
+    queue = contribState.queueIndex - contribState.currentIndex;
     dots = ' .'.repeat(Math.max(queue, 0));
   } catch (err) {
+    if (err instanceof Error)
     console.warn(`Wait queue error: ${err.message}`);
   }
   return (
@@ -135,11 +129,11 @@ export const CeremonyProgress = (props: any) => {
     <Box display="flex" alignItems="center">
       <Box width="100%" mr={1} style={{ display:'flex', flexDirection:'row', alignItems:'center' }} >
         {prefix}
-        <StyledProgressBar 
-          variant="determinate" 
-          value={ceremonyPct} 
+        <StyledProgressBar
+          variant="determinate"
+          value={ceremonyPct}
           size='normal'
-          barColor={(step === Step.QUEUED) ? subtleText : accentColor}
+          barcolor={(step === Step.QUEUED) ? subtleText : accentColor}
         />
       </Box>
       <Box minWidth={35}>
@@ -153,7 +147,7 @@ export const CeremonyProgress = (props: any) => {
 
 const StepProgress = ({ progressPct }: ProgressProps) => {
   return (
-    <StyledProgressBar variant="determinate" value={progressPct} size='small' />
+    <StyledProgressBar variant="determinate" value={progressPct.valueOf()} size='small' barcolor={subtleText} />
   );
 }
 
@@ -161,7 +155,7 @@ const Animation = () => {
   return (
     <Player autoplay
       loop
-      src='./38853-circular-lines-02.json' 
+      src='./38853-circular-lines-02.json'
       style={{ height: '419px', width: '423px' }}
       background='transparent'
     >
@@ -170,7 +164,7 @@ const Animation = () => {
 }
 
 const status = (state: any, dispatch: React.Dispatch<any>) => {
-  const { circuits, contributionCount, contributionState, step, computeStatus, progress } = state;
+  const { circuits, contributionState, step, computeStatus, progress } = state;
   const ceremony = contributionState ? contributionState.ceremony : undefined;
   const cctNum = ceremony ? ceremony.sequence || 0 : 0;
   const cctCount = circuits.length;

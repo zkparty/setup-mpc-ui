@@ -1,32 +1,22 @@
 import React, { useContext, useState } from 'react';
-import { withStyles, makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import IconButton from '@material-ui/core/IconButton';
-import Menu, { MenuProps } from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from '@material-ui/core/Toolbar';
-import MenuIcon from '@material-ui/icons/MenuOutlined';
 import CloseIcon from '@material-ui/icons/Close';
-import SettingsIcon from '@material-ui/icons/Settings';
-import { ZKTitle } from "./Title";
-import { AuthStateContext, AuthDispatchContext } from "../state/AuthContext";
-import {
-  accentColor,
-  secondAccent,
-  textColor,
-  background,
-  darkerBackground,
-  NormalBodyText,
-  subtleText,
-  lighterBackground,
-} from "../styles";
-import Options from './Options';
-import { ComputeStateContext, Step } from '../state/ComputeStateManager';
+import MenuItem from '@material-ui/core/MenuItem';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/MenuOutlined';
+import Menu, { MenuProps } from '@material-ui/core/Menu';
+import ListItemText from '@material-ui/core/ListItemText';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
+import { withStyles, makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+
+import Options from './Options';
+import { ZKTitle } from "./Title";
 import { CeremonyProgress } from './ProgressPanel';
 import { useSelectionContext } from '../state/SelectionContext';
+import { ComputeStateContext, Step } from '../state/ComputeStateManager';
+import { AuthStateContext, AuthDispatchContext } from "../state/AuthContext";
+import { accentColor, textColor, background, subtleText, lighterBackground } from "../styles";
 
 const allowOptions = true; // if true, the 'Options' panel is available
 
@@ -95,8 +85,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface MainMenuProps {
-  anchorEl: Element | ((element: Element) => Element) | null | undefined; 
-  handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined; 
+  anchorEl: Element | ((element: Element) => Element) | null | undefined;
+  handleClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void) | undefined;
   logout: () => void;
 }
 
@@ -135,8 +125,8 @@ const MainMenu = (props: MainMenuProps) => {
         onClose={props.handleClose}
       >
         <StyledMenuItem>
-          <ListItemText primary="Logout"  
-            onClick={ enableLogout ? props.logout : undefined } 
+          <ListItemText primary="Logout"
+            onClick={ enableLogout ? props.logout : undefined }
             style={{ color: (enableLogout ? textColor : subtleText) }} />
         </StyledMenuItem>
         {allowOptions ? (
@@ -148,13 +138,21 @@ const MainMenu = (props: MainMenuProps) => {
         {auth.isCoordinator ?
           (<StyledMenuItem>
             <ListItemText primary="New Circuit" onClick={newCircuit} style={{ color: textColor }}/>
-          </StyledMenuItem>) 
-          : (<></>)
+          </StyledMenuItem>)
+          : (<div></div>)
         }
       </StyledMenu>
       <Options open={openOptions} close={toggleOptions} />
     </span>
   );
+};
+
+const LoginDetails = () => {
+  const auth = useContext(AuthStateContext);
+
+  const userName = auth.isLoggedIn ? auth.authUser.displayName : 'Connect';
+
+  return (<span style={{ color: textColor }}>{userName}</span>);
 };
 
 export default function ButtonAppBar() {
@@ -171,11 +169,11 @@ export default function ButtonAppBar() {
       setMenuAnchorEl(event.currentTarget);
     }
   };
-  
+
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
   };
-      
+
   const handleLogout = () => {
     console.debug('logging out');
     if (AuthDispatch) AuthDispatch({type: 'LOGOUT'});
@@ -183,27 +181,27 @@ export default function ButtonAppBar() {
   }
 
   const displayProgress = ((
-    state.step === Step.WAITING || 
+    state.step === Step.WAITING ||
     state.step === Step.QUEUED ||
     state.step === Step.RUNNING)
     && !state.isProgressPanelVisible
   );
 
   const menuIcon = (
-      menuAnchorEl ? 
+      menuAnchorEl ?
         (<CloseIcon style={{ color: textColor }}/>)
       : (<MenuIcon style={{ color: textColor }}/>)
   );
-      
+
   return (
     <div className={classes.root}>
       <ElevationScroll>
         <AppBar color='default'>
           <Toolbar>
-            <IconButton 
-              edge="start" 
-              className={classes.menuButton} 
-              color="inherit" 
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
               aria-label="menu"
               aria-haspopup="true"
               onClick={handleMenuClick}
@@ -212,14 +210,15 @@ export default function ButtonAppBar() {
             </IconButton>
             <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} logout={handleLogout} />
             <ZKTitle title={state.project?.shortName} />
-            {displayProgress ? 
+            {displayProgress ?
               <div style={{ display: 'flex' }}>
                 {/*<NormalBodyText>Your contribution: </NormalBodyText>*/}
-                <CeremonyProgress format='bar' 
+                <CeremonyProgress format='bar'
                   barColor={(state.step === Step.QUEUED) ? subtleText : accentColor}
                 />
-              </div> 
+              </div>
             : (<></>)}
+            <LoginDetails />
           </Toolbar>
         </AppBar>
       </ElevationScroll>

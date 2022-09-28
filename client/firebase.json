@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "trustedsetup-a86f4",
+    "site": "trustedsetuptest",
     "public": "build",
     "ignore": [
       "firebase.json",
@@ -12,7 +12,51 @@
         "source": "**",
         "destination": "/index.html"
       }
-    ]
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          },
+          {
+            "key": "Cross-Origin-Embedder-Policy",
+            "value": "require-corp"
+          },
+          {
+            "key": "Cross-Origin-Opener-Policy",
+            "value": "same-origin"
+          },
+          {
+            "key": "Cross-Origin-Resource-Policy",
+            "value": "cross-origin"
+          }
+        ]
+      },
+      {
+        "regex": "/.*",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          },
+          {
+            "key": "Cross-Origin-Embedder-Policy",
+            "value": "require-corp"
+          },
+          {
+            "key": "Cross-Origin-Opener-Policy",
+            "value": "same-origin"
+          },
+          {
+            "key": "Cross-Origin-Resource-Policy",
+            "value": "cross-origin"
+          }
+        ]
+      }
+    ]  
   },
   "emulators": {
     "hosting": {
@@ -29,7 +73,7 @@
     }
   },
   "firestore": {
-    "rules": "firestore.rules",
+    "rules": "tests/firestore.rules",
     "indexes": "firestore.indexes.json"
   }
 }

@@ -240,7 +240,7 @@ function addCeremony(ceremony) {
 
         case 2:
           doc = _a.sent();
-          console.log("new ceremony added with id " + doc.id);
+          console.debug("ceremony "+ doc.id+ " added");
           return [2
           /*return*/
           , doc.id];
@@ -289,7 +289,7 @@ function updateCeremony(ceremony) {
 
         case 3:
           e_2 = _a.sent();
-          console.error("ceremony update failed: " + e_2.message);
+          console.error("Error ceremony update failed: " + e_2.message);
           throw new Error("error updating ceremony data: " + e_2);
 
         case 4:
@@ -322,7 +322,6 @@ function getCeremony(id) {
             throw new Error("ceremony not found");
           }
 
-          console.log("getCeremony " + doc.exists);
           return [2
           /*return*/
           , doc.data()];
@@ -481,7 +480,7 @@ exports.addCeremonyEvent = function (ceremonyId, event) {
         case 3:
           _a.sent();
 
-          console.log("added event " + doc.id);
+          console.debug("event " + doc.id + " added");
           return [3
           /*break*/
           , 5];
@@ -509,10 +508,9 @@ exports.ceremonyEventListener = function (ceremonyId, callback) {
       db = app_1["default"].firestore();
       query = db.collectionGroup("events").where('timestamp', '>', app_1["default"].firestore.Timestamp.now());
       unsub = query.onSnapshot(function (querySnapshot) {
-        //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
         querySnapshot.docChanges().forEach(function (docSnapshot) {
           var event = docSnapshot.doc.data();
-          var ceremony = docSnapshot.doc.ref.parent.parent; //console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
+          var ceremony = docSnapshot.doc.ref.parent.parent;
 
           if ((ceremony === null || ceremony === void 0 ? void 0 : ceremony.id) === ceremonyId) {
             switch (event.eventType) {
@@ -530,7 +528,7 @@ exports.ceremonyEventListener = function (ceremonyId, callback) {
           }
         });
       }, function (err) {
-        console.warn("Error while listening for ceremony events " + err);
+        console.warn("Error while listening for ceremony events: " + err);
       });
       return [2
       /*return*/
@@ -548,17 +546,16 @@ exports.circuitEventListener = function (callback) {
       db = app_1["default"].firestore();
       query = db.collectionGroup("events").where('timestamp', '>', app_1["default"].firestore.Timestamp.now());
       unsub = query.onSnapshot(function (querySnapshot) {
-        //console.debug(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
         querySnapshot.docChanges().forEach(function (docSnapshot) {
           var event = docSnapshot.doc.data();
-          var ceremony = docSnapshot.doc.ref.parent.parent; //console.debug(`Event: ${JSON.stringify(event)} ceremony Id: ${ceremony?.id}`);
+          var ceremony = docSnapshot.doc.ref.parent.parent;
 
           if (event.eventType === 'VERIFIED') {
             callback(ceremony);
           }
         });
       }, function (err) {
-        console.warn("Error while listening for ceremony events " + err);
+        console.warn("Error while listening for ceremony events: " + err);
       });
       return [2
       /*return*/
@@ -575,12 +572,11 @@ exports.ceremonyListener = function (callback) {
       db = app_1["default"].firestore();
       query = db.collectionGroup("ceremonies").withConverter(ceremonyConverter).where('ceremonyState', '==', RUNNING);
       query.onSnapshot(function (querySnapshot) {
-        //console.log(`Ceremony event notified: ${JSON.stringify(querySnapshot)}`);
         querySnapshot.docChanges().forEach(function (docSnapshot) {
           return __awaiter(void 0, void 0, void 0, function () {
             return __generator(this, function (_a) {
-              if (docSnapshot.type === 'modified' || docSnapshot.type === 'added') {
-                console.debug("Circuit: " + docSnapshot.doc.id);
+              if (docSnapshot.type === 'added' || docSnapshot.type === 'modified') {
+                console.debug("circuit: " + docSnapshot.doc.id + " added or modified");
                 getCeremonyStats(docSnapshot.doc.ref.id).then(function (stats) {
                   var ceremony = __assign(__assign({}, docSnapshot.doc.data()), stats);
 
@@ -595,7 +591,7 @@ exports.ceremonyListener = function (callback) {
           });
         });
       }, function (err) {
-        console.log("Error while listening for ceremony changes " + err);
+        console.warn("Error while listening for ceremony changes: " + err);
       });
       return [2
       /*return*/
@@ -617,7 +613,7 @@ exports.ceremonyUpdateListener = function (id, callback) {
         var c = querySnapshot.data();
         if (c !== undefined) callback(c);
       }, function (err) {
-        console.log("Error while listening for ceremony changes " + err);
+        console.warn("Error while listening for ceremony changes: " + err);
       })];
     });
   });
@@ -630,7 +626,7 @@ exports.contributionUpdateListener = function (id, callback) {
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
-          console.debug("contributionUpdateListener " + id);
+          console.debug("contributionUpdateListener: " + id);
           db = app_1["default"].firestore();
           query = db.collection("ceremonies").doc(id).collection("contributions").withConverter(contributionConverter).orderBy("queueIndex", "asc");
           return [4
@@ -638,7 +634,7 @@ exports.contributionUpdateListener = function (id, callback) {
           , query.get()];
 
         case 1:
-          querySnapshot = _a.sent(); //console.debug(`query snapshot ${querySnapshot.size}`);
+          querySnapshot = _a.sent();
 
           querySnapshot.docs.forEach(function (doc) {
             return callback(doc.data(), 'added');
@@ -646,12 +642,11 @@ exports.contributionUpdateListener = function (id, callback) {
           return [2
           /*return*/
           , query.onSnapshot(function (querySnapshot) {
-            //console.debug(`contribData snapshot ${querySnapshot.size}`);
             querySnapshot.docChanges().forEach(function (contrib) {
               callback(contrib.doc.data(), contrib.type, contrib.oldIndex);
             });
           }, function (err) {
-            console.log("Error while listening for ceremony changes " + err);
+            console.warn("Error while listening for ceremony changes: " + err);
           })];
       }
     });
@@ -778,14 +773,14 @@ exports.ceremonyContributionListener = function (participantId, isCoordinator, c
 
   console.debug("getting contributions for " + participantId);
   var db = app_1["default"].firestore(); // Get running ceremonies
-  // Coordinator can contribute to ceremonies even if they're not 
+  // Coordinator can contribute to ceremonies even if they're not
   // past start time
 
   var states = [RUNNING];
   if (isCoordinator) states.push(PRESELECTION, WAITING);
   var query = db.collection("ceremonies").withConverter(ceremonyConverter).where('ceremonyState', 'in', states).orderBy('sequence', 'asc');
   var found = false;
-  var promises = []; // TODO - Review the need for onSnapshot. a get() would probably do the job. 
+  var promises = []; // TODO - Review the need for onSnapshot. a get() would probably do the job.
   // sub/unsub is overkill
 
   var unsub = query.onSnapshot(function (querySnapshot) {
@@ -800,10 +795,10 @@ exports.ceremonyContributionListener = function (participantId, isCoordinator, c
       }
     });
   }, function (err) {
-    console.log("Error while listening for ceremony changes " + err.message);
+    console.warn("Error while listening for ceremony changes: " + err.message);
   });
   return unsub;
-}; // Join this circuit. 
+}; // Join this circuit.
 
 
 exports.joinCircuit = function (ceremonyId, participantId) {
@@ -823,7 +818,7 @@ exports.joinCircuit = function (ceremonyId, participantId) {
           ceremony = ceremonySnapshot.data();
 
           if (!ceremony) {
-            console.error("Ceremony " + ceremonyId + " not found!");
+            console.error("Error ceremony " + ceremonyId + " not found!");
             return [2
             /*return*/
             , undefined];
@@ -864,7 +859,7 @@ exports.joinCircuit = function (ceremonyId, participantId) {
 
           if (contrib.status === WAITING || contrib.status === RUNNING) {
             // Re-use this
-            console.log("Reusing contrib " + contrib.queueIndex);
+            console.debug("reusing contrib " + contrib.queueIndex);
             contrib.lastSeen = new Date();
             contrib.status = WAITING;
             return [2
@@ -872,7 +867,7 @@ exports.joinCircuit = function (ceremonyId, participantId) {
             , setContribution(ceremony, contrib)];
           } else {
             // Either COMPLETE or INVALIDATED - skip this circuit
-            console.log("Participant has already attempted " + ceremonyId);
+            console.debug("participant has already attempted in ceremony " + ceremonyId);
             return [2
             /*return*/
             , undefined];
@@ -1047,14 +1042,13 @@ exports.ceremonyQueueListener = function (ceremonyId, callback) {
   return __awaiter(void 0, void 0, void 0, function () {
     var lastQueueIndex, lastValidIndex, db, query, cs;
     return __generator(this, function (_a) {
-      console.log("listening for queue activity for " + ceremonyId);
+      console.debug("listening for queue activity for " + ceremonyId);
       lastQueueIndex = 0;
       lastValidIndex = 0;
       db = app_1["default"].firestore();
       query = db.collection("ceremonies").doc(ceremonyId).collection("events").where("eventType", "in", [VERIFIED, VERIFY_FAILED, INVALIDATED, ABORTED]);
       cs = {};
       exports.ceremonyQueueListenerUnsub = query.onSnapshot(function (querySnapshot) {
-        //console.debug(`queue listener doc: ${querySnapshot.size}`);
         //let found = false;
         lastQueueIndex = querySnapshot.docs.reduce(function (last, snap) {
           //if (snap.type !== 'removed') {
@@ -1082,7 +1076,6 @@ exports.ceremonyQueueListener = function (ceremonyId, callback) {
           // }
 
         }, lastValidIndex); //if (found) {
-        //console.debug(`new queue index ${lastQueueIndex+1}`);
 
         callback({
           currentIndex: lastQueueIndex + 1,
@@ -1135,7 +1128,7 @@ exports.addOrUpdateContribution = function (ceremonyId, contribution) {
         case 4:
           _a.sent();
 
-          console.log("added contribution summary " + doc.id + " for index " + contribution.queueIndex);
+          console.debug("added contribution summary " + doc.id + " for index " + contribution.queueIndex);
           return [3
           /*break*/
           , 8];
@@ -1146,7 +1139,7 @@ exports.addOrUpdateContribution = function (ceremonyId, contribution) {
           if (!(INVALIDATED === oldStatus)) return [3
           /*break*/
           , 6];
-          console.warn("Invalid contribution status change: " + oldStatus + " to " + contribution.status + ". Ignored.");
+          console.warn("Error invalid contribution status change: " + oldStatus + " to " + contribution.status + ". Ignored.");
           return [3
           /*break*/
           , 8];
@@ -1207,7 +1200,7 @@ exports.addOrUpdateParticipant = function (participant) {
         case 3:
           _a.sent();
 
-          console.debug("updated participant " + doc.id);
+          console.debug("participant " + doc.id + " updated");
           return [3
           /*break*/
           , 5];
@@ -1376,7 +1369,7 @@ exports.resetContributions = function (participant) {
               });
             });
           });
-          console.log("Reset " + count + " contributions");
+          console.warn("Error reset " + count + " contributions");
           return [3
           /*break*/
           , 4];
@@ -1402,9 +1395,8 @@ exports.getUserStatus = function (userId) {
         case 0:
           // userId will contain user Id (e.g. github email) // TODO: , or a signature)
           // If userId is an entry in the coordinators collection, they have coord privs.
-          console.log(userId);
           status = 'USER';
-          console.debug("status for " + userId);
+          console.debug("status for user " + userId);
           db = app_1["default"].firestore();
           _a.label = 1;
 
@@ -1520,11 +1512,11 @@ exports.resetContrib = function (circuitId, participantId, idx) {
           contrib = _a.sent();
 
           if (contrib.empty) {
-            console.log("Contrib for " + participantId + " not found in " + circuitId);
+            console.debug("contrib for " + participantId + " not found in " + circuitId);
           } else if (contrib.size > 1) {
-            console.log("Duplicate Contrib for " + participantId + " found in " + circuitId);
+            console.debug("duplicate contrib for " + participantId + " found in " + circuitId);
           } else if (contrib.docs[0].get('queueIndex') !== idx) {
-            console.warn("index mismatch for " + participantId + " not found in " + circuitId + " " + contrib.docs[0].get('queueIndex') + " expected " + idx + " ");
+            console.warn("Error index mismatch for " + participantId + " not found in " + circuitId + " " + contrib.docs[0].get('queueIndex') + " expected " + idx + " ");
           } else {
             contrib.docs[0].ref.update({
               participantId: "RESET_" + participantId + " ",

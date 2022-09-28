@@ -19,8 +19,6 @@ type AppProps = {
 };
 
 const App = (props: AppProps) => {
-  console.log(`Firebase inited ${firebase.app.name}`);
-  console.log(`auth user: ${firebase.auth().currentUser?.displayName}`);
 
   return (
     <AuthContextProvider project={props.project || undefined}>

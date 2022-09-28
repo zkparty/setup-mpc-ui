@@ -3,25 +3,25 @@ import "firebase/storage";
 import { resolve } from 'path';
 import fetchStream from 'fetch-readablestream';
 
-const formatParamsFileName = (index: number): string => {
+const formatParamsFileName = (index: number, prefix: string, suffix: string): string => {
     var tmp = "000" + index.toString();
     var padIndex = tmp.substr(tmp.length-4);
-    return `ph2_${padIndex}.zkey`;
+    return `${prefix}_${padIndex}.${suffix}`;
 };
 
-export const getParamsFile = async (ceremonyId: string, index: number, progressCallback: (p: number) => void): Promise<Uint8Array> => {
+export const getParamsFile = async (ceremonyId: string, index: number, prefix: string, suffix: string, progressCallback: (p: number) => void): Promise<Uint8Array> => {
     const storage = firebase.storage();
 
-    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
+    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index, prefix, suffix)}`);
     const metadata = await fileRef.getMetadata()
-        .catch((err: any) => { 
-            console.log(`Expected params file doesn't exist? ${err.message}`); 
+        .catch((err: any) => {
+            console.debug(`Expected params file doesn't exist? ${err.message}`);
             throw err;
     });
-    
+
     const url = await fileRef.getDownloadURL();
     const totBytes = metadata.size;
-    console.log(`Fetching ${url}  ${totBytes} `);
+    console.debug(`fetching ${url}  ${totBytes} `);
 
     const readAllChunks = async (readableStream: any): Promise<Uint8Array> => {
         const reader = readableStream.getReader();
@@ -31,8 +31,6 @@ export const getParamsFile = async (ceremonyId: string, index: number, progressC
         do {
             const resp = await reader.read();
             const { value } : { value:Uint8Array } = resp;
-
-            //console.debug(`chunk ${JSON.stringify(resp)}`);
 
             done = resp.done;
             if (!done) {
@@ -52,9 +50,9 @@ export const getParamsFile = async (ceremonyId: string, index: number, progressC
     return chunks;
 };
 
-export const uploadParams = async (ceremonyId: string, index: number, params: Uint8Array, progressCallback: (p: number) => void): Promise<string> => {
+export const uploadParams = async (ceremonyId: string, index: number, prefix: string, suffix: string, params: Uint8Array, progressCallback: (p: number) => void): Promise<string> => {
     const storage = firebase.storage();
-    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index)}`);
+    const fileRef = storage.ref(`/ceremony_data/${ceremonyId}/${formatParamsFileName(index, prefix, suffix)}`);
     const executor = (resolve: (val: string) => void, reject: (reason: any) => void) => {
         const uploadTask = fileRef.put(params);
 
@@ -70,7 +68,7 @@ export const uploadParams = async (ceremonyId: string, index: number, params: Ui
                     break;
                 }
                 case firebase.storage.TaskState.PAUSED: {
-                    console.log(`upload paused!`)
+                    console.debug(`upload paused!`)
                     break;
                 }
                 }
@@ -80,7 +78,7 @@ export const uploadParams = async (ceremonyId: string, index: number, params: Ui
         },
         () => {
             // success
-            console.log(`Params uploaded to ${uploadTask.snapshot.ref.fullPath}. ${uploadTask.snapshot.totalBytes} bytes`);
+            console.debug(`Params uploaded to ${uploadTask.snapshot.ref.fullPath}. ${uploadTask.snapshot.totalBytes} bytes`);
             resolve(uploadTask.snapshot.ref.fullPath);
     })};
     return new Promise(executor);
@@ -96,6 +94,7 @@ export const uploadCircuitFile = async (ceremonyId: string, circuitFile: File): 
         //const fbFileRef = ceremonyDataRef.child(circuitFile.name);
         return fbFileRef.put(circuitFile);
     } catch (err) {
+        if (err instanceof Error)
         console.warn(`Error uploading circuit file: ${err.message}`);
         throw err;
     }

@@ -21,6 +21,11 @@ export type ParticipantRunningState =
 
 export type TranscriptState = "WAITING" | "VERIFYING" | "COMPLETE";
 
+// export enum ComputeMode { 
+//   "ZKEY",
+//   "POWERSOFTAU",
+// };
+
 export interface Ceremony {
   // firebase-only data
   id: string;
@@ -28,13 +33,13 @@ export interface Ceremony {
   serverURL: string;
   description: string;
   circuitFileName: string;
+  mode: ComputeMode;
   instructions: string;
   github: string;
   homepage: string;
   adminAddr: string;
   lastSummaryUpdate: Date;
 
-  // fetched from mpc server, cached by zkp server for when / if mpc server is disconnected
   ceremonyState: CeremonyState;
   startTime: Date | string;
   endTime: Date | string | undefined;
@@ -53,6 +58,8 @@ export interface Ceremony {
   transcript?: string;
   hash?: string; // Participant's own hash
   isCompleted?: boolean; // Participant has completed this circuit
+  highestQueueIndex: number;
+  zkeyPrefix: string;
 }
 
 export interface Participant {
@@ -162,3 +169,5 @@ export interface Project {
   circuits: string[];
   coordinators: string[];
 }
+
+export declare function f(): void;

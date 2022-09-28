@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dispatch, PropsWithChildren, useEffect, useReducer, useState } from "react";
+import { Dispatch, PropsWithChildren, useEffect, useReducer } from "react";
 import firebase from "firebase";
 import { getSiteSettings, getUserStatus } from "../api/FirestoreApi";
 
@@ -42,15 +42,15 @@ export const AuthContextProvider = (props:AuthProps) => {
           getSiteSettings()
             .then(data => {if (data) dispatch({ type: 'SITE_SETTINGS', data })})
             .catch(err => console.error(`Error getting site settings: ${err.message}`));
-        
+
           //console.debug(`dispatch login ${JSON.stringify(user)}`);
           dispatch({
             type: 'LOGIN',
             user: user,
             //accessToken: (user as any).stsTokenManager?.accessToken,
           });
-          if (!user?.email) {
-            console.warn(`user email not available`);
+          if (!user?.displayName) {
+            console.warn(`user displayName not available`);
           }
         } else {
           dispatch(
@@ -77,7 +77,7 @@ export const AuthContextProvider = (props:AuthProps) => {
           }
         });
     }
-    
+
   }, [state.loaded, state.authUser, state.project, state.defaultProject]);
 
   return (
@@ -93,7 +93,7 @@ export const authStateReducer = (state: any, action: any):any => {
   let newState = {...state};
   switch (action.type) {
     case 'LOGIN': {
-      console.debug(`LOGIN token ${action.accessToken}`);
+      console.debug(`login token ${action.accessToken}`);
       if (action.accessToken !== undefined) newState = {...newState, accessToken: action.accessToken};
       return {...newState, isLoggedIn: true, authUser: {...state.authUser, ...action.user}, loaded: true };
     }
@@ -114,6 +114,5 @@ export const authStateReducer = (state: any, action: any):any => {
       return {...newState, project: action.data};
     }
   }
-  console.log(`unknown action type ${action.type}`);
   return state;
 }

@@ -6,7 +6,7 @@ import firebaseConfig from './app/firebaseConfig';
 
 const run = () => {
     firebase.initializeApp(
-        
+
     );
 
     fs.readFile('//mnt/c/temp/zkopru/reset_list.csv', 'utf8', (err: any, data: string) => {
@@ -16,8 +16,7 @@ const run = () => {
         }
         const lines = data.split('\n');
         const records = lines.map(line => line.split(','));
-        console.log(`records: ${records.length}`);
-        console.log(`records[1]: ${records[1]}`);
+        console.debug(`records[1]: ${records[1]}`);
 
         records.forEach( (record, i) => {
             if (i>0 && record.length >=4) {

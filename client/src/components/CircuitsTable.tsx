@@ -16,6 +16,7 @@ import {CopyToClipboard} from 'react-copy-to-clipboard';
 import ViewLog from './ViewLog';
 import moment from 'moment';
 import { CopyIcon } from '../icons';
+import Blockies from 'react-blockies';
 
 const HeaderCell = styled.div`
   display: flex;
@@ -39,7 +40,6 @@ const TableRow = styled.div`
 export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ceremony[] }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({title: (<></>), content: (<></>)});
-  //console.debug(`render circuits table`);
 
   const { circuits, isLoggedIn } = props;
 
@@ -91,13 +91,25 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
     const renderHash = (hash: string) => {
       let content = (<></>);
       if (hash && hash.length > 0) {
+        const hashBlockie = () => (
+          <Blockies
+            seed={hash}
+            size={10}
+            scale={4}
+            //color="#dfe" /* normal color; random by default */
+            //bgColor="#ffe" {/* background color; random by default */}
+            //spotColor="#abc" {/* color of the more notable features; random by default */}
+            className="identicon"
+          />
+        )
         content = (
           <CopyToClipboard text={hash} >
-            <span style={{ display: 'flex', justifyContent: 'space-evenly',  }}>
-              <NormalBodyText style={{ color: 'inherit', fontSize: '18px' }}>
-                {`${hash.substr(0,3)}...${hash.substr(-3)}`}
-              </NormalBodyText>
-              {CopyIcon}
+            <span style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'  }}>
+              {/*<NormalBodyText style={{ color: 'inherit', fontSize: '18px' }}>*/}
+                <div style={{ padding: 10 }}>{hashBlockie()}</div>
+
+              {/*</NormalBodyText>*/}
+              <div>{CopyIcon}</div>
             </span>
           </CopyToClipboard>
         );

@@ -188,8 +188,7 @@ function getCeremonySummariesCached() {
   }).then(function (json) {
     return json.map(jsonToCeremony);
   })["catch"](function (err) {
-    console.error("Error occurred fetching ceremonies:");
-    console.error(err);
+    console.error("Error occurred fetching ceremonies: " + err);
     throw err;
   });
 }
@@ -203,8 +202,7 @@ function getCeremonySummaries() {
   }).then(function (json) {
     return json.map(jsonToCeremony);
   })["catch"](function (err) {
-    console.error("Error occurred fetching ceremonies:");
-    console.error(err);
+    console.error("Error occurred fetching ceremonies: " + err);
     throw err;
   });
 }
@@ -226,8 +224,7 @@ function getCeremonyDataCached(id) {
 
     return jsonToCeremony(json);
   })["catch"](function (err) {
-    console.error("Error occurred fetching ceremony:");
-    console.error(err);
+    console.error("Error occurred fetching ceremony: " + err);
     throw err;
   });
 }
@@ -249,8 +246,7 @@ function getCeremonyData(id) {
 
     return jsonToCeremony(json);
   })["catch"](function (err) {
-    console.error("Error occurred fetching ceremony:");
-    console.error(err);
+    console.error("Error occurred fetching ceremony: " + err);
     throw err;
   });
 }
@@ -272,8 +268,6 @@ function addCeremony(ceremony) {
   //     return json.id;
   //   })
   //   .catch(err => {
-  //     console.error("Error occurred posting ceremony:");
-  //     console.error(err);
   //     throw err;
   //   });
 }
@@ -287,7 +281,7 @@ var tryDate = function tryDate(d, defaultResult) {
   try {
     return d.toDate();
   } catch (e) {
-    console.warn("error converting firebase date " + e.message);
+    console.warn("Error converting firebase date " + e.message);
     return defaultResult;
   }
 };
@@ -300,7 +294,6 @@ function jsonToCeremony(json) {
       completedAt = json.completedAt,
       participants = json.participants,
       rest = __rest(json, ["lastSummaryUpdate", "startTime", "endTime", "completedAt", "participants"]); //const start: firebase.firestore.Timestamp = startTime;
-  //console.log(`start time ${start ? start.toDate().toLocaleDateString() : '-'}`);
 
 
   try {
@@ -377,7 +370,6 @@ var addGist = function addGist(summary, description, authToken) {
 
         case 1:
           res = _a.sent();
-          console.debug("" + (res ? 'ok' : 'error'));
           if (!res) return [3
           /*break*/
           , 3];

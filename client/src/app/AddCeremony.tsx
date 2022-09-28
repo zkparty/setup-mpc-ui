@@ -84,7 +84,7 @@ const AddCeremonyPage = () => {
   }
 
   return (
-      <CeremonyDetails ceremony={ceremony} onSubmit={onSubmit}></CeremonyDetails> 
+      <CeremonyDetails ceremony={ceremony} onSubmit={onSubmit}></CeremonyDetails>
   );
 };
 
@@ -120,7 +120,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       display: 'block',
-      flexWrap: 'wrap', 
+      flexWrap: 'wrap',
     },
     margin: {
       margin: theme.spacing(1),
@@ -128,7 +128,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const inputField = (props: StandardTextFieldProps & {oldValue: string}) => {
+const InputField = (props: StandardTextFieldProps & {oldValue: string}) => {
   //const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState<any | null>(props.oldValue);
 
@@ -148,8 +148,8 @@ const inputField = (props: StandardTextFieldProps & {oldValue: string}) => {
   }
 
   return ({
-    element: 
-      (<CssTextField 
+    element:
+      (<CssTextField
         {...props}
         value={value}
         variant='outlined'
@@ -173,7 +173,7 @@ const writeToDb = async (ceremony: Ceremony):Promise<string> => {
 
 const uploadFile = async (id: string, circuitFile: File, onSubmit: (id?: string) => void) => {
   uploadCircuitFile(id, circuitFile).then((snapshot) => {
-    console.log(`Uploaded file ${snapshot.ref.fullPath}`);
+    console.debug(`uploaded file ${snapshot.ref.fullPath}`);
     const event: CeremonyEvent = {
       sender: "COORDINATOR",
       eventType: "CIRCUIT_FILE_UPLOAD",
@@ -203,7 +203,8 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
         ceremony.current = props.ceremony;
         console.debug(`ceremony id ${ceremony.current.id}`);
       } catch (err) {
-        console.log(`Cannot parse provided ceremony ${err.message}`);
+        if (err instanceof Error)
+        console.error(`Cannot parse provided ceremony ${err.message}`);
       }
     } else {
       console.debug(`adding ceremony`);
@@ -214,48 +215,33 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
     if (ceremony.current && !unsubscribe.current) {
       unsubscribe.current = ()=> {}; // placeholder
       ceremonyEventListener(ceremony.current.id, statusUpdate).then(unsub =>
-        { 
+        {
           unsubscribe.current = unsub;
           return unsub;
         }
       )
     }
-  
+
     }, [ceremony.current?.id]
   );
 
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     console.log(`handleChange ${e.target.id}`);
-  //     e.preventDefault();
-
-  //     switch (e.target.id) {
-  //       //case 'title': ceremony.current.title = e.target.value; break;
-  //       //case 'description': ceremony.current.description = e.target.value; break;
-  //       case 'start-time': ceremony.current.startTime = Date.parse(e.target.value); break;
-  //       case 'end-time': ceremony.current.endTime = Date.parse(e.target.value); break;
-  //       //case 'min-participants': ceremony.current.minParticipants = parseInt(e.target.value); break;
-  //     }
-  // };
-
   const handleFileUpload = (f: File) => {
-      console.log(`handleFileUpload`);
       circuitFile = f;
       ceremony.current.circuitFileName = circuitFile.name;
   }
 
-  const title = inputField({
-      id:"title", 
-      label:"Title", 
+  const title = InputField({
+      id:"title",
+      label:"Title",
       type:'text',
       multiline: true,
       InputLabelProps: { shrink: true },
       oldValue: ceremony.current?.title,
   });
-  //console.debug(`title value: ${title.value()}`);
 
-  const description = inputField({
-    id:"desc", 
-    label:"Description", 
+  const description = InputField({
+    id:"desc",
+    label:"Description",
     type:'text',
     multiline: true,
     InputLabelProps: { shrink: true },
@@ -271,7 +257,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
   const startTimeStr = formatDate(ceremony.current?.startTime);
   const endTimeStr = formatDate(ceremony.current?.endTime);
 
-  const startTime = inputField({
+  const startTime = InputField({
     id: 'start-time',
     label: 'Start Time',
     type: 'datetime-local',
@@ -280,7 +266,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
     defaultValue: startTimeStr,
   });
 
-  const endTime = inputField({
+  const endTime = InputField({
     id: 'end-time',
     label: 'End Time',
     type: 'datetime-local',
@@ -289,9 +275,9 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
     defaultValue: endTimeStr,
   });
 
-  const minParticipants = inputField({
-    id:"min-participants", 
-    label:"Minimum Participants", 
+  const minParticipants = InputField({
+    id:"min-participants",
+    label:"Minimum Participants",
     type:'number',
     oldValue: ceremony.current?.minParticipants?.toString() || '0',
   });
@@ -307,17 +293,17 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
       if (!ceremony.current.title || ceremony.current.title.length == 0) {enqueueSnackbar("Must have a title"); isValid = false;}
       if (!ceremony.current.description || ceremony.current.description.length == 0) {enqueueSnackbar("Must have a description"); isValid = false;};
     } catch (err) {
-      console.log(`Error validating input: ${err.message}`);
+      if (err instanceof Error)
+      console.error(`Error validating input: ${err.message}`);
       isValid = false;
     }
     return isValid;
   };
 
   const handleSubmit = (event: { preventDefault: () => void; }) => {
-    console.log(`submit ....`);
     event.preventDefault();
     // validate
-    if (!validateInput()) {console.log(`validation failed`); return};
+    if (!validateInput()) {console.error(`Error validation failed`); return};
 
     if (circuitFile) {
         // Firebase storage ref for the new file
@@ -331,7 +317,7 @@ const CeremonyDetails = (props: { ceremony: Ceremony | null, onSubmit: (id?: str
           console.debug(`upload ${circuitFile.name}`);
           uploadFile(id, circuitFile, props.onSubmit);
         } else {
-          console.log(`No circuit file to upload`);
+          console.error(`Error no circuit file to upload`);
           props.onSubmit(id);
         }
         ceremony.current.id = id; // trigger effect

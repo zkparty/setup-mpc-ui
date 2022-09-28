@@ -1,33 +1,21 @@
-import { Fragment } from "react";
-import * as React from "react";
-import ButtonAppBar from "../components/ButtonAppBar";
-import { ParticipantSection } from "./ParticipantSection";
-
-import {
-  accentColor,
-  secondAccent,
-  textColor,
-  PageContainer,
-  lighterBackground,
-  SectionContainer,
-  CeremonyTitle,
-  inverseText
-} from "../styles";
-import AddCeremonyPage from "./AddCeremony";
+import { Box } from "@material-ui/core";
 import Modal from "@material-ui/core/Modal";
+
+import './styles.css';
+import { PageContainer } from "../styles";
+import AddCeremonyPage from "./AddCeremony";
 import { CeremonyPage } from "./CeremonyPage";
 import Footer from './../components/Footer';
 import AboutPanel from './../components/AboutPanel';
-import { useSelectionContext } from '../state/SelectionContext';
-import './styles.css';
-import { Box } from "@material-ui/core";
+import ButtonAppBar from "../components/ButtonAppBar";
 import CircuitsPanel from "../components/CircuitsPanel";
+import { ParticipantSection } from "./ParticipantSection";
+import { useSelectionContext } from '../state/SelectionContext';
 
 export const LandingPage = () => {
     const [selection, dispatch] = useSelectionContext();
 
     const closeModal = () => {dispatch({type: 'CLOSE_CEREMONY'});}
-
     return (
       <>
         <ButtonAppBar />
@@ -44,6 +32,7 @@ export const LandingPage = () => {
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
           >
+            <>
             {(selection.edit) ?
               (<AddCeremonyPage />)
               :
@@ -51,6 +40,7 @@ export const LandingPage = () => {
             /* : (selection.newCircuit) ?
               : (<></>)*/
             }
+            </>
           </Modal>
         </PageContainer>
         <Footer />
