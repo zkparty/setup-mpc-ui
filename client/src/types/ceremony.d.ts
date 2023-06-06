@@ -170,4 +170,27 @@ export interface Project {
   coordinators: string[];
 }
 
+export interface Queue {
+  connection: boolean;
+  client: any;
+  keepaliveTimer: number;
+  connected: boolean;
+  authToken: string;
+  userId: string;
+  ceremonyState: any;
+  queueLength: number;
+  timeoutAt: number;
+  activeContributor: string;
+  contributing: boolean;
+  contributionName: string;
+  contributionHashes: string[];
+  loadingInitial: boolean;
+  inQueue: boolean;
+
+  contributionUpdates: any[];
+
+  join: any;
+
+}
+
 export declare function f(): void;
