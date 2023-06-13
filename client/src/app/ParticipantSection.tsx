@@ -2,45 +2,34 @@ import React, { Dispatch, useContext, useEffect, useRef } from "react";
 import Typography from "@material-ui/core/Typography";
 import { AuthContextInterface, AuthStateContext } from "../state/AuthContext";
 
-import { Ceremony, Participant, Project } from "../types/ceremony";
+import { Ceremony, Participant, Project, Queue } from "../types/ceremony";
 
-import { 
-  ceremonyQueueListener, ceremonyQueueListenerUnsub, getSiteSettings, joinCircuit } from "../api/FirestoreApi";
 import { newParticipant, Step, ComputeStateContext, ComputeDispatchContext, ComputeContextInterface } from '../state/ComputeStateManager';
 import { getContributions } from "../state/Compute";
 import { createSummaryGist } from "../api/ZKPartyApi";
 import WelcomePanel from "../components/WelcomePanel";
 import ProgressPanel from "../components/ProgressPanel";
 import LoginPanel from "../components/LoginPanel";
-import { auth } from "firebase-admin";
+import state from '../state/state';
+import { observer } from 'mobx-react-lite';
+
 
 const stepText = (step: string) => (<Typography align="center">{step}</Typography>);
 
-const handleStepChange = (state: ComputeContextInterface, 
+const handleStepChange = (ceremony: Queue, 
     dispatch: Dispatch<any> | undefined,
     authState: AuthContextInterface
   ) => {
 
-  const { step, computeStatus, participant, contributionState, circuits, joiningCircuit, project } = state;
+  const { auth, step, computeStatus, participant, contributionState, circuits, joiningCircuit, project } = ceremony;
   console.debug(`handle step change ${step}`);
   switch (step) {
       case (Step.ACKNOWLEDGED): {
         // After 'LAUNCH' clicked
         // Display status messages for all remaining conditions
         // Initialise - get participant ID
-        if (dispatch) {
-          // getSiteSettings().then(
-          //   settings => {
-          //     dispatch({ type: 'SET_SETTINGS', data: settings });
-          // });
 
-          if (!participant && dispatch && project) {
-            getParticipant(dispatch, authState, project).then(() => {
-              console.debug('participant set');
-              //dispatch({type: 'SET_STEP', data: Step.INITIALISED});
-            });
-          }
-        }
+        auth();
         break;
       }
       case (Step.INITIALISED): {
@@ -76,8 +65,8 @@ const joinNewCircuit = (
   project: Project,
   ) => {
 
-
   const updateQueue = (update: any) => {
+
     console.debug(`queue update ${JSON.stringify(update)} `);
     // Sanity check - only continue if lastValidIndex > 0
     // Coordinator excepted
@@ -85,7 +74,6 @@ const joinNewCircuit = (
       if (dispatch) dispatch({
         type: 'UPDATE_QUEUE',
         data: update,
-        unsub: ceremonyQueueListenerUnsub,
       });
     } else {
       console.warn(`lastValidIndex is 0. Queue update not accepted`);
@@ -103,7 +91,7 @@ const joinNewCircuit = (
     // Must be called only once
     if (!joiningCircuit) {
       console.debug(`joining circuit`);
-      joinCircuit(newCircuit.id, participant.uid).then(cs => {
+      ceremony.join(participant.uid).then(cs => {
         // Coordinator excepted
         console.debug(`joined circuit. queue index ${cs ? cs.queueIndex : '-'}`);
         if (!cs) {
@@ -122,15 +110,15 @@ const joinNewCircuit = (
   };
 };
 
-const getParticipant = async (dispatch: Dispatch<any>, authState: AuthContextInterface, project: Project) => {
-  console.debug(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
-  dispatch({
-    type: 'SET_PARTICIPANT',
-    data: newParticipant(authState.authUser.uid, authState.authUser.displayName),
-    accessToken: authState.accessToken });
-  // Trigger contribution count for this user
-  await getContributions(project, authState.authUser.uid, dispatch, authState.isCoordinator);
-};
+// const getParticipant = async (dispatch: Dispatch<any>, authState: AuthContextInterface, project: Project) => {
+//   console.debug(`uid: ${authState.authUser.uid} acc.token ${authState.accessToken}`);
+//   // dispatch({
+//   //   type: 'SET_PARTICIPANT',
+//   //   data: newParticipant(authState.authUser.uid, authState.authUser.displayName),
+//   //   accessToken: authState.accessToken });
+//   // Trigger contribution count for this user
+//   await getContributions(project, authState.authUser.uid, dispatch, authState.isCoordinator);
+// };
 
 const advanceCircuit = (circuits: Ceremony[]) => {
   // Get the next circuit to be completed.
@@ -139,17 +127,17 @@ const advanceCircuit = (circuits: Ceremony[]) => {
 }
 
 
-export const ParticipantSection = () => {
-  const state = useContext(ComputeStateContext);
+export const ParticipantSection = observer(() => {
+  const { ceremony } = useContext(state);
   const dispatch = useContext(ComputeDispatchContext);
   const authState = useContext(AuthStateContext);
   const summaryStarted = useRef<boolean>(false);
 
-  const { step, computeStatus, participant, contributionState, circuits, 
-    joiningCircuit, worker, seriesIsComplete, userContributions, summaryGistUrl, project, accessToken } = state;
+  const { authenticated, step, computeStatus, participant, contributionState, circuits, 
+    joiningCircuit, worker, seriesIsComplete, userContributions, summaryGistUrl, project, accessToken } = ceremony;
 
   useEffect(() => {
-    handleStepChange(state, dispatch, authState);
+    handleStepChange(ceremony, dispatch, authState);
   },[step, participant, computeStatus, contributionState, circuits, joiningCircuit, worker, authState, project, dispatch]);
 
   useEffect(() => {
@@ -211,4 +199,4 @@ export const ParticipantSection = () => {
         {content}
       </div>
   );
-};
+});

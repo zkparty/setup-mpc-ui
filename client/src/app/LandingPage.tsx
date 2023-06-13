@@ -4,14 +4,7 @@ import ButtonAppBar from "../components/ButtonAppBar";
 import { ParticipantSection } from "./ParticipantSection";
 
 import {
-  accentColor,
-  secondAccent,
-  textColor,
   PageContainer,
-  lighterBackground,
-  SectionContainer,
-  CeremonyTitle,
-  inverseText
 } from "../styles";
 import AddCeremonyPage from "./AddCeremony";
 import Modal from "@material-ui/core/Modal";

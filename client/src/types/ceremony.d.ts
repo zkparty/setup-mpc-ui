@@ -191,6 +191,9 @@ export interface Queue {
 
   join: any;
 
+  stopKeepAlive: () => {};
+
+  auth();
 }
 
 export declare function f(): void;

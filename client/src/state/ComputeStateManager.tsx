@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Ceremony, CeremonyEvent, Contribution, ContributionState, ContributionSummary, Participant, ParticipantState, Project } from "../types/ceremony";
 
-import { addCeremonyEvent, updateContribution, addOrUpdateParticipant, getProject, ceremonyQueueListener } from "../api/FirestoreApi";
+//import { addCeremonyEvent, updateContribution, addOrUpdateParticipant, getProject, ceremonyQueueListener } from "../api/FirestoreApi";
 import { createContext, Dispatch, PropsWithChildren, useContext, useReducer } from "react";
 import { startDownload, startComputation, startUpload, endOfCircuit, getEntropy } from './Compute';
 import { AuthStateContext } from './AuthContext';

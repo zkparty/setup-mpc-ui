@@ -4,23 +4,24 @@ import { background, textColor } from "../styles";
 import { LandingPage } from "./LandingPage";
 import { AuthContextProvider } from "../state/AuthContext";
 import { SelectionContextProvider } from '../state/SelectionContext';
-import firebase from "firebase/app";
-import firebaseConfig from "./firebaseConfig";
-import "firebase/auth";
-import "firebase/firestore";
-import "firebase/storage";
+// import firebase from "firebase/app";
+// import firebaseConfig from "./firebaseConfig";
+// import "firebase/auth";
+// import "firebase/firestore";
+// import "firebase/storage";
 import { ComputeContextProvider } from '../state/ComputeStateManager';
 
-firebase.initializeApp(firebaseConfig);
-firebase.firestore().settings({ experimentalForceLongPolling: true });
+
+// firebase.initializeApp(firebaseConfig);
+// firebase.firestore().settings({ experimentalForceLongPolling: true });
 
 type AppProps = {
   project?: string | null
 };
 
 const App = (props: AppProps) => {
-  console.log(`Firebase inited ${firebase.app.name}`);
-  console.log(`auth user: ${firebase.auth().currentUser?.displayName}`);
+  //console.log(`Firebase inited ${firebase.app.name}`);
+  //console.log(`auth user: ${firebase.auth().currentUser?.displayName}`);
 
   return (
     <AuthContextProvider project={props.project || undefined}>

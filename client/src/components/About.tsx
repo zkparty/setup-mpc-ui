@@ -37,7 +37,7 @@ const verifySection = (
     hash. Please copy and paste it to a document you save on your computer.
     You will be able to use it to verify that your contribution was
     used by the next participant once we upload the complete contribution 
-    transcript to the <StyledLink href='https://storage.googleapis.com/trustedsetup-a86f4.appspot.com/clrfund/index.html' target='_blank'>website</StyledLink>.
+    transcript to the <StyledLink href='https://s3.eu-central-1.amazonaws.com/www.trusted-setup-pse.org/clrfund/index.html' target='_blank'>website</StyledLink>.
     </NormalBodyText>    
   </Section>
 );

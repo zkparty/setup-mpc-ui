@@ -1,19 +1,16 @@
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useRef } from "react";
 import * as React from "react";
 import styled from "styled-components";
-import { ReactNode } from "react";
 import { DataGrid, GridColDef, GridCellParams } from '@material-ui/data-grid';
 import {
   textColor,
   lighterBackground,
   accentColor,
   PageContainer,
-  secondAccent,
   CeremonyTitle,
   Center
 } from "../styles";
 import { Ceremony, CeremonyEvent, Contribution, ContributionSummary, Participant } from "../types/ceremony";
-import { ceremonyEventListener, ceremonyUpdateListener, contributionUpdateListener, getCeremony, getContributionState } from "../api/FirestoreApi";
 import { createStyles, makeStyles, Theme, Typography, withStyles, Container } from "@material-ui/core";
 import Fab from '@material-ui/core/Fab';
 import EditIcon from '@material-ui/icons/Edit';
@@ -25,6 +22,8 @@ import { AuthStateContext } from "../state/AuthContext";
 import { SelectedCeremonyContext, useSelectionContext } from "../state/SelectionContext";
 import { useSnackbar } from "notistack";
 import { ceremonyStatus } from "../utils/utils";
+import state from '../state/state';
+import { observer } from 'mobx-react-lite';
 
 const CeremonyDetailsTable = styled.table`
   text-align: right;
@@ -64,13 +63,14 @@ const CeremonyDetailsSubSection = styled.div`
   box-sizing: border-box;
 `;
 
-export const CeremonyPage = (props: {onClose: ()=> void }) => {
+export const CeremonyPage = observer((props: {onClose: ()=> void }) => {
+  const { ceremony } = React.useContext(state)
   const [loaded, setLoaded] = useState<boolean>(false);
-  const [ceremony, setCeremony] = useState<null | Ceremony>(null);
-  const [contributions, setContributions] = useState<ContributionSummary[]>([]);
-  const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
-  const contributionListenerUnsub = useRef<(() => void) | null>(null);
-  const eventsListenerUnsub = useRef<(() => void) | null>(null);
+  //const [ceremony, setCeremony] = useState<null | Ceremony>(null);
+  //const [contributions, setContributions] = useState<ContributionSummary[]>([]);
+  //const ceremonyListenerUnsub = useRef<(() => void) | null>(null);
+  //const contributionListenerUnsub = useRef<(() => void) | null>(null);
+  //const eventsListenerUnsub = useRef<(() => void) | null>(null);
   const loadingContributions = useRef(false);
   const [selection, dispatch] = useSelectionContext();
   const { enqueueSnackbar } = useSnackbar();
@@ -85,57 +85,57 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
     enqueueSnackbar(event.message);
   };
 
-  const refreshCeremony = async () => {
-    const c = ceremonyId ? await getCeremony(ceremonyId) : undefined;
-    if (c !== undefined) setCeremony(c);
-  };
+  // const refreshCeremony = async () => {
+  //   const c = ceremonyId ? await getCeremony(ceremonyId) : undefined;
+  //   if (c !== undefined) setCeremony(c);
+  // };
 
-  const updateContribution = (doc: ContributionSummary, changeType: string, oldIndex?: number) => {
-    // A contribution has been updated
-    //console.debug(`contribution update: ${doc.queueIndex} ${changeType} ${oldIndex}`);
-    let newContributions = contributions;
-    switch (changeType) {
-      case 'added': {
-        newContributions.push(doc);
-        break;
-      }
-      case 'modified': {
-        if (oldIndex !== undefined) newContributions[oldIndex] = doc;
-        break;
-      }
-      case 'removed': {
-        if (oldIndex !== undefined) newContributions.splice(oldIndex, 1);
-        break;
-      }
-    }
-    setContributions(newContributions);
-  }
+  // const updateContribution = (doc: ContributionSummary, changeType: string, oldIndex?: number) => {
+  //   // A contribution has been updated
+  //   //console.debug(`contribution update: ${doc.queueIndex} ${changeType} ${oldIndex}`);
+  //   let newContributions = ceremony.contributions; // TODO fix this
+  //   switch (changeType) {
+  //     case 'added': {
+  //       newContributions.push(doc);
+  //       break;
+  //     }
+  //     case 'modified': {
+  //       if (oldIndex !== undefined) newContributions[oldIndex] = doc;
+  //       break;
+  //     }
+  //     case 'removed': {
+  //       if (oldIndex !== undefined) newContributions.splice(oldIndex, 1);
+  //       break;
+  //     }
+  //   }
+  //   setContributions(newContributions);
+  // }
 
-  if (!loaded) {
-    refreshCeremony()
-      .then(() => setLoaded(true));
-  }
+  // if (!loaded) {
+  //   //refreshCeremony()
+  //     .then(() => setLoaded(true));
+  // }
 
-  if (!eventsListenerUnsub.current && ceremonyId) {
-    // Start ceremony listener
-    ceremonyEventListener(ceremonyId, statusUpdate)
-        .then(unsub => eventsListenerUnsub.current = unsub);
-  }
+  // if (!eventsListenerUnsub.current && ceremonyId) {
+  //   // Start ceremony listener
+  //   ceremonyEventListener(ceremonyId, statusUpdate)
+  //       .then(unsub => eventsListenerUnsub.current = unsub);
+  // }
 
-  if (!ceremonyListenerUnsub.current && ceremonyId) {
-    // Start ceremony listener
-    ceremonyUpdateListener(ceremonyId, setCeremony)
-        .then(unsub => {ceremonyListenerUnsub.current = unsub;});
-  }
+  // if (!ceremonyListenerUnsub.current && ceremonyId) {
+  //   // Start ceremony listener
+  //   ceremonyUpdateListener(ceremonyId, setCeremony)
+  //       .then(unsub => {ceremonyListenerUnsub.current = unsub;});
+  // }
 
-  if (!loadingContributions.current && ceremonyId) {
-    // Start contribution listener
-    contributionUpdateListener(ceremonyId, updateContribution)
-        .then(unsub => contributionListenerUnsub.current = unsub);
-    loadingContributions.current = true;
-  }
+  // if (!loadingContributions.current && ceremonyId) {
+  //   // Start contribution listener
+  //   contributionUpdateListener(ceremonyId, updateContribution)
+  //       .then(unsub => contributionListenerUnsub.current = unsub);
+  //   loadingContributions.current = true;
+  // }
 
-  const gridRows = contributions.map(v => {
+  const gridRows = ceremony?.contributionUpdates.map(v => {
     return {
       ...v, 
       id: v.queueIndex,
@@ -146,7 +146,7 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
 
   const contributionStats = (): {completed: number, waiting: number, lastVerified: number, transcript: string} => {
     let result = {completed: 0, waiting: 0, lastVerified: -1, transcript: ''};
-    contributions.forEach(c => {
+    ceremony?.contributionUpdates.forEach(c => {
       switch (c.status) {
         case 'COMPLETE': {
           result.completed++;
@@ -169,9 +169,7 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
   };
 
   const handleClose = () => {
-    if (ceremonyListenerUnsub.current) ceremonyListenerUnsub.current();
-    if (contributionListenerUnsub.current) contributionListenerUnsub.current();
-    props.onClose();
+    ceremony?.stopKeepAlive();
   };
 
   const closeViewLog = () => {
@@ -195,10 +193,10 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
               <div style={{ marginLeft: 'auto' }}>
                 <CeremonyDetails 
                   ceremony={ceremony} 
-                  numContCompleted={contribStats.completed} 
-                  numContWaiting={contribStats.waiting}
-                  transcript={contribStats.transcript}
-                  lastVerified={contribStats.lastVerified}
+                  numContCompleted={ceremony.ceremonyState.circuitStats.completed} 
+                  numContWaiting={ceremony.ceremonyState.circuitStats.waiting}
+                  transcript={ceremony.ceremonyState.circuitStats.transcript}
+                  lastVerified={ceremony.ceremonyState.circuitStats.lastVerified}
                   openViewLog={openViewLog} />
               </div>
               <div style={{ float: 'right', marginLeft: 'auto' }}>
@@ -206,7 +204,7 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
               </div>
             </div>
             <br />
-            <ContributionsGrid contributions={gridRows} openViewer={openViewLog} />
+            <ContributionsGrid contributions={gridRows || []} openViewer={openViewLog} />
             <ViewLog open={viewLogOpen} 
               close={closeViewLog} 
               content={viewLogContent.current} 
@@ -224,7 +222,7 @@ export const CeremonyPage = (props: {onClose: ()=> void }) => {
       )}
     </>
   );
-};
+});
 
 const Actions = (props: {handleEdit: ()=>void, handleClose: ()=> void}) => {
   return (

@@ -4,7 +4,7 @@ import { Ceremony, CeremonyEvent, CeremonyState,
 // import firebase from 'firebase/app';
 // import firestore from "firebase/firestore";
 import { jsonToCeremony, jsonToContribution } from './ZKPartyApi';
-import Queue from './Ceremony';
+import Queue from '../state/Ceremony';
 
 const COMPLETE = "COMPLETE";
 const INVALIDATED = "INVALIDATED";
