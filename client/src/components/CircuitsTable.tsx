@@ -17,6 +17,8 @@ import ViewLog from './ViewLog';
 import moment from 'moment';
 import { CopyIcon } from '../icons';
 import Blockies from 'react-blockies';
+import state from '../state/state';
+import { observer } from 'mobx-react-lite';
 
 const HeaderCell = styled.div`
   display: flex;
@@ -37,7 +39,8 @@ const TableRow = styled.div`
   color: ${(props: { completed?: boolean }) => props.completed ? accentColor: textColor};
 `
 
-export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ceremony[] }) {
+const CircuitsTable = observer((props: { isLoggedIn: boolean, circuits: Ceremony[] }) => {
+  const { ceremony } = useContext(state);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({title: (<></>), content: (<></>)});
   //console.debug(`render circuits table`);
@@ -79,122 +82,124 @@ export default function CircuitsTable(props: { isLoggedIn: boolean, circuits: Ce
       />
     </div>
   )
-};
+});
 
-  const renderRow = (
-    circuit: any,
-    index: number,
-    isSignedIn: boolean,
-    showTranscript: (title: JSX.Element, body: JSX.Element) => void,
-    cellWidths: string[]
-  ) => {
+const renderRow = (
+  circuit: any,
+  index: number,
+  isSignedIn: boolean,
+  showTranscript: (title: JSX.Element, body: JSX.Element) => void,
+  cellWidths: string[]
+) => {
 
-    const renderHash = (hash: string) => {
-      let content = (<></>);
-      if (hash && hash.length > 0) {
-        const hashBlockie = () => (
-          <Blockies
-            seed={hash} 
-            size={10} 
-            scale={4} 
-            //color="#dfe" /* normal color; random by default */
-            //bgColor="#ffe" {/* background color; random by default */}
-            //spotColor="#abc" {/* color of the more notable features; random by default */}
-            className="identicon" 
-          />
-        )
-        content = (
-          <CopyToClipboard text={hash} >
-            <span style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'  }}>
-              {/*<NormalBodyText style={{ color: 'inherit', fontSize: '18px' }}>*/}
-                <div style={{ padding: 10 }}>{hashBlockie()}</div>
-            
-              {/*</NormalBodyText>*/}
-              <div>{CopyIcon}</div>
-            </span>
-          </CopyToClipboard>
-        );
-      }
-      return (<span>{content}</span>);
+  const renderHash = (hash: string) => {
+    let content = (<></>);
+    if (hash && hash.length > 0) {
+      const hashBlockie = () => (
+        <Blockies
+          seed={hash} 
+          size={10} 
+          scale={4} 
+          //color="#dfe" /* normal color; random by default */
+          //bgColor="#ffe" {/* background color; random by default */}
+          //spotColor="#abc" {/* color of the more notable features; random by default */}
+          className="identicon" 
+        />
+      )
+      content = (
+        <CopyToClipboard text={hash} >
+          <span style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'  }}>
+            {/*<NormalBodyText style={{ color: 'inherit', fontSize: '18px' }}>*/}
+              <div style={{ padding: 10 }}>{hashBlockie()}</div>
+          
+            {/*</NormalBodyText>*/}
+            <div>{CopyIcon}</div>
+          </span>
+        </CopyToClipboard>
+      );
+    }
+    return (<span>{content}</span>);
+  };
+
+  const formatDuration = (avgSecs: number) => {
+    return moment.duration(avgSecs, 'seconds').humanize();
+  }
+
+  const formatTranscript = (circuit: Ceremony) => {
+    const { transcript, sequence, numConstraints, circuitFileName } = circuit;
+
+    if (!transcript) return;
+
+    const title = (
+      <div>
+        <H3Title>Verification Transcript</H3Title>
+        <NormalBodyText>{`Circuit ${sequence}`}</NormalBodyText>
+        <NormalBodyText>{`Circuit File: ${circuitFileName}`}</NormalBodyText>
+        <NormalBodyText>{`Constraints: ${numConstraints}`}</NormalBodyText>
+      </div>
+    );
+
+    const lineStyle = {
+      marginBlockStart: '0em',
+      marginBlockEnd: '0em'
+    };
+    const linesToJsx = (content: string) => {
+      const lines: string[] = content.split('\n');
+      const body= lines.map(v =>
+        (<p style={lineStyle}>{v}</p>));
+      return (<div>{body}</div>);
     };
 
-    const formatDuration = (avgSecs: number) => {
-      return moment.duration(avgSecs, 'seconds').humanize();
-    }
-
-    const formatTranscript = (circuit: Ceremony) => {
-      const { transcript, sequence, numConstraints, circuitFileName } = circuit;
-
-      if (!transcript) return;
-
-      const title = (
-        <div>
-          <H3Title>Verification Transcript</H3Title>
-          <NormalBodyText>{`Circuit ${sequence}`}</NormalBodyText>
-          <NormalBodyText>{`Circuit File: ${circuitFileName}`}</NormalBodyText>
-          <NormalBodyText>{`Constraints: ${numConstraints}`}</NormalBodyText>
-        </div>
-      );
-
-      const lineStyle = {
-        marginBlockStart: '0em',
-        marginBlockEnd: '0em'
-      };
-      const linesToJsx = (content: string) => {
-        const lines: string[] = content.split('\n');
-        const body= lines.map(v =>
-          (<p style={lineStyle}>{v}</p>));
-        return (<div>{body}</div>);
-      };
-
-      const copyStyle = {
-        display: 'flex',
-        justifyContent: 'space-evenly',
-        width: '245px',
-        background: darkerBackground,
-        borderRadius: '30px',
-        marginBottom: '41px',
-      };
-      const body = (
-        <div>
-          <CopyToClipboard text={transcript} >
-            <span style={copyStyle}>
-              <NormalBodyText>Copy to clipboard</NormalBodyText>
-              {CopyIcon}
-            </span>
-          </CopyToClipboard>
-          {linesToJsx(transcript)}
-        </div>
-      );
-
-      showTranscript(title, body);
-    }
-
-    return (
-      <TableRow key={index} completed={circuit.isCompleted}>
-        <HeaderCell style={{ maxWidth: cellWidths[0] }}>{index}</HeaderCell>
-        <HeaderCell style={{ maxWidth: cellWidths[1] }}>
-          {circuit.complete}
-        </HeaderCell>
-        <HeaderCell style={{ maxWidth: cellWidths[2] }}>
-        {formatDuration(circuit.averageSecondsPerContribution)}
-        </HeaderCell>
-        <HeaderCell style={{ maxWidth: cellWidths[3], textAlign: 'center' }}>
-          <Button style={{
-            color: 'inherit',
-            font: 'Inconsolata 18px',
-            textTransform: 'none',
-            textDecoration: 'underline', }}
-           onClick={() => formatTranscript(circuit)}>
-            View
-          </Button>
-        </HeaderCell>
-        {isSignedIn ?
-          <HeaderCell style={{ maxWidth: cellWidths[4] }}>
-            {renderHash(circuit.hash)}
-          </HeaderCell> :
-          <></>
-        }
-      </TableRow>
+    const copyStyle = {
+      display: 'flex',
+      justifyContent: 'space-evenly',
+      width: '245px',
+      background: darkerBackground,
+      borderRadius: '30px',
+      marginBottom: '41px',
+    };
+    const body = (
+      <div>
+        <CopyToClipboard text={transcript} >
+          <span style={copyStyle}>
+            <NormalBodyText>Copy to clipboard</NormalBodyText>
+            {CopyIcon}
+          </span>
+        </CopyToClipboard>
+        {linesToJsx(transcript)}
+      </div>
     );
+
+    showTranscript(title, body);
   }
+
+  return (
+    <TableRow key={index} completed={circuit.isCompleted}>
+      <HeaderCell style={{ maxWidth: cellWidths[0] }}>{index}</HeaderCell>
+      <HeaderCell style={{ maxWidth: cellWidths[1] }}>
+        {circuit.complete}
+      </HeaderCell>
+      <HeaderCell style={{ maxWidth: cellWidths[2] }}>
+      {formatDuration(circuit.averageSecondsPerContribution)}
+      </HeaderCell>
+      <HeaderCell style={{ maxWidth: cellWidths[3], textAlign: 'center' }}>
+        <Button style={{
+          color: 'inherit',
+          font: 'Inconsolata 18px',
+          textTransform: 'none',
+          textDecoration: 'underline', }}
+          onClick={() => formatTranscript(circuit)}>
+          View
+        </Button>
+      </HeaderCell>
+      {isSignedIn ?
+        <HeaderCell style={{ maxWidth: cellWidths[4] }}>
+          {renderHash(circuit.hash)}
+        </HeaderCell> :
+        <></>
+      }
+    </TableRow>
+  );
+};
+
+export default CircuitsTable;

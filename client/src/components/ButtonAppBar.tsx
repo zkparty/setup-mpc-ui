@@ -27,6 +27,8 @@ import { ComputeStateContext, Step } from '../state/ComputeStateManager';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import { CeremonyProgress } from './ProgressPanel';
 import { useSelectionContext } from '../state/SelectionContext';
+import state from '../state/state';
+import { observer } from 'mobx-react-lite';
 
 const allowOptions = true; // if true, the 'Options' panel is available
 
@@ -165,10 +167,10 @@ const LoginDetails = () => {
   return (<span style={{ color: textColor }}>{userName}</span>);
 };
 
-export default function ButtonAppBar() {
+const ButtonAppBar = observer(() => {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
   const AuthDispatch = React.useContext(AuthDispatchContext);
-  const state = useContext(ComputeStateContext);
+  const { ceremony, ui } = useContext(state);
   const classes = useStyles();
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -191,10 +193,9 @@ export default function ButtonAppBar() {
   }
 
   const displayProgress = ((
-    state.step === Step.WAITING || 
-    state.step === Step.QUEUED ||
-    state.step === Step.RUNNING)
-    && !state.isProgressPanelVisible
+    ceremony.inQueue || 
+    ceremony.contributing)
+    && !ui.isProgressPanelVisible
   );
 
   const menuIcon = (
@@ -219,12 +220,12 @@ export default function ButtonAppBar() {
               {menuIcon}
             </IconButton>
             <MainMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} logout={handleLogout} />
-            <ZKTitle title={state.project?.shortName} />
+            <ZKTitle title={ceremony.project?.shortName} />
             {displayProgress ? 
               <div style={{ display: 'flex' }}>
                 {/*<NormalBodyText>Your contribution: </NormalBodyText>*/}
                 <CeremonyProgress format='bar' 
-                  barColor={(state.step === Step.QUEUED) ? subtleText : accentColor}
+                  barColor={(ceremony.inQueue) ? subtleText : accentColor}
                 />
               </div> 
             : (<></>)}
@@ -234,4 +235,6 @@ export default function ButtonAppBar() {
       </ElevationScroll>
     </div>
   );
-}
+});
+
+export default ButtonAppBar;

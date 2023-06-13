@@ -18,6 +18,9 @@ import styled from 'styled-components';
 import VisibilitySensor from 'react-visibility-sensor';
 import AttestationPanel from './AttestationPanel';
 import { ContributionState } from '../types/ceremony';
+import state from '../state/state';
+import { observer } from 'mobx-react-lite';
+import Queue from '../state/Ceremony';
 
 const StyledHeader = styled.div`
   font-family: Inconsolata;
@@ -170,9 +173,9 @@ const Animation = () => {
   );
 }
 
-const status = (state: any, dispatch: React.Dispatch<any>) => {
-  const { circuits, contributionCount, contributionState, step, computeStatus, progress } = state;
-  const ceremony = contributionState ? contributionState.ceremony : undefined;
+const status = (ceremony: Queue, dispatch: React.Dispatch<any>) => {
+  const { circuits, contributionCount, contributionState, step, computeStatus, progress } = ceremony;
+  //const ceremony = contributionState ? contributionState.ceremony : undefined;
   const cctNum = ceremony ? ceremony.sequence || 0 : 0;
   const cctCount = circuits.length;
   let header = '';
@@ -254,13 +257,13 @@ const status = (state: any, dispatch: React.Dispatch<any>) => {
   return { header, body1, body2 };
 }
 
-export default function ProgressPanel() {
-  const state = useContext(ComputeStateContext);
+const ProgressPanel = observer(() => {
+  const { ceremony } = useContext(state);
   const dispatch = useContext(ComputeDispatchContext);
 
   if (!dispatch) return (<></>);
 
-  const content = status(state, dispatch);
+  const content = status(ceremony, dispatch);
 
   return (
     <div>
@@ -286,5 +289,7 @@ export default function ProgressPanel() {
         </Grid>
     </div>
   );
-}
+});
+
+export default ProgressPanel;
 

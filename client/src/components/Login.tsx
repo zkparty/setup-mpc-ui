@@ -1,10 +1,8 @@
 import React, { useState, useContext } from "react";
 import { AuthDispatchContext, AuthStateContext } from "../state/AuthContext";
 import GitHubIcon from "@material-ui/icons/GitHub";
-import firebase from "firebase";
 import { accentColor, lighterBackground } from "../styles";
 import { Button, Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
-import { getUserStatus } from "../api/FirestoreApi";
 import { AuthButton, AuthButtonText } from './../styles';
 import axios from 'axios';
 

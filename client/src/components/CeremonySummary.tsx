@@ -16,6 +16,9 @@ import {  useSelectionContext } from "../state/SelectionContext";
 import LinearProgress, { LinearProgressProps } from '@material-ui/core/LinearProgress';
 import { Typography, Box, makeStyles } from "@material-ui/core";
 import { ceremonyStatus } from '../utils/utils';
+import state from '../state/state';
+import { observer } from 'mobx-react-lite';
+import { useContext } from "react";
 
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
   return (
@@ -60,7 +63,8 @@ const Flex = styled.div`
   display: flex;
 `;
 
-const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
+const CeremonySummary = observer((props: { ceremony: Ceremony } & RouteProps) => {
+    const { ceremony } = useContext(state);
     const c = props.ceremony;
     const [ selection, dispatch ] = useSelectionContext();
     const classes = useStyles();
@@ -100,6 +104,6 @@ const CeremonySummary = (props: { ceremony: Ceremony } & RouteProps) => {
         </Flex>
       </CeremonyContainer>
     );
-  };
+  });
   
   export default CeremonySummary;

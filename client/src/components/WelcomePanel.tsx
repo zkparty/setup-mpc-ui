@@ -6,6 +6,8 @@ import {
   SubtleBody,
 } from "../styles";
 import { ComputeDispatchContext } from '../state/ComputeStateManager';
+import state from '../state/state';
+import { observer } from 'mobx-react-lite';
 
 const Acknowledge = ({ contribute }: { contribute: () => void}) =>
   (<div style={{ display: 'grid', marginTop: '78px' }}>
@@ -14,10 +16,10 @@ const Acknowledge = ({ contribute }: { contribute: () => void}) =>
     </AuthButton>
    </div>);
 
-export default function WelcomePanel(props: any) {
-  const dispatch = useContext(ComputeDispatchContext);
+const WelcomePanel = (props: any) => {
+  const { ceremony } = useContext(state);
   const handleClick = () => {
-    if (dispatch) dispatch({type: 'ACKNOWLEDGE' });
+    ceremony.auth();
   }
 
   const isRunning = true;
@@ -51,4 +53,6 @@ export default function WelcomePanel(props: any) {
       )
     }
   </div>);
-}
+};
+
+export default WelcomePanel;

@@ -4,10 +4,12 @@ import {
     NormalBodyText,
     PanelTitle,
   } from "../styles";
-import { ComputeDispatchContext, ComputeStateContext } from '../state/ComputeStateManager';
+import { ComputeDispatchContext } from '../state/ComputeStateManager';
 import { startCircuitEventListener, startCircuitListener } from '../state/Circuits';
 import { AuthStateContext } from '../state/AuthContext';
 import CircuitsTable from './CircuitsTable';
+import state from '../state/state';
+import { observer } from 'mobx-react-lite';
 
 const tableText = (isLoggedIn: boolean, circuitLength: number) => {
   return (
@@ -25,15 +27,15 @@ const tableText = (isLoggedIn: boolean, circuitLength: number) => {
   );
 }
 
-export default function CircuitsPanel() {
-  const state = useContext(ComputeStateContext);
+const CircuitsPanel = observer(() => {
+  const { ceremony} = useContext(state);
   const dispatch = useContext(ComputeDispatchContext);
   const authState = useContext(AuthStateContext);
   const [loaded, setLoaded] = useState(false);
   const [viewWidth, setViewWidth] = useState(window.innerWidth);
   //console.debug(`render circuits table`);
 
-  const { circuits, project, projectId } = state;
+  const { circuits, project, projectId } = ceremony;
   const { isLoggedIn, } = authState;
 
   useEffect(() => {
@@ -76,4 +78,6 @@ export default function CircuitsPanel() {
       <CircuitsTable isLoggedIn={isLoggedIn} circuits={circuits} />
     </div>
   )
-};
+});
+
+export default CircuitsPanel;

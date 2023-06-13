@@ -2,11 +2,11 @@ import { createContext } from 'react'
 import { configure } from 'mobx'
 import Interface from './interface'
 import Ceremony from './Ceremony'
-import { Queue } from '../types/ceremony'
+import Queue from './Ceremony'
 
 interface State {
-  ui: Interface | null;
-  ceremony: Queue | null;
+  ui: Interface;
+  ceremony: Queue;
 }
 
 configure({
@@ -14,13 +14,12 @@ configure({
 })
 
 export const buildState = (): State => {
-  const state: State = { ui: null, ceremony: null};
+  const state: State = { ui: new Interface(), ceremony: new Queue()};
 
-  const ui = new Interface()
+  //const ui = new Interface()
   const ceremony: Queue = new Ceremony(state) as any
 
   Object.assign(state, {
-    ui,
     ceremony,
   })
   return state

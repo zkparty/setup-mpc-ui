@@ -19,6 +19,7 @@ export default class Queue {
   contributionHashes = null
   loadingInitial = true
   inQueue = false
+  isFinished = false
 
   contributionUpdates = []
 

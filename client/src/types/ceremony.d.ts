@@ -186,14 +186,15 @@ export interface Queue {
   contributionHashes: string[];
   loadingInitial: boolean;
   inQueue: boolean;
+  isFInished: boolean;
 
   contributionUpdates: any[];
 
   join: any;
 
-  stopKeepAlive: () => {};
-
+  stopKeepAlive();
   auth();
+  authenticated();
 }
 
 export declare function f(): void;
